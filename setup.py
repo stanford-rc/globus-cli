@@ -1,15 +1,19 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name="globuscli",
     version="0.1.0",
-    packages=["globuscli"],
+    packages=find_packages(),
     install_requires=['globus-sdk-python'],
     # for now, install directly from GitHub
     # TODO: once this is on pypi, install from there
     dependency_links=[
-        'https://github.com/globusonline/globus-sdk-python/archive/support-globus-cli.zip#egg=globus-sdk-python-0.1'
+        'https://github.com/globusonline/globus-sdk-python/archive/master.zip#egg=globus-sdk-python-0.1'
     ],
+
+    entry_points={
+        'console_scripts': ['globuscli = globuscli.parse_cmd:run_command']
+    },
 
     # descriptive info, non-critical
     description="Globus CLI",
