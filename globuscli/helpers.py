@@ -28,11 +28,29 @@ def input_is_interactive():
     return sys.stdin.isatty()
 
 
+def err_is_interactive():
+    """
+    Is the stderr going to a shell, or being redirected somewhere else?
+    """
+    return sys.stderr.isatty()
+
+
 def require_interactive_input(message='Non-interactive input is not allowed.'):
     """
     Require that the shell input is interactive.
     Fail and exit if the condition is not met.
     """
     if not input_is_interactive():
+        print(message, file=sys.stderr)
+        sys.exit(1)
+
+
+def require_interactive_err(message='Non-interactive stderr is not allowed.'):
+    """
+    Require that the shell error output is interactive.
+    Fail and exit if the condition is not met.
+    """
+    if not err_is_interactive():
+        # still print to stderr -- it's what we meant
         print(message, file=sys.stderr)
         sys.exit(1)

@@ -8,7 +8,8 @@ setup(
     # for now, install directly from GitHub
     # TODO: once this is on pypi, install from there
     dependency_links=[
-        'https://github.com/globusonline/globus-sdk-python/archive/master.zip#egg=globus-sdk-python-0.1'
+        ('https://github.com/globusonline/globus-sdk-python/'
+         'archive/master.zip#egg=globus-sdk-python-0.1')
     ],
 
     entry_points={
