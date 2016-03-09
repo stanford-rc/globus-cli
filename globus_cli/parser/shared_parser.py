@@ -2,7 +2,7 @@ import argparse
 import textwrap
 import json
 
-import globuscli
+import globus_cli
 
 
 class GlobusCLISharedParser(argparse.ArgumentParser):
@@ -12,16 +12,16 @@ class GlobusCLISharedParser(argparse.ArgumentParser):
     """
     def __init__(self, *args, **kwargs):
         # TODO: Update this description to be more informative, accurate
-        description = textwrap.dedent("""Run a globuscli command.
-        globuscli is structured to provide a uniform command line interface to
-        all Globus services. For more information and tutorials, see
-        docs.globus.org
+        description = textwrap.dedent("""Run a globus command.
+        The globus command is structured to provide a uniform command line
+        interface to all Globus services. For more information and tutorials,
+        see docs.globus.org
         """)
 
         # this is marginally nicer than trying to stuff explicit kwargs
         # inbetween *args and **kwargs in the initializer invocation below
         newkwargs = {
-            'prog': 'globuscli',
+            'prog': 'globus',
             'description': description
         }
         newkwargs.update(kwargs)
@@ -36,10 +36,10 @@ class GlobusCLISharedParser(argparse.ArgumentParser):
             default='json', choices=['json', 'text'], type=str.lower,
             help='Output format for stdout.')
 
-        # version of globuscli -- ignores all other passed arguments and prints
+        # version of globus cli -- ignores all other passed arguments and prints
         # the version
         self.add_argument('--version', action='version',
-                          version='%(prog)s ' + globuscli.__version__)
+                          version='%(prog)s ' + globus_cli.__version__)
 
         # additional params -- only useable on a select subset of commands;
         # many will ignore it

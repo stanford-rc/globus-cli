@@ -3,8 +3,8 @@ from __future__ import print_function
 import getpass
 import json
 
-from globuscli.parser import GlobusCLISharedParser
-from globuscli.helpers import stderr_prompt
+from globus_cli.parser import GlobusCLISharedParser
+from globus_cli.helpers import stderr_prompt
 
 from globus_sdk import NexusClient
 
@@ -17,7 +17,7 @@ def add_subcommand_parsers(subparsers):
         'nexus', help=(
             'Interact with legacy Nexus API. WARNING: Deprecated.'
             'Only use this if you need access to legacy tokens '
-            'during the development of globuscli. These methods '
+            'during the development of the globus cli. These methods '
             'will be replaced in the near future with commands '
             'which use other services.'))
 
@@ -29,7 +29,7 @@ def add_subcommand_parsers(subparsers):
 
 def add_get_goauth_token_parser(subsubparsers):
     """
-    Subcommand parser for `globuscli nexus get-goauth-token`
+    Subcommand parser for `globus nexus get-goauth-token`
     """
     get_goauth_token_parser = subsubparsers.add_parser(
         'get-goauth-token', help=(
@@ -47,7 +47,7 @@ def add_get_goauth_token_parser(subsubparsers):
 
 def get_goauth_token(args):
     """
-    Executor for `globuscli nexus get-goauth-token`
+    Executor for `globus nexus get-goauth-token`
     Reads username and password from stdin if they aren't in the args.
     """
     # get username and/or password if not present

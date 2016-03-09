@@ -1,6 +1,6 @@
-from globuscli.parser.shared_parser import GlobusCLISharedParser
-from globuscli.services import add_subcommand_parsers
-from globuscli.helpers import additional_params_checker
+from globus_cli.parser.shared_parser import GlobusCLISharedParser
+from globus_cli.services import add_subcommand_parsers
+from globus_cli.helpers import additional_params_checker
 
 
 def _gen_parser():

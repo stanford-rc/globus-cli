@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="globuscli",
+    name="globus-cli",
     version="0.1.0",
     packages=find_packages(),
     install_requires=['globus-sdk-python'],
@@ -13,7 +13,7 @@ setup(
     ],
 
     entry_points={
-        'console_scripts': ['globuscli = globuscli:run_command']
+        'console_scripts': ['globus = globus_cli:run_command']
     },
 
     # descriptive info, non-critical
