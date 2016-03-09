@@ -1,5 +1,6 @@
 from globuscli.parser.shared_parser import GlobusCLISharedParser
 from globuscli.services import add_subcommand_parsers
+from globuscli.helpers import additional_params_checker
 
 
 def _gen_parser():
@@ -22,10 +23,20 @@ def _gen_parser():
 def _load_args():
     """
     Load commandline arguments, and do any necessary post-processing.
-    Right now, there is none.
+
+    Mainly, check if `--supports-additional-params` was passed, and alters the
+    func to call if it was.
     """
     parser = _gen_parser()
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    # are we introspecting the command to see if it supports additional params?
+    # note that this function will kill the run in place -- we'll exit here as
+    # a result with status 0 or 1, indicating the result of the check
+    if args.check_added_params:
+        additional_params_checker(args.func)
+
+    return args
 
 
 def run_command():
