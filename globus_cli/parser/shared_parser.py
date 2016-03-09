@@ -36,8 +36,8 @@ class GlobusCLISharedParser(argparse.ArgumentParser):
             default='json', choices=['json', 'text'], type=str.lower,
             help='Output format for stdout.')
 
-        # version of globus cli -- ignores all other passed arguments and prints
-        # the version
+        # version of globus cli -- ignores all other passed arguments and
+        # prints the version
         self.add_argument('--version', action='version',
                           version='%(prog)s ' + globus_cli.__version__)
 
@@ -45,7 +45,7 @@ class GlobusCLISharedParser(argparse.ArgumentParser):
         # many will ignore it
         # this is used to pass parameters to API calls when they support a
         # wider range of options than the base CLI commands
-        self.add_argument('--additional-params', dest='added_params',
+        self.add_argument('--additional-params', dest='additional_params',
                           default={}, type=json.loads,
                           help=('Additional parameters for API calls. '
                                 'Encoded as query params for commands '

@@ -15,7 +15,7 @@ def add_subcommand_parsers(subparsers):
     """
     nexus_parser = subparsers.add_parser(
         'nexus', help=(
-            'Interact with legacy Nexus API. WARNING: Deprecated.'
+            'Interact with legacy Nexus API. WARNING: Deprecated. '
             'Only use this if you need access to legacy tokens '
             'during the development of the globus cli. These methods '
             'will be replaced in the near future with commands '
