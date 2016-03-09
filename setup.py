@@ -13,7 +13,7 @@ setup(
     ],
 
     entry_points={
-        'console_scripts': ['globuscli = globuscli.parse_cmd:run_command']
+        'console_scripts': ['globuscli = globuscli:run_command']
     },
 
     # descriptive info, non-critical
