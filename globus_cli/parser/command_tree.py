@@ -114,13 +114,30 @@ _COMMAND_TREE = {
             },
             'endpoint-autoactivate': {
                 'help': 'Activate an Endpoint via autoactivation',
-                'func': _not_implemented_func,
-                'arguments': []
+                'func': transfer.endpoint_autoactivate,
+                'arguments': [
+                    (['--endpoint-id'],
+                     {'dest': 'endpoint_id', 'required': True,
+                      'help': ('ID of the endpoint, typically fetched from '
+                               'endpoint-search')}
+                     )
+                ]
             },
             'ls': {
                 'help': 'List the contents of a directory on an endpoint',
-                'func': _not_implemented_func,
-                'arguments': []
+                'func': transfer.op_ls,
+                'arguments': [
+                    (['--endpoint-id'],
+                     {'dest': 'endpoint_id', 'required': True,
+                      'help': ('ID of the endpoint, typically fetched from '
+                               'endpoint-search')}
+                     ),
+                    (['--path'],
+                     {'dest': 'path', 'default': '/',
+                      'help': ('Path on the remote endpoint to list. '
+                               'Defaults to "/"')}
+                     )
+                ]
             }
         }
     }
