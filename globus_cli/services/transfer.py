@@ -49,27 +49,6 @@ def add_create_endpoint_parser(subsubparsers):
     """
 
 
-def add_endpoint_search_parser(subsubparsers):
-    """
-    Subcommand parser for `globus transfer endpoint-search`
-    """
-    endpoint_search_parser = subsubparsers.add_parser(
-        'endpoint-search', help=(
-            'Search for Globus Endpoints')
-        )
-    endpoint_search_parser.set_defaults(func=endpoint_search)
-
-    endpoint_search_parser.add_argument(
-        '--filter-scope', dest='scope', default=None,
-        choices=('all', 'my-endpoints', 'my-gcp-endpoints', 'recently-used',
-                 'in-use', 'shared-by-me', 'shared-with-me'),
-        help=('The set of endpoints to search over. '
-              'Omission is equivalent to "all"'))
-    endpoint_search_parser.add_argument(
-        '--filter-fulltext', dest='fulltext', default=None,
-        help='Text filter to apply to ')
-
-
 def add_endpoint_autoactivate_parser(subsubparsers):
     """
     Subcommand parser for `globus transfer endpoint-autoactivate`

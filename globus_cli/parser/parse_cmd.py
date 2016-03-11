@@ -1,5 +1,5 @@
 from globus_cli.parser.shared_parser import GlobusCLISharedParser
-from globus_cli.services import add_subcommand_parsers
+from globus_cli.parser.command_tree import build_command_tree
 
 
 def _gen_parser():
@@ -13,7 +13,7 @@ def _gen_parser():
         title='Commands',
         parser_class=GlobusCLISharedParser, metavar='')
 
-    add_subcommand_parsers(subparsers)
+    build_command_tree(subparsers)
 
     # return the created parser in all of its glory
     return top_level_parser
