@@ -3,7 +3,7 @@ from __future__ import print_function
 import getpass
 import json
 
-from globus_cli.helpers import stderr_prompt
+from globus_cli.helpers import stderr_prompt, outformat_is_json
 
 from globus_sdk import NexusClient
 
@@ -24,7 +24,7 @@ def get_goauth_token(args):
     tok = client.get_goauth_token(args.username, args.password)
 
     # print it out in JSON or TEXT format, then exit
-    if args.outformat == 'json':
-        print(json.dumps({'token': tok}))
+    if outformat_is_json(args):
+        print(json.dumps({'access_token': tok}))
     else:
         print(tok)

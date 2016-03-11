@@ -3,6 +3,17 @@ from globus_cli.parser import GlobusCLISharedParser
 from globus_cli.services import nexus, auth, transfer
 
 
+def _not_implemented_func(args):
+    """
+    This is a dummy function used to stub parts of the command tree that
+    haven't been implemented yet.
+    It has the same signature as a typical command function (i.e. takes args
+    and nothing else), but raises a NotImplementedError
+    """
+    raise NotImplementedError(('Hold yer horses! '
+                               'This command has not been implemented yet!'))
+
+
 _COMMAND_TREE = {
     'nexus': {
         'help': ('Interact with legacy Nexus API. WARNING: Deprecated. '
@@ -69,7 +80,17 @@ _COMMAND_TREE = {
         'commands': {
             'get-endpoint': {
                 'help': 'Get a Globus Endpoint document',
-                'func': lambda x: None,
+                'func': _not_implemented_func,
+                'arguments': []
+            },
+            'update-endpoint': {
+                'help': 'Update an Endpoint definition',
+                'func': _not_implemented_func,
+                'arguments': []
+            },
+            'create-endpoint': {
+                'help': 'Create a new Endpoint',
+                'func': _not_implemented_func,
                 'arguments': []
             },
             'endpoint-search': {
@@ -90,6 +111,16 @@ _COMMAND_TREE = {
                                'endpoints.')}
                      )
                 ]
+            },
+            'endpoint-autoactivate': {
+                'help': 'Activate an Endpoint via autoactivation',
+                'func': _not_implemented_func,
+                'arguments': []
+            },
+            'ls': {
+                'help': 'List the contents of a directory on an endpoint',
+                'func': _not_implemented_func,
+                'arguments': []
             }
         }
     }

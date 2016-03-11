@@ -1,8 +1,23 @@
 import argparse
 import textwrap
-import json
 
 import globus_cli
+
+
+# Format Enum for output formatting
+# could use a namedtuple, but that's overkill
+JSON_FORMAT = 'json'
+TEXT_FORMAT = 'text'
+
+
+def _str_to_outformat(s):
+    s = s.lower()
+    if s == 'json':
+        return JSON_FORMAT
+    elif s == 'text':
+        return TEXT_FORMAT
+    else:
+        ValueError('Invalid Output Format Specified')
 
 
 class GlobusCLISharedParser(argparse.ArgumentParser):
@@ -33,7 +48,8 @@ class GlobusCLISharedParser(argparse.ArgumentParser):
         # are free to implement the TEXT format however they see fit
         self.add_argument(
             '-F', '--format', dest='outformat',
-            default='json', choices=['json', 'text'], type=str.lower,
+            default='json', choices=[JSON_FORMAT, TEXT_FORMAT],
+            type=_str_to_outformat,
             help='Output format for stdout.')
 
         # version of globus cli -- ignores all other passed arguments and
