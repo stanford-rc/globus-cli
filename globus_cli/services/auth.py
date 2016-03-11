@@ -1,5 +1,4 @@
 from globus_cli.parser import GlobusCLISharedParser
-from globus_cli.helpers import supports_additional_params
 
 from globus_sdk import AuthClient
 
@@ -57,15 +56,13 @@ def add_token_introspect_parser(subsubparsers):
         'token', help='Token to lookup in Globus Auth')
 
 
-@supports_additional_params
 def get_identities(args):
     """
     Executor for `globus auth get-identities`
     """
     client = AuthClient()
 
-    # copy the additional params we are given
-    params = dict(args.additional_params)
+    params = {}
 
     # set commandline params if passed
     if args.usernames:
@@ -78,7 +75,6 @@ def get_identities(args):
     print(res.text_body)
 
 
-@supports_additional_params
 def token_introspect(args):
     """
     Executor for `globus auth token-introspect`
@@ -87,8 +83,7 @@ def token_introspect(args):
     """
     client = AuthClient()
 
-    # copy the additional params we are given
-    params = dict(args.additional_params)
+    params = {}
 
     token = config.get_auth_token(client.environment)
 

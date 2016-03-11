@@ -1,5 +1,4 @@
 from globus_cli.parser import GlobusCLISharedParser
-from globus_cli.helpers import supports_additional_params
 
 from globus_sdk import TransferClient
 
@@ -83,12 +82,10 @@ def add_ls_parser(subsubparsers):
     """
 
 
-@supports_additional_params
 def endpoint_search(args):
     client = TransferClient()
 
-    # copy the additional params we are given
-    params = dict(args.additional_params)
+    params = {}
 
     if args.scope:
         params['filter_scope'] = args.scope

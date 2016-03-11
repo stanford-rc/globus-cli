@@ -40,19 +40,3 @@ class GlobusCLISharedParser(argparse.ArgumentParser):
         # prints the version
         self.add_argument('--version', action='version',
                           version='%(prog)s ' + globus_cli.__version__)
-
-        # additional params -- only useable on a select subset of commands;
-        # many will ignore it
-        # this is used to pass parameters to API calls when they support a
-        # wider range of options than the base CLI commands
-        self.add_argument('--additional-params', dest='additional_params',
-                          default={}, type=json.loads,
-                          help=('Additional parameters for API calls. '
-                                'Encoded as query params for commands '
-                                'which map directly onto API calls. '
-                                'Usage and meaning will depend on command.'))
-        self.add_argument('--supports-additional-params',
-                          dest='check_added_params',
-                          default=False, action='store_true',
-                          help=('Check if a command supports the '
-                                '`--additional-params` argument.'))
