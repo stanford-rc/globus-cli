@@ -1,3 +1,7 @@
+from __future__ import print_function
+
+import sys
+
 from globus_cli.parser.shared_parser import GlobusCLISharedParser
 from globus_cli.parser.command_tree import build_command_tree
 
@@ -36,4 +40,8 @@ def run_command():
     args to a function that this module doesn't even know about
     """
     args = _load_args()
-    args.func(args)
+    try:
+        args.func(args)
+    except NotImplementedError as e:
+        print('NotImplementedError: {}'.format(e.message), file=sys.stderr)
+        sys.exit(1)
