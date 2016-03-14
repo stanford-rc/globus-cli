@@ -4,12 +4,12 @@ setup(
     name="globus-cli",
     version="0.1.0",
     packages=find_packages(),
-    install_requires=['globus-sdk-python'],
+    install_requires=['globus-sdk'],
     # for now, install directly from GitHub
     # TODO: once this is on pypi, install from there
     dependency_links=[
         ('https://github.com/globusonline/globus-sdk-python/'
-         'archive/master.zip#egg=globus-sdk-python-0.1')
+         'archive/master.zip#egg=globus-sdk-0.1')
     ],
 
     entry_points={
