@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import sys
+import errno
 
 from globus_cli.parser.shared_parser import GlobusCLISharedParser
 from globus_cli.parser.command_tree import build_command_tree
@@ -33,28 +34,6 @@ def _load_args():
     return args
 
 
-def _cleanup_stdio():
-    """
-    Close out stderr and stdout cleanly
-
-    Make sure to correctly handle the case of pipes breaking because we're
-    doing something like piping to `head -n 1`
-    """
-    # handle stdout
-    try:
-        sys.stdout.flush()
-    finally:
-        try:
-            sys.stdout.close()
-        # when stdout is done, stderr is next, but inside of a finally-finally
-        # so that it's sure to run
-        finally:
-            try:
-                sys.stderr.flush()
-            finally:
-                sys.stderr.close()
-
-
 def run_command():
     """
     Whatever arguments were loaded, they set a function to be invoked on the
@@ -67,6 +46,11 @@ def run_command():
     except NotImplementedError as e:
         print('NotImplementedError: {}'.format(e.message), file=sys.stderr)
         sys.exit(1)
-    # clean stdout/stderr
-    finally:
-        _cleanup_stdio()
+    except IOError as e:
+        # handle a broken pipe by doing nothing
+        # this is normal, and often shows up in piped commands when the
+        # consumer closes before the producer
+        if e.errno is errno.EPIPE:
+            pass
+        else:
+            raise

@@ -123,6 +123,11 @@ _COMMAND_TREE = {
                      )
                 ]
             },
+            'task-list': {
+                'help': 'List Tasks for the current user',
+                'func': transfer.task_list,
+                'arguments': []
+            },
             'ls': {
                 'help': 'List the contents of a directory on an endpoint',
                 'func': transfer.op_ls,
