@@ -123,6 +123,17 @@ _COMMAND_TREE = {
                      )
                 ]
             },
+            'endpoint-server-list': {
+                'help': 'List all servers belonging to an Endpoint',
+                'func': transfer.endpoint_server_list,
+                'arguments': [
+                    (['--endpoint-id'],
+                     {'dest': 'endpoint_id', 'required': True,
+                      'help': ('ID of the endpoint, typically fetched from '
+                               'endpoint-search')}
+                     )
+                ]
+            },
             'task-list': {
                 'help': 'List Tasks for the current user',
                 'func': transfer.task_list,

@@ -57,6 +57,24 @@ def endpoint_autoactivate(args):
     print(res.text_body)
 
 
+def endpoint_server_list(args):
+    """
+    Executor for `globus transfer endpoint-server-list`
+    """
+    client = TransferClient()
+
+    server_iterator = client.endpoint_server_list(args.endpoint_id)
+
+    if outformat_is_json(args):
+        _print_json_from_iterator(server_iterator)
+    else:
+        text_col_format = _text_header_and_format(
+            [(36, 'URI')])
+
+        for result in server_iterator:
+            print(text_col_format.format(result['uri']))
+
+
 def task_list(args):
     """
     Executor for `globus transfer task-list`
