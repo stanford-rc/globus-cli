@@ -44,7 +44,7 @@ def endpoint_search(args):
     """
     client = TransferClient()
     search_iterator = client.endpoint_search(
-        args.fulltext, filter_scope=args.scope)
+        filter_fulltext=args.fulltext, filter_scope=args.scope)
 
     if outformat_is_json(args):
         _print_json_from_iterator(search_iterator)
@@ -79,13 +79,13 @@ def endpoint_server_list(args):
             print(text_col_format.format(result['uri']))
 
 
-def endpoint_my_shared_endpoint_list(args):
+def my_shared_endpoint_list(args):
     """
     Executor for `globus transfer endpoint-my-shared-endpoint-list`
     """
     client = TransferClient()
 
-    ep_iterator = client.endpoint_my_shared_endpoint_list(args.endpoint_id)
+    ep_iterator = client.my_shared_endpoint_list(args.endpoint_id)
 
     if outformat_is_json(args):
         _print_json_from_iterator(ep_iterator)
@@ -112,6 +112,27 @@ def endpoint_role_list(args):
                 result['principal_type'], result['principal'], result['role']))
 
 
+def endpoint_acl_list(args):
+    """
+    Executor for `globus transfer endpoint-acl-list`
+    """
+    client = TransferClient()
+
+    rule_iterator = client.endpoint_acl_list(args.endpoint_id)
+
+    if outformat_is_json(args):
+        _print_json_from_iterator(rule_iterator)
+    else:
+        text_col_format = _text_header_and_format(
+            [(16, 'Principal Type'), (36, 'Principal'), (None, 'Permissions'),
+             (None, 'Path')])
+
+        for result in rule_iterator:
+            print(text_col_format.format(
+                result['principal_type'], result['principal'],
+                result['permissions'], result['path']))
+
+
 def bookmark_list(args):
     """
     Executor for `globus transfer bookmark-list`
@@ -124,7 +145,7 @@ def bookmark_list(args):
         _print_json_from_iterator(bookmark_iterator)
     else:
         text_col_format = _text_header_and_format(
-            [(32, 'Name'), (36, 'Endpoint ID'), (4, 'Path')])
+            [(32, 'Name'), (36, 'Endpoint ID'), (None, 'Path')])
 
         for result in bookmark_iterator:
             print(text_col_format.format(

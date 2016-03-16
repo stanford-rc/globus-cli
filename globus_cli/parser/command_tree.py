@@ -134,10 +134,10 @@ _COMMAND_TREE = {
                      )
                 ]
             },
-            'endpoint-my-shared-endpoint-list': {
+            'my-shared-endpoint-list': {
                 'help': ('List all Shared Endpoints on an Endpoint owned by '
                          'the current user'),
-                'func': transfer.endpoint_my_shared_endpoint_list,
+                'func': transfer.my_shared_endpoint_list,
                 'arguments': [
                     (['--endpoint-id'],
                      {'dest': 'endpoint_id', 'required': True,
@@ -149,6 +149,17 @@ _COMMAND_TREE = {
             'endpoint-role-list': {
                 'help': 'List of assigned Roles on an Endpoint',
                 'func': transfer.endpoint_role_list,
+                'arguments': [
+                    (['--endpoint-id'],
+                     {'dest': 'endpoint_id', 'required': True,
+                      'help': ('ID of the endpoint, typically fetched from '
+                               'endpoint-search')}
+                     )
+                ]
+            },
+            'endpoint-acl-list': {
+                'help': 'List of Access Control List rules on an Endpoint',
+                'func': transfer.endpoint_acl_list,
                 'arguments': [
                     (['--endpoint-id'],
                      {'dest': 'endpoint_id', 'required': True,
