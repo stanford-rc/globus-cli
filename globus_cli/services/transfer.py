@@ -28,6 +28,16 @@ def _text_header_and_format(lengths_and_headers):
     return format_str
 
 
+def _endpoint_list_to_text(iterator):
+    text_col_format = _text_header_and_format(
+        [(32, 'Owner'), (36, 'ID'), (None, 'Display Name')])
+
+    for result in iterator:
+        print(text_col_format.format(
+            result['owner_string'], result['id'],
+            _display_name_or_cname(result)))
+
+
 def endpoint_search(args):
     """
     Executor for `globus transfer endpoint-search`
@@ -39,13 +49,7 @@ def endpoint_search(args):
     if outformat_is_json(args):
         _print_json_from_iterator(search_iterator)
     else:
-        text_col_format = _text_header_and_format(
-            [(32, 'Owner'), (36, 'ID'), (None, 'Display Name')])
-
-        for result in search_iterator:
-            print(text_col_format.format(
-                result['owner_string'], result['id'],
-                _display_name_or_cname(result)))
+        _endpoint_list_to_text(search_iterator)
 
 
 def endpoint_autoactivate(args):
@@ -73,6 +77,58 @@ def endpoint_server_list(args):
 
         for result in server_iterator:
             print(text_col_format.format(result['uri']))
+
+
+def endpoint_my_shared_endpoint_list(args):
+    """
+    Executor for `globus transfer endpoint-my-shared-endpoint-list`
+    """
+    client = TransferClient()
+
+    ep_iterator = client.endpoint_my_shared_endpoint_list(args.endpoint_id)
+
+    if outformat_is_json(args):
+        _print_json_from_iterator(ep_iterator)
+    else:
+        _endpoint_list_to_text(ep_iterator)
+
+
+def endpoint_role_list(args):
+    """
+    Executor for `globus transfer endpoint-role-list`
+    """
+    client = TransferClient()
+
+    role_iterator = client.endpoint_role_list(args.endpoint_id)
+
+    if outformat_is_json(args):
+        _print_json_from_iterator(role_iterator)
+    else:
+        text_col_format = _text_header_and_format(
+            [(16, 'Principal Type'), (36, 'Principal'), (16, 'Role')])
+
+        for result in role_iterator:
+            print(text_col_format.format(
+                result['principal_type'], result['principal'], result['role']))
+
+
+def bookmark_list(args):
+    """
+    Executor for `globus transfer bookmark-list`
+    """
+    client = TransferClient()
+
+    bookmark_iterator = client.bookmark_list()
+
+    if outformat_is_json(args):
+        _print_json_from_iterator(bookmark_iterator)
+    else:
+        text_col_format = _text_header_and_format(
+            [(32, 'Name'), (36, 'Endpoint ID'), (4, 'Path')])
+
+        for result in bookmark_iterator:
+            print(text_col_format.format(
+                result['name'], result['endpoint_id'], result['path']))
 
 
 def task_list(args):

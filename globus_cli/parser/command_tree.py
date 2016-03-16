@@ -134,6 +134,34 @@ _COMMAND_TREE = {
                      )
                 ]
             },
+            'endpoint-my-shared-endpoint-list': {
+                'help': ('List all Shared Endpoints on an Endpoint owned by '
+                         'the current user'),
+                'func': transfer.endpoint_my_shared_endpoint_list,
+                'arguments': [
+                    (['--endpoint-id'],
+                     {'dest': 'endpoint_id', 'required': True,
+                      'help': ('ID of the endpoint, typically fetched from '
+                               'endpoint-search')}
+                     )
+                ]
+            },
+            'endpoint-role-list': {
+                'help': 'List of assigned Roles on an Endpoint',
+                'func': transfer.endpoint_role_list,
+                'arguments': [
+                    (['--endpoint-id'],
+                     {'dest': 'endpoint_id', 'required': True,
+                      'help': ('ID of the endpoint, typically fetched from '
+                               'endpoint-search')}
+                     )
+                ]
+            },
+            'bookmark-list': {
+                'help': 'List Bookmarks for the current user',
+                'func': transfer.bookmark_list,
+                'arguments': []
+            },
             'task-list': {
                 'help': 'List Tasks for the current user',
                 'func': transfer.task_list,
