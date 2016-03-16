@@ -128,6 +128,17 @@ _COMMAND_TREE = {
                 'func': transfer.task_list,
                 'arguments': []
             },
+            'task-event-list': {
+                'help': 'List Events for a given Task',
+                'func': transfer.task_event_list,
+                'arguments': [
+                    (['--task-id'],
+                     {'dest': 'task_id', 'required': True,
+                      'help': ('ID of the task for which you want to list '
+                               'events.')}
+                     )
+                ]
+            },
             'ls': {
                 'help': 'List the contents of a directory on an endpoint',
                 'func': transfer.op_ls,
