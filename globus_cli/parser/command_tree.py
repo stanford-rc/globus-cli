@@ -204,6 +204,22 @@ _COMMAND_TREE = {
                                'Defaults to "/"')}
                      )
                 ]
+            },
+            'mkdir': {
+                'help': 'Make a directory on an Endpoint',
+                'func': transfer.op_mkdir,
+                'arguments': [
+                    (['--endpoint-id'],
+                     {'dest': 'endpoint_id', 'required': True,
+                      'help': ('ID of the endpoint, typically fetched from '
+                               'endpoint-search')}
+                     ),
+                    (['--path'],
+                     {'dest': 'path', 'required': True,
+                      'help': 'Path on the remote endpoint to create'
+                      }
+                     )
+                ]
             }
         }
     }
