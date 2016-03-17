@@ -218,3 +218,17 @@ def op_mkdir(args):
         print(res.text_body)
     else:
         print(res.json_body['message'])
+
+
+def op_rename(args):
+    """
+    Executor for `globus transfer rename`
+    """
+    client = TransferClient()
+    res = client.operation_rename(args.endpoint_id, oldpath=args.oldpath,
+                                  newpath=args.newpath)
+
+    if outformat_is_json(args):
+        print(res.text_body)
+    else:
+        print(res.json_body['message'])

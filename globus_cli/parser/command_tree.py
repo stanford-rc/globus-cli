@@ -220,6 +220,27 @@ _COMMAND_TREE = {
                       }
                      )
                 ]
+            },
+            'rename': {
+                'help': 'Rename a file or directory on an Endpoint',
+                'func': transfer.op_rename,
+                'arguments': [
+                    (['--endpoint-id'],
+                     {'dest': 'endpoint_id', 'required': True,
+                      'help': ('ID of the endpoint, typically fetched from '
+                               'endpoint-search')}
+                     ),
+                    (['--old-path'],
+                     {'dest': 'oldpath', 'required': True,
+                      'help': 'Path to the file/dir to rename'
+                      }
+                     ),
+                    (['--new-path'],
+                     {'dest': 'newpath', 'required': True,
+                      'help': 'Desired location of the file/dir after rename'
+                      }
+                     )
+                ]
             }
         }
     }
