@@ -13,7 +13,8 @@ def task_list(args):
     """
     client = TransferClient()
 
-    task_iterator = client.task_list(num_results=10)
+    task_iterator = client.task_list(num_results=10,
+                                     filter='type:TRANSFER,DELETE')
 
     if outformat_is_json(args):
         print_json_from_iterator(task_iterator)

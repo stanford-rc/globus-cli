@@ -9,6 +9,8 @@ from globus_cli.services.transfer.task import (
     task_list, task_event_list)
 from globus_cli.services.transfer.file_operations import (
     op_ls, op_mkdir, op_rename)
+from globus_cli.services.transfer.task_submit import (
+    submit_transfer, submit_delete)
 
 
 __all__ = [
@@ -17,5 +19,6 @@ __all__ = [
     'endpoint_acl_list',
     'bookmark_list',
     'task_list', 'task_event_list',
-    'op_ls', 'op_mkdir', 'op_rename'
+    'op_ls', 'op_mkdir', 'op_rename',
+    'submit_transfer', 'submit_delete'
 ]
