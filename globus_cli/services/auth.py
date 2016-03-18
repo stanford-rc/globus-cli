@@ -1,5 +1,7 @@
 from globus_sdk import AuthClient
 
+import json
+
 
 def get_identities(args):
     """
@@ -17,7 +19,7 @@ def get_identities(args):
 
     res = client.get_identities(**params)
 
-    print(res.text_body)
+    print(json.dumps(res))
 
 
 def token_introspect(args):
