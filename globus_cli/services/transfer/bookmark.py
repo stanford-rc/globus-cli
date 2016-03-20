@@ -23,4 +23,5 @@ def bookmark_list(args):
 
         for result in bookmark_iterator:
             print(text_col_format.format(
-                result['name'], result['endpoint_id'], result['path']))
+                result.data['name'], result.data['endpoint_id'],
+                result.data['path']))

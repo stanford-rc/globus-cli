@@ -19,7 +19,7 @@ def get_identities(args):
 
     res = client.get_identities(**params)
 
-    print(json.dumps(res))
+    print(json.dumps(res.json_body))
 
 
 def token_introspect(args):

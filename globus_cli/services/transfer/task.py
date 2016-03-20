@@ -25,9 +25,10 @@ def task_list(args):
 
         for result in task_iterator:
             print(text_col_format.format(
-                result['task_id'], result['status'], result['type'],
-                result['source_endpoint_id'],
-                result['destination_endpoint_id']))
+                result.data['task_id'], result.data['status'],
+                result.data['type'],
+                result.data['source_endpoint_id'],
+                result.data['destination_endpoint_id']))
 
 
 def task_event_list(args):
@@ -46,5 +47,5 @@ def task_event_list(args):
 
         for result in event_iterator:
             print(text_col_format.format(
-                result['time'], result['code'],
-                result['is_error'], result['details']))
+                result.data['time'], result.data['code'],
+                result.data['is_error'], result.data['details']))

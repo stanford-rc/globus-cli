@@ -10,7 +10,7 @@ def display_name_or_cname(ep_doc):
 def print_json_from_iterator(iterator):
     json_output_dict = {'DATA': []}
     for item in iterator:
-        json_output_dict['DATA'].append(item)
+        json_output_dict['DATA'].append(item.data)
     print(json.dumps(json_output_dict))
 
 
@@ -30,5 +30,5 @@ def endpoint_list_to_text(iterator):
 
     for result in iterator:
         print(text_col_format.format(
-            result['owner_string'], result['id'],
-            display_name_or_cname(result)))
+            result.data['owner_string'], result.data['id'],
+            display_name_or_cname(result.data)))

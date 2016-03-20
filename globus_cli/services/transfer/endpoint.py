@@ -27,7 +27,7 @@ def endpoint_autoactivate(args):
     """
     client = TransferClient()
     res = client.endpoint_autoactivate(args.endpoint_id)
-    print(res.text_body)
+    print(res.data.text_body)
 
 
 def endpoint_server_list(args):
@@ -45,7 +45,7 @@ def endpoint_server_list(args):
             [(36, 'URI')])
 
         for result in server_iterator:
-            print(text_col_format.format(result['uri']))
+            print(text_col_format.format(result.data['uri']))
 
 
 def my_shared_endpoint_list(args):
@@ -78,4 +78,5 @@ def endpoint_role_list(args):
 
         for result in role_iterator:
             print(text_col_format.format(
-                result['principal_type'], result['principal'], result['role']))
+                result.data['principal_type'], result.data['principal'],
+                result.data['role']))

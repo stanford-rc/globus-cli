@@ -24,5 +24,5 @@ def endpoint_acl_list(args):
 
         for result in rule_iterator:
             print(text_col_format.format(
-                result['principal_type'], result['principal'],
-                result['permissions'], result['path']))
+                result.data['principal_type'], result.data['principal'],
+                result.data['permissions'], result.data['path']))
