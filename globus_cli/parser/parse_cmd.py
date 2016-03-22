@@ -18,11 +18,7 @@ def _gen_parser():
     subparsers = top_level_parser.add_subparsers(
         title='Commands',
         parser_class=GlobusCLISharedParser, metavar='')
-
-    build_command_tree(subparsers)
-
-    # return the created parser in all of its glory
-    return top_level_parser
+    return build_command_tree()
 
 
 def _load_args():
