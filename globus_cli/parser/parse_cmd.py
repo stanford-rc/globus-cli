@@ -4,7 +4,6 @@ import sys
 import os
 import errno
 
-from globus_cli.parser.shared_parser import GlobusCLISharedParser
 from globus_cli.parser.command_tree import build_command_tree
 
 
