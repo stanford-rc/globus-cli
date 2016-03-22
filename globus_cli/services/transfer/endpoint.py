@@ -1,4 +1,5 @@
 from __future__ import print_function
+import json
 
 from globus_sdk import TransferClient
 
@@ -27,7 +28,7 @@ def endpoint_autoactivate(args):
     """
     client = TransferClient()
     res = client.endpoint_autoactivate(args.endpoint_id)
-    print(res.data.text_body)
+    print(json.dumps(res.data, indent=2))
 
 
 def endpoint_server_list(args):

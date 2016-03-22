@@ -1,7 +1,7 @@
 from __future__ import print_function
+import json
 
 from globus_sdk import TransferClient
-
 from globus_cli.helpers import outformat_is_json
 
 
@@ -10,7 +10,7 @@ def submit_transfer(args):
     Executor for `globus transfer submit-transfer`
     """
     client = TransferClient()
-    submission_id = client.get_submission_id().json_body['value']
+    submission_id = client.get_submission_id().data['value']
 
     datadoc = {
         'DATA_TYPE': 'transfer',
@@ -29,9 +29,9 @@ def submit_transfer(args):
     res = client.submit_transfer(submission_id, datadoc)
 
     if outformat_is_json(args):
-        print(res.text_body)
+        print(json.dumps(res.data, indent=2))
     else:
-        print(res.json_body['message'])
+        print(res.data['message'])
 
 
 def submit_delete(args):
@@ -39,7 +39,7 @@ def submit_delete(args):
     Executor for `globus transfer submit-delete`
     """
     client = TransferClient()
-    submission_id = client.get_submission_id().json_body['value']
+    submission_id = client.get_submission_id().data['value']
 
     datadoc = {
         'DATA_TYPE': 'delete',
@@ -57,6 +57,6 @@ def submit_delete(args):
     res = client.submit_delete(submission_id, datadoc)
 
     if outformat_is_json(args):
-        print(res.text_body)
+        print(json.dumps(res.data, indent=2))
     else:
-        print(res.json_body['message'])
+        print(res.data['message'])
