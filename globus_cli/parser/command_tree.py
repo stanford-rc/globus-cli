@@ -76,6 +76,18 @@ _TRANSFER_COMMANDS = {
             },
             'event-list': {
                 _FUNC: transfer.task_event_list
+            },
+            'pause-info': {
+                _FUNC: transfer.task_pause_info
+            },
+            'cancel': {
+                _FUNC: transfer.cancel_task
+            },
+            'update': {
+                _FUNC: transfer.update_task
+            },
+            'show': {
+                _FUNC: transfer.show_task
             }
         }
     },
