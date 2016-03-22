@@ -2,11 +2,12 @@ from __future__ import print_function
 
 from globus_sdk import TransferClient
 
-from globus_cli.helpers import outformat_is_json
+from globus_cli.helpers import outformat_is_json, cliargs
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format)
 
 
+@cliargs('List Tasks for the current user', [])
 def task_list(args):
     """
     Executor for `globus transfer task-list`
@@ -31,6 +32,11 @@ def task_list(args):
                 result.data['destination_endpoint_id']))
 
 
+@cliargs('List Events for a given Task',
+         [(['--task-id'],
+           {'dest': 'task_id', 'required': True,
+            'help': 'ID of the task for which you want to list events.'})
+          ])
 def task_event_list(args):
     """
     Executor for `globus transfer task-event-list`

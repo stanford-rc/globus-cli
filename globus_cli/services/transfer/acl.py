@@ -2,11 +2,17 @@ from __future__ import print_function
 
 from globus_sdk import TransferClient
 
-from globus_cli.helpers import outformat_is_json
+from globus_cli.helpers import outformat_is_json, cliargs
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format)
 
 
+@cliargs('List of Access Control List rules on an Endpoint',
+         [(['--endpoint-id'],
+           {'dest': 'endpoint_id', 'required': True,
+            'help': ('ID of the endpoint, typically fetched '
+                     'from endpoint-search')})
+          ])
 def endpoint_acl_list(args):
     """
     Executor for `globus transfer endpoint-acl-list`

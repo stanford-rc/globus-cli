@@ -1,8 +1,17 @@
+import json
 from globus_sdk import AuthClient
 
-import json
+from globus_cli.helpers import cliargs
 
 
+@cliargs('Inspect Globus Auth Identities',
+         [(['--usernames'],
+           {'dest': 'usernames', 'default': [], 'nargs': '+',
+            'help': 'Usernames to lookup in Globus Auth'}),
+          (['--identities'],
+           {'dest': 'identities', 'default': [], 'nargs': '+',
+            'help': 'Identity IDs to lookup in Globus Auth'})
+          ])
 def get_identities(args):
     """
     Executor for `globus auth get-identities`
@@ -22,6 +31,8 @@ def get_identities(args):
     print(json.dumps(res.data, indent=2))
 
 
+@cliargs('Inspect Globus Auth Tokens',
+         [(['token'], {'help': 'Token to lookup in Globus Auth'})])
 def token_introspect(args):
     """
     Executor for `globus auth token-introspect`

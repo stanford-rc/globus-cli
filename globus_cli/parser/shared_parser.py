@@ -2,12 +2,7 @@ import argparse
 import textwrap
 
 import globus_cli
-
-
-# Format Enum for output formatting
-# could use a namedtuple, but that's overkill
-JSON_FORMAT = 'json'
-TEXT_FORMAT = 'text'
+from globus_cli.helpers import JSON_FORMAT, TEXT_FORMAT
 
 
 def _str_to_outformat(s):

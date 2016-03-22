@@ -2,11 +2,12 @@ from __future__ import print_function
 
 from globus_sdk import TransferClient
 
-from globus_cli.helpers import outformat_is_json
+from globus_cli.helpers import outformat_is_json, cliargs
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format)
 
 
+@cliargs('List Bookmarks for the current user', [])
 def bookmark_list(args):
     """
     Executor for `globus transfer bookmark-list`
