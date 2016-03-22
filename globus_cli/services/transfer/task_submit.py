@@ -5,6 +5,11 @@ from globus_sdk import TransferClient
 from globus_cli.helpers import outformat_is_json, cliargs
 
 
+def add_submission_id(client, datadoc):
+    submission_id = client.get_submission_id().data['value']
+    datadoc['submission_id'] = submission_id
+
+
 @cliargs(('Copy a file or directory from one endpoint '
           'to another as an asynchronous task'),
          [(['--source-endpoint'],
@@ -25,7 +30,6 @@ def submit_transfer(args):
     Executor for `globus transfer submit-transfer`
     """
     client = TransferClient()
-    submission_id = client.get_submission_id().data['value']
 
     datadoc = {
         'DATA_TYPE': 'transfer',
@@ -41,7 +45,8 @@ def submit_transfer(args):
             }
         ]
     }
-    res = client.submit_transfer(submission_id, datadoc)
+    add_submission_id(client, datadoc)
+    res = client.submit_transfer(datadoc)
 
     if outformat_is_json(args):
         print(json.dumps(res.data, indent=2))
@@ -70,7 +75,6 @@ def submit_delete(args):
     Executor for `globus transfer submit-delete`
     """
     client = TransferClient()
-    submission_id = client.get_submission_id().data['value']
 
     datadoc = {
         'DATA_TYPE': 'delete',
@@ -85,7 +89,8 @@ def submit_delete(args):
             }
         ]
     }
-    res = client.submit_delete(submission_id, datadoc)
+    add_submission_id(client, datadoc)
+    res = client.submit_delete(datadoc)
 
     if outformat_is_json(args):
         print(json.dumps(res.data, indent=2))

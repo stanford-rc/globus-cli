@@ -93,34 +93,20 @@ _TRANSFER_COMMANDS = {
             }
         }
     },
-    'file': {
-        _HELP: ('Start asynchronous Tasks, and perform synchronous '
-                'filesystem operations on Endpoints. '
-                'Many Globus capabilities are only available as '
-                'asynchronous actions in which you start a data '
-                'transfer or other activity, and then let Globus '
-                'take control of the minutae. '
-                'Start Tasks with these commands, then poll and '
-                'inspect them with `globus transfer task ...`. '
-                'All asynchronous commands have the prefix "async-" '
-                'and all other commands are synchronous activity.'),
-        _COMMANDS: {
-            'async-transfer': {
-                _FUNC: transfer.submit_transfer
-            },
-            'async-delete': {
-                _FUNC: transfer.submit_delete
-            },
-            'ls': {
-                _FUNC: transfer.op_ls
-            },
-            'mkdir': {
-                _FUNC: transfer.op_mkdir
-            },
-            'rename': {
-                _FUNC: transfer.op_rename
-            }
-        }
+    'async-transfer': {
+        _FUNC: transfer.submit_transfer
+    },
+    'async-delete': {
+        _FUNC: transfer.submit_delete
+    },
+    'ls': {
+        _FUNC: transfer.op_ls
+    },
+    'mkdir': {
+        _FUNC: transfer.op_mkdir
+    },
+    'rename': {
+        _FUNC: transfer.op_rename
     },
     'bookmark-list': {
         _FUNC: transfer.bookmark_list
