@@ -22,7 +22,7 @@ def task_list(args):
         print_json_from_iterator(task_iterator)
     else:
         text_col_format = text_header_and_format(
-            [(36, 'Task ID'), (16, 'Status'), (16, 'Type'),
+            [(36, 'Task ID'), (10, 'Status'), (10, 'Type'),
              (36, 'Source'), (36, 'Dest'), (None, 'Label')])
 
         for result in task_iterator:

@@ -185,8 +185,13 @@ def _add_subcommands(parser, command_dict):
             _add_subcommands(current_parser, current_command[_COMMANDS])
         else:
             current_parser.set_defaults(func=current_command[_FUNC])
+            required_args_group = current_parser.add_argument_group(
+                'required arguments')
             for args, kwargs in current_command[_FUNC].cli_arguments:
-                current_parser.add_argument(*args, **kwargs)
+                if 'required' in kwargs and kwargs['required']:
+                    required_args_group.add_argument(*args, **kwargs)
+                else:
+                    current_parser.add_argument(*args, **kwargs)
 
 
 def build_command_tree():
