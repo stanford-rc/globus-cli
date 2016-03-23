@@ -14,6 +14,9 @@ def _load_args():
     parser = build_command_tree()
     args = parser.parse_args()
 
+    if args.func.cli_argument_validator:
+        args.func.cli_argument_validator(args, parser)
+
     return args
 
 

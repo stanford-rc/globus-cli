@@ -25,7 +25,7 @@ def outformat_is_text(args):
     return args.outformat == TEXT_FORMAT
 
 
-def cliargs(helptext, arguments):
+def cliargs(helptext, arguments, arg_validator=None):
     """
     Decorator that takes a function and adds CLI arguments and helptext to it
     as function attributes. The function can then be placed directly into the
@@ -41,6 +41,7 @@ def cliargs(helptext, arguments):
         """
         wrapped.cli_help = helptext
         wrapped.cli_arguments = arguments
+        wrapped.cli_argument_validator = arg_validator
 
         return wrapped
 

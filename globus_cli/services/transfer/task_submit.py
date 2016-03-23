@@ -1,5 +1,6 @@
 from __future__ import print_function
 import json
+import argparse
 
 from globus_sdk import TransferClient
 from globus_cli.helpers import outformat_is_json, cliargs
@@ -8,6 +9,16 @@ from globus_cli.helpers import outformat_is_json, cliargs
 def add_submission_id(client, datadoc):
     submission_id = client.get_submission_id().data['value']
     datadoc['submission_id'] = submission_id
+
+
+def _validate_transfer_args(args, parser):
+    if (args.source is None or args.dest is None) and args.batch is None:
+        parser.error('async-transfer requires either --source-path and '
+                     '--dest-path OR --batch')
+    if ((args.source is not None and args.batch is not None) or
+            (args.dest is not None and args.batch is not None)):
+        parser.error('async-transfer cannot take --batch in addition to '
+                     '--source-path or --dest-path')
 
 
 @cliargs(('Copy a file or directory from one endpoint '
@@ -19,17 +30,35 @@ def add_submission_id(client, datadoc):
            {'dest': 'dest_endpoint', 'required': True,
             'help': 'ID of the endpoint to which to transfer'}),
           (['--source-path'],
-           {'dest': 'source', 'required': True,
+           {'dest': 'source',
             'help': 'Path to the file/dir to move on source-endpoint'}),
           (['--dest-path'],
-           {'dest': 'dest', 'required': True,
-            'help': 'Desired location of the file/dir on dest-endpoint'})
-          ])
+           {'dest': 'dest',
+            'help': 'Desired location of the file/dir on dest-endpoint'}),
+          (['--batch'],
+           {'dest': 'batch', 'type': json.loads,
+            'help': ('Paths to source and destination files, as a JSON '
+                     'document. Document format is '
+                     '{"DATA": [{"source": <path>, "dest": <path>}, ...]}')})
+          ],
+         arg_validator=_validate_transfer_args)
 def submit_transfer(args):
     """
-    Executor for `globus transfer submit-transfer`
+    Executor for `globus transfer async-transfer`
     """
-    client = TransferClient()
+    def _transfer_item(src, dst):
+        return {
+            'DATA_TYPE': 'transfer_item',
+            'source_path': src,
+            'destination_path': dst
+        }
+
+    if args.batch is not None:
+        transferdata = []
+        for item in args.batch['DATA']:
+            transferdata.append(_transfer_item(item['source'], item['dest']))
+    else:
+        transferdata = [_transfer_item(args.source, args.dest)]
 
     datadoc = {
         'DATA_TYPE': 'transfer',
@@ -37,14 +66,10 @@ def submit_transfer(args):
         'source_endpoint': args.source_endpoint,
         'destination_endpoint': args.dest_endpoint,
         'sync_level': 2,
-        'DATA': [
-            {
-                'DATA_TYPE': 'transfer_item',
-                'source_path': args.source,
-                'destination_path': args.dest
-            }
-        ]
+        'DATA': transferdata
     }
+
+    client = TransferClient()
     add_submission_id(client, datadoc)
     res = client.submit_transfer(datadoc)
 
