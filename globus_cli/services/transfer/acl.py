@@ -1,4 +1,5 @@
 from __future__ import print_function
+import json
 
 from globus_sdk import TransferClient
 
@@ -13,9 +14,9 @@ from globus_cli.services.transfer.helpers import (
             'help': ('ID of the endpoint, typically fetched '
                      'from endpoint-search')})
           ])
-def endpoint_acl_list(args):
+def acl_list(args):
     """
-    Executor for `globus transfer endpoint-acl-list`
+    Executor for `globus transfer access acl-list`
     """
     client = TransferClient()
 
@@ -25,10 +26,134 @@ def endpoint_acl_list(args):
         print_json_from_iterator(rule_iterator)
     else:
         text_col_format = text_header_and_format(
-            [(16, 'Principal Type'), (36, 'Principal'), (None, 'Permissions'),
-             (None, 'Path')])
+            [(36, 'Rule ID'), (16, 'Principal Type'), (36, 'Principal'),
+             (None, 'Permissions'), (None, 'Path')])
 
         for result in rule_iterator:
             print(text_col_format.format(
+                result.data['id'],
                 result.data['principal_type'], result.data['principal'],
                 result.data['permissions'], result.data['path']))
+
+
+@cliargs('Get detailed info on a specific ACL rule',
+         [(['--endpoint-id'],
+           {'dest': 'endpoint_id', 'required': True,
+            'help': ('ID of the endpoint, typically fetched '
+                     'from endpoint-search')}),
+          (['--rule-id'],
+           {'dest': 'rule_id', 'required': True,
+            'help': 'ID of the rule to display'})
+          ])
+def show_acl_rule(args):
+    """
+    Executor for `globus transfer access show-acl-rule`
+    """
+    client = TransferClient()
+
+    res = client.get_endpoint_acl_rule(args.endpoint_id, args.rule_id)
+
+    print(json.dumps(res.data, indent=2))
+
+
+@cliargs('Add an ACL rule',
+         [(['--endpoint-id'],
+           {'dest': 'endpoint_id', 'required': True,
+            'help': 'ID of the endpoint'}),
+          (['--permissions'],
+           {'dest': 'permissions', 'required': True,
+            'choices': ('r', 'rw'), 'type': str.lower,
+            'help': 'Permissions to add. Read-Only or Read/Write.'}),
+          (['--principal'],
+           {'dest': 'principal', 'required': True,
+            'help': 'Principal to grant permissions to'}),
+          (['--principal-type'],
+           {'dest': 'principal_type', 'required': True,
+            'choices': ('identity', 'group', 'anonymous',
+                        'all_authenticated_users'), 'type': str.lower,
+            'help': 'Principal type to grant permissions to'}),
+          (['--path'],
+           {'dest': 'path', 'required': True,
+            'help': 'Path on which the rule grants permissions'}),
+          ])
+def add_acl_rule(args):
+    """
+    Executor for `globus transfer access add-acl-rule`
+    """
+    client = TransferClient()
+
+    rule_data = {
+        'DATA_TYPE': 'access',
+        'permissions': args.permissions,
+        'principal': args.principal,
+        'principal_type': args.principal_type,
+        'path': args.path
+    }
+
+    res = client.add_endpoint_acl_rule(args.endpoint_id, rule_data)
+
+    print(json.dumps(res.data, indent=2))
+
+
+@cliargs('Remove an ACL rule',
+         [(['--endpoint-id'],
+           {'dest': 'endpoint_id', 'required': True,
+            'help': 'ID of the endpoint'}),
+          (['--rule-id'],
+           {'dest': 'rule_id', 'required': True,
+            'help': 'ID of the rule to display'})
+          ])
+def del_acl_rule(args):
+    """
+    Executor for `globus transfer access del-acl-rule`
+    """
+    client = TransferClient()
+
+    res = client.delete_endpoint_acl_rule(args.endpoint_id, args.rule_id)
+
+    print(json.dumps(res.data, indent=2))
+
+
+@cliargs('Update an ACL rule',
+         [(['--endpoint-id'],
+           {'dest': 'endpoint_id', 'required': True,
+            'help': 'ID of the endpoint'}),
+          (['--rule-id'],
+           {'dest': 'rule_id', 'required': True,
+            'help': 'ID of the rule to display'}),
+          (['--permissions'],
+           {'dest': 'permissions', 'default': None,
+            'choices': ('r', 'rw'), 'type': str.lower,
+            'help': 'Permissions to add. Read-Only or Read/Write.'}),
+          (['--principal'],
+           {'dest': 'principal', 'default': None,
+            'help': 'Principal to grant permissions to'}),
+          (['--principal-type'],
+           {'dest': 'principal_type', 'default': None,
+            'choices': ('identity', 'group', 'anonymous',
+                        'all_authenticated_users'), 'type': str.lower,
+            'help': 'Principal type to grant permissions to'}),
+          (['--path'],
+           {'dest': 'path', 'default': None,
+            'help': 'Path on which the rule grants permissions'}),
+          ])
+def update_acl_rule(args):
+    """
+    Executor for `globus transfer access update-acl-rule`
+    """
+    client = TransferClient()
+
+    rule_data = {
+        'DATA_TYPE': 'access'
+    }
+    for key, val in (('permissions', args.permissions),
+                     ('principal', args.principal),
+                     ('principal_type', args.principal_type),
+                     ('path', args.path)):
+        if val is not None:
+            rule_data[key] = val
+
+    res = client.update_endpoint_acl_rule(args.endpoint_id, args.rule_id,
+                                          rule_data)
+
+    print(json.dumps(res.data, indent=2))

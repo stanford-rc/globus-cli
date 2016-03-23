@@ -100,8 +100,20 @@ _TRANSFER_COMMANDS = {
             'endpoint-role-list': {
                 _FUNC: transfer.endpoint_role_list
             },
-            'endpoint-acl-list': {
-                _FUNC: transfer.endpoint_acl_list
+            'acl-list': {
+                _FUNC: transfer.acl_list
+            },
+            'show-acl-rule': {
+                _FUNC: transfer.show_acl_rule
+            },
+            'add-acl-rule': {
+                _FUNC: transfer.add_acl_rule
+            },
+            'del-acl-rule': {
+                _FUNC: transfer.del_acl_rule
+            },
+            'update-acl-rule': {
+                _FUNC: transfer.update_acl_rule
             }
         }
     },
