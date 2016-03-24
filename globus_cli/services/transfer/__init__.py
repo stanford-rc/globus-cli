@@ -1,5 +1,6 @@
 from globus_cli.services.transfer.endpoint import (
-    endpoint_search, endpoint_autoactivate, endpoint_server_list,
+    endpoint_search, endpoint_autoactivate, endpoint_deactivate,
+    endpoint_server_list,
     my_shared_endpoint_list, endpoint_role_list)
 from globus_cli.services.transfer.acl import (
     acl_list, show_acl_rule, add_acl_rule, del_acl_rule,

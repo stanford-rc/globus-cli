@@ -56,6 +56,9 @@ _TRANSFER_COMMANDS = {
             'autoactivate': {
                 _FUNC: transfer.endpoint_autoactivate
             },
+            'deactivate': {
+                _FUNC: transfer.endpoint_deactivate
+            },
             'server-list': {
                 _FUNC: transfer.endpoint_server_list
             },

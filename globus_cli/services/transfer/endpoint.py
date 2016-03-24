@@ -50,6 +50,21 @@ def endpoint_autoactivate(args):
     print(json.dumps(res.data, indent=2))
 
 
+@cliargs('Deactivate an Endpoint',
+         [(['--endpoint-id'],
+           {'dest': 'endpoint_id', 'required': True,
+            'help': ('ID of the endpoint, typically fetched '
+                     'from endpoint-search')})
+          ])
+def endpoint_deactivate(args):
+    """
+    Executor for `globus transfer endpoint-deactivate`
+    """
+    client = TransferClient()
+    res = client.endpoint_deactivate(args.endpoint_id)
+    print(json.dumps(res.data, indent=2))
+
+
 @cliargs('List all servers belonging to an Endpoint',
          [(['--endpoint-id'],
            {'dest': 'endpoint_id', 'required': True,
