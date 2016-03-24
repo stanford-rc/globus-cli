@@ -4,6 +4,7 @@ import argparse
 
 from globus_sdk import TransferClient
 from globus_cli.helpers import outformat_is_json, cliargs
+from globus_cli.services.transfer.activation import autoactivate
 
 
 def add_submission_id(client, datadoc):
@@ -70,6 +71,9 @@ def submit_transfer(args):
     }
 
     client = TransferClient()
+    autoactivate(client, args.source_endpoint, if_expires_in=60)
+    autoactivate(client, args.dest_endpoint, if_expires_in=60)
+
     add_submission_id(client, datadoc)
     res = client.submit_transfer(datadoc)
 
@@ -100,6 +104,7 @@ def submit_delete(args):
     Executor for `globus transfer submit-delete`
     """
     client = TransferClient()
+    autoactivate(client, args.endpoint_id, if_expires_in=60)
 
     datadoc = {
         'DATA_TYPE': 'delete',

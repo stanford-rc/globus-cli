@@ -6,6 +6,7 @@ from globus_sdk import TransferClient
 from globus_cli.helpers import outformat_is_json, cliargs
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format, endpoint_list_to_text)
+from globus_cli.services.transfer.activation import autoactivate
 
 
 @cliargs('Search for Globus Endpoints',
@@ -45,7 +46,7 @@ def endpoint_autoactivate(args):
     Executor for `globus transfer endpoint-autoactivate`
     """
     client = TransferClient()
-    res = client.endpoint_autoactivate(args.endpoint_id)
+    res = autoactivate(client, args.endpoint_id)
     print(json.dumps(res.data, indent=2))
 
 

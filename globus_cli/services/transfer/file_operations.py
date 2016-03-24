@@ -3,6 +3,7 @@ import json
 
 from globus_sdk import TransferClient
 from globus_cli.helpers import outformat_is_json, cliargs
+from globus_cli.services.transfer.activation import autoactivate
 
 
 @cliargs('List the contents of a directory on an endpoint',
@@ -20,6 +21,8 @@ def op_ls(args):
     Executor for `globus transfer ls`
     """
     client = TransferClient()
+    autoactivate(client, args.endpoint_id, if_expires_in=60)
+
     res = client.operation_ls(args.endpoint_id, path=args.path)
     if outformat_is_json(args):
         print(json.dumps(res.data, indent=2))
@@ -42,6 +45,8 @@ def op_mkdir(args):
     Executor for `globus transfer mkdir`
     """
     client = TransferClient()
+    autoactivate(client, args.endpoint_id, if_expires_in=60)
+
     res = client.operation_mkdir(args.endpoint_id, path=args.path)
 
     if outformat_is_json(args):
@@ -67,6 +72,8 @@ def op_rename(args):
     Executor for `globus transfer rename`
     """
     client = TransferClient()
+    autoactivate(client, args.endpoint_id, if_expires_in=60)
+
     res = client.operation_rename(args.endpoint_id, oldpath=args.oldpath,
                                   newpath=args.newpath)
 
