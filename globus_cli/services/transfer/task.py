@@ -3,7 +3,7 @@ import json
 
 from globus_sdk import TransferClient
 
-from globus_cli.helpers import outformat_is_json, cliargs
+from globus_cli.helpers import outformat_is_json, cliargs, CLIArg
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format)
 
@@ -23,22 +23,22 @@ def task_list(args):
     else:
         text_col_format = text_header_and_format(
             [(36, 'Task ID'), (10, 'Status'), (10, 'Type'),
-             (36, 'Source'), (36, 'Dest'), (None, 'Label')])
+             (32, 'Source Display Name'), (32, 'Dest Display Name'),
+             (None, 'Label')])
 
         for result in task_iterator:
             print(text_col_format.format(
                 result.data['task_id'], result.data['status'],
                 result.data['type'],
-                result.data['source_endpoint_id'],
-                result.data['destination_endpoint_id'],
+                result.data['source_endpoint_display_name'],
+                result.data['destination_endpoint_display_name'],
                 result.data['label']))
 
 
-@cliargs('List Events for a given Task',
-         [(['--task-id'],
-           {'dest': 'task_id', 'required': True,
-            'help': 'ID of the task for which you want to list events'})
-          ])
+@cliargs('List Events for a given Task', [
+    CLIArg('task-id', required=True,
+           help='ID of the task for which you want to list events')
+    ])
 def task_event_list(args):
     """
     Executor for `globus transfer task-event-list`
@@ -59,11 +59,10 @@ def task_event_list(args):
                 result.data['is_error'], result.data['details']))
 
 
-@cliargs('Cancel a specific task, owned by the current user',
-         [(['--task-id'],
-           {'dest': 'task_id', 'required': True,
-            'help': 'ID of the task which you want to cancel'})
-          ])
+@cliargs('Cancel a specific task, owned by the current user', [
+    CLIArg('task-id', required=True,
+           help='ID of the task which you want to cancel')
+    ])
 def cancel_task(args):
     """
     Executor for `globus transfer task cancel`
@@ -78,17 +77,12 @@ def cancel_task(args):
         print(res.data['message'])
 
 
-@cliargs('Update label and/or deadline on an active task',
-         [(['--task-id'],
-           {'dest': 'task_id', 'required': True,
-            'help': 'ID of the task which you want to cancel'}),
-          (['--label'],
-           {'dest': 'label', 'default': None,
-            'help': 'New Label for the Task'}),
-          (['--deadline'],
-           {'dest': 'deadline', 'default': None,
-            'help': 'New Deadline for the Task'}),
-          ])
+@cliargs('Update label and/or deadline on an active task', [
+    CLIArg('task-id', required=True,
+           help='ID of the task which you want to cancel'),
+    CLIArg('label', default=None, help='New Label for the Task'),
+    CLIArg('deadline', default=None, help='New Deadline for the Task')
+    ])
 def update_task(args):
     """
     Executor for `globus transfer task update`
@@ -112,11 +106,10 @@ def update_task(args):
         print('Success')
 
 
-@cliargs('Show detailed information about a specific task',
-         [(['--task-id'],
-           {'dest': 'task_id', 'required': True,
-            'help': 'ID of the task which you want to examine'})
-          ])
+@cliargs('Show detailed information about a specific task', [
+    CLIArg('task-id', required=True,
+           help='ID of the task which you want to examine')
+    ])
 def show_task(args):
     """
     Executor for `globus transfer task show`
@@ -128,11 +121,9 @@ def show_task(args):
     print(json.dumps(res.data, indent=2))
 
 
-@cliargs('Show detailed info about pause rules that are applied to a task',
-         [(['--task-id'],
-           {'dest': 'task_id', 'required': True,
-            'help': 'ID of the task'})
-          ])
+@cliargs('Show detailed info about pause rules that are applied to a task', [
+    CLIArg('task-id', required=True, help='ID of the task')
+    ])
 def task_pause_info(args):
     """
     Executor for `globus transfer task pause-info`

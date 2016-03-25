@@ -46,3 +46,22 @@ def cliargs(helptext, arguments, arg_validator=None):
         return wrapped
 
     return inner_decorator
+
+
+class CLIArg(object):
+    def __init__(self, name, **kwargs):
+        self.kwargs = kwargs
+        self.name = name
+
+        self.kwargs.update({
+            'dest': self.name.replace('-', '_')
+        })
+
+    def argparse_arglist(self):
+        return ['--{}'.format(self.name)]
+
+    def argparse_kwargs(self):
+        return self.kwargs
+
+    def is_required(self):
+        return 'required' in self.kwargs and self.kwargs['required']

@@ -1,6 +1,8 @@
+import textwrap
+
 from globus_cli.parser.shared_parser import GlobusCLISharedParser
 from globus_cli.services import nexus, auth, transfer
-from globus_cli.helpers import cliargs
+from globus_cli.helpers import cliargs, CLIArg
 
 
 @cliargs('Not Implemented', [])
@@ -190,8 +192,12 @@ def _add_subcommands(parser, command_dict):
             current_parser.set_defaults(func=current_command[_FUNC])
             required_args_group = current_parser.add_argument_group(
                 'required arguments')
-            for args, kwargs in current_command[_FUNC].cli_arguments:
-                if 'required' in kwargs and kwargs['required']:
+
+            argset = current_command[_FUNC].cli_arguments
+            for cli_arg in argset:
+                args, kwargs = (cli_arg.argparse_arglist(),
+                                cli_arg.argparse_kwargs())
+                if cli_arg.is_required():
                     required_args_group.add_argument(*args, **kwargs)
                 else:
                     current_parser.add_argument(*args, **kwargs)
@@ -203,7 +209,14 @@ def build_command_tree():
     Add nexus, auth, and transfer subcommands, their subsubcommands, and
     arguments.
     """
-    top_level_parser = GlobusCLISharedParser()
+    # TODO: Update this description to be more informative, accurate
+    description = textwrap.dedent("""Run a globus command.
+    The globus command is structured to provide a uniform command line
+    interface to all Globus services. For more information and tutorials,
+    see docs.globus.org
+    """)
+
+    top_level_parser = GlobusCLISharedParser(description=description)
     _add_subcommands(top_level_parser, _COMMAND_TREE)
 
     # return the created parser in all of its glory

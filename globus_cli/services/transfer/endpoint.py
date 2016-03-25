@@ -3,24 +3,21 @@ import json
 
 from globus_sdk import TransferClient
 
-from globus_cli.helpers import outformat_is_json, cliargs
+from globus_cli.helpers import outformat_is_json, cliargs, CLIArg
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format, endpoint_list_to_text)
 from globus_cli.services.transfer.activation import autoactivate
 
 
-@cliargs('Search for Globus Endpoints',
-         [(['--filter-scope'],
-           {'dest': 'scope', 'default': None,
-            'choices': ('all', 'my-endpoints', 'my-gcp-endpoints',
-                        'recently-used', 'in-use', 'shared-by-me',
-                        'shared-with-me'),
-            'help': ('The set of endpoints to search over. '
-                     'Omission is equivalent to "all"')}),
-          (['--filter-fulltext'],
-           {'dest': 'fulltext', 'default': None,
-            'help': 'Text filter to apply to the selected set of endpoints.'})
-          ])
+@cliargs('Search for Globus Endpoints', [
+    CLIArg('filter-scope', default=None,
+           choices=('all', 'my-endpoints', 'my-gcp-endpoints', 'recently-used',
+                    'in-use', 'shared-by-me', 'shared-with-me'),
+           help=('The set of endpoints to search over. '
+                 'Omission is equivalent to "all"')),
+    CLIArg('filter-fulltext', default=None,
+           help='Text filter to apply to the selected set of endpoints.')
+])
 def endpoint_search(args):
     """
     Executor for `globus transfer endpoint-search`
@@ -35,12 +32,10 @@ def endpoint_search(args):
         endpoint_list_to_text(search_iterator)
 
 
-@cliargs('Activate an Endpoint via autoactivation',
-         [(['--endpoint-id'],
-           {'dest': 'endpoint_id', 'required': True,
-            'help': ('ID of the endpoint, typically fetched '
-                     'from endpoint-search')})
-          ])
+@cliargs('Activate an Endpoint via autoactivation', [
+    CLIArg('endpoint-id', required=True,
+           help='ID of the endpoint, typically fetched from endpoint-search')
+    ])
 def endpoint_autoactivate(args):
     """
     Executor for `globus transfer endpoint-autoactivate`
@@ -50,12 +45,10 @@ def endpoint_autoactivate(args):
     print(json.dumps(res.data, indent=2))
 
 
-@cliargs('Deactivate an Endpoint',
-         [(['--endpoint-id'],
-           {'dest': 'endpoint_id', 'required': True,
-            'help': ('ID of the endpoint, typically fetched '
-                     'from endpoint-search')})
-          ])
+@cliargs('Deactivate an Endpoint', [
+    CLIArg('endpoint-id', required=True,
+           help='ID of the endpoint, typically fetched from endpoint-search')
+    ])
 def endpoint_deactivate(args):
     """
     Executor for `globus transfer endpoint-deactivate`
@@ -65,12 +58,10 @@ def endpoint_deactivate(args):
     print(json.dumps(res.data, indent=2))
 
 
-@cliargs('List all servers belonging to an Endpoint',
-         [(['--endpoint-id'],
-           {'dest': 'endpoint_id', 'required': True,
-            'help': ('ID of the endpoint, typically fetched '
-                     'from endpoint-search')})
-          ])
+@cliargs('List all servers belonging to an Endpoint', [
+    CLIArg('endpoint-id', required=True,
+           help='ID of the endpoint, typically fetched from endpoint-search')
+    ])
 def endpoint_server_list(args):
     """
     Executor for `globus transfer endpoint-server-list`
@@ -89,12 +80,10 @@ def endpoint_server_list(args):
             print(text_col_format.format(result.data['uri']))
 
 
-@cliargs('List all Shared Endpoints on an Endpoint by the current user',
-         [(['--endpoint-id'],
-           {'dest': 'endpoint_id', 'required': True,
-            'help': ('ID of the endpoint, typically fetched '
-                     'from endpoint-search')})
-          ])
+@cliargs('List all Shared Endpoints on an Endpoint by the current user', [
+    CLIArg('endpoint-id', required=True,
+           help='ID of the endpoint, typically fetched from endpoint-search')
+    ])
 def my_shared_endpoint_list(args):
     """
     Executor for `globus transfer endpoint my-shared-endpoint-list`
@@ -109,12 +98,10 @@ def my_shared_endpoint_list(args):
         endpoint_list_to_text(ep_iterator)
 
 
-@cliargs('List of assigned Roles on an Endpoint',
-         [(['--endpoint-id'],
-           {'dest': 'endpoint_id', 'required': True,
-            'help': ('ID of the endpoint, typically fetched '
-                     'from endpoint-search')})
-          ])
+@cliargs('List of assigned Roles on an Endpoint', [
+    CLIArg('endpoint-id', required=True,
+           help='ID of the endpoint, typically fetched from endpoint-search')
+    ])
 def endpoint_role_list(args):
     """
     Executor for `globus transfer access endpoint-role-list`

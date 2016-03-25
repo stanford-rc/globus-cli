@@ -3,7 +3,7 @@ import json
 import argparse
 
 from globus_sdk import TransferClient
-from globus_cli.helpers import outformat_is_json, cliargs
+from globus_cli.helpers import outformat_is_json, cliargs, CLIArg
 from globus_cli.services.transfer.activation import autoactivate
 
 
@@ -13,36 +13,31 @@ def add_submission_id(client, datadoc):
 
 
 def _validate_transfer_args(args, parser):
-    if (args.source is None or args.dest is None) and args.batch is None:
+    if (args.source_path is None or args.dest_path is None) and (
+            args.batch is None):
         parser.error('async-transfer requires either --source-path and '
                      '--dest-path OR --batch')
-    if ((args.source is not None and args.batch is not None) or
-            (args.dest is not None and args.batch is not None)):
+    if ((args.source_path is not None and args.batch is not None) or
+            (args.dest_path is not None and args.batch is not None)):
         parser.error('async-transfer cannot take --batch in addition to '
                      '--source-path or --dest-path')
 
 
 @cliargs(('Copy a file or directory from one endpoint '
-          'to another as an asynchronous task'),
-         [(['--source-endpoint'],
-           {'dest': 'source_endpoint', 'required': True,
-            'help': 'ID of the endpoint from which to transfer'}),
-          (['--dest-endpoint'],
-           {'dest': 'dest_endpoint', 'required': True,
-            'help': 'ID of the endpoint to which to transfer'}),
-          (['--source-path'],
-           {'dest': 'source',
-            'help': 'Path to the file/dir to move on source-endpoint'}),
-          (['--dest-path'],
-           {'dest': 'dest',
-            'help': 'Desired location of the file/dir on dest-endpoint'}),
-          (['--batch'],
-           {'dest': 'batch', 'type': json.loads,
-            'help': ('Paths to source and destination files, as a JSON '
-                     'document. Document format is '
-                     '{"DATA": [{"source": <path>, "dest": <path>}, ...]}')})
-          ],
-         arg_validator=_validate_transfer_args)
+          'to another as an asynchronous task'), [
+    CLIArg('source-endpoint', required=True,
+           help='ID of the endpoint from which to transfer'),
+    CLIArg('dest-endpoint', required=True,
+           help='ID of the endpoint to which to transfer'),
+    CLIArg('source-path',
+           help='Path to the file/dir to move on source-endpoint'),
+    CLIArg('dest-path',
+           help='Desired location of the file/dir on dest-endpoint'),
+    CLIArg('batch', type=json.loads,
+           help=('Paths to source and destination files, as a JSON '
+                 'document. Document format is '
+                 '{"DATA": [{"source": <path>, "dest": <path>}, ...]}'))
+    ], arg_validator=_validate_transfer_args)
 def submit_transfer(args):
     """
     Executor for `globus transfer async-transfer`
@@ -59,7 +54,7 @@ def submit_transfer(args):
         for item in args.batch['DATA']:
             transferdata.append(_transfer_item(item['source'], item['dest']))
     else:
-        transferdata = [_transfer_item(args.source, args.dest)]
+        transferdata = [_transfer_item(args.source_path, args.dest_path)]
 
     datadoc = {
         'DATA_TYPE': 'transfer',
@@ -84,21 +79,15 @@ def submit_transfer(args):
 
 
 @cliargs(('Delete a file or directory from one endpoint '
-          'as an asynchronous task'),
-         [(['--endpoint-id'],
-           {'dest': 'endpoint_id', 'required': True,
-            'help': 'ID of the endpoint from which to delete file(s)'}),
-          (['--path'],
-           {'dest': 'path', 'required': True,
-            'help': 'Path to the file/dir to delete'}),
-          (['--recursive'],
-           {'dest': 'recursive', 'default': False,
-            'help': 'Recursively delete dirs', 'action': 'store_true'}),
-          (['--ignore-missing'],
-           {'dest': 'ignore_missing', 'default': False,
-            'help': 'Don\'t throw errors if the file or dir is absent',
-            'action': 'store_true'})
-          ])
+          'as an asynchronous task'), [
+    CLIArg('endpoint-id', required=True,
+           help='ID of the endpoint from which to delete file(s)'),
+    CLIArg('path', required=True, help='Path to the file/dir to delete'),
+    CLIArg('recursive', default=False, action='store_true',
+           help='Recursively delete dirs'),
+    CLIArg('ignore-missing', default=False, action='store_true',
+           help='Don\'t throw errors if the file or dir is absent')
+    ])
 def submit_delete(args):
     """
     Executor for `globus transfer submit-delete`

@@ -3,19 +3,18 @@ from __future__ import print_function
 import getpass
 import json
 
-from globus_cli.helpers import stderr_prompt, outformat_is_json, cliargs
+from globus_cli.helpers import (
+    stderr_prompt, outformat_is_json, cliargs, CLIArg)
 
 from globus_sdk import NexusClient
 
 
-@cliargs('Get a Legacy GOAuth Token from Globus Nexus.',
-         [(['-u', '--username'],
-           {'dest': 'username', 'default': None,
-            'help': 'Username for a GlobusID user to use to get a token.'}),
-          (['-p', '--password'],
-           {'dest': 'password', 'default': None,
-            'help': 'Password for a GlobusID user to use to get a token.'})
-          ])
+@cliargs('Get a Legacy GOAuth Token from Globus Nexus.', [
+    CLIArg('username', default=None,
+           help='Username for a GlobusID user to use to get a token.'),
+    CLIArg('password', default=None,
+           help='Password for a GlobusID user to use to get a token.')
+    ])
 def get_goauth_token(args):
     """
     Executor for `globus nexus get-goauth-token`
