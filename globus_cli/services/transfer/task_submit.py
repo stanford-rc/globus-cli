@@ -1,6 +1,5 @@
 from __future__ import print_function
 import json
-import argparse
 
 from globus_sdk import TransferClient
 from globus_cli.helpers import outformat_is_json, cliargs, CLIArg

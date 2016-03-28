@@ -1,206 +1,127 @@
 import textwrap
 
 from globus_cli.parser.shared_parser import GlobusCLISharedParser
+from globus_cli.parser.helpers import (
+    not_implemented_func, FuncCommand, MenuCommand, add_cli_args)
 from globus_cli.services import nexus, auth, transfer
-from globus_cli.helpers import cliargs, CLIArg
 
 
-@cliargs('Not Implemented', [])
-def _not_implemented_func(args):
-    """
-    This is a dummy function used to stub parts of the command tree that
-    haven't been implemented yet.
-    It has the same signature as a typical command function (i.e. takes args
-    and nothing else), but raises a NotImplementedError
-    """
-    raise NotImplementedError(('Hold yer horses! '
-                               'This command has not been implemented yet!'))
+_NEXUS_COMMANDS = [
+    FuncCommand('get-goauth-token', nexus.get_goauth_token)
+]
 
+_AUTH_COMMANDS = [
+    FuncCommand('get-identities', auth.get_identities),
+    FuncCommand('token-introspect', auth.token_introspect)
+]
 
-_COMMANDS = '__commands__'
-_FUNC = '__func__'
-_HELP = '__help__'
+_TRANSFER_COMMANDS = [
+    MenuCommand('endpoint', [
+        FuncCommand('show', not_implemented_func),
+        FuncCommand('update', not_implemented_func),
+        FuncCommand('create', not_implemented_func),
+        FuncCommand('search', transfer.endpoint_search),
+        FuncCommand('autoactivate', transfer.endpoint_autoactivate),
+        FuncCommand('deactivate', transfer.endpoint_deactivate),
+        FuncCommand('server-list', transfer.endpoint_server_list),
+        FuncCommand('my-shared-endpoint-list',
+                    transfer.my_shared_endpoint_list)],
+                helptext=(
+        'Interact with Globus Endpoint definitions in Globus. '
+        'Display endpoint information, create and update new '
+        'endpoints, and search existing endpoints.')),
 
+    MenuCommand('task', [
+        FuncCommand('list', transfer.task_list),
+        FuncCommand('event-list', transfer.task_event_list),
+        FuncCommand('pause-info', transfer.task_pause_info),
+        FuncCommand('cancel', transfer.cancel_task),
+        FuncCommand('update', transfer.update_task),
+        FuncCommand('show', transfer.show_task)
+        ],
+                helptext=(
+        'Manage asynchronous Tasks in Globus. '
+        'File transfers, deletions, and other asynchronous '
+        'fire-and-forget transfers in Globus are represented '
+        'as Task documents. List, inspect, cancel, pause, and '
+        'resume your Tasks using this command.')),
 
-_NEXUS_COMMANDS = {
-    'get-goauth-token': {
-        _FUNC: nexus.get_goauth_token
-    }
-}
+    MenuCommand('access', [
+        FuncCommand('endpoint-role-list', transfer.endpoint_role_list),
+        FuncCommand('acl-list', transfer.acl_list),
+        FuncCommand('show-acl-rule', transfer.show_acl_rule),
+        FuncCommand('add-acl-rule', transfer.add_acl_rule),
+        FuncCommand('del-acl-rule', transfer.del_acl_rule),
+        FuncCommand('update-acl-rule', transfer.update_acl_rule)
+        ],
+                helptext=(
+        'Manage and inspect the access and permissions on '
+        'Globus Transfer resources. '
+        'Primarily consists of Endpoint Roles and Endpoint '
+        'ACLs.')),
 
-_AUTH_COMMANDS = {
-    'get-identities': {
-        _FUNC: auth.get_identities
-    },
-    'token-introspect': {
-        _FUNC: auth.token_introspect
-    }
-}
+    FuncCommand('async-transfer', transfer.submit_transfer),
+    FuncCommand('async-delete', transfer.submit_delete),
+    FuncCommand('ls', transfer.op_ls),
+    FuncCommand('mkdir', transfer.op_mkdir),
+    FuncCommand('rename', transfer.op_rename),
+    FuncCommand('bookmark-list', transfer.bookmark_list)
+]
 
-_TRANSFER_COMMANDS = {
-    'endpoint': {
-        _HELP: ('Interact with Globus Endpoint definitions in Globus. '
-                'Display endpoint information, create and update new '
-                'endpoints, and search existing endpoints.'),
-        _COMMANDS: {
-            'show': {
-                _FUNC: _not_implemented_func
-            },
-            'update': {
-                _FUNC: _not_implemented_func
-            },
-            'create': {
-                _FUNC: _not_implemented_func
-            },
-            'search': {
-                _FUNC: transfer.endpoint_search
-            },
-            'autoactivate': {
-                _FUNC: transfer.endpoint_autoactivate
-            },
-            'deactivate': {
-                _FUNC: transfer.endpoint_deactivate
-            },
-            'server-list': {
-                _FUNC: transfer.endpoint_server_list
-            },
-            'my-shared-endpoint-list': {
-                _FUNC: transfer.my_shared_endpoint_list
-            }
-        }
-    },
-    'task': {
-        _HELP: ('Manage asynchronous Tasks in Globus. '
-                'File transfers, deletions, and other asynchronous '
-                'fire-and-forget transfers in Globus are represented '
-                'as Task documents. List, inspect, cancel, pause, and '
-                'resume your Tasks using this command.'),
-        _COMMANDS: {
-            'list': {
-                _FUNC: transfer.task_list
-            },
-            'event-list': {
-                _FUNC: transfer.task_event_list
-            },
-            'pause-info': {
-                _FUNC: transfer.task_pause_info
-            },
-            'cancel': {
-                _FUNC: transfer.cancel_task
-            },
-            'update': {
-                _FUNC: transfer.update_task
-            },
-            'show': {
-                _FUNC: transfer.show_task
-            }
-        }
-    },
-    'access': {
-        _HELP: ('Manage and inspect the access and permissions on '
-                'Globus Transfer resources. '
-                'Primarily consists of Endpoint Roles and Endpoint '
-                'ACLs.'),
-        _COMMANDS: {
-            'endpoint-role-list': {
-                _FUNC: transfer.endpoint_role_list
-            },
-            'acl-list': {
-                _FUNC: transfer.acl_list
-            },
-            'show-acl-rule': {
-                _FUNC: transfer.show_acl_rule
-            },
-            'add-acl-rule': {
-                _FUNC: transfer.add_acl_rule
-            },
-            'del-acl-rule': {
-                _FUNC: transfer.del_acl_rule
-            },
-            'update-acl-rule': {
-                _FUNC: transfer.update_acl_rule
-            }
-        }
-    },
-    'async-transfer': {
-        _FUNC: transfer.submit_transfer
-    },
-    'async-delete': {
-        _FUNC: transfer.submit_delete
-    },
-    'ls': {
-        _FUNC: transfer.op_ls
-    },
-    'mkdir': {
-        _FUNC: transfer.op_mkdir
-    },
-    'rename': {
-        _FUNC: transfer.op_rename
-    },
-    'bookmark-list': {
-        _FUNC: transfer.bookmark_list
-    }
-}
-
-_COMMAND_TREE = {
-    'nexus': {
-        _HELP: ('Interact with legacy Nexus API. WARNING: Deprecated. '
+_COMMAND_TREE = [
+    MenuCommand('nexus', _NEXUS_COMMANDS, helptext=(
+                'Interact with legacy Nexus API. WARNING: Deprecated. '
                 'Only use this if you need access to legacy tokens '
                 'during the development of the globus cli. These methods '
                 'will be replaced in the near future with commands '
-                'which use other services.'),
-        _COMMANDS: _NEXUS_COMMANDS
-    },
-    'auth': {
-        _HELP: ('Interact with Globus Auth API. '
+                'which use other services.')),
+    MenuCommand('auth', _AUTH_COMMANDS, helptext=(
+                'Interact with Globus Auth API. '
                 'Used to inspect tokens, identities, identity sets, '
                 'consent to service terms, revoke and manage consents, '
                 'manage OAuth Clients, and a variety of other '
-                'Authorization and Authentication based activities.'),
-        _COMMANDS: _AUTH_COMMANDS
-    },
-    'transfer': {
-        _HELP: ('Interact with Globus Transfer API. '
+                'Authorization and Authentication based activities.')),
+    MenuCommand('transfer', _TRANSFER_COMMANDS, helptext=(
+                'Interact with Globus Transfer API. '
                 'Used to inspect, modify, and interact with Globus '
                 'Endpoints. Has capabilities to search Endpoints, manage '
                 'Sharing Access via Access Control Lists (ACLs), manage '
                 'Endpoint roles, and do actual Transfer tasks between '
-                'Endpoints.'),
-        _COMMANDS: _TRANSFER_COMMANDS
-    }
-}
+                'Endpoints.'))
+]
 
 
-def _add_subcommands(parser, command_dict):
-    def gethelp(maybe_command):
-        if _FUNC in maybe_command:
-            return maybe_command[_FUNC].cli_help
-        else:
-            return maybe_command[_HELP]
+def _add_subcommands(parser, commandset):
+    """
+    Build out subcommands recursively with this helper method.
+    Any given command may have subcommands, ad infinitum, so the simplest
+    solution is the recursive one.
+    Walk commands, plugging in any that terminate the command tree at a
+    function. Any others are menu commands that have further subcommands, and
+    those therefore require that we add whatever subcommands they have
+    (recursive case).
+    """
 
+    # we start with a subparser collection named "Commands"
     subparsers = parser.add_subparsers(
-        title='Commands', parser_class=GlobusCLISharedParser, metavar='')
+        title='Commands', parser_class=GlobusCLISharedParser,
+        metavar='')
 
-    for command in command_dict:
-        current_command = command_dict[command]
+    # iterate over all commands in the set, and ...
+    for command in commandset:
         current_parser = subparsers.add_parser(
-            command, help=gethelp(current_command))
+            command.name, help=command.helptext)
 
-        if _COMMANDS in current_command:
-            _add_subcommands(current_parser, current_command[_COMMANDS])
+        # the command wraps a function, build it out
+        if isinstance(command, FuncCommand):
+            # round up the arguments dangling off of the command and put them
+            # in here
+            current_parser.set_defaults(func=command.func)
+            add_cli_args(current_parser, command.func.cli_arguments)
+
+        # it's a menu, recurse
         else:
-            current_parser.set_defaults(func=current_command[_FUNC])
-            required_args_group = current_parser.add_argument_group(
-                'required arguments')
-
-            argset = current_command[_FUNC].cli_arguments
-            for cli_arg in argset:
-                args, kwargs = (cli_arg.argparse_arglist(),
-                                cli_arg.argparse_kwargs())
-                if cli_arg.is_required():
-                    required_args_group.add_argument(*args, **kwargs)
-                else:
-                    current_parser.add_argument(*args, **kwargs)
+            _add_subcommands(current_parser, command.commandset)
 
 
 def build_command_tree():

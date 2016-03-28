@@ -17,8 +17,8 @@ from globus_cli.services.transfer.task_submit import (
 
 
 __all__ = [
-    'endpoint_search', 'endpoint_autoactivate', 'endpoint_server_list',
-    'my_shared_endpoint_list',
+    'endpoint_search', 'endpoint_autoactivate', 'endpoint_deactivate',
+    'endpoint_server_list', 'my_shared_endpoint_list',
 
     'endpoint_role_list',
 
