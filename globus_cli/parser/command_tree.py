@@ -71,7 +71,7 @@ _AUTH_COMMANDS = [
 _TRANSFER_COMMANDS = [
     MenuCommand(
         'endpoint',
-        [FuncCommand('show', not_implemented_func),
+        [FuncCommand('show', transfer.endpoint_show),
          FuncCommand('update', not_implemented_func),
          FuncCommand('create', not_implemented_func),
          FuncCommand('search', transfer.endpoint_search),

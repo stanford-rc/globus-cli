@@ -24,7 +24,7 @@ def endpoint_search(args):
     """
     client = TransferClient()
     search_iterator = client.endpoint_search(
-        filter_fulltext=args.fulltext, filter_scope=args.scope)
+        filter_fulltext=args.filter_fulltext, filter_scope=args.filter_scope)
 
     if outformat_is_json(args):
         print_json_from_iterator(search_iterator)
@@ -120,3 +120,27 @@ def endpoint_role_list(args):
             print(text_col_format.format(
                 result.data['principal_type'], result.data['principal'],
                 result.data['role']))
+
+
+@cliargs('Display a detailed endpoint definition', [
+    CLIArg('endpoint-id', required=True,
+           help='ID of the endpoint, typically fetched from endpoint-search')
+    ])
+def endpoint_show(args):
+    """
+    Executor for `globus transfer endpoint show`
+    """
+    client = TransferClient()
+
+    res = client.get_endpoint(args.endpoint_id)
+
+    if outformat_is_json(args):
+        print(json.dumps(res.data, indent=2))
+    else:
+        fields = (('Display Name', 'display_name'), ('ID', 'id'),
+                  ('Owner', 'owner_string'), ('Activated', 'activated'),
+                  ('Shareable', 'shareable'))
+        maxlen = max(len(n) for n, f in fields) + 1
+        for name, field in fields:
+            print(('{:' + str(maxlen) + '} {}')
+                  .format(name+':', res.data[field]))
