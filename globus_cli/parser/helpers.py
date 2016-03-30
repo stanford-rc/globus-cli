@@ -14,7 +14,7 @@ def not_implemented_func(args):
 
 
 class MenuCommand(object):
-    def __init__(self, name, commandset, helptext=None):
+    def __init__(self, name, commandset, helptext):
         self.name = name
         self.commandset = commandset
         self.helptext = helptext
