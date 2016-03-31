@@ -94,12 +94,19 @@ _TRANSFER_COMMANDS = [
 
     MenuCommand(
         'access',
-        [FuncCommand('endpoint-role-list', transfer.endpoint_role_list),
-         FuncCommand('acl-list', transfer.acl_list),
-         FuncCommand('show-acl-rule', transfer.show_acl_rule),
-         FuncCommand('add-acl-rule', transfer.add_acl_rule),
-         FuncCommand('del-acl-rule', transfer.del_acl_rule),
-         FuncCommand('update-acl-rule', transfer.update_acl_rule)],
+        [MenuCommand(
+            'endpoint-role',
+            [FuncCommand('list', transfer.endpoint_role_list)],
+            'Manage endpoint roles'),
+         MenuCommand(
+             'acl',
+             [FuncCommand('list', transfer.acl_list),
+              FuncCommand('show-rule', transfer.show_acl_rule),
+              FuncCommand('add-rule', transfer.add_acl_rule),
+              FuncCommand('del-rule', transfer.del_acl_rule),
+              FuncCommand('update-rule', transfer.update_acl_rule)],
+             'Manage endpoint Access Control Lists')
+         ],
         'Manage Access Control, Permissions, and Roles'),
 
     MenuCommand(
