@@ -38,7 +38,7 @@ def full_help_func(args, tree=None, parent_name='globus'):
     def format_func_cmd(func_cmd):
         start = '\n' + ' '*4 + cmd_fullname(func_cmd) + '\n'
 
-        return start + help_text(func_cmd, helpindent=16)
+        return start + help_text(func_cmd, helpindent=8)
 
     def format_menu_cmd(menu_cmd):
         start = ('\n== ' +
@@ -120,12 +120,6 @@ _TRANSFER_COMMANDS = [
 _COMMAND_TREE = [
     FuncCommand('help', full_help_func),
 
-    MenuCommand('nexus', _NEXUS_COMMANDS, (
-                'Interact with legacy Nexus API. WARNING: Deprecated. '
-                'Only use this if you need access to legacy tokens '
-                'during the development of the globus cli. These methods '
-                'will be replaced in the near future with commands '
-                'which use other services.')),
     MenuCommand('auth', _AUTH_COMMANDS, (
                 'Interact with Globus Auth API. '
                 'Inspect Tokens, Identities, and Identity Sets, '
@@ -135,7 +129,13 @@ _COMMAND_TREE = [
                 'Interact with Globus Transfer API. '
                 'Transfer, Delete, List, and Rename files on Endpoints, '
                 'manage your Endpoints and Shares, and monitor your ongoing '
-                'Transfer Tasks.'))
+                'Transfer Tasks.')),
+    MenuCommand('nexus', _NEXUS_COMMANDS, (
+                'Interact with legacy Nexus API. WARNING: Deprecated. '
+                'Only use this if you need access to legacy tokens '
+                'during the development of the globus cli. These methods '
+                'will be replaced in the near future with commands '
+                'which use other services.'))
 ]
 
 
