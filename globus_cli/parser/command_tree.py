@@ -111,7 +111,8 @@ _TRANSFER_COMMANDS = [
 
     MenuCommand(
         'bookmark',
-        [FuncCommand('list', transfer.bookmark_list)],
+        [FuncCommand('list', transfer.bookmark_list),
+         FuncCommand('create', transfer.bookmark_create)],
         'Manage Endpoint Bookmarks'),
 
     MenuCommand(
