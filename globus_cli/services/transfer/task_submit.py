@@ -41,34 +41,23 @@ def submit_transfer(args):
     """
     Executor for `globus transfer async-transfer`
     """
-    def _transfer_item(src, dst):
-        return {
-            'DATA_TYPE': 'transfer_item',
-            'source_path': src,
-            'destination_path': dst
-        }
-
-    if args.batch is not None:
-        transferdata = []
-        for item in args.batch['DATA']:
-            transferdata.append(_transfer_item(item['source'], item['dest']))
-    else:
-        transferdata = [_transfer_item(args.source_path, args.dest_path)]
-
-    datadoc = {
-        'DATA_TYPE': 'transfer',
-        'label': 'globus-cli transfer',
-        'source_endpoint': args.source_endpoint,
-        'destination_endpoint': args.dest_endpoint,
-        'sync_level': 2,
-        'DATA': transferdata
-    }
-
     client = TransferClient()
     autoactivate(client, args.source_endpoint, if_expires_in=60)
     autoactivate(client, args.dest_endpoint, if_expires_in=60)
 
-    add_submission_id(client, datadoc)
+    if args.batch is not None:
+        transfer_items = [
+            client.make_submit_transfer_item(item['source'], item['dest'])
+            for item in args.batch['DATA']
+            ]
+    else:
+        transfer_items = [client.make_submit_transfer_item(args.source_path,
+                                                           args.dest_path)]
+
+    datadoc = client.make_submit_transfer_data(
+        args.source_endpoint, args.dest_endpoint, transfer_items,
+        label='globus-cli transfer', sync_level="mtime")
+
     res = client.submit_transfer(datadoc)
 
     if outformat_is_json(args):
