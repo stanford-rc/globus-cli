@@ -41,22 +41,37 @@ def full_help_func(args, tree=None, parent_name='globus'):
         return start + help_text(func_cmd, helpindent=8)
 
     def format_menu_cmd(menu_cmd):
-        start = ('\n== ' +
+        start = ('\n\n== ' +
                  cmd_fullname(menu_cmd, noglobus=True).upper() +
                  ' ==\n')
 
         return start + help_text(menu_cmd)
 
+    printme = False
     if tree is None:
+        printme = True
         tree = _COMMAND_TREE
 
+    funccmd_help = ''
+    menucmd_help = ''
     for cmd in tree:
         if isinstance(cmd, FuncCommand):
-            print(format_func_cmd(cmd))
+            funccmd_help += format_func_cmd(cmd) + '\n'
         else:
-            print(format_menu_cmd(cmd))
-            full_help_func(args, tree=cmd.commandset,
-                           parent_name=cmd_fullname(cmd))
+            menucmd_help += format_menu_cmd(cmd) + '\n'
+            menucmd_help += full_help_func(
+                args, tree=cmd.commandset, parent_name=cmd_fullname(cmd)
+                )
+
+    if funccmd_help and menucmd_help:
+        full_help = funccmd_help + menucmd_help
+    else:
+        full_help = funccmd_help or menucmd_help
+
+    if printme:
+        print(full_help)
+
+    return full_help
 
 
 _NEXUS_COMMANDS = [
@@ -79,7 +94,12 @@ _TRANSFER_COMMANDS = [
          FuncCommand('deactivate', transfer.endpoint_deactivate),
          FuncCommand('server-list', transfer.endpoint_server_list),
          FuncCommand('my-shared-endpoint-list',
-                     transfer.my_shared_endpoint_list)],
+                     transfer.my_shared_endpoint_list),
+         MenuCommand(
+            'role',
+            [FuncCommand('list', transfer.endpoint_role_list)],
+            'Manage endpoint roles')
+         ],
         'Manage Globus Endpoint definitions'),
 
     MenuCommand(
@@ -93,21 +113,13 @@ _TRANSFER_COMMANDS = [
         'Manage asynchronous Tasks'),
 
     MenuCommand(
-        'access',
-        [MenuCommand(
-            'endpoint-role',
-            [FuncCommand('list', transfer.endpoint_role_list)],
-            'Manage endpoint roles'),
-         MenuCommand(
-             'acl',
-             [FuncCommand('list', transfer.acl_list),
-              FuncCommand('show-rule', transfer.show_acl_rule),
-              FuncCommand('add-rule', transfer.add_acl_rule),
-              FuncCommand('del-rule', transfer.del_acl_rule),
-              FuncCommand('update-rule', transfer.update_acl_rule)],
-             'Manage endpoint Access Control Lists')
-         ],
-        'Manage Access Control, Permissions, and Roles'),
+        'acl',
+        [FuncCommand('list', transfer.acl_list),
+         FuncCommand('show-rule', transfer.show_acl_rule),
+         FuncCommand('add-rule', transfer.add_acl_rule),
+         FuncCommand('del-rule', transfer.del_acl_rule),
+         FuncCommand('update-rule', transfer.update_acl_rule)],
+        'Manage Endpoint Access Control Lists'),
 
     MenuCommand(
         'bookmark',
@@ -115,14 +127,11 @@ _TRANSFER_COMMANDS = [
          FuncCommand('create', transfer.bookmark_create)],
         'Manage Endpoint Bookmarks'),
 
-    MenuCommand(
-        'op',
-        [FuncCommand('async-transfer', transfer.submit_transfer),
-         FuncCommand('async-delete', transfer.submit_delete),
-         FuncCommand('ls', transfer.op_ls),
-         FuncCommand('mkdir', transfer.op_mkdir),
-         FuncCommand('rename', transfer.op_rename)],
-        'Perform filesystem operations on endpoints')
+    FuncCommand('async-transfer', transfer.submit_transfer),
+    FuncCommand('async-delete', transfer.submit_delete),
+    FuncCommand('ls', transfer.op_ls),
+    FuncCommand('mkdir', transfer.op_mkdir),
+    FuncCommand('rename', transfer.op_rename)
 ]
 
 _COMMAND_TREE = [
