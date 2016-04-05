@@ -4,7 +4,14 @@ from globus_cli.helpers import cliargs
 from globus_cli.parser.shared_parser import GlobusCLISharedParser
 from globus_cli.parser.helpers import (
     not_implemented_func, FuncCommand, MenuCommand, add_cli_args)
-from globus_cli.services import nexus, auth, transfer
+from globus_cli.services import auth, transfer
+
+
+@cliargs('Show login help', [])
+def login_help(args):
+    print('\nTo login to the Globus CLI, go to\n')
+    print('    https://tokens.globus.org/\n')
+    print('and follow the instructions for the Globus CLI\n')
 
 
 @cliargs('Show simplified help text for all Globus CLI commands', [])
@@ -49,6 +56,9 @@ def full_help_func(args, tree=None, parent_name='globus'):
 
     printme = False
     if tree is None:
+        headerline = 'Globus CLI Commands'
+        print('\n' + headerline)
+        print('='*len(headerline))
         printme = True
         tree = _COMMAND_TREE
 
@@ -73,10 +83,6 @@ def full_help_func(args, tree=None, parent_name='globus'):
 
     return full_help
 
-
-_NEXUS_COMMANDS = [
-    FuncCommand('get-goauth-token', nexus.get_goauth_token)
-]
 
 _AUTH_COMMANDS = [
     FuncCommand('get-identities', auth.get_identities),
@@ -136,6 +142,7 @@ _TRANSFER_COMMANDS = [
 
 _COMMAND_TREE = [
     FuncCommand('help', full_help_func),
+    FuncCommand('login', login_help),
 
     MenuCommand('auth', _AUTH_COMMANDS, (
                 'Interact with Globus Auth API. '
@@ -146,13 +153,7 @@ _COMMAND_TREE = [
                 'Interact with Globus Transfer API. '
                 'Transfer, Delete, List, and Rename files on Endpoints, '
                 'manage your Endpoints and Shares, and monitor your ongoing '
-                'Transfer Tasks.')),
-    MenuCommand('nexus', _NEXUS_COMMANDS, (
-                'Interact with legacy Nexus API. WARNING: Deprecated. '
-                'Only use this if you need access to legacy tokens '
-                'during the development of the globus cli. These methods '
-                'will be replaced in the near future with commands '
-                'which use other services.'))
+                'Transfer Tasks.'))
 ]
 
 
