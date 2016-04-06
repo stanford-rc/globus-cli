@@ -39,18 +39,32 @@ def _validate_transfer_args(args, parser):
     CLIArg('recursive', default=False, action='store_true',
            help=('source-path and dest-path are both directories, do a '
                  'recursive dir transfer. Ignored when using --batch')),
+    CLIArg('sync-level', default="mtime", type=str.lower,
+           choices=("exists", "mtime", "checksum"),
+           help=('How will the transfer task determine whether or not to '
+                 'actually transfer a file? '
+                 'EXISTS: if the dest file is absent; '
+                 'MTIME: if source is newer (modififed time) than dest; '
+                 'CHECKSUM: if source and dest contents differ')),
     CLIArg('batch', default=False, action='store_true',
-           help=('Accept a batch of source/dest path pairs on stdin.'))
+           help=('Accept a batch of source/dest path pairs on stdin. '
+                 'Skips empty lines and allows comments beginning with "#"'))
     ], arg_validator=_validate_transfer_args)
 def submit_transfer(args):
     """
     Executor for `globus transfer async-transfer`
     """
     client = TransferClient()
-    autoactivate(client, args.source_endpoint, if_expires_in=60)
-    autoactivate(client, args.dest_endpoint, if_expires_in=60)
 
     if args.batch is not None:
+        # if input is interactive, print help to stderr
+        if sys.stdin.isatty():
+            print(('Enter transfers, line by line, as\n\n'
+                   '    [--recursive] source-path dest-path\n\n'
+                   'Lines are split with shlex in POSIX mode: '
+                   'https://docs.python.org/library/shlex.html#parsing-rules\n'
+                   'Terminate input with Ctrl+D or <EOF>\n'), file=sys.stderr)
+
         def parse_batch_line(line):
             """
             Parse a line of batch input and turn it into a transfer submission
@@ -64,20 +78,36 @@ def submit_transfer(args):
             parser.add_argument('source')
             parser.add_argument('dest')
 
+            # get the argument vector:
             # do a shlex split to handle quoted paths with spaces in them
-            args = parser.parse_args(shlex.split(line))
+            # also lets us have comments with #
+            argv = shlex.split(line, comments=True)
+            if not argv:
+                return None
+
+            args = parser.parse_args(argv)
 
             return client.make_submit_transfer_item(
                 args.source, args.dest, recursive=args.recursive)
 
-        transfer_items = [parse_batch_line(line) for line in sys.stdin]
+        # nested comprehensions to filter the results to remove None
+        # use readlines() rather than implicit file read line looping to force
+        # python to properly capture EOF (otherwise, EOF acts as a flush and
+        # things get weird)
+        transfer_items = [item for item in (parse_batch_line(line)
+                                            for line in sys.stdin.readlines())
+                          if item is not None]
     else:
         transfer_items = [client.make_submit_transfer_item(
             args.source_path, args.dest_path, recursive=args.recursive)]
 
     datadoc = client.make_submit_transfer_data(
         args.source_endpoint, args.dest_endpoint, transfer_items,
-        label='globus-cli transfer', sync_level="mtime")
+        label='globus-cli transfer', sync_level=args.sync_level)
+
+    # autoactivate after parsing all args and putting things together
+    autoactivate(client, args.source_endpoint, if_expires_in=60)
+    autoactivate(client, args.dest_endpoint, if_expires_in=60)
 
     res = client.submit_transfer(datadoc)
 
