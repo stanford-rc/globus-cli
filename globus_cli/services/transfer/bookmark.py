@@ -1,7 +1,5 @@
 from __future__ import print_function
 
-import json
-
 from globus_sdk import TransferClient
 
 from globus_cli.helpers import (

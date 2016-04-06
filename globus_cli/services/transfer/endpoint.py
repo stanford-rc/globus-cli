@@ -5,7 +5,7 @@ from globus_sdk import TransferClient
 
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
-    colon_formatted_print)
+    colon_formatted_print, not_implemented_func)
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format, endpoint_list_to_text,
     assemble_generic_doc)
@@ -205,9 +205,82 @@ def endpoint_show(args):
     res = client.get_endpoint(args.endpoint_id)
 
     if outformat_is_json(args):
-        print(json.dumps(res.data, indent=2))
+        print_json_response(res)
     else:
         fields = (('Display Name', 'display_name'), ('ID', 'id'),
                   ('Owner', 'owner_string'), ('Activated', 'activated'),
                   ('Shareable', 'shareable'))
         colon_formatted_print(res.data, fields)
+
+
+@cliargs('Not Implemented', [])
+def endpoint_create(args):
+    """
+    Executor for `globus transfer endpoint create`
+    """
+    not_implemented_func()
+
+
+@cliargs('Update attributes of an Endpoint', [
+    CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+    CLIArg('display-name', help='New Display Name for the Endpoint'),
+    CLIArg('description', help='New Description for the Endpoint'),
+    CLIArg('organization', help='New Organization for the Endpoint'),
+    CLIArg('contact-email', help='New Contact Email for the Endpoint'),
+    CLIArg('contact-info', help='New Contact Info for the Endpoint'),
+    CLIArg('info-link', help='New Link for Info about the Endpoint'),
+    CLIArg('force-encryption', choices=('true', 'false'), type=str.lower,
+           help=('Only available on Globus Connect Server. '
+                 '(Un)Force transfers to use encryption')),
+    CLIArg('default-directory',
+           help=('Only available on Globus Connect Server. '
+                 'Set the default directory')),
+    CLIArg('myproxy-server',
+           help=('Only available on Globus Connect Server. '
+                 'Set the MyProxy Server URI')),
+    CLIArg('myproxy-dn',
+           help=('Only available on Globus Connect Server. '
+                 'Set the MyProxy Server DN')),
+    CLIArg('oauth-server',
+           help=('Only available on Globus Connect Server. '
+                 'Set the OAuth Server URI')),
+    ])
+def endpoint_update(args):
+    """
+    Executor for `globus transfer endpoint update`
+    """
+    client = TransferClient()
+
+    ep_doc = assemble_generic_doc(
+        'endpoint',
+        display_name=args.display_name, description=args.description,
+        organization=args.organization, contact_email=args.contact_email,
+        contact_info=args.contact_info, info_link=args.info_link,
+        force_encryption=args.force_encryption,
+        default_directory=args.default_directory,
+        myproxy_server=args.myproxy_server, myproxy_dn=args.myproxy_dn,
+        oauth_server=args.oauth_server)
+
+    res = client.update_endpoint(args.endpoint_id, ep_doc)
+
+    if outformat_is_json(args):
+        print_json_response(res)
+    else:
+        print(res.data['message'])
+
+
+@cliargs('Delete a given Endpoint', [
+    CLIArg('endpoint-id', required=True, help='ID of the endpoint')
+    ])
+def endpoint_delete(args):
+    """
+    Executor for `globus transfer endpoint delete`
+    """
+    client = TransferClient()
+
+    res = client.delete_endpoint(args.endpoint_id)
+
+    if outformat_is_json(args):
+        print_json_response(res)
+    else:
+        print(res.data['message'])

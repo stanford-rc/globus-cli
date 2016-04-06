@@ -76,3 +76,14 @@ def colon_formatted_print(data, named_fields):
     maxlen = max(len(n) for n, f in named_fields) + 1
     for name, field in named_fields:
         print('{} {}'.format((name + ':').ljust(maxlen), data[field]))
+
+
+def not_implemented_func():
+    """
+    This is a dummy function used to stub parts of the command tree that
+    haven't been implemented yet.
+    It has the same signature as a typical command function (i.e. takes args
+    and nothing else), but raises a NotImplementedError
+    """
+    raise NotImplementedError(('Hold yer horses! '
+                               'This command has not been implemented yet!'))

@@ -1,7 +1,12 @@
 from globus_cli.services.transfer.endpoint import (
     endpoint_search, endpoint_autoactivate, endpoint_deactivate,
 
-    endpoint_server_list, endpoint_show,
+    endpoint_show,
+    endpoint_create,
+    endpoint_update,
+    endpoint_delete,
+
+    endpoint_server_list,
     my_shared_endpoint_list,
 
     endpoint_role_list, endpoint_role_show,
@@ -25,7 +30,11 @@ from globus_cli.services.transfer.task_submit import (
 __all__ = [
     'endpoint_search', 'endpoint_autoactivate', 'endpoint_deactivate',
     'endpoint_server_list', 'my_shared_endpoint_list',
+
     'endpoint_show',
+    'endpoint_create',
+    'endpoint_update',
+    'endpoint_delete',
 
     'endpoint_role_list', 'endpoint_role_show',
     'endpoint_role_create', 'endpoint_role_delete',

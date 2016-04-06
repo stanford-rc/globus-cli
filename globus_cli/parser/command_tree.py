@@ -3,7 +3,7 @@ import textwrap
 from globus_cli.helpers import cliargs
 from globus_cli.parser.shared_parser import GlobusCLISharedParser
 from globus_cli.parser.helpers import (
-    not_implemented_func, FuncCommand, MenuCommand, add_cli_args)
+    FuncCommand, MenuCommand, add_cli_args)
 from globus_cli.services import auth, transfer
 
 
@@ -93,8 +93,9 @@ _TRANSFER_COMMANDS = [
     MenuCommand(
         'endpoint',
         [FuncCommand('show', transfer.endpoint_show),
-         FuncCommand('update', not_implemented_func),
-         FuncCommand('create', not_implemented_func),
+         FuncCommand('create', transfer.endpoint_create),
+         FuncCommand('update', transfer.endpoint_update),
+         FuncCommand('delete', transfer.endpoint_delete),
          FuncCommand('search', transfer.endpoint_search),
          FuncCommand('autoactivate', transfer.endpoint_autoactivate),
          FuncCommand('deactivate', transfer.endpoint_deactivate),

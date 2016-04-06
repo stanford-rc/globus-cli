@@ -1,18 +1,3 @@
-from globus_cli.helpers import cliargs
-
-
-@cliargs('Not Implemented', [])
-def not_implemented_func(args):
-    """
-    This is a dummy function used to stub parts of the command tree that
-    haven't been implemented yet.
-    It has the same signature as a typical command function (i.e. takes args
-    and nothing else), but raises a NotImplementedError
-    """
-    raise NotImplementedError(('Hold yer horses! '
-                               'This command has not been implemented yet!'))
-
-
 class MenuCommand(object):
     def __init__(self, name, commandset, helptext):
         self.name = name
