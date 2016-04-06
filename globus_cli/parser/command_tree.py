@@ -133,7 +133,10 @@ _TRANSFER_COMMANDS = [
     MenuCommand(
         'bookmark',
         [FuncCommand('list', transfer.bookmark_list),
-         FuncCommand('create', transfer.bookmark_create)],
+         FuncCommand('show', transfer.bookmark_show),
+         FuncCommand('create', transfer.bookmark_create),
+         FuncCommand('rename', transfer.bookmark_rename),
+         FuncCommand('delete', transfer.bookmark_delete)],
         'Manage Endpoint Bookmarks'),
 
     FuncCommand('async-transfer', transfer.submit_transfer),

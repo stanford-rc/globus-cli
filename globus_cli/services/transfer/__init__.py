@@ -11,7 +11,8 @@ from globus_cli.services.transfer.acl import (
     acl_list, show_acl_rule, add_acl_rule, del_acl_rule,
     update_acl_rule)
 from globus_cli.services.transfer.bookmark import (
-    bookmark_list, bookmark_create)
+    bookmark_list, bookmark_show,
+    bookmark_create, bookmark_rename, bookmark_delete)
 from globus_cli.services.transfer.task import (
     task_list, task_event_list, task_pause_info,
     cancel_task, update_task, show_task)
@@ -32,7 +33,8 @@ __all__ = [
     'acl_list', 'show_acl_rule', 'add_acl_rule', 'del_acl_rule',
     'update_acl_rule',
 
-    'bookmark_list', 'bookmark_create',
+    'bookmark_list', 'bookmark_show',
+    'bookmark_create', 'bookmark_rename', 'bookmark_delete',
 
     'task_list', 'task_event_list', 'task_pause_info',
     'cancel_task', 'update_task', 'show_task',

@@ -4,7 +4,8 @@ import json
 from globus_sdk import TransferClient
 
 from globus_cli.helpers import (
-    outformat_is_json, cliargs, CLIArg, print_json_response)
+    outformat_is_json, cliargs, CLIArg, print_json_response,
+    colon_formatted_print)
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format, endpoint_list_to_text,
     assemble_generic_doc)
@@ -142,10 +143,7 @@ def endpoint_role_show(args):
     else:
         named_fields = (('Principal Type', 'principal_type'),
                         ('Principal', 'principal'), ('Role', 'role'))
-        maxlen = max(len(n) for n, f in named_fields) + 1
-        for name, field in named_fields:
-            print('{} {}'.format((name + ':').ljust(maxlen),
-                                 role_doc.data[field]))
+        colon_formatted_print(role_doc.data, named_fields)
 
 
 @cliargs('Create a Role on an Endpoint', [
@@ -212,7 +210,4 @@ def endpoint_show(args):
         fields = (('Display Name', 'display_name'), ('ID', 'id'),
                   ('Owner', 'owner_string'), ('Activated', 'activated'),
                   ('Shareable', 'shareable'))
-        maxlen = max(len(n) for n, f in fields) + 1
-        for name, field in fields:
-            print(('{:' + str(maxlen) + '} {}')
-                  .format(name+':', res.data[field]))
+        colon_formatted_print(res.data, fields)

@@ -70,3 +70,9 @@ class CLIArg(object):
 
 def print_json_response(res):
     print(json.dumps(res.data, indent=2))
+
+
+def colon_formatted_print(data, named_fields):
+    maxlen = max(len(n) for n, f in named_fields) + 1
+    for name, field in named_fields:
+        print('{} {}'.format((name + ':').ljust(maxlen), data[field]))
