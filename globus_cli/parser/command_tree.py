@@ -103,7 +103,10 @@ _TRANSFER_COMMANDS = [
                      transfer.my_shared_endpoint_list),
          MenuCommand(
             'role',
-            [FuncCommand('list', transfer.endpoint_role_list)],
+            [FuncCommand('list', transfer.endpoint_role_list),
+             FuncCommand('show', transfer.endpoint_role_show),
+             FuncCommand('create', transfer.endpoint_role_create),
+             FuncCommand('delete', transfer.endpoint_role_delete)],
             'Manage endpoint roles')
          ],
         'Manage Globus Endpoint definitions'),

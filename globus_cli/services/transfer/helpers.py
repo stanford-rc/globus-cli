@@ -11,7 +11,7 @@ def print_json_from_iterator(iterator):
     json_output_dict = {'DATA': []}
     for item in iterator:
         json_output_dict['DATA'].append(item.data)
-    print(json.dumps(json_output_dict))
+    print(json.dumps(json_output_dict, indent=2))
 
 
 def text_header_and_format(lengths_and_headers):
@@ -32,3 +32,10 @@ def endpoint_list_to_text(iterator):
         print(text_col_format.format(
             result.data['owner_string'], result.data['id'],
             display_name_or_cname(result.data)))
+
+
+def assemble_generic_doc(datatype, *args, **kwargs):
+    doc = {'DATA_TYPE': datatype}
+    for argname in kwargs:
+        doc[argname] = kwargs[argname]
+    return doc

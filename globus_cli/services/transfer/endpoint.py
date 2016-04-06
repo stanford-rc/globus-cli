@@ -3,9 +3,11 @@ import json
 
 from globus_sdk import TransferClient
 
-from globus_cli.helpers import outformat_is_json, cliargs, CLIArg
+from globus_cli.helpers import (
+    outformat_is_json, cliargs, CLIArg, print_json_response)
 from globus_cli.services.transfer.helpers import (
-    print_json_from_iterator, text_header_and_format, endpoint_list_to_text)
+    print_json_from_iterator, text_header_and_format, endpoint_list_to_text,
+    assemble_generic_doc)
 from globus_cli.services.transfer.activation import autoactivate
 
 
@@ -114,12 +116,82 @@ def endpoint_role_list(args):
         print_json_from_iterator(role_iterator)
     else:
         text_col_format = text_header_and_format(
-            [(16, 'Principal Type'), (36, 'Principal'), (16, 'Role')])
+            [(16, 'Principal Type'), (36, 'Role ID'), (36, 'Principal'),
+             (16, 'Role')])
 
         for result in role_iterator:
             print(text_col_format.format(
-                result.data['principal_type'], result.data['principal'],
-                result.data['role']))
+                result.data['principal_type'], result.data['id'],
+                result.data['principal'], result.data['role']))
+
+
+@cliargs('Show full info for a Role on an Endpoint', [
+    CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+    CLIArg('role-id', required=True, help='ID of the role')
+    ])
+def endpoint_role_show(args):
+    """
+    Executor for `globus transfer endpoint role show`
+    """
+    client = TransferClient()
+
+    role_doc = client.get_endpoint_role(args.endpoint_id, args.role_id)
+
+    if outformat_is_json(args):
+        print_json_response(role_doc)
+    else:
+        named_fields = (('Principal Type', 'principal_type'),
+                        ('Principal', 'principal'), ('Role', 'role'))
+        maxlen = max(len(n) for n, f in named_fields) + 1
+        for name, field in named_fields:
+            print('{} {}'.format((name + ':').ljust(maxlen),
+                                 role_doc.data[field]))
+
+
+@cliargs('Create a Role on an Endpoint', [
+    CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+    CLIArg('principal-type', required=True,
+           choices=('identity', 'group'), type=str.lower,
+           help='Type of entity to set a role on'),
+    CLIArg('principal', required=True, help='Entity to set a role on'),
+    CLIArg('role', default='access_manager',
+           choices=('access_manager',), type=str.lower,
+           help='A role to assign. Currently only supports access_manager')
+    ])
+def endpoint_role_create(args):
+    """
+    Executor for `globus transfer endpoint role show`
+    """
+    client = TransferClient()
+
+    role_doc = assemble_generic_doc(
+        'role', principal_type=args.principal_type, principal=args.principal,
+        role=args.role)
+
+    res = client.add_endpoint_role(args.endpoint_id, role_doc)
+
+    if outformat_is_json(args):
+        print_json_response(res)
+    else:
+        print('ID: ' + res.data['id'])
+
+
+@cliargs('Remove a Role from an Endpoint', [
+    CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+    CLIArg('role-id', required=True, help='ID of the role')
+    ])
+def endpoint_role_delete(args):
+    """
+    Executor for `globus transfer endpoint role delete`
+    """
+    client = TransferClient()
+
+    res = client.delete_endpoint_role(args.endpoint_id, args.role_id)
+
+    if outformat_is_json(args):
+        print_json_response(res)
+    else:
+        print(res.data['message'])
 
 
 @cliargs('Display a detailed endpoint definition', [

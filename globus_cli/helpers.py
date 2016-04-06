@@ -1,5 +1,6 @@
 from __future__ import print_function
 import sys
+import json
 
 
 # Format Enum for output formatting
@@ -65,3 +66,7 @@ class CLIArg(object):
 
     def is_required(self):
         return 'required' in self.kwargs and self.kwargs['required']
+
+
+def print_json_response(res):
+    print(json.dumps(res.data, indent=2))
