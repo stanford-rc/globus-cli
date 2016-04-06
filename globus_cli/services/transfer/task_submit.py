@@ -1,4 +1,8 @@
 from __future__ import print_function
+
+import argparse
+import shlex
+import sys
 import json
 
 from globus_sdk import TransferClient
@@ -32,10 +36,11 @@ def _validate_transfer_args(args, parser):
            help='Path to the file/dir to move on source-endpoint'),
     CLIArg('dest-path',
            help='Desired location of the file/dir on dest-endpoint'),
-    CLIArg('batch', type=json.loads,
-           help=('Paths to source and destination files, as a JSON '
-                 'document. Document format is '
-                 '{"DATA": [{"source": <path>, "dest": <path>}, ...]}'))
+    CLIArg('recursive', default=False, action='store_true',
+           help=('source-path and dest-path are both directories, do a '
+                 'recursive dir transfer. Ignored when using --batch')),
+    CLIArg('batch', default=False, action='store_true',
+           help=('Accept a batch of source/dest path pairs on stdin.'))
     ], arg_validator=_validate_transfer_args)
 def submit_transfer(args):
     """
@@ -46,13 +51,29 @@ def submit_transfer(args):
     autoactivate(client, args.dest_endpoint, if_expires_in=60)
 
     if args.batch is not None:
-        transfer_items = [
-            client.make_submit_transfer_item(item['source'], item['dest'])
-            for item in args.batch['DATA']
-            ]
+        def parse_batch_line(line):
+            """
+            Parse a line of batch input and turn it into a transfer submission
+            item.
+            """
+            # define a parser to handle the batch line
+            parser = argparse.ArgumentParser(
+                description='async-transfer batch parser')
+            parser.add_argument('--recursive', default=False,
+                                action='store_true')
+            parser.add_argument('source')
+            parser.add_argument('dest')
+
+            # do a shlex split to handle quoted paths with spaces in them
+            args = parser.parse_args(shlex.split(line))
+
+            return client.make_submit_transfer_item(
+                args.source, args.dest, recursive=args.recursive)
+
+        transfer_items = [parse_batch_line(line) for line in sys.stdin]
     else:
-        transfer_items = [client.make_submit_transfer_item(args.source_path,
-                                                           args.dest_path)]
+        transfer_items = [client.make_submit_transfer_item(
+            args.source_path, args.dest_path, recursive=args.recursive)]
 
     datadoc = client.make_submit_transfer_data(
         args.source_endpoint, args.dest_endpoint, transfer_items,
