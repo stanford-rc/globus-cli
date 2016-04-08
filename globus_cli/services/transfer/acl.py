@@ -1,11 +1,9 @@
 from __future__ import print_function
 import json
 
-from globus_sdk import TransferClient
-
 from globus_cli.helpers import outformat_is_json, cliargs, CLIArg
 from globus_cli.services.transfer.helpers import (
-    print_json_from_iterator, text_header_and_format)
+    print_json_from_iterator, text_header_and_format, get_client)
 
 
 @cliargs('List of Access Control List rules on an Endpoint', [
@@ -16,7 +14,7 @@ def acl_list(args):
     """
     Executor for `globus transfer access acl-list`
     """
-    client = TransferClient()
+    client = get_client()
 
     rule_iterator = client.endpoint_acl_list(args.endpoint_id)
 
@@ -43,7 +41,7 @@ def show_acl_rule(args):
     """
     Executor for `globus transfer access show-acl-rule`
     """
-    client = TransferClient()
+    client = get_client()
 
     res = client.get_endpoint_acl_rule(args.endpoint_id, args.rule_id)
 
@@ -66,7 +64,7 @@ def add_acl_rule(args):
     """
     Executor for `globus transfer access add-acl-rule`
     """
-    client = TransferClient()
+    client = get_client()
 
     rule_data = {
         'DATA_TYPE': 'access',
@@ -89,7 +87,7 @@ def del_acl_rule(args):
     """
     Executor for `globus transfer access del-acl-rule`
     """
-    client = TransferClient()
+    client = get_client()
 
     res = client.delete_endpoint_acl_rule(args.endpoint_id, args.rule_id)
 
@@ -113,7 +111,7 @@ def update_acl_rule(args):
     """
     Executor for `globus transfer access update-acl-rule`
     """
-    client = TransferClient()
+    client = get_client()
 
     rule_data = {
         'DATA_TYPE': 'access'

@@ -5,8 +5,8 @@ import shlex
 import sys
 import json
 
-from globus_sdk import TransferClient
 from globus_cli.helpers import outformat_is_json, cliargs, CLIArg
+from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.activation import autoactivate
 
 
@@ -54,7 +54,7 @@ def submit_transfer(args):
     """
     Executor for `globus transfer async-transfer`
     """
-    client = TransferClient()
+    client = get_client()
 
     if args.batch is not None:
         # if input is interactive, print help to stderr
@@ -131,7 +131,7 @@ def submit_delete(args):
     """
     Executor for `globus transfer submit-delete`
     """
-    client = TransferClient()
+    client = get_client()
     autoactivate(client, args.endpoint_id, if_expires_in=60)
 
     datadoc = {

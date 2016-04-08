@@ -1,8 +1,8 @@
 from __future__ import print_function
 import json
 
-from globus_sdk import TransferClient
 from globus_cli.helpers import outformat_is_json, cliargs, CLIArg
+from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.activation import autoactivate
 
 
@@ -16,7 +16,7 @@ def op_ls(args):
     """
     Executor for `globus transfer ls`
     """
-    client = TransferClient()
+    client = get_client()
     autoactivate(client, args.endpoint_id, if_expires_in=60)
 
     res = client.operation_ls(args.endpoint_id, path=args.path)
@@ -37,7 +37,7 @@ def op_mkdir(args):
     """
     Executor for `globus transfer mkdir`
     """
-    client = TransferClient()
+    client = get_client()
     autoactivate(client, args.endpoint_id, if_expires_in=60)
 
     res = client.operation_mkdir(args.endpoint_id, path=args.path)
@@ -60,7 +60,7 @@ def op_rename(args):
     """
     Executor for `globus transfer rename`
     """
-    client = TransferClient()
+    client = get_client()
     autoactivate(client, args.endpoint_id, if_expires_in=60)
 
     res = client.operation_rename(args.endpoint_id, oldpath=args.old_path,

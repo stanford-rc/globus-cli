@@ -1,12 +1,10 @@
 from __future__ import print_function
 
-from globus_sdk import TransferClient
-
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
     colon_formatted_print)
 from globus_cli.services.transfer.helpers import (
-    print_json_from_iterator, text_header_and_format)
+    print_json_from_iterator, text_header_and_format, get_client)
 
 
 @cliargs('List Bookmarks for the current user', [])
@@ -14,7 +12,7 @@ def bookmark_list(args):
     """
     Executor for `globus transfer bookmark list`
     """
-    client = TransferClient()
+    client = get_client()
 
     bookmark_iterator = client.bookmark_list()
 
@@ -38,7 +36,7 @@ def bookmark_show(args):
     """
     Executor for `globus transfer bookmark show`
     """
-    client = TransferClient()
+    client = get_client()
 
     res = client.get_bookmark(args.bookmark_id)
 
@@ -61,7 +59,7 @@ def bookmark_create(args):
     """
     Executor for `globus transfer bookmark create`
     """
-    client = TransferClient()
+    client = get_client()
 
     submit_data = {
         'endpoint_id': args.endpoint_id,
@@ -85,7 +83,7 @@ def bookmark_rename(args):
     """
     Executor for `globus transfer bookmark rename`
     """
-    client = TransferClient()
+    client = get_client()
 
     submit_data = {
         'name': args.name
@@ -106,7 +104,7 @@ def bookmark_delete(args):
     """
     Executor for `globus transfer bookmark delete`
     """
-    client = TransferClient()
+    client = get_client()
 
     res = client.delete_bookmark(args.bookmark_id)
 

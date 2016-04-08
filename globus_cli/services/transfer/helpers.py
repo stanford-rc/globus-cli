@@ -2,6 +2,13 @@ from __future__ import print_function
 
 import json
 
+from globus_cli import version
+from globus_sdk import TransferClient
+
+
+def get_client():
+    return TransferClient(app_name=version.app_name)
+
 
 def display_name_or_cname(ep_doc):
     return ep_doc['display_name'] or ep_doc['canonical_name']

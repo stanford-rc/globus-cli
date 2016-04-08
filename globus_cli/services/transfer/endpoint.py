@@ -1,14 +1,12 @@
 from __future__ import print_function
 import json
 
-from globus_sdk import TransferClient
-
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
     colon_formatted_print, not_implemented_func)
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format, endpoint_list_to_text,
-    assemble_generic_doc)
+    assemble_generic_doc, get_client)
 from globus_cli.services.transfer.activation import autoactivate
 
 
@@ -25,7 +23,7 @@ def endpoint_search(args):
     """
     Executor for `globus transfer endpoint-search`
     """
-    client = TransferClient()
+    client = get_client()
     search_iterator = client.endpoint_search(
         filter_fulltext=args.filter_fulltext, filter_scope=args.filter_scope)
 
@@ -43,7 +41,7 @@ def endpoint_autoactivate(args):
     """
     Executor for `globus transfer endpoint-autoactivate`
     """
-    client = TransferClient()
+    client = get_client()
     res = autoactivate(client, args.endpoint_id)
     print(json.dumps(res.data, indent=2))
 
@@ -56,7 +54,7 @@ def endpoint_deactivate(args):
     """
     Executor for `globus transfer endpoint-deactivate`
     """
-    client = TransferClient()
+    client = get_client()
     res = client.endpoint_deactivate(args.endpoint_id)
     print(json.dumps(res.data, indent=2))
 
@@ -69,7 +67,7 @@ def endpoint_server_list(args):
     """
     Executor for `globus transfer endpoint-server-list`
     """
-    client = TransferClient()
+    client = get_client()
 
     server_iterator = client.endpoint_server_list(args.endpoint_id)
 
@@ -91,7 +89,7 @@ def my_shared_endpoint_list(args):
     """
     Executor for `globus transfer endpoint my-shared-endpoint-list`
     """
-    client = TransferClient()
+    client = get_client()
 
     ep_iterator = client.my_shared_endpoint_list(args.endpoint_id)
 
@@ -109,7 +107,7 @@ def endpoint_role_list(args):
     """
     Executor for `globus transfer access endpoint-role-list`
     """
-    client = TransferClient()
+    client = get_client()
 
     role_iterator = client.endpoint_role_list(args.endpoint_id)
 
@@ -134,7 +132,7 @@ def endpoint_role_show(args):
     """
     Executor for `globus transfer endpoint role show`
     """
-    client = TransferClient()
+    client = get_client()
 
     role_doc = client.get_endpoint_role(args.endpoint_id, args.role_id)
 
@@ -160,7 +158,7 @@ def endpoint_role_create(args):
     """
     Executor for `globus transfer endpoint role show`
     """
-    client = TransferClient()
+    client = get_client()
 
     role_doc = assemble_generic_doc(
         'role', principal_type=args.principal_type, principal=args.principal,
@@ -182,7 +180,7 @@ def endpoint_role_delete(args):
     """
     Executor for `globus transfer endpoint role delete`
     """
-    client = TransferClient()
+    client = get_client()
 
     res = client.delete_endpoint_role(args.endpoint_id, args.role_id)
 
@@ -200,7 +198,7 @@ def endpoint_show(args):
     """
     Executor for `globus transfer endpoint show`
     """
-    client = TransferClient()
+    client = get_client()
 
     res = client.get_endpoint(args.endpoint_id)
 
@@ -249,7 +247,7 @@ def endpoint_update(args):
     """
     Executor for `globus transfer endpoint update`
     """
-    client = TransferClient()
+    client = get_client()
 
     ep_doc = assemble_generic_doc(
         'endpoint',
@@ -276,7 +274,7 @@ def endpoint_delete(args):
     """
     Executor for `globus transfer endpoint delete`
     """
-    client = TransferClient()
+    client = get_client()
 
     res = client.delete_endpoint(args.endpoint_id)
 

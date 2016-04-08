@@ -1,11 +1,9 @@
 from __future__ import print_function
 import json
 
-from globus_sdk import TransferClient
-
 from globus_cli.helpers import outformat_is_json, cliargs, CLIArg
 from globus_cli.services.transfer.helpers import (
-    print_json_from_iterator, text_header_and_format)
+    print_json_from_iterator, text_header_and_format, get_client)
 
 
 @cliargs('List Tasks for the current user', [])
@@ -13,7 +11,7 @@ def task_list(args):
     """
     Executor for `globus transfer task-list`
     """
-    client = TransferClient()
+    client = get_client()
 
     task_iterator = client.task_list(num_results=10,
                                      filter='type:TRANSFER,DELETE')
@@ -43,7 +41,7 @@ def task_event_list(args):
     """
     Executor for `globus transfer task-event-list`
     """
-    client = TransferClient()
+    client = get_client()
 
     event_iterator = client.task_event_list(args.task_id)
 
@@ -67,7 +65,7 @@ def cancel_task(args):
     """
     Executor for `globus transfer task cancel`
     """
-    client = TransferClient()
+    client = get_client()
 
     res = client.cancel_task(args.task_id)
 
@@ -87,7 +85,7 @@ def update_task(args):
     """
     Executor for `globus transfer task update`
     """
-    client = TransferClient()
+    client = get_client()
 
     task_doc = {
         'DATA_TYPE': 'task'
@@ -114,7 +112,7 @@ def show_task(args):
     """
     Executor for `globus transfer task show`
     """
-    client = TransferClient()
+    client = get_client()
 
     res = client.get_task(args.task_id)
 
@@ -128,7 +126,7 @@ def task_pause_info(args):
     """
     Executor for `globus transfer task pause-info`
     """
-    client = TransferClient()
+    client = get_client()
 
     res = client.task_pause_info(args.task_id)
 

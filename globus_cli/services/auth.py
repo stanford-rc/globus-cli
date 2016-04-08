@@ -1,7 +1,13 @@
 import json
 from globus_sdk import AuthClient
 
+from globus_cli import version
 from globus_cli.helpers import cliargs, CLIArg
+
+
+def _get_auth_client():
+    client = AuthClient(app_name=version.app_name)
+    return client
 
 
 @cliargs('Inspect Globus Auth Identities', [
@@ -14,7 +20,7 @@ def get_identities(args):
     """
     Executor for `globus auth get-identities`
     """
-    client = AuthClient()
+    client = _get_auth_client()
 
     params = {}
 
