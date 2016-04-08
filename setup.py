@@ -11,7 +11,7 @@ setup(
     name="globus-cli",
     version=version,
     packages=find_packages(),
-    install_requires=['globus-sdk'],
+    install_requires=['argparse', 'globus-sdk'],
 
     entry_points={
         'console_scripts': ['globus = globus_cli:run_command']
@@ -19,16 +19,22 @@ setup(
 
     # descriptive info, non-critical
     description="Globus CLI",
-    long_description=open("README.md").read(),
+    long_description=open("README.rst").read(),
     author="Stephen Rosen",
     author_email="sirosen@globus.org",
     url="https://github.com/globusonline/globus-cli",
     keywords=["globus", "cli", "command line"],
     classifiers=[
-        "Development Status :: 5 - Alpha",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: POSIX",
-        "Programming Language :: Python"
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5"
     ],
 )
