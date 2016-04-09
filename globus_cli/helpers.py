@@ -1,6 +1,7 @@
 from __future__ import print_function
 import sys
 import json
+import textwrap
 
 
 # Format Enum for output formatting
@@ -26,7 +27,18 @@ def outformat_is_text(args):
     return args.outformat == TEXT_FORMAT
 
 
-def cliargs(helptext, arguments, arg_validator=None):
+def _wrap_helptext(helptext, wraplen=50):
+    # split the helptext into lines, wrap the lines, and join them back
+    # together. This extra work is needed because textwrap's
+    # replace_whitespace=False
+    # option doesn't do what you think it does, and causes funny newlines in
+    # the middle of output if left to its own devices
+    lines = [textwrap.fill(line, width=wraplen, replace_whitespace=False)
+             for line in helptext.splitlines()]
+    return '\n'.join(lines)
+
+
+def cliargs(helptext, *arguments, **kwargs):
     """
     Decorator that takes a function and adds CLI arguments and helptext to it
     as function attributes. The function can then be placed directly into the
@@ -40,9 +52,9 @@ def cliargs(helptext, arguments, arg_validator=None):
         just takes the arguments to cliargs() and puts them into attributes of
         the function.
         """
-        wrapped.cli_help = helptext
+        wrapped.cli_help = _wrap_helptext(helptext, wraplen=78)
         wrapped.cli_arguments = arguments
-        wrapped.cli_argument_validator = arg_validator
+        wrapped.cli_argument_validator = kwargs.get('arg_validator', None)
 
         return wrapped
 
@@ -54,9 +66,9 @@ class CLIArg(object):
         self.kwargs = kwargs
         self.name = name
 
-        self.kwargs.update({
-            'dest': self.name.replace('-', '_')
-        })
+        self.kwargs['dest'] = self.name.replace('-', '_')
+        if 'help' in self.kwargs:
+            self.kwargs['help'] = _wrap_helptext(self.kwargs['help'])
 
     def argparse_arglist(self):
         return ['--{}'.format(self.name)]

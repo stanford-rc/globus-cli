@@ -10,12 +10,11 @@ def _get_auth_client():
     return client
 
 
-@cliargs('Inspect Globus Auth Identities', [
-    CLIArg('usernames', default=[], nargs='+',
-           help='Usernames to lookup in Globus Auth'),
-    CLIArg('identities', default=[], nargs='+',
-           help='Identity IDs to lookup in Globus Auth')
-    ])
+@cliargs('Inspect Globus Auth Identities',
+         CLIArg('usernames', default=[], nargs='+',
+                help='Usernames to lookup in Globus Auth'),
+         CLIArg('identities', default=[], nargs='+',
+                help='Identity IDs to lookup in Globus Auth'))
 def get_identities(args):
     """
     Executor for `globus auth get-identities`
@@ -35,9 +34,8 @@ def get_identities(args):
     print(json.dumps(res.data, indent=2))
 
 
-@cliargs('Inspect Globus Auth Tokens', [
-    CLIArg('token', help='Token to lookup in Globus Auth')
-])
+@cliargs('Inspect Globus Auth Tokens',
+         CLIArg('token', help='Token to lookup in Globus Auth'))
 def token_introspect(args):
     """
     Executor for `globus auth token-introspect`

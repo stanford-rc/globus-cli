@@ -8,7 +8,7 @@ from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format, get_client)
 
 
-@cliargs('List Bookmarks for the current user', [])
+@cliargs('List Bookmarks for the current user')
 def bookmark_list(args):
     """
     Executor for `globus transfer bookmark list`
@@ -37,11 +37,10 @@ def _validate_show_args(args, parser):
         parser.error('show cannot take both --bookmark-id and --bookmark-name')
 
 
-@cliargs('Show a Bookmark by either name or ID', [
-    CLIArg('bookmark-id', help='ID of the Bookmark'),
-    CLIArg('bookmark-name', help='Name of the Bookmark')
-    ],
-    arg_validator=_validate_show_args)
+@cliargs('Show a Bookmark by either name or ID',
+         CLIArg('bookmark-id', help='ID of the Bookmark'),
+         CLIArg('bookmark-name', help='Name of the Bookmark'),
+         arg_validator=_validate_show_args)
 def bookmark_show(args):
     """
     Executor for `globus transfer bookmark show`
@@ -72,13 +71,12 @@ def bookmark_show(args):
         colon_formatted_print(res.data, fields)
 
 
-@cliargs('Create a Bookmark for the current user', [
-    CLIArg('endpoint-id', required=True,
-           help='ID of the endpoint on which to add a Bookmark'),
-    CLIArg('path', required=True,
-           help='Path on the endpoint for the Bookmark'),
-    CLIArg('name', required=True, help='Name for the Bookmark')
-    ])
+@cliargs('Create a Bookmark for the current user',
+         CLIArg('endpoint-id', required=True,
+                help='ID of the endpoint on which to add a Bookmark'),
+         CLIArg('path', required=True,
+                help='Path on the endpoint for the Bookmark'),
+         CLIArg('name', required=True, help='Name for the Bookmark'))
 def bookmark_create(args):
     """
     Executor for `globus transfer bookmark create`
@@ -99,10 +97,9 @@ def bookmark_create(args):
         print('Bookmark ID: {}'.format(res.data['id']))
 
 
-@cliargs('Change a Bookmark\'s name', [
-    CLIArg('bookmark-id', required=True, help='ID of the Bookmark'),
-    CLIArg('name', required=True, help='New name for the Bookmark')
-    ])
+@cliargs('Change a Bookmark\'s name',
+         CLIArg('bookmark-id', required=True, help='ID of the Bookmark'),
+         CLIArg('name', required=True, help='New name for the Bookmark'))
 def bookmark_rename(args):
     """
     Executor for `globus transfer bookmark rename`
@@ -121,9 +118,8 @@ def bookmark_rename(args):
         print('Success')
 
 
-@cliargs('Delete a Bookmark', [
-    CLIArg('bookmark-id', required=True, help='ID of the Bookmark')
-    ])
+@cliargs('Delete a Bookmark',
+         CLIArg('bookmark-id', required=True, help='ID of the Bookmark'))
 def bookmark_delete(args):
     """
     Executor for `globus transfer bookmark delete`

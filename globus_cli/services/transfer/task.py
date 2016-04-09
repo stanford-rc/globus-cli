@@ -6,7 +6,7 @@ from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format, get_client)
 
 
-@cliargs('List Tasks for the current user', [])
+@cliargs('List Tasks for the current user')
 def task_list(args):
     """
     Executor for `globus transfer task-list`
@@ -33,10 +33,9 @@ def task_list(args):
                 result.data['label']))
 
 
-@cliargs('List Events for a given Task', [
-    CLIArg('task-id', required=True,
-           help='ID of the task for which you want to list events')
-    ])
+@cliargs('List Events for a given Task',
+         CLIArg('task-id', required=True,
+                help='ID of the task for which you want to list events'))
 def task_event_list(args):
     """
     Executor for `globus transfer task-event-list`
@@ -57,10 +56,9 @@ def task_event_list(args):
                 result.data['is_error'], result.data['details']))
 
 
-@cliargs('Cancel a specific task, owned by the current user', [
-    CLIArg('task-id', required=True,
-           help='ID of the task which you want to cancel')
-    ])
+@cliargs('Cancel a specific task, owned by the current user',
+         CLIArg('task-id', required=True,
+                help='ID of the task which you want to cancel'))
 def cancel_task(args):
     """
     Executor for `globus transfer task cancel`
@@ -75,12 +73,11 @@ def cancel_task(args):
         print(res.data['message'])
 
 
-@cliargs('Update label and/or deadline on an active task', [
-    CLIArg('task-id', required=True,
-           help='ID of the task which you want to cancel'),
-    CLIArg('label', default=None, help='New Label for the Task'),
-    CLIArg('deadline', default=None, help='New Deadline for the Task')
-    ])
+@cliargs('Update label and/or deadline on an active task',
+         CLIArg('task-id', required=True,
+                help='ID of the task which you want to cancel'),
+         CLIArg('label', default=None, help='New Label for the Task'),
+         CLIArg('deadline', default=None, help='New Deadline for the Task'))
 def update_task(args):
     """
     Executor for `globus transfer task update`
@@ -104,10 +101,9 @@ def update_task(args):
         print('Success')
 
 
-@cliargs('Show detailed information about a specific task', [
-    CLIArg('task-id', required=True,
-           help='ID of the task which you want to examine')
-    ])
+@cliargs('Show detailed information about a specific task',
+         CLIArg('task-id', required=True,
+                help='ID of the task which you want to examine'))
 def show_task(args):
     """
     Executor for `globus transfer task show`
@@ -119,9 +115,8 @@ def show_task(args):
     print(json.dumps(res.data, indent=2))
 
 
-@cliargs('Show detailed info about pause rules that are applied to a task', [
-    CLIArg('task-id', required=True, help='ID of the task')
-    ])
+@cliargs('Show detailed info about pause rules that are applied to a task',
+         CLIArg('task-id', required=True, help='ID of the task'))
 def task_pause_info(args):
     """
     Executor for `globus transfer task pause-info`

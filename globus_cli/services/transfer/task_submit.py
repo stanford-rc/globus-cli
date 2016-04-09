@@ -27,29 +27,30 @@ def _validate_transfer_args(args, parser):
 
 
 @cliargs(('Copy a file or directory from one endpoint '
-          'to another as an asynchronous task'), [
-    CLIArg('source-endpoint', required=True,
-           help='ID of the endpoint from which to transfer'),
-    CLIArg('dest-endpoint', required=True,
-           help='ID of the endpoint to which to transfer'),
-    CLIArg('source-path',
-           help='Path to the file/dir to move on source-endpoint'),
-    CLIArg('dest-path',
-           help='Desired location of the file/dir on dest-endpoint'),
-    CLIArg('recursive', default=False, action='store_true',
-           help=('source-path and dest-path are both directories, do a '
-                 'recursive dir transfer. Ignored when using --batch')),
-    CLIArg('sync-level', default="mtime", type=str.lower,
-           choices=("exists", "mtime", "checksum"),
-           help=('How will the transfer task determine whether or not to '
-                 'actually transfer a file? '
-                 'EXISTS: if the dest file is absent; '
-                 'MTIME: if source is newer (modififed time) than dest; '
-                 'CHECKSUM: if source and dest contents differ')),
-    CLIArg('batch', default=False, action='store_true',
-           help=('Accept a batch of source/dest path pairs on stdin. '
-                 'Skips empty lines and allows comments beginning with "#"'))
-    ], arg_validator=_validate_transfer_args)
+          'to another as an asynchronous task'),
+         CLIArg('source-endpoint', required=True,
+                help='ID of the endpoint from which to transfer'),
+         CLIArg('dest-endpoint', required=True,
+                help='ID of the endpoint to which to transfer'),
+         CLIArg('source-path',
+                help='Path to the file/dir to move on source-endpoint'),
+         CLIArg('dest-path',
+                help='Desired location of the file/dir on dest-endpoint'),
+         CLIArg('recursive', default=False, action='store_true',
+                help=('source-path and dest-path are both directories, do a '
+                      'recursive dir transfer. Ignored when using --batch')),
+         CLIArg('sync-level', default="mtime", type=str.lower,
+                choices=("exists", "mtime", "checksum"),
+                help=('How will the transfer task determine whether or not to '
+                      'actually transfer a file?\n'
+                      'EXISTS: if the dest file is absent\n'
+                      'MTIME: if source is newer (modififed time) than dest\n'
+                      'CHECKSUM: if source and dest contents differ')),
+         CLIArg('batch', default=False, action='store_true',
+                help=('Accept a batch of source/dest path pairs on stdin. '
+                      'Skips empty lines and allows '
+                      'comments beginning with "#"')),
+         arg_validator=_validate_transfer_args)
 def submit_transfer(args):
     """
     Executor for `globus transfer async-transfer`
@@ -118,15 +119,14 @@ def submit_transfer(args):
 
 
 @cliargs(('Delete a file or directory from one endpoint '
-          'as an asynchronous task'), [
-    CLIArg('endpoint-id', required=True,
-           help='ID of the endpoint from which to delete file(s)'),
-    CLIArg('path', required=True, help='Path to the file/dir to delete'),
-    CLIArg('recursive', default=False, action='store_true',
-           help='Recursively delete dirs'),
-    CLIArg('ignore-missing', default=False, action='store_true',
-           help='Don\'t throw errors if the file or dir is absent')
-    ])
+          'as an asynchronous task'),
+         CLIArg('endpoint-id', required=True,
+                help='ID of the endpoint from which to delete file(s)'),
+         CLIArg('path', required=True, help='Path to the file/dir to delete'),
+         CLIArg('recursive', default=False, action='store_true',
+                help='Recursively delete dirs'),
+         CLIArg('ignore-missing', default=False, action='store_true',
+                help='Don\'t throw errors if the file or dir is absent'))
 def submit_delete(args):
     """
     Executor for `globus transfer submit-delete`

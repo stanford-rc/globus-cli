@@ -7,14 +7,14 @@ from globus_cli.parser.helpers import (
 from globus_cli.services import auth, transfer
 
 
-@cliargs('Show login help', [])
+@cliargs('Show login help')
 def login_help(args):
     print('\nTo login to the Globus CLI, go to\n')
     print('    https://tokens.globus.org/\n')
     print('and follow the instructions for the Globus CLI\n')
 
 
-@cliargs('Show simplified help text for all Globus CLI commands', [])
+@cliargs('Show simplified help text for all Globus CLI commands')
 def full_help_func(args, tree=None, parent_name='globus'):
     """
     Print long-form help for all commands. Must go in this module to have

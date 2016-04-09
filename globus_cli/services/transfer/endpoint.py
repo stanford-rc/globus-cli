@@ -10,15 +10,15 @@ from globus_cli.services.transfer.helpers import (
 from globus_cli.services.transfer.activation import autoactivate
 
 
-@cliargs('Search for Globus Endpoints', [
-    CLIArg('filter-scope', default=None,
-           choices=('all', 'my-endpoints', 'my-gcp-endpoints', 'recently-used',
-                    'in-use', 'shared-by-me', 'shared-with-me'),
-           help=('The set of endpoints to search over. '
-                 'Omission is equivalent to "all"')),
-    CLIArg('filter-fulltext', default=None,
-           help='Text filter to apply to the selected set of endpoints.')
-])
+@cliargs('Search for Globus Endpoints',
+         CLIArg('filter-scope', default=None,
+                choices=('all', 'my-endpoints', 'my-gcp-endpoints',
+                         'recently-used', 'in-use', 'shared-by-me',
+                         'shared-with-me'),
+                help=('The set of endpoints to search over. '
+                      'Omission is equivalent to "all"')),
+         CLIArg('filter-fulltext', default=None,
+                help='Text filter to apply to the selected set of endpoints.'))
 def endpoint_search(args):
     """
     Executor for `globus transfer endpoint-search`
@@ -33,10 +33,8 @@ def endpoint_search(args):
         endpoint_list_to_text(search_iterator)
 
 
-@cliargs('Activate an Endpoint via autoactivation', [
-    CLIArg('endpoint-id', required=True,
-           help='ID of the endpoint, typically fetched from endpoint-search')
-    ])
+@cliargs('Activate an Endpoint via autoactivation',
+         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
 def endpoint_autoactivate(args):
     """
     Executor for `globus transfer endpoint-autoactivate`
@@ -46,10 +44,8 @@ def endpoint_autoactivate(args):
     print(json.dumps(res.data, indent=2))
 
 
-@cliargs('Deactivate an Endpoint', [
-    CLIArg('endpoint-id', required=True,
-           help='ID of the endpoint, typically fetched from endpoint-search')
-    ])
+@cliargs('Deactivate an Endpoint',
+         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
 def endpoint_deactivate(args):
     """
     Executor for `globus transfer endpoint-deactivate`
@@ -59,10 +55,8 @@ def endpoint_deactivate(args):
     print(json.dumps(res.data, indent=2))
 
 
-@cliargs('List all servers belonging to an Endpoint', [
-    CLIArg('endpoint-id', required=True,
-           help='ID of the endpoint, typically fetched from endpoint-search')
-    ])
+@cliargs('List all servers belonging to an Endpoint',
+         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
 def endpoint_server_list(args):
     """
     Executor for `globus transfer endpoint-server-list`
@@ -81,10 +75,8 @@ def endpoint_server_list(args):
             print(text_col_format.format(result.data['uri']))
 
 
-@cliargs('List all Shared Endpoints on an Endpoint by the current user', [
-    CLIArg('endpoint-id', required=True,
-           help='ID of the endpoint, typically fetched from endpoint-search')
-    ])
+@cliargs('List all Shared Endpoints on an Endpoint by the current user',
+         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
 def my_shared_endpoint_list(args):
     """
     Executor for `globus transfer endpoint my-shared-endpoint-list`
@@ -99,10 +91,8 @@ def my_shared_endpoint_list(args):
         endpoint_list_to_text(ep_iterator)
 
 
-@cliargs('List of assigned Roles on an Endpoint', [
-    CLIArg('endpoint-id', required=True,
-           help='ID of the endpoint, typically fetched from endpoint-search')
-    ])
+@cliargs('List of assigned Roles on an Endpoint',
+         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
 def endpoint_role_list(args):
     """
     Executor for `globus transfer access endpoint-role-list`
@@ -124,10 +114,9 @@ def endpoint_role_list(args):
                 result.data['principal'], result.data['role']))
 
 
-@cliargs('Show full info for a Role on an Endpoint', [
-    CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
-    CLIArg('role-id', required=True, help='ID of the role')
-    ])
+@cliargs('Show full info for a Role on an Endpoint',
+         CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+         CLIArg('role-id', required=True, help='ID of the role'))
 def endpoint_role_show(args):
     """
     Executor for `globus transfer endpoint role show`
@@ -144,16 +133,16 @@ def endpoint_role_show(args):
         colon_formatted_print(role_doc.data, named_fields)
 
 
-@cliargs('Create a Role on an Endpoint', [
-    CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
-    CLIArg('principal-type', required=True,
-           choices=('identity', 'group'), type=str.lower,
-           help='Type of entity to set a role on'),
-    CLIArg('principal', required=True, help='Entity to set a role on'),
-    CLIArg('role', default='access_manager',
-           choices=('access_manager',), type=str.lower,
-           help='A role to assign. Currently only supports access_manager')
-    ])
+@cliargs('Create a Role on an Endpoint',
+         CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+         CLIArg('principal-type', required=True,
+                choices=('identity', 'group'), type=str.lower,
+                help='Type of entity to set a role on'),
+         CLIArg('principal', required=True, help='Entity to set a role on'),
+         CLIArg('role', default='access_manager',
+                choices=('access_manager',), type=str.lower,
+                help=('A role to assign. '
+                      'Currently only supports access_manager')))
 def endpoint_role_create(args):
     """
     Executor for `globus transfer endpoint role show`
@@ -172,10 +161,9 @@ def endpoint_role_create(args):
         print('ID: ' + res.data['id'])
 
 
-@cliargs('Remove a Role from an Endpoint', [
-    CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
-    CLIArg('role-id', required=True, help='ID of the role')
-    ])
+@cliargs('Remove a Role from an Endpoint',
+         CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+         CLIArg('role-id', required=True, help='ID of the role'))
 def endpoint_role_delete(args):
     """
     Executor for `globus transfer endpoint role delete`
@@ -190,10 +178,8 @@ def endpoint_role_delete(args):
         print(res.data['message'])
 
 
-@cliargs('Display a detailed endpoint definition', [
-    CLIArg('endpoint-id', required=True,
-           help='ID of the endpoint, typically fetched from endpoint-search')
-    ])
+@cliargs('Display a detailed endpoint definition',
+         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
 def endpoint_show(args):
     """
     Executor for `globus transfer endpoint show`
@@ -211,7 +197,7 @@ def endpoint_show(args):
         colon_formatted_print(res.data, fields)
 
 
-@cliargs('Not Implemented', [])
+@cliargs('Not Implemented')
 def endpoint_create(args):
     """
     Executor for `globus transfer endpoint create`
@@ -219,30 +205,29 @@ def endpoint_create(args):
     not_implemented_func()
 
 
-@cliargs('Update attributes of an Endpoint', [
-    CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
-    CLIArg('display-name', help='New Display Name for the Endpoint'),
-    CLIArg('description', help='New Description for the Endpoint'),
-    CLIArg('organization', help='New Organization for the Endpoint'),
-    CLIArg('contact-email', help='New Contact Email for the Endpoint'),
-    CLIArg('contact-info', help='New Contact Info for the Endpoint'),
-    CLIArg('info-link', help='New Link for Info about the Endpoint'),
-    CLIArg('force-encryption', choices=('true', 'false'), type=str.lower,
-           help=('Only available on Globus Connect Server. '
-                 '(Un)Force transfers to use encryption')),
-    CLIArg('default-directory',
-           help=('Only available on Globus Connect Server. '
-                 'Set the default directory')),
-    CLIArg('myproxy-server',
-           help=('Only available on Globus Connect Server. '
-                 'Set the MyProxy Server URI')),
-    CLIArg('myproxy-dn',
-           help=('Only available on Globus Connect Server. '
-                 'Set the MyProxy Server DN')),
-    CLIArg('oauth-server',
-           help=('Only available on Globus Connect Server. '
-                 'Set the OAuth Server URI')),
-    ])
+@cliargs('Update attributes of an Endpoint',
+         CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+         CLIArg('display-name', help='New Display Name for the Endpoint'),
+         CLIArg('description', help='New Description for the Endpoint'),
+         CLIArg('organization', help='New Organization for the Endpoint'),
+         CLIArg('contact-email', help='New Contact Email for the Endpoint'),
+         CLIArg('contact-info', help='New Contact Info for the Endpoint'),
+         CLIArg('info-link', help='New Link for Info about the Endpoint'),
+         CLIArg('force-encryption', choices=('true', 'false'), type=str.lower,
+                help=('Only available on Globus Connect Server. '
+                      '(Un)Force transfers to use encryption')),
+         CLIArg('default-directory',
+                help=('Only available on Globus Connect Server. '
+                      'Set the default directory')),
+         CLIArg('myproxy-server',
+                help=('Only available on Globus Connect Server. '
+                      'Set the MyProxy Server URI')),
+         CLIArg('myproxy-dn',
+                help=('Only available on Globus Connect Server. '
+                      'Set the MyProxy Server DN')),
+         CLIArg('oauth-server',
+                help=('Only available on Globus Connect Server. '
+                      'Set the OAuth Server URI')))
 def endpoint_update(args):
     """
     Executor for `globus transfer endpoint update`
@@ -267,9 +252,8 @@ def endpoint_update(args):
         print(res.data['message'])
 
 
-@cliargs('Delete a given Endpoint', [
-    CLIArg('endpoint-id', required=True, help='ID of the endpoint')
-    ])
+@cliargs('Delete a given Endpoint',
+         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
 def endpoint_delete(args):
     """
     Executor for `globus transfer endpoint delete`

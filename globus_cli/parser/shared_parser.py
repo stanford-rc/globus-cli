@@ -23,7 +23,8 @@ class GlobusCLISharedParser(argparse.ArgumentParser):
         # this is marginally nicer than trying to stuff explicit kwargs
         # inbetween *args and **kwargs in the initializer invocation below
         newkwargs = {
-            'prog': 'globus'
+            'prog': 'globus',
+            'formatter_class': argparse.RawTextHelpFormatter
         }
         newkwargs.update(kwargs)
         argparse.ArgumentParser.__init__(self, *args, **newkwargs)
