@@ -1,4 +1,5 @@
 from __future__ import print_function
+import sys
 
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
@@ -29,22 +30,45 @@ def bookmark_list(args):
                 result.data['id'], result.data['path']))
 
 
-@cliargs('Show a Bookmark', [
-    CLIArg('bookmark-id', required=True, help='ID of the Bookmark')
-    ])
+def _validate_show_args(args, parser):
+    if args.bookmark_id is None and args.bookmark_name is None:
+        parser.error('show requires either --bookmark-id or --bookmark-name')
+    elif args.bookmark_id is not None and args.bookmark_name is not None:
+        parser.error('show cannot take both --bookmark-id and --bookmark-name')
+
+
+@cliargs('Show a Bookmark by either name or ID', [
+    CLIArg('bookmark-id', help='ID of the Bookmark'),
+    CLIArg('bookmark-name', help='Name of the Bookmark')
+    ],
+    arg_validator=_validate_show_args)
 def bookmark_show(args):
     """
     Executor for `globus transfer bookmark show`
     """
     client = get_client()
 
-    res = client.get_bookmark(args.bookmark_id)
+    if args.bookmark_id is not None:
+        res = client.get_bookmark(args.bookmark_id)
+    elif args.bookmark_name is not None:
+        res = None
+        for res in client.bookmark_list():
+            if res.data['name'] == args.bookmark_name:
+                break
+            else:
+                res = None
+        if res is None:
+            print('No bookmark found with name {}'.format(args.bookmark_name),
+                  file=sys.stderr)
+            return
+    else:
+        raise ValueError('Trying to lookup bookmark without ID or Name')
 
     if outformat_is_json(args):
         print_json_response(res)
     else:
-        fields = (('Name', 'name'), ('Endpoint ID', 'endpoint_id'),
-                  ('Path', 'path'))
+        fields = (('ID', 'id'), ('Name', 'name'),
+                  ('Endpoint ID', 'endpoint_id'), ('Path', 'path'))
         colon_formatted_print(res.data, fields)
 
 

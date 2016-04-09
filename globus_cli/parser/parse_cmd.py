@@ -23,7 +23,7 @@ def _load_args():
 def _except_hook(exception_type, exception, traceback,
                  _bound_except_hook=sys.excepthook):
     """
-    Abuses bind at defintiion time to capture the old sys.excepthook
+    Abuses bind at defintion time to capture the old sys.excepthook
     """
     if os.environ.get('GLOBUS_CLI_DEBUGMODE', None):
         _bound_except_hook(exception_type, exception, traceback)
