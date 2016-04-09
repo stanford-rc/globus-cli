@@ -1,6 +1,6 @@
 import argparse
 
-import globus_cli
+from globus_cli.version import __version__
 from globus_cli.helpers import JSON_FORMAT, TEXT_FORMAT
 
 
@@ -40,4 +40,4 @@ class GlobusCLISharedParser(argparse.ArgumentParser):
         # version of globus cli -- ignores all other passed arguments and
         # prints the version
         self.add_argument('--version', action='version',
-                          version='%(prog)s ' + globus_cli.__version__)
+                          version='%(prog)s ' + __version__)
