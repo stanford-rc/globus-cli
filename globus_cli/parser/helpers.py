@@ -1,15 +1,17 @@
+from globus_cli.helpers import wrap_helptext
+
 class MenuCommand(object):
     def __init__(self, name, commandset, helptext):
         self.name = name
         self.commandset = commandset
-        self.helptext = helptext
+        self.helptext = wrap_helptext(helptext)
 
 
 class FuncCommand(object):
     def __init__(self, name, func):
         self.name = name
         self.func = func
-        self.helptext = func.cli_help
+        self.helptext = wrap_helptext(func.cli_help)
 
 
 def add_cli_args(parser, argset):

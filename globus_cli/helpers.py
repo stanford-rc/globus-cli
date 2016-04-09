@@ -27,7 +27,7 @@ def outformat_is_text(args):
     return args.outformat == TEXT_FORMAT
 
 
-def _wrap_helptext(helptext, wraplen=50):
+def wrap_helptext(helptext, wraplen=50):
     # split the helptext into lines, wrap the lines, and join them back
     # together. This extra work is needed because textwrap's
     # replace_whitespace=False
@@ -52,7 +52,7 @@ def cliargs(helptext, *arguments, **kwargs):
         just takes the arguments to cliargs() and puts them into attributes of
         the function.
         """
-        wrapped.cli_help = _wrap_helptext(helptext, wraplen=78)
+        wrapped.cli_help = wrap_helptext(helptext, wraplen=78)
         wrapped.cli_arguments = arguments
         wrapped.cli_argument_validator = kwargs.get('arg_validator', None)
 
@@ -68,7 +68,7 @@ class CLIArg(object):
 
         self.kwargs['dest'] = self.name.replace('-', '_')
         if 'help' in self.kwargs:
-            self.kwargs['help'] = _wrap_helptext(self.kwargs['help'])
+            self.kwargs['help'] = wrap_helptext(self.kwargs['help'])
 
     def argparse_arglist(self):
         return ['--{}'.format(self.name)]
