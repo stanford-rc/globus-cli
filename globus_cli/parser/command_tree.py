@@ -1,21 +1,26 @@
 import textwrap
 
-from globus_cli.helpers import cliargs
+from globus_cli.version import __version__
+from globus_cli.helpers import cliargs, wrap_helptext
 from globus_cli.parser.shared_parser import GlobusCLISharedParser
 from globus_cli.parser.helpers import (
     FuncCommand, MenuCommand, add_cli_args)
 from globus_cli.services import auth, transfer
 
 
-@cliargs('Show login help')
+@cliargs(('Get authentication credentials for the Globus CLI. '
+          'Necessary before any Globus CLI commands which require '
+          'authentication will work'))
 def login_help(args):
     print('\nTo login to the Globus CLI, go to\n')
     print('    https://tokens.globus.org/\n')
-    print('and follow the instructions for the Globus CLI\n')
+    print('and select the the "Globus CLI" option.\n')
 
 
-@cliargs('Show simplified help text for all Globus CLI commands')
-def full_help_func(args, tree=None, parent_name='globus'):
+@cliargs(('Show a short description for all Globus CLI commands. '
+          'For detailed help text, run the specific command you want to know '
+          'more about with the `--help` option.'))
+def command_list(args, tree=None, parent_name='globus'):
     """
     Print long-form help for all commands. Must go in this module to have
     _COMMAND_TREE in scope.
@@ -69,7 +74,7 @@ def full_help_func(args, tree=None, parent_name='globus'):
             funccmd_help += format_func_cmd(cmd) + '\n'
         else:
             menucmd_help += format_menu_cmd(cmd) + '\n'
-            menucmd_help += full_help_func(
+            menucmd_help += command_list(
                 args, tree=cmd.commandset, parent_name=cmd_fullname(cmd)
                 )
 
@@ -148,7 +153,7 @@ _TRANSFER_COMMANDS = [
 ]
 
 _COMMAND_TREE = [
-    FuncCommand('help', full_help_func),
+    FuncCommand('list-commands', command_list),
     FuncCommand('login', login_help),
 
     MenuCommand('auth', _AUTH_COMMANDS, (
@@ -183,7 +188,8 @@ def _add_subcommands(parser, commandset):
     # iterate over all commands in the set, and ...
     for command in commandset:
         current_parser = subparsers.add_parser(
-            command.name, help=command.helptext, description=command.helptext)
+            command.name, help=wrap_helptext(command.helptext),
+            description=wrap_helptext(command.helptext, wraplen=78))
 
         # the command wraps a function, build it out
         if isinstance(command, FuncCommand):
@@ -205,12 +211,23 @@ def build_command_tree():
     """
     # TODO: Update this description to be more informative, accurate
     description = textwrap.dedent("""Run a globus command.
-    The globus command is structured to provide a uniform command line
-    interface to all Globus services. For more information and tutorials,
-    see docs.globus.org
+    The Globus CLI is structured to provide a uniform command line
+    interface to all Globus services.
+
+    All Globus CLI commands take a number of shared options:
+
+        -h, --help      Provides information about the specific options
+                        available for a command.
+
+        -F, --format    Lets you choose between columnar TEXT output and JSON
+                        formatted output.
+
+        --version       Prints the version of the Globus CLI that you are
+                        using.
     """)
 
     top_level_parser = GlobusCLISharedParser(description=description)
+
     _add_subcommands(top_level_parser, _COMMAND_TREE)
 
     # return the created parser in all of its glory
