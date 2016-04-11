@@ -47,7 +47,7 @@ and to see the available commands, run
 
 .. code-block:: sh
 
-    globus help
+    globus list-commands
 
 
 Bugs and Feature Requests
