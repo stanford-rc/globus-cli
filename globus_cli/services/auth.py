@@ -10,11 +10,18 @@ def _get_auth_client():
     return client
 
 
+def _validate_get_identities_args(args, parser):
+    if args.usernames == [] and args.identities == []:
+        parser.error('get-identities requires either --usernames or '
+                     '--identities')
+
+
 @cliargs('Inspect Globus Auth Identities',
          CLIArg('usernames', default=[], nargs='+',
                 help='Usernames to lookup in Globus Auth'),
          CLIArg('identities', default=[], nargs='+',
-                help='Identity IDs to lookup in Globus Auth'))
+                help='Identity IDs to lookup in Globus Auth'),
+         arg_validator=_validate_get_identities_args)
 def get_identities(args):
     """
     Executor for `globus auth get-identities`
