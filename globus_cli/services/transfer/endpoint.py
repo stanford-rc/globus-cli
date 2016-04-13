@@ -17,14 +17,18 @@ from globus_cli.services.transfer.activation import autoactivate
                 help=('The set of endpoints to search over. '
                       'Omission is equivalent to "all"')),
          CLIArg('filter-fulltext', default=None,
-                help='Text filter to apply to the selected set of endpoints.'))
+                help='Text filter to apply to the selected set of endpoints'),
+         CLIArg('filter-owner-id', default=None,
+                help=('Filter search results to endpoints owned by a specific '
+                      'identity')))
 def endpoint_search(args):
     """
     Executor for `globus transfer endpoint-search`
     """
     client = get_client()
     search_iterator = client.endpoint_search(
-        filter_fulltext=args.filter_fulltext, filter_scope=args.filter_scope)
+        filter_fulltext=args.filter_fulltext, filter_scope=args.filter_scope,
+        filter_owner_id=args.filter_owner_id)
 
     if outformat_is_json(args):
         print_json_from_iterator(search_iterator)

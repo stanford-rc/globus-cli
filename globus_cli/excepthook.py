@@ -26,8 +26,15 @@ def pagination_overrun_hook():
 
 def transferapi_hook(exception):
     _errmsg(('A Transfer API Error Occurred.\n'
-             'request_id: {}\ncode: {}\nmessage: {}').format(
-                 exception.request_id, exception.code, exception.message))
+             'HTTP status: {}\nrequest_id: {}\ncode: {}\nmessage: {}').format(
+                 exception.http_status, exception.request_id, exception.code,
+                 exception.message))
+
+
+def globusapi_hook(exception):
+    _errmsg(('A Globus API Error Occurred.\n'
+             'HTTP status: {}\ncode: {}\nmessage: {}').format(
+                 exception.http_status, exception.code, exception.message))
 
 
 def custom_except_hook(exception_type, exception, traceback,
@@ -65,6 +72,8 @@ def custom_except_hook(exception_type, exception, traceback,
             pagination_overrun_hook()
         elif exception_type is exc.TransferAPIError:
             transferapi_hook(exception)
+        elif exception_type is exc.GlobusAPIError:
+            globusapi_hook(exception)
         else:
             print('{}: {}'.format(exception_type.__name__, exception))
 
