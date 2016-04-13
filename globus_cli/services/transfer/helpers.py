@@ -37,8 +37,8 @@ def endpoint_list_to_text(iterator):
 
     for result in iterator:
         print(text_col_format.format(
-            result.data['owner_string'], result.data['id'],
-            display_name_or_cname(result.data)))
+            result['owner_string'], result['id'],
+            display_name_or_cname(result)))
 
 
 def assemble_generic_doc(datatype, *args, **kwargs):

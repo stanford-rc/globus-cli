@@ -1,7 +1,7 @@
 from __future__ import print_function
-import json
 
-from globus_cli.helpers import outformat_is_json, cliargs, CLIArg
+from globus_cli.helpers import (
+    outformat_is_json, cliargs, CLIArg, print_json_response)
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format, get_client)
 
@@ -25,9 +25,9 @@ def acl_list(args):
 
         for result in rule_iterator:
             print(text_col_format.format(
-                result.data['id'],
-                result.data['principal_type'], result.data['principal'],
-                result.data['permissions'], result.data['path']))
+                result['id'],
+                result['principal_type'], result['principal'],
+                result['permissions'], result['path']))
 
 
 @cliargs('Get detailed info on a specific ACL rule',
@@ -41,7 +41,7 @@ def show_acl_rule(args):
 
     res = client.get_endpoint_acl_rule(args.endpoint_id, args.rule_id)
 
-    print(json.dumps(res.data, indent=2))
+    print_json_response(res)
 
 
 @cliargs('Add an ACL rule',
@@ -73,7 +73,7 @@ def add_acl_rule(args):
 
     res = client.add_endpoint_acl_rule(args.endpoint_id, rule_data)
 
-    print(json.dumps(res.data, indent=2))
+    print_json_response(res)
 
 
 @cliargs('Remove an ACL rule',
@@ -87,7 +87,7 @@ def del_acl_rule(args):
 
     res = client.delete_endpoint_acl_rule(args.endpoint_id, args.rule_id)
 
-    print(json.dumps(res.data, indent=2))
+    print_json_response(res)
 
 
 @cliargs('Update an ACL rule',
@@ -123,4 +123,4 @@ def update_acl_rule(args):
     res = client.update_endpoint_acl_rule(args.endpoint_id, args.rule_id,
                                           rule_data)
 
-    print(json.dumps(res.data, indent=2))
+    print_json_response(res)

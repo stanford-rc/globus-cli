@@ -26,8 +26,8 @@ def bookmark_list(args):
 
         for result in bookmark_iterator:
             print(text_col_format.format(
-                result.data['name'], result.data['endpoint_id'],
-                result.data['id'], result.data['path']))
+                result['name'], result['endpoint_id'],
+                result['id'], result['path']))
 
 
 def _validate_show_args(args, parser):
@@ -52,7 +52,7 @@ def bookmark_show(args):
     elif args.bookmark_name is not None:
         res = None
         for res in client.bookmark_list():
-            if res.data['name'] == args.bookmark_name:
+            if res['name'] == args.bookmark_name:
                 break
             else:
                 res = None
@@ -68,7 +68,7 @@ def bookmark_show(args):
     else:
         fields = (('ID', 'id'), ('Name', 'name'),
                   ('Endpoint ID', 'endpoint_id'), ('Path', 'path'))
-        colon_formatted_print(res.data, fields)
+        colon_formatted_print(res, fields)
 
 
 @cliargs('Create a Bookmark for the current user',
@@ -94,7 +94,7 @@ def bookmark_create(args):
     if outformat_is_json(args):
         print_json_response(res)
     else:
-        print('Bookmark ID: {}'.format(res.data['id']))
+        print('Bookmark ID: {}'.format(res['id']))
 
 
 @cliargs('Change a Bookmark\'s name',
@@ -131,4 +131,4 @@ def bookmark_delete(args):
     if outformat_is_json(args):
         print_json_response(res)
     else:
-        print(res.data['message'])
+        print(res['message'])

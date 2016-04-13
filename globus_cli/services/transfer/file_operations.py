@@ -1,7 +1,7 @@
 from __future__ import print_function
-import json
 
-from globus_cli.helpers import outformat_is_json, cliargs, CLIArg
+from globus_cli.helpers import (
+    outformat_is_json, cliargs, CLIArg, print_json_response)
 from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.activation import autoactivate
 
@@ -19,9 +19,9 @@ def op_ls(args):
 
     res = client.operation_ls(args.endpoint_id, path=args.path)
     if outformat_is_json(args):
-        print(json.dumps(res.data, indent=2))
+        print_json_response(res)
     else:
-        for item in res.data['DATA']:
+        for item in res:
             print(item['name'])
 
 
@@ -39,9 +39,9 @@ def op_mkdir(args):
     res = client.operation_mkdir(args.endpoint_id, path=args.path)
 
     if outformat_is_json(args):
-        print(json.dumps(res.data, indent=2))
+        print_json_response(res)
     else:
-        print(res.data['message'])
+        print(res['message'])
 
 
 @cliargs('Rename a file or directory on an Endpoint',
@@ -61,6 +61,6 @@ def op_rename(args):
                                   newpath=args.new_path)
 
     if outformat_is_json(args):
-        print(json.dumps(res.data, indent=2))
+        print_json_response(res)
     else:
-        print(res.data['message'])
+        print(res['message'])

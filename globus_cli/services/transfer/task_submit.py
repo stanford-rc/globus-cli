@@ -3,15 +3,15 @@ from __future__ import print_function
 import argparse
 import shlex
 import sys
-import json
 
-from globus_cli.helpers import outformat_is_json, cliargs, CLIArg
+from globus_cli.helpers import (
+    outformat_is_json, cliargs, CLIArg, print_json_response)
 from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.activation import autoactivate
 
 
 def add_submission_id(client, datadoc):
-    submission_id = client.get_submission_id().data['value']
+    submission_id = client.get_submission_id()['value']
     datadoc['submission_id'] = submission_id
 
 
@@ -113,9 +113,9 @@ def submit_transfer(args):
     res = client.submit_transfer(datadoc)
 
     if outformat_is_json(args):
-        print(json.dumps(res.data, indent=2))
+        print_json_response(res)
     else:
-        print(res.data['message'])
+        print(res['message'])
 
 
 @cliargs(('Delete a file or directory from one endpoint '
@@ -151,6 +151,6 @@ def submit_delete(args):
     res = client.submit_delete(datadoc)
 
     if outformat_is_json(args):
-        print(json.dumps(res.data, indent=2))
+        print_json_response(res)
     else:
-        print(res.data['message'])
+        print(res['message'])

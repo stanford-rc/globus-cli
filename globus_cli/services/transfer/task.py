@@ -1,7 +1,7 @@
 from __future__ import print_function
-import json
 
-from globus_cli.helpers import outformat_is_json, cliargs, CLIArg
+from globus_cli.helpers import (
+    outformat_is_json, cliargs, CLIArg, print_json_response)
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format, get_client)
 
@@ -26,11 +26,11 @@ def task_list(args):
 
         for result in task_iterator:
             print(text_col_format.format(
-                result.data['task_id'], result.data['status'],
-                result.data['type'],
-                result.data['source_endpoint_display_name'],
-                result.data['destination_endpoint_display_name'],
-                result.data['label']))
+                result['task_id'], result['status'],
+                result['type'],
+                result['source_endpoint_display_name'],
+                result['destination_endpoint_display_name'],
+                result['label']))
 
 
 @cliargs('List Events for a given Task',
@@ -52,8 +52,8 @@ def task_event_list(args):
 
         for result in event_iterator:
             print(text_col_format.format(
-                result.data['time'], result.data['code'],
-                result.data['is_error'], result.data['details']))
+                result['time'], result['code'],
+                result['is_error'], result['details']))
 
 
 @cliargs('Cancel a specific task, owned by the current user',
@@ -68,9 +68,9 @@ def cancel_task(args):
     res = client.cancel_task(args.task_id)
 
     if outformat_is_json(args):
-        print(json.dumps(res.data, indent=2))
+        print_json_response(res)
     else:
-        print(res.data['message'])
+        print(res['message'])
 
 
 @cliargs('Update label and/or deadline on an active task',
@@ -96,7 +96,7 @@ def update_task(args):
     res = client.update_task(args.task_id, task_doc)
 
     if outformat_is_json(args):
-        print(json.dumps(res.data, indent=2))
+        print_json_response(res)
     else:
         print('Success')
 
@@ -112,7 +112,7 @@ def show_task(args):
 
     res = client.get_task(args.task_id)
 
-    print(json.dumps(res.data, indent=2))
+    print_json_response(res)
 
 
 @cliargs('Show detailed info about pause rules that are applied to a task',
@@ -125,4 +125,4 @@ def task_pause_info(args):
 
     res = client.task_pause_info(args.task_id)
 
-    print(json.dumps(res.data, indent=2))
+    print_json_response(res)

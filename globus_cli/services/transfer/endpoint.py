@@ -1,5 +1,4 @@
 from __future__ import print_function
-import json
 
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
@@ -41,7 +40,7 @@ def endpoint_autoactivate(args):
     """
     client = get_client()
     res = autoactivate(client, args.endpoint_id)
-    print(json.dumps(res.data, indent=2))
+    print_json_response(res)
 
 
 @cliargs('Deactivate an Endpoint',
@@ -52,7 +51,7 @@ def endpoint_deactivate(args):
     """
     client = get_client()
     res = client.endpoint_deactivate(args.endpoint_id)
-    print(json.dumps(res.data, indent=2))
+    print_json_response(res)
 
 
 @cliargs('List all servers belonging to an Endpoint',
@@ -72,7 +71,7 @@ def endpoint_server_list(args):
             [(36, 'URI')])
 
         for result in server_iterator:
-            print(text_col_format.format(result.data['uri']))
+            print(text_col_format.format(result['uri']))
 
 
 @cliargs('List all Shared Endpoints on an Endpoint by the current user',
@@ -110,8 +109,8 @@ def endpoint_role_list(args):
 
         for result in role_iterator:
             print(text_col_format.format(
-                result.data['principal_type'], result.data['id'],
-                result.data['principal'], result.data['role']))
+                result['principal_type'], result['id'],
+                result['principal'], result['role']))
 
 
 @cliargs('Show full info for a Role on an Endpoint',
@@ -130,7 +129,7 @@ def endpoint_role_show(args):
     else:
         named_fields = (('Principal Type', 'principal_type'),
                         ('Principal', 'principal'), ('Role', 'role'))
-        colon_formatted_print(role_doc.data, named_fields)
+        colon_formatted_print(role_doc, named_fields)
 
 
 @cliargs('Create a Role on an Endpoint',
@@ -158,7 +157,7 @@ def endpoint_role_create(args):
     if outformat_is_json(args):
         print_json_response(res)
     else:
-        print('ID: ' + res.data['id'])
+        print('ID: ' + res['id'])
 
 
 @cliargs('Remove a Role from an Endpoint',
@@ -175,7 +174,7 @@ def endpoint_role_delete(args):
     if outformat_is_json(args):
         print_json_response(res)
     else:
-        print(res.data['message'])
+        print(res['message'])
 
 
 @cliargs('Display a detailed endpoint definition',
@@ -194,7 +193,7 @@ def endpoint_show(args):
         fields = (('Display Name', 'display_name'), ('ID', 'id'),
                   ('Owner', 'owner_string'), ('Activated', 'activated'),
                   ('Shareable', 'shareable'))
-        colon_formatted_print(res.data, fields)
+        colon_formatted_print(res, fields)
 
 
 @cliargs('Not Implemented')
@@ -249,7 +248,7 @@ def endpoint_update(args):
     if outformat_is_json(args):
         print_json_response(res)
     else:
-        print(res.data['message'])
+        print(res['message'])
 
 
 @cliargs('Delete a given Endpoint',
@@ -265,4 +264,4 @@ def endpoint_delete(args):
     if outformat_is_json(args):
         print_json_response(res)
     else:
-        print(res.data['message'])
+        print(res['message'])
