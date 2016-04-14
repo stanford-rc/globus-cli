@@ -216,6 +216,8 @@ def endpoint_show(args):
          CLIArg('force-encryption', choices=('true', 'false'), type=str.lower,
                 help=('Only available on Globus Connect Server. '
                       '(Un)Force transfers to use encryption')),
+         CLIArg('public', choices=('true', 'false'), type=str.lower,
+                help='Set the endpoint to be public/private'),
          CLIArg('default-directory',
                 help=('Only available on Globus Connect Server. '
                       'Set the default directory')),
@@ -237,7 +239,8 @@ def endpoint_create(args):
         display_name=args.display_name, description=args.description,
         organization=args.organization, contact_email=args.contact_email,
         contact_info=args.contact_info, info_link=args.info_link,
-        force_encryption=args.force_encryption,
+        force_encryption=(args.force_encryption == 'true'),
+        public=(args.public == 'true'),
         default_directory=args.default_directory,
         myproxy_server=args.myproxy_server, myproxy_dn=args.myproxy_dn,
         oauth_server=args.oauth_server)
@@ -265,6 +268,8 @@ def endpoint_create(args):
          CLIArg('force-encryption', choices=('true', 'false'), type=str.lower,
                 help=('Only available on Globus Connect Server. '
                       '(Un)Force transfers to use encryption')),
+         CLIArg('public', choices=('true', 'false'), type=str.lower,
+                help='Set the endpoint to be public/private'),
          CLIArg('default-directory',
                 help=('Only available on Globus Connect Server. '
                       'Set the default directory')),
@@ -288,7 +293,8 @@ def endpoint_update(args):
         display_name=args.display_name, description=args.description,
         organization=args.organization, contact_email=args.contact_email,
         contact_info=args.contact_info, info_link=args.info_link,
-        force_encryption=args.force_encryption,
+        force_encryption=(args.force_encryption == 'true'),
+        public=(args.public == 'true'),
         default_directory=args.default_directory,
         myproxy_server=args.myproxy_server, myproxy_dn=args.myproxy_dn,
         oauth_server=args.oauth_server)

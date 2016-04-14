@@ -17,7 +17,12 @@ def display_name_or_cname(ep_doc):
 def print_json_from_iterator(iterator):
     json_output_dict = {'DATA': []}
     for item in iterator:
-        json_output_dict['DATA'].append(item.data)
+        dat = item
+        try:
+            dat = item.data
+        except AttributeError:
+            pass
+        json_output_dict['DATA'].append(dat)
     print(json.dumps(json_output_dict, indent=2))
 
 
