@@ -2,12 +2,16 @@ from __future__ import print_function
 import sys
 import json
 import textwrap
+import re
 
 
 # Format Enum for output formatting
 # could use a namedtuple, but that's overkill
 JSON_FORMAT = 'json'
 TEXT_FORMAT = 'text'
+
+# what qualifies as a valid Identity Name?
+_IDENTITY_NAME_REGEX = '^[a-zA-Z0-9]+.*@[a-zA-z0-9-]+\..*[a-zA-Z]+$'
 
 
 def stderr_prompt(prompt):
@@ -99,3 +103,15 @@ def wrap_helptext(helptext, wraplen=50):
     lines = [textwrap.fill(line, width=wraplen, replace_whitespace=False)
              for line in helptext.splitlines()]
     return '\n'.join(lines)
+
+
+def is_valid_identity_name(identity_name):
+    """
+    Check if a string is a valid identity name.
+    Does not do any preprocessing of the identity name, so you must do so
+    before invocation.
+    """
+    if re.match(_IDENTITY_NAME_REGEX, identity_name) is None:
+        return False
+    else:
+        return True

@@ -5,9 +5,29 @@ from globus_cli import version
 from globus_cli.helpers import cliargs, CLIArg
 
 
-def _get_auth_client():
+def get_auth_client():
     client = AuthClient(app_name=version.app_name)
     return client
+
+
+def _lookup_identity_field(id_name=None, id_id=None, field='id'):
+    assert (id_name or id_id) and not (id_name and id_id)
+    client = get_auth_client()
+
+    if id_name:
+        kw = {'usernames': id_name}
+    else:
+        kw = {'ids': id_id}
+
+    return client.get_identities(**kw)['identities'][0][field]
+
+
+def lookup_identity_id(identity_name):
+    return _lookup_identity_field(id_name=identity_name)
+
+
+def lookup_identity_name(identity_id):
+    return _lookup_identity_field(id_id=identity_id, field='username')
 
 
 def _validate_get_identities_args(args, parser):
@@ -26,7 +46,7 @@ def get_identities(args):
     """
     Executor for `globus auth get-identities`
     """
-    client = _get_auth_client()
+    client = get_auth_client()
 
     params = {}
 
@@ -47,15 +67,5 @@ def token_introspect(args):
     """
     Executor for `globus auth token-introspect`
     """
+    # client.token_introspect(token, **params)
     raise NotImplementedError('Requires Client Credential Support')
-    """
-    client = AuthClient()
-
-    params = {}
-
-    token = config.get_auth_token(client.environment)
-
-    res = client.token_introspect(token, **params)
-
-    print(res.text_body)
-    """

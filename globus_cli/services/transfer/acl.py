@@ -1,7 +1,9 @@
 from __future__ import print_function
 
 from globus_cli.helpers import (
-    outformat_is_json, cliargs, CLIArg, print_json_response)
+    outformat_is_json, cliargs, CLIArg, print_json_response,
+    is_valid_identity_name)
+from globus_cli.services.auth import lookup_identity_id, lookup_identity_name
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format, get_client)
 
@@ -14,20 +16,25 @@ def acl_list(args):
     """
     client = get_client()
 
-    rule_iterator = client.endpoint_acl_list(args.endpoint_id)
+    rules = client.endpoint_acl_list(args.endpoint_id)
 
     if outformat_is_json(args):
-        print_json_from_iterator(rule_iterator)
+        print_json_response(rules)
     else:
         text_col_format = text_header_and_format(
-            [(36, 'Rule ID'), (16, 'Principal Type'), (36, 'Principal'),
-             (None, 'Permissions'), (None, 'Path')])
+            [(36, 'Rule ID'), (None, 'Permissions'), (70, 'Shared With'),
+             (None, 'Path')])
 
-        for result in rule_iterator:
+        for rule in rules:
+            principal = rule['principal']
+            if rule['principal_type'] == 'identity':
+                principal = lookup_identity_name(principal)
+            elif rule['principal_type'] == 'group':
+                principal = ('https://www.globus.org'
+                             '/app/groups/{}').format(principal)
             print(text_col_format.format(
-                result['id'],
-                result['principal_type'], result['principal'],
-                result['permissions'], result['path']))
+                rule['id'], rule['permissions'],
+                principal, rule['path']))
 
 
 @cliargs('Get detailed info on a specific ACL rule',
@@ -50,7 +57,9 @@ def show_acl_rule(args):
                 type=str.lower, help=('Permissions to add. '
                                       'Read-Only or Read/Write.')),
          CLIArg('principal', required=True,
-                help='Principal to grant permissions to'),
+                help=('Principal to grant permissions to. ID of a Group or '
+                      'Identity, or a valid Identity Name, like '
+                      '"go@globusid.org"')),
          CLIArg('principal-type', required=True,
                 choices=('identity', 'group', 'anonymous',
                          'all_authenticated_users'),
@@ -63,10 +72,14 @@ def add_acl_rule(args):
     """
     client = get_client()
 
+    principal = args.principal
+    if args.principal_type == 'identity' and is_valid_identity_name(principal):
+        principal = lookup_identity_id(principal)
+
     rule_data = {
         'DATA_TYPE': 'access',
         'permissions': args.permissions,
-        'principal': args.principal,
+        'principal': principal,
         'principal_type': args.principal_type,
         'path': args.path
     }
@@ -97,7 +110,9 @@ def del_acl_rule(args):
                 type=str.lower, help=('Permissions to add. '
                                       'Read-Only or Read/Write.')),
          CLIArg('principal', default=None,
-                help='Principal to grant permissions to'),
+                help=('Principal to grant permissions to. ID of a Group or '
+                      'Identity, or a valid Identity Name, like '
+                      '"go@globusid.org"')),
          CLIArg('principal-type', default=None,
                 choices=('identity', 'group', 'anonymous',
                          'all_authenticated_users'),
@@ -117,6 +132,10 @@ def update_acl_rule(args):
                      ('principal', args.principal),
                      ('principal_type', args.principal_type),
                      ('path', args.path)):
+
+        if key == 'principal' and is_valid_identity_name(val):
+            val = lookup_identity_id(val)
+
         if val is not None:
             rule_data[key] = val
 
