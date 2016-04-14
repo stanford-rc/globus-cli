@@ -12,6 +12,7 @@ Globus CLI
 A Command Line Interface to `Globus <https://www.globus.org/>`_.
 
 Source Code: https://github.com/globusonline/globus-cli
+Documentation: http://globus.github.io/globus-cli
 
 Installation
 ------------
@@ -26,8 +27,8 @@ This will automatically install the CLI and all its dependencies.
 You can also get a bleeding-edge version under development directly from the
 source::
 
-    git checkout https://github.com/globusonline/globus-sdk-python.git
-    cd globus-sdk-python
+    git checkout https://github.com/globusonline/globus-cli.git
+    cd globus-cli
     python setup.py install
 
 Running the CLI
