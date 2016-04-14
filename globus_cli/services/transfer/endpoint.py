@@ -200,12 +200,58 @@ def endpoint_show(args):
         colon_formatted_print(res, fields)
 
 
-@cliargs('Not Implemented')
+@cliargs('Create a new Endpoint',
+         CLIArg('endpoint-type', required=True,
+                help=('Type of endpoint to create. "gcp" and "gcs" are just '
+                      'shorthand for "globus-connect-personal" and '
+                      '"globus-connect-server", respectively'),
+                choices=('globus-connect-server', 'globus-connect-personal',
+                         's3', 'gcp', 'gcs')),
+         CLIArg('display-name', required=True, help='Name for the endpoint'),
+         CLIArg('description', help='Description for the Endpoint'),
+         CLIArg('organization', help='Organization for the Endpoint'),
+         CLIArg('contact-email', help='Contact Email for the Endpoint'),
+         CLIArg('contact-info', help='Contact Info for the Endpoint'),
+         CLIArg('info-link', help='Link for Info about the Endpoint'),
+         CLIArg('force-encryption', choices=('true', 'false'), type=str.lower,
+                help=('Only available on Globus Connect Server. '
+                      '(Un)Force transfers to use encryption')),
+         CLIArg('default-directory',
+                help=('Only available on Globus Connect Server. '
+                      'Set the default directory')),
+         CLIArg('myproxy-server',
+                help=('Only available on Globus Connect Server. '
+                      'Set the MyProxy Server URI')),
+         CLIArg('myproxy-dn',
+                help=('Only available on Globus Connect Server. '
+                      'Set the MyProxy Server DN')),
+         CLIArg('oauth-server',
+                help=('Only available on Globus Connect Server. '
+                      'Set the OAuth Server URI')))
 def endpoint_create(args):
     """
     Executor for `globus transfer endpoint create`
     """
-    not_implemented_func()
+    ep_doc = assemble_generic_doc(
+        'endpoint',
+        display_name=args.display_name, description=args.description,
+        organization=args.organization, contact_email=args.contact_email,
+        contact_info=args.contact_info, info_link=args.info_link,
+        force_encryption=args.force_encryption,
+        default_directory=args.default_directory,
+        myproxy_server=args.myproxy_server, myproxy_dn=args.myproxy_dn,
+        oauth_server=args.oauth_server)
+    if args.endpoint_type == 's3':
+        raise NotImplementedError(
+            'S3 Endpoints cannot be created through the new CLI yet.')
+    elif args.endpoint_type in ('globus-connect-personal', 'gcp'):
+        ep_doc['is_globus_connect'] = True
+    elif args.endpoint_type in ('globus-connect-server', 'gcs'):
+        pass
+
+    client = get_client()
+    res = client.create_endpoint(ep_doc)
+    print_json_response(res)
 
 
 @cliargs('Update attributes of an Endpoint',
