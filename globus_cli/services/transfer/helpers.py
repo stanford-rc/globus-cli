@@ -2,8 +2,8 @@ from __future__ import print_function
 
 import json
 
-from globus_cli import version
 from globus_sdk import TransferClient
+from globus_cli import version
 
 
 def get_client():

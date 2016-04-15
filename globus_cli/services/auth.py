@@ -2,7 +2,7 @@ import json
 from globus_sdk import AuthClient
 
 from globus_cli import version
-from globus_cli.helpers import cliargs, CLIArg
+from globus_cli.helpers import cliargs, CLIArg, is_valid_identity_name
 
 
 def get_auth_client():
@@ -22,8 +22,11 @@ def _lookup_identity_field(id_name=None, id_id=None, field='id'):
     return client.get_identities(**kw)['identities'][0][field]
 
 
-def lookup_identity_id(identity_name):
-    return _lookup_identity_field(id_name=identity_name)
+def maybe_lookup_identity_id(identity_name):
+    if is_valid_identity_name:
+        return _lookup_identity_field(id_name=identity_name)
+    else:
+        return identity_name
 
 
 def lookup_identity_name(identity_id):

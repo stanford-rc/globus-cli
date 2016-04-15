@@ -3,6 +3,8 @@ from __future__ import print_function
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
     colon_formatted_print, not_implemented_func)
+from globus_cli.services.auth import (
+    maybe_lookup_identity_id, lookup_identity_name)
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format, endpoint_list_to_text,
     assemble_generic_doc, get_client)
@@ -20,15 +22,21 @@ from globus_cli.services.transfer.activation import autoactivate
                 help='Text filter to apply to the selected set of endpoints'),
          CLIArg('filter-owner-id', default=None,
                 help=('Filter search results to endpoints owned by a specific '
-                      'identity')))
+                      'identity. Can be the Identity ID, or the Identity '
+                      'Username, as in "go@globusid.org"')))
 def endpoint_search(args):
     """
     Executor for `globus transfer endpoint-search`
     """
     client = get_client()
+
+    owner_id = args.filter_owner_id
+    if owner_id:
+        owner_id = maybe_lookup_identity_id(owner_id)
+
     search_iterator = client.endpoint_search(
         filter_fulltext=args.filter_fulltext, filter_scope=args.filter_scope,
-        filter_owner_id=args.filter_owner_id)
+        filter_owner_id=owner_id)
 
     if outformat_is_json(args):
         print_json_from_iterator(search_iterator)
@@ -102,19 +110,22 @@ def endpoint_role_list(args):
     """
     client = get_client()
 
-    role_iterator = client.endpoint_role_list(args.endpoint_id)
+    roles = client.endpoint_role_list(args.endpoint_id)
 
     if outformat_is_json(args):
-        print_json_from_iterator(role_iterator)
+        print_json_response(roles)
     else:
         text_col_format = text_header_and_format(
             [(16, 'Principal Type'), (36, 'Role ID'), (36, 'Principal'),
              (16, 'Role')])
 
-        for result in role_iterator:
+        for role in roles:
+            principal = role['principal']
+            if role['principal_type'] == 'identity':
+                principal = lookup_identity_name(principal)
+
             print(text_col_format.format(
-                result['principal_type'], result['id'],
-                result['principal'], result['role']))
+                role['principal_type'], role['id'], principal, role['role']))
 
 
 @cliargs('Show full info for a Role on an Endpoint',
@@ -126,14 +137,19 @@ def endpoint_role_show(args):
     """
     client = get_client()
 
-    role_doc = client.get_endpoint_role(args.endpoint_id, args.role_id)
+    role = client.get_endpoint_role(args.endpoint_id, args.role_id)
 
     if outformat_is_json(args):
-        print_json_response(role_doc)
+        print_json_response(role)
     else:
+        formattable_doc = {
+            'principal_type': role['principal_type'],
+            'principal': lookup_identity_name(role['principal']),
+            'role': role['role']
+        }
         named_fields = (('Principal Type', 'principal_type'),
                         ('Principal', 'principal'), ('Role', 'role'))
-        colon_formatted_print(role_doc, named_fields)
+        colon_formatted_print(formattable_doc, named_fields)
 
 
 @cliargs('Create a Role on an Endpoint',
@@ -141,7 +157,9 @@ def endpoint_role_show(args):
          CLIArg('principal-type', required=True,
                 choices=('identity', 'group'), type=str.lower,
                 help='Type of entity to set a role on'),
-         CLIArg('principal', required=True, help='Entity to set a role on'),
+         CLIArg('principal', required=True,
+                help=('Entity to set a role on. ID of a Group or Identity, or '
+                      'a valid Identity Name, like "go@globusid.org"')),
          CLIArg('role', default='access_manager',
                 choices=('access_manager',), type=str.lower,
                 help=('A role to assign. '
@@ -152,8 +170,12 @@ def endpoint_role_create(args):
     """
     client = get_client()
 
+    principal = args.principal
+    if args.principal_type == 'identity':
+        principal = maybe_lookup_identity_id(principal)
+
     role_doc = assemble_generic_doc(
-        'role', principal_type=args.principal_type, principal=args.principal,
+        'role', principal_type=args.principal_type, principal=principal,
         role=args.role)
 
     res = client.add_endpoint_role(args.endpoint_id, role_doc)

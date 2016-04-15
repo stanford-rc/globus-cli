@@ -1,9 +1,9 @@
 from __future__ import print_function
 
 from globus_cli.helpers import (
-    outformat_is_json, cliargs, CLIArg, print_json_response,
-    is_valid_identity_name)
-from globus_cli.services.auth import lookup_identity_id, lookup_identity_name
+    outformat_is_json, cliargs, CLIArg, print_json_response)
+from globus_cli.services.auth import (
+    maybe_lookup_identity_id, lookup_identity_name)
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, text_header_and_format, get_client)
 
@@ -73,8 +73,8 @@ def add_acl_rule(args):
     client = get_client()
 
     principal = args.principal
-    if args.principal_type == 'identity' and is_valid_identity_name(principal):
-        principal = lookup_identity_id(principal)
+    if args.principal_type == 'identity':
+        principal = maybe_lookup_identity_id(principal)
 
     rule_data = {
         'DATA_TYPE': 'access',
@@ -133,8 +133,8 @@ def update_acl_rule(args):
                      ('principal_type', args.principal_type),
                      ('path', args.path)):
 
-        if key == 'principal' and is_valid_identity_name(val):
-            val = lookup_identity_id(val)
+        if key == 'principal':
+            val = maybe_lookup_identity_id(val)
 
         if val is not None:
             rule_data[key] = val
