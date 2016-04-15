@@ -1,7 +1,5 @@
 from __future__ import print_function
 
-import errno
-
 from globus_cli.excepthook import set_excepthook
 from globus_cli.parser.command_tree import build_command_tree
 

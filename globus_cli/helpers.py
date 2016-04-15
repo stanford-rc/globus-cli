@@ -83,17 +83,6 @@ def colon_formatted_print(data, named_fields):
         print('{} {}'.format((name + ':').ljust(maxlen), data[field]))
 
 
-def not_implemented_func():
-    """
-    This is a dummy function used to stub parts of the command tree that
-    haven't been implemented yet.
-    It has the same signature as a typical command function (i.e. takes args
-    and nothing else), but raises a NotImplementedError
-    """
-    raise NotImplementedError(('Hold yer horses! '
-                               'This command has not been implemented yet!'))
-
-
 def wrap_helptext(helptext, wraplen=50):
     # split the helptext into lines, wrap the lines, and join them back
     # together. This extra work is needed because textwrap's

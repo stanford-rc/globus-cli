@@ -1,6 +1,5 @@
 import textwrap
 
-from globus_cli.version import __version__
 from globus_cli.helpers import cliargs, wrap_helptext
 from globus_cli.parser.shared_parser import GlobusCLISharedParser
 from globus_cli.parser.helpers import (

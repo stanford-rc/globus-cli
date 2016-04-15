@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
-    colon_formatted_print, not_implemented_func)
+    colon_formatted_print)
 from globus_cli.services.auth import (
     maybe_lookup_identity_id, lookup_identity_name)
 from globus_cli.services.transfer.helpers import (

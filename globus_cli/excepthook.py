@@ -11,6 +11,7 @@ from __future__ import print_function
 
 import sys
 import os
+import errno
 
 from globus_sdk import exc
 

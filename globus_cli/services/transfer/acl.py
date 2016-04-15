@@ -5,7 +5,7 @@ from globus_cli.helpers import (
 from globus_cli.services.auth import (
     maybe_lookup_identity_id, lookup_identity_name)
 from globus_cli.services.transfer.helpers import (
-    print_json_from_iterator, text_header_and_format, get_client)
+    text_header_and_format, get_client)
 
 
 @cliargs('List of Access Control List rules on an Endpoint',
