@@ -3,9 +3,9 @@ import sys
 
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
-    colon_formatted_print)
+    colon_formatted_print, text_header_and_format)
 from globus_cli.services.transfer.helpers import (
-    print_json_from_iterator, text_header_and_format, get_client)
+    print_json_from_iterator, get_client)
 
 
 @cliargs('List Bookmarks for the current user')

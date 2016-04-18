@@ -104,3 +104,13 @@ def is_valid_identity_name(identity_name):
         return False
     else:
         return True
+
+
+def text_header_and_format(lengths_and_headers):
+    format_lengths = [max(l, len(h)) for (l, h) in lengths_and_headers]
+    format_str = ' | '.join('{:' + str(l) + '}' for l in format_lengths)
+
+    print(format_str.format(*[h for (l, h) in lengths_and_headers]))
+    print(format_str.format(*['-'*l for l in format_lengths]))
+
+    return format_str

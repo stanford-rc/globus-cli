@@ -1,11 +1,11 @@
 from __future__ import print_function
 
 from globus_cli.helpers import (
-    outformat_is_json, cliargs, CLIArg, print_json_response)
+    outformat_is_json, cliargs, CLIArg, text_header_and_format,
+    print_json_response)
 from globus_cli.services.auth import (
     maybe_lookup_identity_id, lookup_identity_name)
-from globus_cli.services.transfer.helpers import (
-    text_header_and_format, get_client)
+from globus_cli.services.transfer.helpers import get_client
 
 
 @cliargs('List of Access Control List rules on an Endpoint',

@@ -2,11 +2,11 @@ from __future__ import print_function
 
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
-    colon_formatted_print)
+    colon_formatted_print, text_header_and_format)
 from globus_cli.services.auth import (
     maybe_lookup_identity_id, lookup_identity_name)
 from globus_cli.services.transfer.helpers import (
-    print_json_from_iterator, text_header_and_format, endpoint_list_to_text,
+    print_json_from_iterator, endpoint_list_to_text,
     assemble_generic_doc, get_client)
 from globus_cli.services.transfer.activation import autoactivate
 

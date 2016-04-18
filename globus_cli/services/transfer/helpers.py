@@ -4,6 +4,7 @@ import json
 
 from globus_sdk import TransferClient
 from globus_cli import version
+from globus_cli.helpers import text_header_and_format
 
 
 def get_client():
@@ -24,16 +25,6 @@ def print_json_from_iterator(iterator):
             pass
         json_output_dict['DATA'].append(dat)
     print(json.dumps(json_output_dict, indent=2))
-
-
-def text_header_and_format(lengths_and_headers):
-    format_lengths = [max(l, len(h)) for (l, h) in lengths_and_headers]
-    format_str = ' | '.join('{:' + str(l) + '}' for l in format_lengths)
-
-    print(format_str.format(*[h for (l, h) in lengths_and_headers]))
-    print(format_str.format(*['-'*l for l in format_lengths]))
-
-    return format_str
 
 
 def endpoint_list_to_text(iterator):
