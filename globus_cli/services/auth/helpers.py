@@ -22,7 +22,7 @@ def _lookup_identity_field(id_name=None, id_id=None, field='id'):
 
 
 def maybe_lookup_identity_id(identity_name):
-    if is_valid_identity_name:
+    if is_valid_identity_name(identity_name):
         return _lookup_identity_field(id_name=identity_name)
     else:
         return identity_name
