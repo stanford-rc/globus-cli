@@ -18,7 +18,7 @@ def login_help(args):
 
 @cliargs(('Show a short description for all Globus CLI commands. '
           'For detailed help text, run the specific command you want to know '
-          'more about with the `--help` option.'))
+          'more about with the `--help` option'))
 def command_list(args, tree=None, parent_name='globus'):
     """
     Print long-form help for all commands. Must go in this module to have
@@ -164,7 +164,7 @@ _COMMAND_TREE = [
                 'Interact with Globus Transfer API. '
                 'Transfer, Delete, List, and Rename files on Endpoints, '
                 'manage your Endpoints and Shares, and monitor your ongoing '
-                'Transfer Tasks.'))
+                'Transfer Tasks'))
 ]
 
 
@@ -216,13 +216,13 @@ def build_command_tree():
     All Globus CLI commands take a number of shared options:
 
         -h, --help      Provides information about the specific options
-                        available for a command.
+                        available for a command
 
         -F, --format    Lets you choose between columnar TEXT output and JSON
-                        formatted output.
+                        formatted output. Defaults to TEXT
 
         --version       Prints the version of the Globus CLI that you are
-                        using.
+                        using
     """)
 
     top_level_parser = GlobusCLISharedParser(description=description)

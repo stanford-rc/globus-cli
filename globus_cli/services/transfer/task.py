@@ -36,7 +36,7 @@ def task_list(args):
 
 @cliargs('List Events for a given Task',
          CLIArg('task-id', required=True,
-                help='ID of the task for which you want to list events'))
+                help='ID of the Task for which you want to list Events'))
 def task_event_list(args):
     """
     Executor for `globus transfer task-event-list`
@@ -59,7 +59,7 @@ def task_event_list(args):
 
 @cliargs('Cancel a specific task, owned by the current user',
          CLIArg('task-id', required=True,
-                help='ID of the task which you want to cancel'))
+                help='ID of the Task which you want to cancel'))
 def cancel_task(args):
     """
     Executor for `globus transfer task cancel`
@@ -74,9 +74,9 @@ def cancel_task(args):
         print(res['message'])
 
 
-@cliargs('Update label and/or deadline on an active task',
+@cliargs('Update label and/or deadline on an active Task',
          CLIArg('task-id', required=True,
-                help='ID of the task which you want to cancel'),
+                help='ID of the Task which you want to cancel'),
          CLIArg('label', default=None, help='New Label for the Task'),
          CLIArg('deadline', default=None, help='New Deadline for the Task'))
 def update_task(args):
@@ -102,9 +102,9 @@ def update_task(args):
         print('Success')
 
 
-@cliargs('Show detailed information about a specific task',
+@cliargs('Show detailed information about a specific Task',
          CLIArg('task-id', required=True,
-                help='ID of the task which you want to examine'))
+                help='ID of the Task which you want to examine'))
 def show_task(args):
     """
     Executor for `globus transfer task show`
@@ -116,8 +116,8 @@ def show_task(args):
     print_json_response(res)
 
 
-@cliargs('Show detailed info about pause rules that are applied to a task',
-         CLIArg('task-id', required=True, help='ID of the task'))
+@cliargs('Show detailed info about pause rules that are applied to a Task',
+         CLIArg('task-id', required=True, help='ID of the Task'))
 def task_pause_info(args):
     """
     Executor for `globus transfer task pause-info`

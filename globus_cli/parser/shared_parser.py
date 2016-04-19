@@ -36,9 +36,11 @@ class GlobusCLISharedParser(argparse.ArgumentParser):
         self.add_argument(
             '-F', '--format', dest='outformat',
             default=TEXT_FORMAT, choices=[JSON_FORMAT, TEXT_FORMAT],
-            type=_str_to_outformat, help='Output format for stdout.')
+            type=_str_to_outformat, help=('Output format for stdout. '
+                                          'Defaults to TEXT'))
 
         # version of globus cli -- ignores all other passed arguments and
         # prints the version
         self.add_argument('--version', action='version',
-                          version='%(prog)s ' + __version__)
+                          version='%(prog)s ' + __version__,
+                          help='Show Globus CLI version and exit')

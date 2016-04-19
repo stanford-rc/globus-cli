@@ -45,7 +45,7 @@ def endpoint_search(args):
 
 
 @cliargs('Activate an Endpoint via autoactivation',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'))
 def endpoint_autoactivate(args):
     """
     Executor for `globus transfer endpoint-autoactivate`
@@ -56,7 +56,7 @@ def endpoint_autoactivate(args):
 
 
 @cliargs('Deactivate an Endpoint',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'))
 def endpoint_deactivate(args):
     """
     Executor for `globus transfer endpoint-deactivate`
@@ -67,7 +67,7 @@ def endpoint_deactivate(args):
 
 
 @cliargs('List all servers belonging to an Endpoint',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'))
 def endpoint_server_list(args):
     """
     Executor for `globus transfer endpoint-server-list`
@@ -87,7 +87,7 @@ def endpoint_server_list(args):
 
 
 @cliargs('List all Shared Endpoints on an Endpoint by the current user',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'))
 def my_shared_endpoint_list(args):
     """
     Executor for `globus transfer endpoint my-shared-endpoint-list`
@@ -103,7 +103,7 @@ def my_shared_endpoint_list(args):
 
 
 @cliargs('List of assigned Roles on an Endpoint',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'))
 def endpoint_role_list(args):
     """
     Executor for `globus transfer access endpoint-role-list`
@@ -129,7 +129,7 @@ def endpoint_role_list(args):
 
 
 @cliargs('Show full info for a Role on an Endpoint',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'),
          CLIArg('role-id', required=True, help='ID of the role'))
 def endpoint_role_show(args):
     """
@@ -153,7 +153,7 @@ def endpoint_role_show(args):
 
 
 @cliargs('Create a Role on an Endpoint',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'),
          CLIArg('principal-type', required=True,
                 choices=('identity', 'group'), type=str.lower,
                 help='Type of entity to set a role on'),
@@ -187,7 +187,7 @@ def endpoint_role_create(args):
 
 
 @cliargs('Remove a Role from an Endpoint',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'),
          CLIArg('role-id', required=True, help='ID of the role'))
 def endpoint_role_delete(args):
     """
@@ -204,7 +204,7 @@ def endpoint_role_delete(args):
 
 
 @cliargs('Display a detailed endpoint definition',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'))
 def endpoint_show(args):
     """
     Executor for `globus transfer endpoint show`
@@ -280,7 +280,7 @@ def endpoint_create(args):
 
 
 @cliargs('Update attributes of an Endpoint',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'),
          CLIArg('display-name', help='New Display Name for the Endpoint'),
          CLIArg('description', help='New Description for the Endpoint'),
          CLIArg('organization', help='New Organization for the Endpoint'),
@@ -330,7 +330,7 @@ def endpoint_update(args):
 
 
 @cliargs('Delete a given Endpoint',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'))
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'))
 def endpoint_delete(args):
     """
     Executor for `globus transfer endpoint delete`

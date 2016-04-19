@@ -26,12 +26,12 @@ def _validate_transfer_args(args, parser):
                      '--source-path or --dest-path')
 
 
-@cliargs(('Copy a file or directory from one endpoint '
+@cliargs(('Copy a file or directory from one Endpoint '
           'to another as an asynchronous task'),
          CLIArg('source-endpoint', required=True,
-                help='ID of the endpoint from which to transfer'),
+                help='ID of the Endpoint from which to transfer'),
          CLIArg('dest-endpoint', required=True,
-                help='ID of the endpoint to which to transfer'),
+                help='ID of the Endpoint to which to transfer'),
          CLIArg('source-path',
                 help='Path to the file/dir to move on source-endpoint'),
          CLIArg('dest-path',
@@ -41,15 +41,33 @@ def _validate_transfer_args(args, parser):
                       'recursive dir transfer. Ignored when using --batch')),
          CLIArg('sync-level', default="mtime", type=str.lower,
                 choices=("exists", "mtime", "checksum"),
-                help=('How will the transfer task determine whether or not to '
-                      'actually transfer a file?\n'
+                help=('How will the transfer Task determine whether or not to '
+                      'actually transfer a file over the network?\n'
                       'EXISTS: if the dest file is absent\n'
                       'MTIME: if source is newer (modififed time) than dest\n'
                       'CHECKSUM: if source and dest contents differ')),
          CLIArg('batch', default=False, action='store_true',
                 help=('Accept a batch of source/dest path pairs on stdin. '
+                      'Uses --source-endpoint and --dest-endpoint as passed '
+                      'on the commandline.\n'
+                      'Splits each line using Python shlex in POSIX mode:\n'
+                      'https://docs.python.org/2/library/shlex.html\n'
+                      'Lines are of the form\n\n'
+                      '[--recursive] SOURCEPATH DESTPATH\n\n'
                       'Skips empty lines and allows '
-                      'comments beginning with "#"')),
+                      'comments beginning with "#".\n\n'
+                      'Example of --batch usage:\n\n'
+                      '  $ cat dat\n'
+                      '  # file 1, simple\n'
+                      '  ~/dir1/sourcepath1 /abspath/destpath1\n'
+                      '  # file 2, with spaces in dest path\n'
+                      '  # paths without explicit ~ implicitly use ~\n'
+                      '  dir2/sourcepath2   "path with spaces/dest2"\n'
+                      '  # dir 1, requires --recursive option\n'
+                      '  --recursive ~/srcdir1/ /somepath/destdir1\n\n'
+                      '  $ cat dat | globus transfer async-transfer \\\n'
+                      '     --batch --sync-level checksum \\\n'
+                      '     --source-endpoint "..." --dest-endpoint "..."\n')),
          arg_validator=_validate_transfer_args)
 def submit_transfer(args):
     """
@@ -118,10 +136,10 @@ def submit_transfer(args):
         print(res['message'])
 
 
-@cliargs(('Delete a file or directory from one endpoint '
+@cliargs(('Delete a file or directory from one Endpoint '
           'as an asynchronous task'),
          CLIArg('endpoint-id', required=True,
-                help='ID of the endpoint from which to delete file(s)'),
+                help='ID of the Endpoint from which to delete file(s)'),
          CLIArg('path', required=True, help='Path to the file/dir to delete'),
          CLIArg('recursive', default=False, action='store_true',
                 help='Recursively delete dirs'),

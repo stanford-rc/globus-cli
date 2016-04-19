@@ -7,8 +7,8 @@ from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.activation import autoactivate
 
 
-@cliargs('List the contents of a directory on an endpoint',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+@cliargs('List the contents of a directory on an Endpoint',
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'),
          CLIArg('long', default=False, action='store_true',
                 help=('For text output only. Do long form output, kind '
                       'of like `ls -l`')),
@@ -47,9 +47,9 @@ def op_ls(args):
 
 
 @cliargs('Make a directory on an Endpoint',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'),
          CLIArg('path', required=True,
-                help='Path on the remote endpoint to create'))
+                help='Path on the remote Endpoint to create'))
 def op_mkdir(args):
     """
     Executor for `globus transfer mkdir`
@@ -66,7 +66,7 @@ def op_mkdir(args):
 
 
 @cliargs('Rename a file or directory on an Endpoint',
-         CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
+         CLIArg('endpoint-id', required=True, help='ID of the Endpoint'),
          CLIArg('old-path', required=True,
                 help='Path to the file/dir to rename'),
          CLIArg('new-path', required=True,

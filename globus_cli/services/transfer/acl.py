@@ -55,7 +55,7 @@ def show_acl_rule(args):
          CLIArg('endpoint-id', required=True, help='ID of the endpoint'),
          CLIArg('permissions', required=True, choices=('r', 'rw'),
                 type=str.lower, help=('Permissions to add. '
-                                      'Read-Only or Read/Write.')),
+                                      'Read-Only or Read/Write')),
          CLIArg('principal', required=True,
                 help=('Principal to grant permissions to. ID of a Group or '
                       'Identity, or a valid Identity Name, like '
@@ -108,7 +108,7 @@ def del_acl_rule(args):
          CLIArg('rule-id', required=True, help='ID of the rule to display'),
          CLIArg('permissions', default=None, choices=('r', 'rw'),
                 type=str.lower, help=('Permissions to add. '
-                                      'Read-Only or Read/Write.')),
+                                      'Read-Only or Read/Write')),
          CLIArg('principal', default=None,
                 help=('Principal to grant permissions to. ID of a Group or '
                       'Identity, or a valid Identity Name, like '
