@@ -183,6 +183,11 @@ def _add_subcommands(parser, commandset):
     subparsers = parser.add_subparsers(
         title='Commands', parser_class=GlobusCLISharedParser,
         metavar='')
+    # manually set subparsers to be required, in order to fix argument parsing
+    # on versions of python which broke this
+    # specific notes available here:
+    #   https://github.com/globus/globus-cli/issues/5
+    subparsers.required = True
 
     # iterate over all commands in the set, and ...
     for command in commandset:
