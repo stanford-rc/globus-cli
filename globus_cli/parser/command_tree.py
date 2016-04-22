@@ -182,7 +182,7 @@ def _add_subcommands(parser, commandset):
     # we start with a subparser collection named "Commands"
     subparsers = parser.add_subparsers(
         title='Commands', parser_class=GlobusCLISharedParser,
-        metavar='')
+        dest='command')
     # manually set subparsers to be required, in order to fix argument parsing
     # on versions of python which broke this
     # specific notes available here:
