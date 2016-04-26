@@ -4,15 +4,12 @@ import argparse
 import shlex
 import sys
 
+from globus_sdk import TransferData, DeleteData
+
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response)
 from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.activation import autoactivate
-
-
-def add_submission_id(client, datadoc):
-    submission_id = client.get_submission_id()['value']
-    datadoc['submission_id'] = submission_id
 
 
 def _validate_transfer_args(args, parser):
@@ -74,6 +71,9 @@ def submit_transfer(args):
     Executor for `globus transfer async-transfer`
     """
     client = get_client()
+    transfer_data = TransferData(
+        client, args.source_endpoint, args.dest_endpoint,
+        label='globus-cli transfer', sync_level=args.sync_level)
 
     if args.batch is not None:
         # if input is interactive, print help to stderr
@@ -106,29 +106,23 @@ def submit_transfer(args):
 
             args = parser.parse_args(argv)
 
-            return client.make_submit_transfer_item(
-                args.source, args.dest, recursive=args.recursive)
+            transfer_data.add_item(args.source, args.dest,
+                                   recursive=args.recursive)
 
-        # nested comprehensions to filter the results to remove None
         # use readlines() rather than implicit file read line looping to force
         # python to properly capture EOF (otherwise, EOF acts as a flush and
         # things get weird)
-        transfer_items = [item for item in (parse_batch_line(line)
-                                            for line in sys.stdin.readlines())
-                          if item is not None]
+        for line in sys.stdin.readlines():
+            parse_batch_line(line)
     else:
-        transfer_items = [client.make_submit_transfer_item(
-            args.source_path, args.dest_path, recursive=args.recursive)]
-
-    datadoc = client.make_submit_transfer_data(
-        args.source_endpoint, args.dest_endpoint, transfer_items,
-        label='globus-cli transfer', sync_level=args.sync_level)
+        transfer_data.add_item(args.source_path, args.dest_path,
+                               recursive=args.recursive)
 
     # autoactivate after parsing all args and putting things together
     autoactivate(client, args.source_endpoint, if_expires_in=60)
     autoactivate(client, args.dest_endpoint, if_expires_in=60)
 
-    res = client.submit_transfer(datadoc)
+    res = client.submit_transfer(transfer_data)
 
     if outformat_is_json(args):
         print_json_response(res)
@@ -152,21 +146,13 @@ def submit_delete(args):
     client = get_client()
     autoactivate(client, args.endpoint_id, if_expires_in=60)
 
-    datadoc = {
-        'DATA_TYPE': 'delete',
-        'label': 'globus-cli delete',
-        'endpoint': args.endpoint_id,
-        'recursive': args.recursive,
-        'ignore_missing': args.ignore_missing,
-        'DATA': [
-            {
-                'DATA_TYPE': 'delete_item',
-                'path': args.path
-            }
-        ]
-    }
-    add_submission_id(client, datadoc)
-    res = client.submit_delete(datadoc)
+    delete_data = DeleteData(client, args.endpoint_id,
+                             label='globus-cli delete',
+                             recursive=args.recursive,
+                             ignore_missing=args.ignore_missing)
+    delete_data.add_item(args.path)
+
+    res = client.submit_delete(delete_data)
 
     if outformat_is_json(args):
         print_json_response(res)
