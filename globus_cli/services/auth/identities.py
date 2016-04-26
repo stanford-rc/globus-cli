@@ -1,6 +1,6 @@
 from globus_cli.helpers import (
     cliargs, CLIArg, print_json_response, outformat_is_json,
-    text_header_and_format)
+    print_table)
 from globus_cli.services.auth.helpers import get_auth_client
 
 
@@ -45,13 +45,7 @@ def get_identities(args):
         max_org_len = max_keylen('organization')
         max_email_len = max_keylen('email')
 
-        text_col_format = text_header_and_format(
-            [(36, 'ID'),
-             (max_fullname_len, 'Full Name'),
-             (max_username_len, 'Username'),
-             (max_org_len, 'Organization'),
-             (max_email_len, 'Email Address')])
-        for identity in ids:
-            print(text_col_format.format(
-                identity['id'], identity['name'], identity['username'],
-                identity['organization'], identity['email']))
+        print_table(ids, [('ID', 'id'), ('Full Name', 'name'),
+                          ('Username', 'username'),
+                          ('Organization', 'organization'),
+                          ('Email Address', 'email')])

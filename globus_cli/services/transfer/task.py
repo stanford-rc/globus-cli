@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
-    text_header_and_format)
+    print_table)
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, get_client)
 
@@ -20,18 +20,11 @@ def task_list(args):
     if outformat_is_json(args):
         print_json_from_iterator(task_iterator)
     else:
-        text_col_format = text_header_and_format(
-            [(36, 'Task ID'), (10, 'Status'), (10, 'Type'),
-             (32, 'Source Display Name'), (32, 'Dest Display Name'),
-             (None, 'Label')])
-
-        for result in task_iterator:
-            print(text_col_format.format(
-                result['task_id'], result['status'],
-                result['type'],
-                result['source_endpoint_display_name'],
-                result['destination_endpoint_display_name'],
-                result['label']))
+        print_table(task_iterator, [
+            ('Task ID', 'task_id'), ('Status', 'status'), ('Type', 'type'),
+            ('Source Display Name', 'source_endpoint_display_name'),
+            ('Dest Display Name', 'destination_endpoint_display_name'),
+            ('Label', 'label')])
 
 
 @cliargs('List Events for a given Task',
@@ -48,13 +41,9 @@ def task_event_list(args):
     if outformat_is_json(args):
         print_json_from_iterator(event_iterator)
     else:
-        text_col_format = text_header_and_format(
-            [(25, 'Time'), (32, 'Code'), (8, 'Is Error'), (None, 'Details')])
-
-        for result in event_iterator:
-            print(text_col_format.format(
-                result['time'], result['code'],
-                result['is_error'], result['details']))
+        print_table(event_iterator, [
+            ('Time', 'time'), ('Code', 'code'), ('Is Error', 'is_error'),
+            ('Details', 'details')])
 
 
 @cliargs('Cancel a specific task, owned by the current user',

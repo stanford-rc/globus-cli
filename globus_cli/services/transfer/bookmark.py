@@ -3,7 +3,7 @@ import sys
 
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
-    colon_formatted_print, text_header_and_format)
+    colon_formatted_print, print_table)
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, get_client)
 
@@ -20,14 +20,9 @@ def bookmark_list(args):
     if outformat_is_json(args):
         print_json_from_iterator(bookmark_iterator)
     else:
-        text_col_format = text_header_and_format(
-            [(32, 'Name'), (36, 'Endpoint ID'), (36, 'Bookmark ID'),
-             (None, 'Path')])
-
-        for result in bookmark_iterator:
-            print(text_col_format.format(
-                result['name'], result['endpoint_id'],
-                result['id'], result['path']))
+        print_table(bookmark_iterator, [
+            ('Name', 'name'), ('Endpoint ID', 'endpoint_id'),
+            ('Bookmark ID', 'id'), ('Path', 'path')])
 
 
 def _validate_show_args(args, parser):

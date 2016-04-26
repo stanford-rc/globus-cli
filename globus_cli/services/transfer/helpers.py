@@ -4,7 +4,7 @@ import json
 
 from globus_sdk import TransferClient
 from globus_cli import version
-from globus_cli.helpers import text_header_and_format
+from globus_cli.helpers import print_table
 
 
 def get_client():
@@ -28,13 +28,8 @@ def print_json_from_iterator(iterator):
 
 
 def endpoint_list_to_text(iterator):
-    text_col_format = text_header_and_format(
-        [(32, 'Owner'), (36, 'ID'), (None, 'Display Name')])
-
-    for result in iterator:
-        print(text_col_format.format(
-            result['owner_string'], result['id'],
-            display_name_or_cname(result)))
+    print_table(iterator, [('Owner', 'owner_string'), ('ID', 'id'),
+                           ('Display Name', display_name_or_cname)])
 
 
 def assemble_generic_doc(datatype, *args, **kwargs):

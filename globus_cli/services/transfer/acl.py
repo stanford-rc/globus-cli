@@ -1,8 +1,7 @@
 from __future__ import print_function
 
 from globus_cli.helpers import (
-    outformat_is_json, cliargs, CLIArg, text_header_and_format,
-    print_json_response)
+    outformat_is_json, cliargs, CLIArg, print_table, print_json_response)
 from globus_cli.services.auth import (
     maybe_lookup_identity_id, lookup_identity_name)
 from globus_cli.services.transfer.helpers import get_client
@@ -21,20 +20,17 @@ def acl_list(args):
     if outformat_is_json(args):
         print_json_response(rules)
     else:
-        text_col_format = text_header_and_format(
-            [(36, 'Rule ID'), (None, 'Permissions'), (70, 'Shared With'),
-             (None, 'Path')])
-
-        for rule in rules:
+        def principal_str(rule):
             principal = rule['principal']
             if rule['principal_type'] == 'identity':
-                principal = lookup_identity_name(principal)
+                return lookup_identity_name(principal)
             elif rule['principal_type'] == 'group':
-                principal = ('https://www.globus.org'
-                             '/app/groups/{}').format(principal)
-            print(text_col_format.format(
-                rule['id'], rule['permissions'],
-                principal, rule['path']))
+                return ('https://www.globus.org/app/groups/{}'
+                        ).format(principal)
+            return principal
+
+        print_table(rules, [('Rule ID', 'id'), ('Permissions', 'permissions'),
+                            ('Shared With', principal_str), ('Path', 'path')])
 
 
 @cliargs('Get detailed info on a specific ACL rule',

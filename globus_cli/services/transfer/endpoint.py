@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
-    colon_formatted_print, text_header_and_format)
+    colon_formatted_print, print_table)
 from globus_cli.services.auth import (
     maybe_lookup_identity_id, lookup_identity_name)
 from globus_cli.services.transfer.helpers import (
@@ -79,11 +79,7 @@ def endpoint_server_list(args):
     if outformat_is_json(args):
         print_json_from_iterator(server_iterator)
     else:
-        text_col_format = text_header_and_format(
-            [(36, 'URI')])
-
-        for result in server_iterator:
-            print(text_col_format.format(result['uri']))
+        print_table(server_iterator, [('URI', 'uri')])
 
 
 @cliargs('List all Shared Endpoints on an Endpoint by the current user',
@@ -115,17 +111,14 @@ def endpoint_role_list(args):
     if outformat_is_json(args):
         print_json_response(roles)
     else:
-        text_col_format = text_header_and_format(
-            [(16, 'Principal Type'), (36, 'Role ID'), (36, 'Principal'),
-             (16, 'Role')])
-
-        for role in roles:
+        def principal_str(role):
             principal = role['principal']
             if role['principal_type'] == 'identity':
                 principal = lookup_identity_name(principal)
-
-            print(text_col_format.format(
-                role['principal_type'], role['id'], principal, role['role']))
+            return principal
+        print_table(roles, [('Principal Type', 'principal_type'),
+                            ('Role ID', 'id'), ('Principal', principal_str),
+                            ('Role', 'role')])
 
 
 @cliargs('Show full info for a Role on an Endpoint',

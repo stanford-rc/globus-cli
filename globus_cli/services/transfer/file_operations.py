@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
-    text_header_and_format)
+    print_table)
 from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.activation import autoactivate
 
@@ -32,18 +32,10 @@ def op_ls(args):
             def max_keylen(key):
                 return max(len(str(f[key])) for f in res)
 
-            text_col_format = text_header_and_format(
-                [(None, 'permissions'), (max_keylen('user'), 'user'),
-                 (max_keylen('group'), 'group'), (max_keylen('size'), 'size'),
-                 (max_keylen('last_modified'), 'last modified'),
-                 (max_keylen('type'), 'file type'),
-                 (max_keylen('name'), 'filename')])
-
-            for item in res:
-                print(text_col_format.format(
-                    item['permissions'], item['user'], item['group'],
-                    item['size'], item['last_modified'], item['type'],
-                    item['name']))
+            print_table(res, [('permissions', 'permissions'), ('user', 'user'),
+                              ('group', 'group'), ('size', 'size'),
+                              ('last_modified', 'last_modififed'),
+                              ('file type', 'type'), ('filename', 'name')])
 
 
 @cliargs('Make a directory on an Endpoint',
