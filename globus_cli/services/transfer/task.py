@@ -1,4 +1,6 @@
 from __future__ import print_function
+import sys
+import time
 
 from globus_cli.helpers import (
     outformat_is_json, cliargs, CLIArg, print_json_response,
@@ -116,3 +118,44 @@ def task_pause_info(args):
     res = client.task_pause_info(args.task_id)
 
     print_json_response(res)
+
+
+@cliargs('Wait for a Task to complete',
+         CLIArg('task-id', required=True,
+                help='ID of the Task to wait on'),
+         CLIArg('timeout', default=None, type=int, metavar='N',
+                help=('Wait N seconds. If the Task does not terminate by '
+                      'then, exit with status 0')),
+         CLIArg('polling-interval', default=1, type=int,
+                help=('Number of seconds between Task status checks. '
+                      'Defaults to 1')),
+         CLIArg('heartbeat', '-H', default=False, action='store_true',
+                help=('Every polling interval, print "." to stdout to '
+                      'indicate that task wait is till active')))
+def task_wait(args):
+    """
+    Executor for `globus transfer task wait`
+    """
+    client = get_client()
+
+    def timed_out(waited_time):
+        if args.timeout is None:
+            return False
+        else:
+            return waited_time > args.timeout
+
+    waited_time = 0
+    while not timed_out(waited_time):
+        if args.heartbeat:
+            print('.', end='')
+
+        task = client.get_task(args.task_id)
+
+        status = task['status']
+        if status != 'ACTIVE':
+            if args.heartbeat:
+                print()
+            sys.exit(1)
+
+        waited_time += args.polling_interval
+        time.sleep(args.polling_interval)

@@ -20,7 +20,8 @@ from globus_cli.services.transfer.bookmark import (
     bookmark_create, bookmark_rename, bookmark_delete)
 from globus_cli.services.transfer.task import (
     task_list, task_event_list, task_pause_info,
-    cancel_task, update_task, show_task)
+    cancel_task, update_task, show_task,
+    task_wait)
 from globus_cli.services.transfer.file_operations import (
     op_ls, op_mkdir, op_rename)
 from globus_cli.services.transfer.task_submit import (
@@ -47,6 +48,7 @@ __all__ = [
 
     'task_list', 'task_event_list', 'task_pause_info',
     'cancel_task', 'update_task', 'show_task',
+    'task_wait',
 
     'op_ls', 'op_mkdir', 'op_rename',
     'submit_transfer', 'submit_delete'

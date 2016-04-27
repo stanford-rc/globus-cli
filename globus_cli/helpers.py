@@ -56,16 +56,17 @@ def cliargs(helptext, *arguments, **kwargs):
 
 
 class CLIArg(object):
-    def __init__(self, name, **kwargs):
+    def __init__(self, name, *args, **kwargs):
         self.kwargs = kwargs
         self.name = name
+        self.args = args
 
         self.kwargs['dest'] = self.name.replace('-', '_')
         if 'help' in self.kwargs:
             self.kwargs['help'] = wrap_helptext(self.kwargs['help'])
 
     def argparse_arglist(self):
-        return ['--{}'.format(self.name)]
+        return ['--{}'.format(self.name)] + list(self.args)
 
     def argparse_kwargs(self):
         return self.kwargs

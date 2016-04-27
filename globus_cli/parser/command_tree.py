@@ -123,7 +123,8 @@ _TRANSFER_COMMANDS = [
          FuncCommand('pause-info', transfer.task_pause_info),
          FuncCommand('cancel', transfer.cancel_task),
          FuncCommand('update', transfer.update_task),
-         FuncCommand('show', transfer.show_task)],
+         FuncCommand('show', transfer.show_task),
+         FuncCommand('wait', transfer.task_wait)],
         'Manage asynchronous Tasks'),
 
     MenuCommand(
