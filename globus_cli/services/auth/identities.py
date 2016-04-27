@@ -40,11 +40,6 @@ def get_identities(args):
         def max_keylen(key):
             return max(len(i[key]) for i in ids)
 
-        max_fullname_len = max_keylen('name')
-        max_username_len = max_keylen('username')
-        max_org_len = max_keylen('organization')
-        max_email_len = max_keylen('email')
-
         print_table(ids, [('ID', 'id'), ('Full Name', 'name'),
                           ('Username', 'username'),
                           ('Organization', 'organization'),
