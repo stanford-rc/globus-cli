@@ -28,7 +28,7 @@ def get_identities(args):
     if args.usernames:
         params['usernames'] = ','.join(args.usernames)
     if args.identities:
-        params['ids'] = ','.join(args.usernames)
+        params['ids'] = ','.join(args.identities)
 
     res = client.get_identities(**params)
 
