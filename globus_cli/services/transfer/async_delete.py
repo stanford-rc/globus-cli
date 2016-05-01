@@ -1,7 +1,7 @@
 from __future__ import print_function
 import click
 
-from globus_sdk import TransferData, DeleteData
+from globus_sdk import DeleteData
 
 
 from globus_cli.helpers import (

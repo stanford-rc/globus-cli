@@ -1,8 +1,8 @@
 from __future__ import print_function
 import click
 
-from globus_cli.param_types import CaseInsensitiveChoice
-from globus_cli.helpers import common_options, print_json_response
+from globus_cli.helpers import (
+    CaseInsensitiveChoice, common_options, print_json_response)
 from globus_cli.services.transfer.helpers import (
     get_client, assemble_generic_doc)
 from globus_cli.services.transfer.endpoint.helpers import (

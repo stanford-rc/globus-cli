@@ -1,46 +1,6 @@
 from __future__ import print_function
-import click
-import sys
 import json
-import re
 import six
-
-from globus_cli.param_types import CaseInsensitiveChoice
-from globus_cli.version import __version__
-
-
-# Format Enum for output formatting
-# could use a namedtuple, but that's overkill
-JSON_FORMAT = 'json'
-TEXT_FORMAT = 'text'
-
-# what qualifies as a valid Identity Name?
-_IDENTITY_NAME_REGEX = '^[a-zA-Z0-9]+.*@[a-zA-z0-9-]+\..*[a-zA-Z]+$'
-
-
-def stderr_prompt(prompt):
-    """
-    Prompt for input on stderr.
-    Good for not muddying redirected output while prompting the user.
-    """
-    print(prompt, file=sys.stderr, end='')
-    return raw_input()
-
-
-def outformat_is_json():
-    """
-    Only safe to call within a click context.
-    """
-    ctx = click.get_current_context()
-    return ctx.obj['format'] == JSON_FORMAT
-
-
-def outformat_is_text(args):
-    """
-    Only safe to call within a click context.
-    """
-    ctx = click.get_current_context()
-    return ctx.obj['format'] == TEXT_FORMAT
 
 
 def print_json_response(res):
@@ -51,18 +11,6 @@ def colon_formatted_print(data, named_fields):
     maxlen = max(len(n) for n, f in named_fields) + 1
     for name, field in named_fields:
         print('{} {}'.format((name + ':').ljust(maxlen), data[field]))
-
-
-def is_valid_identity_name(identity_name):
-    """
-    Check if a string is a valid identity name.
-    Does not do any preprocessing of the identity name, so you must do so
-    before invocation.
-    """
-    if re.match(_IDENTITY_NAME_REGEX, identity_name) is None:
-        return False
-    else:
-        return True
 
 
 def print_table(iterable, headers_and_keys, print_headers=True):
@@ -124,21 +72,3 @@ def print_table(iterable, headers_and_keys, print_headers=True):
     # print the rows of data
     for i in iterable:
         print(format_str.format(*[none_to_null(kf(i)) for kf in keyfuncs]))
-
-
-def common_options(f):
-    f = click.version_option(__version__)(f)
-    f = click.help_option('-h', '--help')(f)
-
-    def format_callback(ctx, param, value):
-        ctx.obj['format'] = value or ctx.obj.get('format')
-
-        return ctx.obj['format']
-
-    f = click.option('-F', '--format',
-                     type=CaseInsensitiveChoice([JSON_FORMAT, TEXT_FORMAT]),
-                     help=('Output format for stdout. Defaults to text'),
-                     expose_value=False,
-                     callback=format_callback)(f)
-
-    return f

@@ -23,9 +23,11 @@ def bookmark_show(bookmark_name, bookmark_id):
         raise click.UsageError(
             'bookmark show cannot take both --bookmark-id and --bookmark-name')
 
+    client = get_client()
+
     if bookmark_id is not None:
         res = client.get_bookmark(bookmark_id)
-    elif args.bookmark_name is not None:
+    elif bookmark_name is not None:
         res = None
         for res in client.bookmark_list():
             if res['name'] == bookmark_name:
@@ -33,7 +35,7 @@ def bookmark_show(bookmark_name, bookmark_id):
             else:
                 res = None
         if res is None:
-            print('No bookmark found with name {}'.format(args.bookmark_name),
+            print('No bookmark found with name {}'.format(bookmark_name),
                   file=sys.stderr)
             return
     else:
@@ -41,7 +43,7 @@ def bookmark_show(bookmark_name, bookmark_id):
         # broken someday...
         raise ValueError('Trying to lookup bookmark without ID or Name')
 
-    if outformat_is_json(args):
+    if outformat_is_json():
         print_json_response(res)
     else:
         fields = (('ID', 'id'), ('Name', 'name'),

@@ -5,9 +5,9 @@ import sys
 
 from globus_sdk import TransferData
 
-from globus_cli.param_types import CaseInsensitiveChoice
 from globus_cli.helpers import (
-    common_options, outformat_is_json, print_json_response)
+    CaseInsensitiveChoice, common_options, outformat_is_json,
+    print_json_response)
 from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.activation import autoactivate
 

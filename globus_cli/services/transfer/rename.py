@@ -3,12 +3,13 @@ import click
 
 from globus_cli.helpers import (
     common_options, outformat_is_json, print_json_response)
-from globus_cli.services.transfer.helpers import get_client
+from globus_cli.services.transfer.helpers import get_client, endpoint_id_option
 from globus_cli.services.transfer.activation import autoactivate
 
 
 @click.command('rename', help='Rename a file or directory on an Endpoint')
-@click.option('--endpoint-id', required=True, help='ID of the Endpoint')
+@common_options
+@endpoint_id_option
 @click.option('--old-path', required=True,
               help='Path to the file/dir to rename')
 @click.option('--new-path', required=True,

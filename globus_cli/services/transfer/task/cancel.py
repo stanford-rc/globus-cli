@@ -2,10 +2,8 @@ from __future__ import print_function
 import click
 
 from globus_cli.helpers import (
-    common_options, outformat_is_json, print_json_response,
-    print_table)
-from globus_cli.services.transfer.helpers import (
-    print_json_from_iterator, get_client)
+    common_options, outformat_is_json, print_json_response)
+from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.task.helpers import task_id_option
 
 

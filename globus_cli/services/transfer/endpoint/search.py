@@ -1,8 +1,8 @@
 from __future__ import print_function
 import click
 
-from globus_cli.param_types import CaseInsensitiveChoice
-from globus_cli.helpers import common_options, outformat_is_json
+from globus_cli.helpers import (
+    CaseInsensitiveChoice, common_options, outformat_is_json)
 from globus_cli.services.auth import maybe_lookup_identity_id
 from globus_cli.services.transfer.helpers import (
     print_json_from_iterator, endpoint_list_to_text, get_client)

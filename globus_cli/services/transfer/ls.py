@@ -3,14 +3,14 @@ import click
 
 from globus_cli.helpers import (
     common_options, outformat_is_json, print_json_response, print_table)
-from globus_cli.services.transfer.helpers import get_client
+from globus_cli.services.transfer.helpers import get_client, endpoint_id_option
 from globus_cli.services.transfer.activation import autoactivate
 
 
 @click.command('ls', help='List the contents of a directory on an Endpoint',
                short_help='List Endpoint directory contents')
 @common_options
-@click.option('--endpoint-id', required=True, help='ID of the Endpoint')
+@endpoint_id_option
 @click.option('--long', is_flag=True,
               help=('For text output only. Do long form output, kind '
                     'of like `ls -l`'))

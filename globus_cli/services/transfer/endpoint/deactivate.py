@@ -6,6 +6,7 @@ from globus_cli.services.transfer.helpers import get_client, endpoint_id_option
 
 
 @click.command('deactivate', help='Deactivate an Endpoint')
+@common_options
 @endpoint_id_option
 def endpoint_deactivate(endpoint_id):
     """
