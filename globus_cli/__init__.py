@@ -1,6 +1,5 @@
-from globus_cli.parser import run_command
+from globus_cli.run import main
+from globus_cli.version import __version__
 
-__version__ = '0.1.0'
 
-
-__all__ = ['run_command']
+__all__ = ['main', '__version__']

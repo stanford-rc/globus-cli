@@ -1,14 +1,10 @@
+from globus_cli.services.auth.commands import auth_command
 from globus_cli.services.auth.helpers import (
-    maybe_lookup_identity_id, lookup_identity_name)
-from globus_cli.services.auth.identities import (
-    get_identities)
-from globus_cli.services.auth.tokens import (
-    token_introspect)
+    lookup_identity_name, maybe_lookup_identity_id)
+
 
 __all__ = [
-    'maybe_lookup_identity_id', 'lookup_identity_name',
+    'auth_command',
 
-    'get_identities',
-
-    'token_introspect'
+    'lookup_identity_name', 'maybe_lookup_identity_id'
 ]
