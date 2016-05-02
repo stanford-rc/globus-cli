@@ -2,6 +2,7 @@ from __future__ import print_function
 import click
 
 from globus_cli.excepthook import set_excepthook
+from globus_cli.list_commands import list_commands
 from globus_cli.helpers import common_options
 
 from globus_cli.services.auth import auth_command
@@ -23,7 +24,7 @@ def login_help():
     print('and select the the "Globus CLI" option.\n')
 
 
-@click.group(context_settings=dict(obj=_global_click_obj))
+@click.group('globus', context_settings=dict(obj=_global_click_obj))
 @common_options
 def main():
     set_excepthook()
@@ -32,3 +33,4 @@ def main():
 main.add_command(auth_command)
 main.add_command(transfer_command)
 main.add_command(login_help)
+main.add_command(list_commands)
