@@ -36,5 +36,5 @@ def ls_command(path, long, endpoint_id):
 
             print_table(res, [('permissions', 'permissions'), ('user', 'user'),
                               ('group', 'group'), ('size', 'size'),
-                              ('last_modified', 'last_modififed'),
+                              ('last_modified', 'last_modified'),
                               ('file type', 'type'), ('filename', 'name')])
