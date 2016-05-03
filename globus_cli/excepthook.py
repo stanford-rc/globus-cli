@@ -16,8 +16,21 @@ import errno
 from globus_sdk import exc
 
 
+_prefix = 'Globus CLI Error:'
+_prefix_len = len(_prefix)
+
+
 def _errmsg(msg):
-    print('Globus CLI Error: {}'.format(msg), file=sys.stderr)
+    print('{} {}'.format(_prefix, msg), file=sys.stderr)
+
+
+def _format_error_field(name, val, multiline=False):
+    name = name + ':'
+    if not multiline or '\n' not in val:
+        return '{} {}'.format(name.ljust(_prefix_len), val)
+    else:
+        spacer = '\n' + ' '*(_prefix_len + 1)
+        return '{}{}{}'.format(name, spacer, spacer.join(val.split('\n')))
 
 
 def pagination_overrun_hook():
@@ -26,16 +39,19 @@ def pagination_overrun_hook():
 
 
 def transferapi_hook(exception):
-    _errmsg(('A Transfer API Error Occurred.\n'
-             'HTTP status: {}\nrequest_id: {}\ncode: {}\nmessage: {}').format(
-                 exception.http_status, exception.request_id, exception.code,
-                 exception.message))
+    _errmsg(('A Transfer API Error Occurred.\n{}\n{}\n{}\n{}').format(
+            _format_error_field('HTTP status', exception.http_status),
+            _format_error_field('request_id', exception.request_id),
+            _format_error_field('code', exception.code),
+            _format_error_field('message', exception.message, multiline=True)))
 
 
 def globusapi_hook(exception):
     _errmsg(('A Globus API Error Occurred.\n'
-             'HTTP status: {}\ncode: {}\nmessage: {}').format(
-                 exception.http_status, exception.code, exception.message))
+             '{}\n{}\n{}').format(
+        _format_error_field('HTTP status', exception.http_status),
+        _format_error_field('code', exception.code),
+        _format_error_field('message', exception.message, multiline=True)))
 
 
 def custom_except_hook(exception_type, exception, traceback,
