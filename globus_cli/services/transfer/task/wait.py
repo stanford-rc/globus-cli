@@ -3,7 +3,7 @@ import click
 import sys
 import time
 
-from globus_cli.helpers import common_options
+from globus_cli.helpers import common_options, HiddenOption
 from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.task.helpers import task_id_option
 
@@ -20,7 +20,8 @@ from globus_cli.services.transfer.task.helpers import task_id_option
 @click.option('--heartbeat', '-H', is_flag=True,
               help=('Every polling interval, print "." to stdout to '
                     'indicate that task wait is till active'))
-def task_wait(heartbeat, polling_interval, timeout, task_id):
+@click.option('--meow', is_flag=True, cls=HiddenOption)
+def task_wait(meow, heartbeat, polling_interval, timeout, task_id):
     """
     Executor for `globus transfer task wait`
     """
@@ -31,6 +32,14 @@ def task_wait(heartbeat, polling_interval, timeout, task_id):
             return False
         else:
             return waited_time >= timeout
+
+    # Tasks start out sleepy
+    if meow:
+        print("""\
+   |\      _,,,---,,_
+   /,`.-'`'    -.  ;-;;,_
+  |,4-  ) )-,_..;\ (  `'-'
+ '---''(_/--'  `-'\_)""")
 
     waited_time = 0
     while not timed_out(waited_time):
@@ -44,6 +53,15 @@ def task_wait(heartbeat, polling_interval, timeout, task_id):
         if status != 'ACTIVE':
             if heartbeat:
                 print()
+            # meowing tasks wake up!
+            if meow:
+                print("""\
+                  _..
+  /}_{\           /.-'
+ ( a a )-.___...-'/
+ ==._.==         ;
+      \ i _..._ /,
+      {_;/   {_//""")
             sys.exit(1)
 
         waited_time += polling_interval

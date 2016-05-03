@@ -1,4 +1,5 @@
 from globus_cli.helpers.param_types import CaseInsensitiveChoice
+from globus_cli.helpers.hidden_option import HiddenOption
 from globus_cli.helpers.identities import is_valid_identity_name
 from globus_cli.helpers.printing import (
     print_json_response, colon_formatted_print, print_table)
@@ -8,6 +9,7 @@ from globus_cli.helpers.options import (
 
 __all__ = [
     'CaseInsensitiveChoice',
+    'HiddenOption',
 
     'is_valid_identity_name',
 
