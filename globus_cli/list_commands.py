@@ -3,15 +3,29 @@ import copy
 import click
 
 
+_command_length = 16
+
+
 @click.command('list-commands', short_help='List all CLI Commands',
                help=('List all Globus CLI Commands with short help output. '
                      'For full command help, run the command with the '
                      '`--help` flag'))
 def list_commands():
     def _print_cmd(command):
-        # print commands with help -- for now, we figure that no command name
-        # is more than 16 chars
-        print('    {:16}{}'.format(command.name, command.short_help))
+        # print commands with short_help
+        indent = 4
+        min_space = 2
+
+        # if the output would be pinched too close together, or if the command
+        # name would overflow, use two separate lines
+        if len(command.name) > _command_length - min_space:
+            print(' '*indent + command.name)
+            print(' '*(indent + _command_length) + command.short_help)
+        # otherwise, it's all cool to cram into one line, just ljust command
+        # names so that they form a nice column
+        else:
+            print(' '*indent + '{}{}'.format(
+                command.name.ljust(_command_length), command.short_help))
 
     def _print_cmd_group(command, parent_names):
         parents = ' '.join(parent_names)
