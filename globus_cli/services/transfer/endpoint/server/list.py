@@ -6,12 +6,12 @@ from globus_cli.services.transfer.helpers import (
     get_client, endpoint_id_option, print_json_from_iterator)
 
 
-@click.command('server-list', help='List all servers belonging to an Endpoint')
+@click.command('list', help='List all servers belonging to an Endpoint')
 @common_options
 @endpoint_id_option
-def endpoint_server_list(endpoint_id):
+def server_list(endpoint_id):
     """
-    Executor for `globus transfer endpoint server-list`
+    Executor for `globus transfer endpoint server list`
     """
     client = get_client()
 
