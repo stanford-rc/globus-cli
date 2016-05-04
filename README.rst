@@ -12,6 +12,7 @@ Globus CLI
 A Command Line Interface to `Globus <https://www.globus.org/>`_.
 
 Source Code: https://github.com/globusonline/globus-cli
+
 Documentation: http://globus.github.io/globus-cli
 
 Installation
