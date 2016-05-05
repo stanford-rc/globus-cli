@@ -4,6 +4,8 @@ from globus_cli.helpers import common_options
 
 from globus_cli.services.transfer.endpoint.server.list import server_list
 from globus_cli.services.transfer.endpoint.server.show import server_show
+from globus_cli.services.transfer.endpoint.server.add import server_add
+from globus_cli.services.transfer.endpoint.server.update import server_update
 from globus_cli.services.transfer.endpoint.server.delete import server_delete
 
 
@@ -19,4 +21,6 @@ def server_command():
 
 server_command.add_command(server_list)
 server_command.add_command(server_show)
+server_command.add_command(server_add)
+server_command.add_command(server_update)
 server_command.add_command(server_delete)
