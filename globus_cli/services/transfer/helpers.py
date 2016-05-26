@@ -33,7 +33,7 @@ def endpoint_list_to_text(iterator):
                            ('Display Name', display_name_or_cname)])
 
 
-def assemble_generic_doc(datatype, *args, **kwargs):
+def assemble_generic_doc(datatype, **kwargs):
     doc = {'DATA_TYPE': datatype}
     for argname in kwargs:
         if kwargs[argname] is not None:

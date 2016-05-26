@@ -8,7 +8,7 @@ from globus_cli.services.transfer.task.helpers import task_id_option
 
 @click.command('show', help='Show detailed information about a specific Task')
 @common_options
-@task_id_option(help='ID of the Task which you want to examine')
+@task_id_option(helptext='ID of the Task which you want to examine')
 def show_task(task_id):
     """
     Executor for `globus transfer task show`

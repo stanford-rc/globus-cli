@@ -10,7 +10,7 @@ from globus_cli.services.transfer.task.helpers import task_id_option
 
 @click.command('wait', help='Wait for a Task to complete')
 @common_options
-@task_id_option(help='ID of the Task to wait on')
+@task_id_option(helptext='ID of the Task to wait on')
 @click.option('--timeout', type=int, metavar='N',
               help=('Wait N seconds. If the Task does not terminate by '
                     'then, exit with status 0'))

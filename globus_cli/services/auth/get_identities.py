@@ -41,9 +41,6 @@ def get_identities(values, lookup_style):
     else:
         ids = res['identities']
 
-        def max_keylen(key):
-            return max(len(i[key]) for i in ids)
-
         print_table(ids, [('ID', 'id'), ('Full Name', 'name'),
                           ('Username', 'username'),
                           ('Organization', 'organization'),

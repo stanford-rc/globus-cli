@@ -9,7 +9,7 @@ from globus_cli.services.transfer.task.helpers import task_id_option
 
 @click.command('event-list', help='List Events for a given Task')
 @common_options
-@task_id_option(help='ID of the Task for which you want to list Events')
+@task_id_option(helptext='ID of the Task for which you want to list Events')
 def task_event_list(task_id):
     """
     Executor for `globus transfer task-event-list`
