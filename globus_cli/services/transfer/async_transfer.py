@@ -162,7 +162,7 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
             argv = shlex.split(line, comments=True)
             if argv:
                 try:
-                    process_batch_line(args=argv)
+                    process_batch_line.main(args=argv)
                 except SystemExit:
                     pass
     else:
