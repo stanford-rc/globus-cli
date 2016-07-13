@@ -11,7 +11,7 @@ setup(
     name="globus-cli",
     version=version,
     packages=find_packages(),
-    install_requires=['click', 'globus-sdk>=0.2.0'],
+    install_requires=['click', 'globus-sdk>=0.2.0', 'configobj'],
 
     entry_points={
         'console_scripts': ['globus = globus_cli:main']
