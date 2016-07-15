@@ -1,9 +1,11 @@
 import click
 from globus_cli.helpers import common_options
 
+from globus_cli.config.edit import edit_command
+from globus_cli.config.init import init_command
+from globus_cli.config.remove import remove_command
 from globus_cli.config.set import set_command
 from globus_cli.config.show import show_command
-from globus_cli.config.edit import edit_command
 
 
 @click.group('config', short_help=(
@@ -31,6 +33,8 @@ def config_command():
     pass
 
 
+config_command.add_command(edit_command)
+config_command.add_command(init_command)
+config_command.add_command(remove_command)
 config_command.add_command(set_command)
 config_command.add_command(show_command)
-config_command.add_command(edit_command)

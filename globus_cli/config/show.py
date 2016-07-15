@@ -6,7 +6,7 @@ from globus_cli.config.helpers import load_config
 
 
 @click.command('show', help='Show a value from the Globus Config')
-@common_options
+@common_options(no_format_option=True)
 @click.argument('parameter', required=True)
 def show_command(parameter):
     """
@@ -16,7 +16,7 @@ def show_command(parameter):
 
     section = 'general'
     if '.' in parameter:
-        section, parameter= parameter.split('.', 1)
+        section, parameter = parameter.split('.', 1)
 
     try:
         value = conf[section][parameter]

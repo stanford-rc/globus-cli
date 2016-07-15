@@ -5,13 +5,12 @@ from globus_cli.helpers import common_options
 from globus_cli.config.helpers import load_config
 
 
-@click.command('set', help='Set a value in the Globus Config')
+@click.command('remove', help='Remove a value from the Globus Config')
 @common_options(no_format_option=True)
 @click.argument('parameter', required=True)
-@click.argument('value', required=True)
-def set_command(value, parameter):
+def remove_command(parameter):
     """
-    Executor for `globus config set`
+    Executor for `globus config remove`
     """
     conf = load_config()
 
@@ -22,8 +21,8 @@ def set_command(value, parameter):
     # ensure that the section exists
     if section not in conf:
         conf[section] = {}
-    # set the value for the given parameter
-    conf[section][parameter] = value
+    # remove the value for the given parameter
+    del conf[section][parameter]
 
     # write to disk
     print('Writing updated config to {}'.format(conf.filename))
