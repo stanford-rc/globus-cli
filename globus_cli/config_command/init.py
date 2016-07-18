@@ -2,9 +2,10 @@ from __future__ import print_function
 import textwrap
 import click
 
+from globus_cli.config import OUTPUT_FORMAT_OPTNAME
 from globus_cli.helpers import common_options
 from globus_cli.helpers.param_types import CaseInsensitiveChoice
-from globus_cli.config.helpers import load_config
+from globus_cli.config_command.helpers import load_config
 
 
 @click.command('init', help='Initialize your Globus Config file')
@@ -43,14 +44,15 @@ def init_command(default_output_format, auth_token, transfer_token):
             'This must be one of "json" or "text". Other values will be '
             'ignored. ENTER to skip.'))
         default_output_format = raw_input(
-            'Default CLI output format (cli.output_format) [text]: ').lower()
+            'Default CLI output format (cli.{}) [text]: '
+            .format(OUTPUT_FORMAT_OPTNAME)).lower()
         if default_output_format not in ('json', 'text'):
             default_output_format = None
 
     if default_output_format:
         if 'cli' not in conf:
             conf['cli'] = {}
-        conf['cli']['output_format'] = default_output_format
+        conf['cli'][OUTPUT_FORMAT_OPTNAME] = default_output_format
 
     # write to disk
     print('\n\nWriting updated config to {}'.format(conf.filename))

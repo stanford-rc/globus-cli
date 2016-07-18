@@ -3,7 +3,7 @@ import click
 
 from globus_cli.excepthook import set_excepthook
 from globus_cli.list_commands import list_commands
-from globus_cli.config import config_command
+from globus_cli.config_command import config_command
 from globus_cli.helpers import common_options
 
 from globus_cli.services.auth import auth_command

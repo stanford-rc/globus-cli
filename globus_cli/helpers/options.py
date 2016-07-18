@@ -1,6 +1,7 @@
 from __future__ import print_function
 import click
 
+from globus_cli import config
 from globus_cli.helpers.param_types import CaseInsensitiveChoice
 from globus_cli.version import __version__
 
@@ -70,7 +71,8 @@ def common_options(*args, **kwargs):
         f = click.help_option('-h', '--help')(f)
 
         def format_callback(ctx, param, value):
-            ctx.obj['format'] = value or ctx.obj.get('format')
+            ctx.obj['format'] = (value or ctx.obj.get('format') or
+                                 config.get_output_format().lower())
 
             return ctx.obj['format']
 

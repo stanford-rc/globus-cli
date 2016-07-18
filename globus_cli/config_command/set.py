@@ -2,7 +2,7 @@ from __future__ import print_function
 import click
 
 from globus_cli.helpers import common_options
-from globus_cli.config.helpers import load_config
+from globus_cli.config_command.helpers import load_config
 
 
 @click.command('set', help='Set a value in the Globus Config')
