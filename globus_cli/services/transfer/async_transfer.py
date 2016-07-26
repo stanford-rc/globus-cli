@@ -1,14 +1,13 @@
 from __future__ import print_function
 import click
-import shlex
-import sys
 
 from globus_sdk import TransferData
 
 from globus_cli.helpers import (
     CaseInsensitiveChoice, common_options, outformat_is_json,
     print_json_response)
-from globus_cli.services.transfer.helpers import get_client
+from globus_cli.services.transfer.helpers import (
+    get_client, shlex_process_stdin)
 from globus_cli.services.transfer.activation import autoactivate
 
 
@@ -113,9 +112,6 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
     """
     Executor for `globus transfer async-transfer`
     """
-    print(str((batch, sync_level, recursive, dest_path,
-               source_path, dest_endpoint, source_endpoint)))
-
     if (source_path is None or dest_path is None) and (not batch):
         raise click.UsageError(
             ('async-transfer requires either --source-path and --dest-path OR '
@@ -132,14 +128,6 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
         label='globus-cli transfer', sync_level=sync_level)
 
     if batch is not None:
-        # if input is interactive, print help to stderr
-        if sys.stdin.isatty():
-            print(('Enter transfers, line by line, as\n\n'
-                   '    [--recursive] source-path dest-path\n\n'
-                   'Lines are split with shlex in POSIX mode: '
-                   'https://docs.python.org/library/shlex.html#parsing-rules\n'
-                   'Terminate input with Ctrl+D or <EOF>\n'), file=sys.stderr)
-
         @click.command()
         @click.option('--recursive', is_flag=True)
         @click.argument('source_path')
@@ -152,19 +140,10 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
             transfer_data.add_item(source_path, dest_path,
                                    recursive=recursive)
 
-        # use readlines() rather than implicit file read line looping to force
-        # python to properly capture EOF (otherwise, EOF acts as a flush and
-        # things get weird)
-        for line in sys.stdin.readlines():
-            # get the argument vector:
-            # do a shlex split to handle quoted paths with spaces in them
-            # also lets us have comments with #
-            argv = shlex.split(line, comments=True)
-            if argv:
-                try:
-                    process_batch_line.main(args=argv)
-                except SystemExit:
-                    pass
+        shlex_process_stdin(
+            process_batch_line,
+            ('Enter transfers, line by line, as\n\n'
+             '    [--recursive] source-path dest-path\n'))
     else:
         transfer_data.add_item(source_path, dest_path,
                                recursive=recursive)
