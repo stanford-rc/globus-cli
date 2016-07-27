@@ -7,7 +7,7 @@ from globus_cli.helpers import (
     CaseInsensitiveChoice, common_options, outformat_is_json,
     print_json_response)
 from globus_cli.services.transfer.helpers import (
-    get_client, shlex_process_stdin)
+    get_client, shlex_process_stdin, submission_id_option)
 from globus_cli.services.transfer.activation import autoactivate
 
 
@@ -85,6 +85,7 @@ from globus_cli.services.transfer.activation import autoactivate
     their contents, do the transfer.
     """))
 @common_options
+@submission_id_option
 @click.option('--source-endpoint', required=True,
               help='ID of the Endpoint from which to transfer')
 @click.option('--dest-endpoint', required=True,
@@ -108,7 +109,8 @@ from globus_cli.services.transfer.activation import autoactivate
                     'Uses --source-endpoint and --dest-endpoint as passed on '
                     'the commandline.'))
 def async_transfer_command(batch, sync_level, recursive, dest_path,
-                           source_path, dest_endpoint, source_endpoint):
+                           source_path, dest_endpoint, source_endpoint,
+                           submission_id):
     """
     Executor for `globus transfer async-transfer`
     """
@@ -147,6 +149,9 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
     else:
         transfer_data.add_item(source_path, dest_path,
                                recursive=recursive)
+
+    if submission_id is not None:
+        transfer_data['submission_id'] = submission_id
 
     # autoactivate after parsing all args and putting things together
     autoactivate(client, source_endpoint, if_expires_in=60)
