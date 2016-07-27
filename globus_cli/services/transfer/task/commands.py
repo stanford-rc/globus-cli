@@ -11,6 +11,9 @@ from globus_cli.services.transfer.task.event_list import task_event_list
 from globus_cli.services.transfer.task.pause_info import task_pause_info
 from globus_cli.services.transfer.task.wait import task_wait
 
+from globus_cli.services.transfer.task.generate_submission_id import (
+    generate_submission_id)
+
 
 @click.group(name='task', help='Manage asynchronous Tasks')
 @common_options
@@ -25,3 +28,4 @@ task_command.add_command(cancel_task)
 task_command.add_command(task_event_list)
 task_command.add_command(task_pause_info)
 task_command.add_command(task_wait)
+task_command.add_command(generate_submission_id)
