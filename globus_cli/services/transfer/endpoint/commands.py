@@ -2,6 +2,7 @@ import click
 
 from globus_cli.helpers import common_options
 
+from globus_cli.services.transfer.endpoint.acl import acl_command
 from globus_cli.services.transfer.endpoint.role import role_command
 from globus_cli.services.transfer.endpoint.server import server_command
 
@@ -25,8 +26,9 @@ def endpoint_command():
 
 
 # groups
-endpoint_command.add_command(server_command)
+endpoint_command.add_command(acl_command)
 endpoint_command.add_command(role_command)
+endpoint_command.add_command(server_command)
 
 # commands
 endpoint_command.add_command(endpoint_search)

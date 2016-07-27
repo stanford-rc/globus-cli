@@ -2,7 +2,6 @@ import click
 
 from globus_cli.helpers import common_options
 
-from globus_cli.services.transfer.acl import acl_command
 from globus_cli.services.transfer.bookmark import bookmark_command
 from globus_cli.services.transfer.endpoint import endpoint_command
 from globus_cli.services.transfer.task import task_command
@@ -23,7 +22,6 @@ def transfer_command():
 
 
 # subgroups
-transfer_command.add_command(acl_command)
 transfer_command.add_command(bookmark_command)
 transfer_command.add_command(endpoint_command)
 transfer_command.add_command(task_command)
