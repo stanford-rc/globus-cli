@@ -54,8 +54,7 @@ def globusapi_hook(exception):
         _format_error_field('message', exception.message, multiline=True)))
 
 
-def custom_except_hook(exception_type, exception, traceback,
-                       _bound_excepthook=sys.excepthook):
+def custom_except_hook(exc_info):
     """
     A custom excepthook to present python errors produced by the CLI.
     We don't want to show end users big scary stacktraces if they aren't python
@@ -70,9 +69,9 @@ def custom_except_hook(exception_type, exception, traceback,
     possibility, as it may demand more sophisticated handling of EPIPE.
     Possible TODO item to reduce this risk: inspect the exception and only hide
     EPIPE if it comes from within the globus_cli package.
-
-    Abuses bind at definition time to capture the "real" excepthook.
     """
+    exception_type, exception, traceback = exc_info
+
     # handle a broken pipe by doing nothing
     # this is normal, and often shows up in piped commands when the
     # consumer closes before the producer
@@ -81,7 +80,7 @@ def custom_except_hook(exception_type, exception, traceback,
 
     # check if we're in debug mode, and run the real excepthook if we are
     if os.environ.get('GLOBUS_CLI_DEBUGMODE', None) is not None:
-        _bound_excepthook(exception_type, exception, traceback)
+        sys.excepthook(exception_type, exception, traceback)
 
     # we're not in debug mode, do custom handling
     else:
@@ -93,7 +92,3 @@ def custom_except_hook(exception_type, exception, traceback,
             globusapi_hook(exception)
         else:
             print('{}: {}'.format(exception_type.__name__, exception))
-
-
-def set_excepthook():
-    sys.excepthook = custom_except_hook
