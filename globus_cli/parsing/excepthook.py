@@ -7,13 +7,11 @@ format an exception.
 Define an except hook per exception type that we want to treat specially,
 generally types of SDK errors, and dispatch onto tht set of hooks.
 """
-from __future__ import print_function
-
 import sys
 import os
-import errno
 
 from globus_sdk import exc
+from globus_cli.safeio import safeprint
 
 
 _prefix = 'Globus CLI Error:'
@@ -21,7 +19,7 @@ _prefix_len = len(_prefix)
 
 
 def _errmsg(msg):
-    print('{} {}'.format(_prefix, msg), file=sys.stderr)
+    safeprint('{} {}'.format(_prefix, msg), write_to_stderr=True)
 
 
 def _format_error_field(name, val, multiline=False):
@@ -72,12 +70,6 @@ def custom_except_hook(exc_info):
     """
     exception_type, exception, traceback = exc_info
 
-    # handle a broken pipe by doing nothing
-    # this is normal, and often shows up in piped commands when the
-    # consumer closes before the producer
-    if exception_type is IOError and exception.errno is errno.EPIPE:
-        return
-
     # check if we're in debug mode, and run the real excepthook if we are
     if os.environ.get('GLOBUS_CLI_DEBUGMODE', None) is not None:
         sys.excepthook(exception_type, exception, traceback)
@@ -91,4 +83,4 @@ def custom_except_hook(exc_info):
         elif exception_type is exc.GlobusAPIError:
             globusapi_hook(exception)
         else:
-            print('{}: {}'.format(exception_type.__name__, exception))
+            safeprint('{}: {}'.format(exception_type.__name__, exception))

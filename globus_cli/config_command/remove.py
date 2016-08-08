@@ -1,6 +1,6 @@
-from __future__ import print_function
 import click
 
+from globus_cli.safeio import safeprint
 from globus_cli.helpers import common_options
 from globus_cli.config_command.helpers import load_config
 
@@ -25,5 +25,5 @@ def remove_command(parameter):
     del conf[section][parameter]
 
     # write to disk
-    print('Writing updated config to {}'.format(conf.filename))
+    safeprint('Writing updated config to {}'.format(conf.filename))
     conf.write()

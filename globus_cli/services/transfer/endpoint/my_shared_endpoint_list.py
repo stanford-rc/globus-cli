@@ -1,4 +1,3 @@
-from __future__ import print_function
 import click
 
 from globus_cli.helpers import common_options, outformat_is_json

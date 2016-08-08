@@ -1,4 +1,3 @@
-from __future__ import print_function
 import click
 import json
 import sys
@@ -7,6 +6,7 @@ import shlex
 from globus_sdk import TransferClient
 
 from globus_cli import version
+from globus_cli.safeio import safeprint
 from globus_cli.helpers import print_table
 
 
@@ -27,7 +27,7 @@ def print_json_from_iterator(iterator):
         except AttributeError:
             pass
         json_output_dict['DATA'].append(dat)
-    print(json.dumps(json_output_dict, indent=2))
+    safeprint(json.dumps(json_output_dict, indent=2))
 
 
 def endpoint_list_to_text(iterator):
@@ -103,10 +103,11 @@ def shlex_process_stdin(process_command, helptext):
     """
     # if input is interactive, print help to stderr
     if sys.stdin.isatty():
-        print(('{}\n'.format(helptext) +
-               'Lines are split with shlex in POSIX mode: '
-               'https://docs.python.org/library/shlex.html#parsing-rules\n'
-               'Terminate input with Ctrl+D or <EOF>\n'), file=sys.stderr)
+        safeprint(
+            ('{}\n'.format(helptext) +
+             'Lines are split with shlex in POSIX mode: '
+             'https://docs.python.org/library/shlex.html#parsing-rules\n'
+             'Terminate input with Ctrl+D or <EOF>\n'), write_to_stderr=True)
 
     # use readlines() rather than implicit file read line looping to force
     # python to properly capture EOF (otherwise, EOF acts as a flush and

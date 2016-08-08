@@ -1,6 +1,6 @@
-from __future__ import print_function
 import click
 
+from globus_cli.safeio import safeprint
 from globus_cli.helpers import (
     common_options, outformat_is_json, print_json_response)
 from globus_cli.services.transfer.helpers import (
@@ -28,4 +28,4 @@ def update_task(deadline, label, task_id):
     if outformat_is_json():
         print_json_response(res)
     else:
-        print('Success')
+        safeprint('Success')

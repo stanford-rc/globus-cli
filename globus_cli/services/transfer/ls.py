@@ -1,6 +1,6 @@
-from __future__ import print_function
 import click
 
+from globus_cli.safeio import safeprint
 from globus_cli.helpers import (
     common_options, outformat_is_json, print_json_response, print_table)
 from globus_cli.services.transfer.helpers import get_client, endpoint_id_option
@@ -105,4 +105,4 @@ def ls_command(path, recursive_depth_limit, recursive, long, endpoint_id):
                           ('file type', 'type'), ('filename', 'name')])
     else:
         for item in res:
-            print(item['name'])
+            safeprint(item['name'])

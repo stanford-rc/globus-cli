@@ -1,8 +1,8 @@
-from __future__ import print_function
 import click
 import sys
 import time
 
+from globus_cli.safeio import safeprint
 from globus_cli.helpers import common_options, HiddenOption
 from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.task.helpers import task_id_option
@@ -35,7 +35,7 @@ def task_wait(meow, heartbeat, polling_interval, timeout, task_id):
 
     # Tasks start out sleepy
     if meow:
-        print("""\
+        safeprint("""\
    |\      _,,,---,,_
    /,`.-'`'    -.  ;-;;,_
   |,4-  ) )-,_..;\ (  `'-'
@@ -44,7 +44,7 @@ def task_wait(meow, heartbeat, polling_interval, timeout, task_id):
     waited_time = 0
     while not timed_out(waited_time):
         if heartbeat:
-            print('.', end='')
+            safeprint('.', end='')
             sys.stdout.flush()
 
         task = client.get_task(task_id)
@@ -52,10 +52,10 @@ def task_wait(meow, heartbeat, polling_interval, timeout, task_id):
         status = task['status']
         if status != 'ACTIVE':
             if heartbeat:
-                print()
+                safeprint()
             # meowing tasks wake up!
             if meow:
-                print("""\
+                safeprint("""\
                   _..
   /}_{\           /.-'
  ( a a )-.___...-'/
@@ -69,4 +69,4 @@ def task_wait(meow, heartbeat, polling_interval, timeout, task_id):
 
     # add a trailing newline to heartbeats
     if heartbeat:
-        print()
+        safeprint()

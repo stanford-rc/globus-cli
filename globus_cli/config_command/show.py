@@ -1,6 +1,6 @@
-from __future__ import print_function
 import click
 
+from globus_cli.safeio import safeprint
 from globus_cli.helpers import common_options
 from globus_cli.config import lookup_option
 
@@ -19,6 +19,6 @@ def show_command(parameter):
     value = lookup_option(parameter, section=section)
 
     if value is None:
-        print('{} not set'.format(parameter))
+        safeprint('{} not set'.format(parameter))
     else:
-        print('{} = {}'.format(parameter, value))
+        safeprint('{} = {}'.format(parameter, value))

@@ -1,16 +1,17 @@
-from __future__ import print_function
 import json
 import six
 
+from globus_cli.safeio import safeprint
+
 
 def print_json_response(res):
-    print(json.dumps(res.data, indent=2))
+    safeprint(json.dumps(res.data, indent=2))
 
 
 def colon_formatted_print(data, named_fields):
     maxlen = max(len(n) for n, f in named_fields) + 1
     for name, field in named_fields:
-        print('{} {}'.format((name + ':').ljust(maxlen), data[field]))
+        safeprint('{} {}'.format((name + ':').ljust(maxlen), data[field]))
 
 
 def print_table(iterable, headers_and_keys, print_headers=True):
@@ -67,8 +68,8 @@ def print_table(iterable, headers_and_keys, print_headers=True):
 
     # print headers
     if print_headers:
-        print(format_str.format(*[h for h in headers]))
-        print(format_str.format(*['-'*w for w in widths]))
+        safeprint(format_str.format(*[h for h in headers]))
+        safeprint(format_str.format(*['-'*w for w in widths]))
     # print the rows of data
     for i in iterable:
-        print(format_str.format(*[none_to_null(kf(i)) for kf in keyfuncs]))
+        safeprint(format_str.format(*[none_to_null(kf(i)) for kf in keyfuncs]))

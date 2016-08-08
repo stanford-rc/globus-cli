@@ -1,8 +1,8 @@
-from __future__ import print_function
 import click
 
 from globus_sdk import TransferData
 
+from globus_cli.safeio import safeprint
 from globus_cli.helpers import (
     CaseInsensitiveChoice, common_options, outformat_is_json,
     print_json_response)
@@ -162,4 +162,4 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
     if outformat_is_json():
         print_json_response(res)
     else:
-        print(res['message'])
+        safeprint(res['message'])

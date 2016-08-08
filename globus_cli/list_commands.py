@@ -1,6 +1,7 @@
-from __future__ import print_function
 import copy
 import click
+
+from globus_cli.safeio import safeprint
 
 
 _command_length = 16
@@ -19,19 +20,19 @@ def list_commands():
         # if the output would be pinched too close together, or if the command
         # name would overflow, use two separate lines
         if len(command.name) > _command_length - min_space:
-            print(' '*indent + command.name)
-            print(' '*(indent + _command_length) + command.short_help)
+            safeprint(' '*indent + command.name)
+            safeprint(' '*(indent + _command_length) + command.short_help)
         # otherwise, it's all cool to cram into one line, just ljust command
         # names so that they form a nice column
         else:
-            print(' '*indent + '{}{}'.format(
+            safeprint(' '*indent + '{}{}'.format(
                 command.name.ljust(_command_length), command.short_help))
 
     def _print_cmd_group(command, parent_names):
         parents = ' '.join(parent_names)
         if parents:
             parents = parents + ' '
-        print('\n=== {}{} ===\n'.format(parents, command.name))
+        safeprint('\n=== {}{} ===\n'.format(parents, command.name))
 
     def _recursive_list_commands(command, parent_names=None):
         if parent_names is None:
@@ -63,4 +64,4 @@ def list_commands():
 
     _recursive_list_commands(root_ctx.command)
     # get an extra newline at the end
-    print()
+    safeprint()

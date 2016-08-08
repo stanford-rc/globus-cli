@@ -1,6 +1,6 @@
-from __future__ import print_function
 import click
 
+from globus_cli.safeio import safeprint
 from globus_cli.helpers import (
     outformat_is_json, common_options, print_json_response)
 from globus_cli.services.transfer.helpers import (
@@ -37,4 +37,4 @@ def endpoint_update(endpoint_id, display_name, description, organization,
     if outformat_is_json():
         print_json_response(res)
     else:
-        print(res['message'])
+        safeprint(res['message'])

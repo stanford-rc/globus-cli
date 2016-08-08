@@ -1,7 +1,6 @@
-from __future__ import print_function
 import click
-import sys
 
+from globus_cli.safeio import safeprint
 from globus_cli.helpers import (
     common_options, outformat_is_json, print_json_response,
     colon_formatted_print)
@@ -35,8 +34,8 @@ def bookmark_show(bookmark_name, bookmark_id):
             else:
                 res = None
         if res is None:
-            print('No bookmark found with name {}'.format(bookmark_name),
-                  file=sys.stderr)
+            safeprint('No bookmark found with name {}'.format(bookmark_name),
+                      write_to_stderr=True)
             return
     else:
         # this should be impossible, but just in case arg validation gets

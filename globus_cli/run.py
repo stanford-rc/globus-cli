@@ -1,6 +1,6 @@
-from __future__ import print_function
 import click
 
+from globus_cli.safeio import safeprint
 from globus_cli.parsing import globus_main_func
 
 from globus_cli.list_commands import list_commands
@@ -17,9 +17,9 @@ from globus_cli.services.transfer import transfer_command
                      'authentication will work'))
 @common_options
 def login_help():
-    print('\nTo login to the Globus CLI, go to\n')
-    print('    https://tokens.globus.org/\n')
-    print('and select the the "Globus CLI" option.\n')
+    safeprint('\nTo login to the Globus CLI, go to\n')
+    safeprint('    https://tokens.globus.org/\n')
+    safeprint('and select the the "Globus CLI" option.\n')
 
 
 @globus_main_func

@@ -1,6 +1,6 @@
-from __future__ import print_function
 import click
 
+from globus_cli.safeio import safeprint
 from globus_cli.helpers import (
     CaseInsensitiveChoice, outformat_is_json, common_options,
     print_json_response)
@@ -39,4 +39,4 @@ def role_create(role, principal, principal_type, endpoint_id):
     if outformat_is_json():
         print_json_response(res)
     else:
-        print('ID: ' + res['id'])
+        safeprint('ID: ' + res['id'])
