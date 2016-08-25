@@ -129,7 +129,7 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
         client, source_endpoint, dest_endpoint,
         label='globus-cli transfer', sync_level=sync_level)
 
-    if batch is not None:
+    if batch:
         @click.command()
         @click.option('--recursive', is_flag=True)
         @click.argument('source_path')
