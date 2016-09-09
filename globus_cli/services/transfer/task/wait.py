@@ -44,7 +44,7 @@ def task_wait(meow, heartbeat, polling_interval, timeout, task_id):
     waited_time = 0
     while not timed_out(waited_time):
         if heartbeat:
-            safeprint('.', end='')
+            safeprint('.', newline=False)
             sys.stdout.flush()
 
         task = client.get_task(task_id)
@@ -52,7 +52,7 @@ def task_wait(meow, heartbeat, polling_interval, timeout, task_id):
         status = task['status']
         if status != 'ACTIVE':
             if heartbeat:
-                safeprint()
+                safeprint('')
             # meowing tasks wake up!
             if meow:
                 safeprint("""\
@@ -69,4 +69,4 @@ def task_wait(meow, heartbeat, polling_interval, timeout, task_id):
 
     # add a trailing newline to heartbeats
     if heartbeat:
-        safeprint()
+        safeprint('')

@@ -4,6 +4,7 @@ from globus_cli.helpers import common_options
 
 from globus_cli.services.transfer.bookmark import bookmark_command
 from globus_cli.services.transfer.endpoint import endpoint_command
+from globus_cli.services.transfer.share import share_command
 from globus_cli.services.transfer.task import task_command
 from globus_cli.services.transfer.async_transfer import async_transfer_command
 from globus_cli.services.transfer.async_delete import async_delete_command
@@ -24,6 +25,7 @@ def transfer_command():
 # subgroups
 transfer_command.add_command(bookmark_command)
 transfer_command.add_command(endpoint_command)
+transfer_command.add_command(share_command)
 transfer_command.add_command(task_command)
 # commands
 transfer_command.add_command(async_transfer_command)

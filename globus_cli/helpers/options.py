@@ -102,7 +102,8 @@ def common_options(*args, **kwargs):
         # Click Context object
         def format_callback(ctx, param, value):
             ctx.obj['format'] = (value or ctx.obj.get('format') or
-                                 config.get_output_format().lower())
+                                 config.get_output_format() or
+                                 'text').lower()
 
             return ctx.obj['format']
 
