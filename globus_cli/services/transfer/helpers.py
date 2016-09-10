@@ -3,15 +3,24 @@ import json
 import sys
 import shlex
 
-from globus_sdk import TransferClient
+from globus_sdk import TransferClient, RefreshTokenAuthorizer
 
 from globus_cli import version
+from globus_cli.config import get_transfer_refresh_token, internal_auth_client
 from globus_cli.safeio import safeprint
 from globus_cli.helpers import print_table
 
 
 def get_client():
-    return TransferClient(app_name=version.app_name)
+    transfer_rt = get_transfer_refresh_token()
+    authorizer = None
+
+    # if there's a refresh token, use it to build the authorizer
+    if transfer_rt is not None:
+        authorizer = RefreshTokenAuthorizer(
+            transfer_rt, internal_auth_client())
+
+    return TransferClient(authorizer=authorizer, app_name=version.app_name)
 
 
 def display_name_or_cname(ep_doc):
