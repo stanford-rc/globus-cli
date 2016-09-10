@@ -64,4 +64,4 @@ def list_commands():
 
     _recursive_list_commands(root_ctx.command)
     # get an extra newline at the end
-    safeprint()
+    safeprint('')
