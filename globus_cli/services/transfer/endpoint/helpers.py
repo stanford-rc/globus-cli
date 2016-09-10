@@ -31,7 +31,8 @@ def create_and_update_opts(create=False, shared_ep=False):
                        help=('Only available on Globus Connect Server. '
                              'Set the default directory'))(f)
         f = _mkopt('--public/--private', 'public',
-                   help='Set the {0} to be public or private'.format(ep_or_share))(f)
+                   help='Set the {0} to be public or private'
+                   .format(ep_or_share))(f)
         f = _mkopt('--info-link', diffhelp=True,
                    help='Link for Info about the {0}'.format(ep_or_share))(f)
         f = _mkopt('--contact-info', diffhelp=True,
