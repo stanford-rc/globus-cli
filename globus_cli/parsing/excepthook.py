@@ -10,6 +10,8 @@ generally types of SDK errors, and dispatch onto tht set of hooks.
 import sys
 import os
 
+import click
+
 from globus_sdk import exc
 from globus_cli.safeio import safeprint
 
@@ -76,7 +78,12 @@ def custom_except_hook(exc_info):
 
     # we're not in debug mode, do custom handling
     else:
-        if exception_type is exc.PaginationOverrunError:
+        # if it's a click exception, re-raise as original -- Click's main
+        # execution context will handle pretty-printing
+        if isinstance(exception, click.ClickException):
+            raise exception_type, exception, traceback
+
+        elif exception_type is exc.PaginationOverrunError:
             pagination_overrun_hook()
         elif exception_type is exc.TransferAPIError:
             transferapi_hook(exception)
