@@ -40,7 +40,7 @@ git repository and installing it manually:
 
 .. code-block:: bash
 
-    git checkout https://github.com/globus/globus-cli.git
+    git clone https://github.com/globus/globus-cli.git
     cd globus-cli
     python setup.py install
 

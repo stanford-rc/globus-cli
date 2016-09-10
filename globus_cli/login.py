@@ -2,11 +2,9 @@ import click
 
 from globus_cli.safeio import safeprint
 from globus_cli.helpers import common_options
-from globus_cli.config import get_internal_auth_client
-
-# FIXME: extract this helper from the config commands or move `globus login`
-# into the config commands
-from globus_cli.config_command.helpers import load_config
+from globus_cli.config import (
+    AUTH_RT_OPTNAME, TRANSFER_RT_OPTNAME,
+    internal_auth_client, write_option)
 
 
 @click.command('login',
@@ -17,12 +15,11 @@ from globus_cli.config_command.helpers import load_config
                      'authentication will work'))
 @common_options
 def login_command():
-    # get the NativeApp client
-    ac = get_internal_auth_client()
+    # build the NativeApp client object
+    ac = internal_auth_client()
 
     # and do the Native App Grant flow
-    # FIXME: currently just does ATs, change to RTs
-    ac.oauth2_start_flow_native_app()
+    ac.oauth2_start_flow_native_app(refresh_tokens=True)
 
     # prompt
     linkprompt = 'Please login to Globus here'
@@ -37,16 +34,20 @@ def login_command():
     # exchange, done!
     tkn = ac.oauth2_exchange_code_for_tokens(auth_code)
 
-    # extract tokens from final response
-    transfer_token = (
+    # extract access tokens from final response
+    transfer_at = (
         tkn.by_resource_server['transfer.api.globus.org']['access_token'])
-    auth_token = (
+    transfer_rt = (
+        tkn.by_resource_server['transfer.api.globus.org']['refresh_token'])
+    auth_at = (
         tkn.by_resource_server['auth.globus.org']['access_token'])
+    auth_rt = (
+        tkn.by_resource_server['auth.globus.org']['refresh_token'])
 
-    # config file as object
-    conf = load_config()
-    # insert tokens
-    conf['general']['transfer_token'] = transfer_token
-    conf['general']['auth_token'] = auth_token
-    # write to disk
-    conf.write()
+    # write data to config
+    # TODO: remove once we deprecate these fully
+    write_option('transfer_token', transfer_at, section='general')
+    write_option('auth_token', auth_at, section='general')
+    # new values we want to use moving forward
+    write_option(TRANSFER_RT_OPTNAME, transfer_rt)
+    write_option(AUTH_RT_OPTNAME, auth_rt)
