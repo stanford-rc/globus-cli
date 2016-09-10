@@ -7,30 +7,18 @@ from globus_cli.helpers.param_types import CaseInsensitiveChoice
 from globus_cli.config_command.helpers import load_config
 
 
-@click.command('init', help='Initialize your Globus Config file')
+@click.command('init',
+               help=('Initialize your Globus Config file with any settings '
+                     'you may want for the SDK and CLI'))
 @common_options(no_format_option=True)
-@click.option('--transfer-token', help='Your Token for Globus Transfer')
-@click.option('--auth-token', help='Your Token for Globus Auth')
 @click.option('--default-output-format',
               help='The default format for the CLI to use when printing.',
               type=CaseInsensitiveChoice(['json', 'text']))
-def init_command(default_output_format, auth_token, transfer_token):
+def init_command(default_output_format):
     """
     Executor for `globus config init`
     """
     conf = load_config()
-
-    # check for auth and transfer tokens, prompt if not given
-    if not auth_token:
-        auth_token = raw_input('\nPlease enter your Globus Auth Token '
-                               '(general.auth_token): ')
-    if not transfer_token:
-        transfer_token = raw_input('\nPlease enter your Globus Transfer Token '
-                                   '(general.transfer_token): ')
-
-    # set these any time that `globus config init` is run
-    conf['general']['auth_token'] = auth_token
-    conf['general']['transfer_token'] = transfer_token
 
     # now handle the output format, requires a little bit more care
     # first, prompt if it isn't given, but be clear that we have a sensible

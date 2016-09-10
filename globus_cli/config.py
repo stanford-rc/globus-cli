@@ -56,6 +56,10 @@ def write_option(option, value, section='cli', system=False):
     # FIXME: DRY violation with config_commands.helpers
     conf = _get_config_obj(system=system)
 
+    # add the section if absent
+    if section not in conf:
+        conf[section] = {}
+
     conf[section][option] = value
     conf.write()
 
