@@ -29,7 +29,7 @@ def login_command():
 
     # come back with auth code
     auth_code = click.prompt(
-        'Enter the resulting Authorization Code here')
+        'Enter the resulting Authorization Code here').strip()
 
     # exchange, done!
     tkn = ac.oauth2_exchange_code_for_tokens(auth_code)
