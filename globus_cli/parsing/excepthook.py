@@ -11,6 +11,7 @@ import sys
 import os
 
 import click
+from six import reraise
 
 from globus_sdk import exc
 from globus_cli.safeio import safeprint, write_error_info, PrintableErrorField
@@ -75,7 +76,7 @@ def custom_except_hook(exc_info):
         # if it's a click exception, re-raise as original -- Click's main
         # execution context will handle pretty-printing
         if isinstance(exception, click.ClickException):
-            raise exception_type, exception, traceback
+            reraise(exception_type, exception, traceback)
 
         # handle the Globus-raised errors with our special hooks
         # these will present the output (on stderr) as JSON
