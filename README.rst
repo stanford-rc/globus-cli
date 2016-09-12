@@ -28,7 +28,7 @@ This will automatically install the CLI and all its dependencies.
 You can also get a bleeding-edge version under development directly from the
 source::
 
-    git checkout https://github.com/globusonline/globus-cli.git
+    git clone https://github.com/globusonline/globus-cli.git
     cd globus-cli
     python setup.py install
 
