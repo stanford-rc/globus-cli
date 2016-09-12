@@ -13,45 +13,32 @@ import os
 import click
 
 from globus_sdk import exc
-from globus_cli.safeio import safeprint
-
-
-_prefix = 'Globus CLI Error:'
-_prefix_len = len(_prefix)
-
-
-def _errmsg(msg):
-    safeprint('{} {}'.format(_prefix, msg), write_to_stderr=True)
-
-
-def _format_error_field(name, val, multiline=False):
-    name = name + ':'
-    if not multiline or '\n' not in val:
-        return '{} {}'.format(name.ljust(_prefix_len), val)
-    else:
-        spacer = '\n' + ' '*(_prefix_len + 1)
-        return '{}{}{}'.format(name, spacer, spacer.join(val.split('\n')))
+from globus_cli.safeio import safeprint, write_error_info, PrintableErrorField
 
 
 def pagination_overrun_hook():
-    _errmsg(('Some kind of paging error happened. '
-             'Likely an issue with the CLI or Globus SDK.'))
+    write_error_info(
+        'Internal Paging Error',
+        [PrintableErrorField(
+            'details', ('Some kind of paging error happened. '
+                        'Likely an issue with the CLI or Globus SDK.'))])
 
 
 def transferapi_hook(exception):
-    _errmsg(('A Transfer API Error Occurred.\n{}\n{}\n{}\n{}').format(
-            _format_error_field('HTTP status', exception.http_status),
-            _format_error_field('request_id', exception.request_id),
-            _format_error_field('code', exception.code),
-            _format_error_field('message', exception.message, multiline=True)))
+    write_error_info(
+        'Transfer API Error',
+        [PrintableErrorField('HTTP status', exception.http_status),
+         PrintableErrorField('request_id', exception.request_id),
+         PrintableErrorField('code', exception.code),
+         PrintableErrorField('message', exception.message, multiline=True)])
 
 
 def globusapi_hook(exception):
-    _errmsg(('A Globus API Error Occurred.\n'
-             '{}\n{}\n{}').format(
-        _format_error_field('HTTP status', exception.http_status),
-        _format_error_field('code', exception.code),
-        _format_error_field('message', exception.message, multiline=True)))
+    write_error_info(
+        'GLobus API Error',
+        [PrintableErrorField('HTTP status', exception.http_status),
+         PrintableErrorField('code', exception.code),
+         PrintableErrorField('message', exception.message, multiline=True)])
 
 
 def custom_except_hook(exc_info):
@@ -83,6 +70,8 @@ def custom_except_hook(exc_info):
         if isinstance(exception, click.ClickException):
             raise exception_type, exception, traceback
 
+        # handle the Globus-raised errors with our special hooks
+        # these will present the output (on stderr) as JSON
         elif exception_type is exc.PaginationOverrunError:
             pagination_overrun_hook()
         elif exception_type is exc.TransferAPIError:

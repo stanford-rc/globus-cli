@@ -49,7 +49,7 @@ def endpoint_id_option(*args, **kwargs):
     # silently discarded
     elif len(args) != 0:
         raise ValueError(
-                'endpoint_id_option() cannot take positional args')
+            'endpoint_id_option() cannot take positional args')
 
     # final case: got 0 or more kwargs, no positionals
     # do the function-which-returns-a-decorator dance to produce a
@@ -129,7 +129,7 @@ def common_options(*args, **kwargs):
     # silently discarded
     elif len(args) != 0:
         raise ValueError(
-                'common_options() cannot take positional args')
+            'common_options() cannot take positional args')
 
     # final case: got 0 or more kwargs, no positionals
     # do the function-which-returns-a-decorator dance to produce a
