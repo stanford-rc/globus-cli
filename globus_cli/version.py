@@ -18,7 +18,7 @@
 #       2.4.6.1.2   -- no additional point versions
 #       0.1.0.0     -- no special rules for things like this
 #       1.4.6.0     -- differing major version, obviously wrong
-__version__ = "0.3.1.0"
+__version__ = "0.3.1.1"
 
 # app name to send as part of SDK requests
 app_name = 'Globus CLI v{} - Alpha'.format(__version__)

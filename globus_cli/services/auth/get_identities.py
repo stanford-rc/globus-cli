@@ -1,13 +1,27 @@
+import base64
+import uuid
+
 import click
 
 from globus_cli.helpers import (
     common_options, print_json_response, outformat_is_json,
-    print_table)
+    print_table, HiddenOption)
 from globus_cli.services.auth.helpers import get_auth_client
 
 
 _USERNAMES_STYLE = 'usernames'
 _IDS_STYLE = 'identities'
+
+_HIDDEN_TRANSFER_STYLE = 'globus-transfer'
+
+
+def _b32_decode(v):
+    assert v.startswith('u_'), "{0} didn't start with 'u_'".format(v)
+    v = v[2:]
+    assert len(v) == 26, "u_{0} is the wrong length".format(v)
+    # append padding and uppercase so that b32decode will work
+    v = v.upper() + 6*'='
+    return str(uuid.UUID(bytes=base64.b32decode(v)))
 
 
 @click.command('get-identities', help='Lookup Globus Auth Identities')
@@ -19,6 +33,8 @@ _IDS_STYLE = 'identities'
 @click.option('--identities', 'lookup_style',
               help='Values are Identity IDs to lookup in Globus Auth',
               flag_value=_IDS_STYLE)
+@click.option('--globus-transfer-decode', 'lookup_style', cls=HiddenOption,
+              flag_value=_HIDDEN_TRANSFER_STYLE)
 @click.argument('values', required=True, nargs=-1)
 def get_identities(values, lookup_style):
     """
@@ -33,6 +49,8 @@ def get_identities(values, lookup_style):
         params['usernames'] = ','.join(values)
     elif lookup_style == _IDS_STYLE:
         params['ids'] = ','.join(values)
+    elif lookup_style == _HIDDEN_TRANSFER_STYLE:
+        params['ids'] = ','.join(_b32_decode(v) for v in values)
 
     res = client.get_identities(**params)
 
