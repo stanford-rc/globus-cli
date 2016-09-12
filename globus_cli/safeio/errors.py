@@ -40,7 +40,8 @@ def write_error_info(error_name, fields):
         message = json.dumps(
             dict(
                 [('error_name', error_name)] +
-                [(f.name, f.value) for f in fields]))
+                [(f.name, f.value) for f in fields]),
+            indent=2)
     else:
         message = 'A {0} Occurred.\n{1}'.format(
             error_name, '\n'.join(str(f) for f in fields))
