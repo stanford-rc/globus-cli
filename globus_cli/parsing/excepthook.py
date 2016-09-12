@@ -41,6 +41,13 @@ def globusapi_hook(exception):
          PrintableErrorField('message', exception.message, multiline=True)])
 
 
+def globus_generic_hook(exception):
+    write_error_info(
+        'Globus Error',
+        [PrintableErrorField('error_type', exception.__class__.__name__),
+         PrintableErrorField('message', str(exception), multiline=True)])
+
+
 def custom_except_hook(exc_info):
     """
     A custom excepthook to present python errors produced by the CLI.
@@ -78,5 +85,14 @@ def custom_except_hook(exc_info):
             transferapi_hook(exception)
         elif exception_type is exc.GlobusAPIError:
             globusapi_hook(exception)
+
+        # specific checks fell through -- now check if it's any kind of
+        # GlobusError
+        elif isinstance(exception, exc.GlobusError):
+            globus_generic_hook(exception)
+
+        # not a GlobusError, not a ClickException -- something like ValueError
+        # or NotImplementedError bubbled all the way up here: just print it
+        # out, basically
         else:
             safeprint('{}: {}'.format(exception_type.__name__, exception))
