@@ -27,11 +27,23 @@ __all__ = [
 # CLI Native App definition
 # accessed via `internal_auth_client()` -- not exported
 CLIENT_ID = '95fdeba8-fac2-42bd-a357-e068d82ff78e'
+# an extra option (not exported) for using the CLI against other Globus
+# Environments (like the future beta environment)
+ENV_CLIENT_ID_OPTNAME = 'cli_client_id'
 
 # constants for global use
 OUTPUT_FORMAT_OPTNAME = 'output_format'
 AUTH_RT_OPTNAME = 'auth_refresh_token'
 TRANSFER_RT_OPTNAME = 'transfer_refresh_token'
+
+# get the environment from env var (not exported)
+GLOBUS_ENV = os.environ.get('GLOBUS_SDK_ENVIRONMENT')
+
+# if the env is set, rewrite the refresh token option names to have it as a
+# prefix
+if GLOBUS_ENV:
+    AUTH_RT_OPTNAME = '{0}_auth_refresh_token'.format(GLOBUS_ENV)
+    TRANSFER_RT_OPTNAME = '{0}_transfer_refresh_token'.format(GLOBUS_ENV)
 
 
 def _get_config_obj(system=False):
@@ -44,9 +56,9 @@ def _get_config_obj(system=False):
     return ConfigObj(path)
 
 
-def lookup_option(option, section='cli'):
+def lookup_option(option, section='cli', environment=None):
     p = globus_sdk.config._get_parser()
-    return p.get(option, section=section)
+    return p.get(option, section=section, environment=environment)
 
 
 def write_option(option, value, section='cli', system=False):
@@ -77,4 +89,9 @@ def get_transfer_refresh_token():
 
 
 def internal_auth_client():
-    return globus_sdk.NativeAppAuthClient(CLIENT_ID, app_name=version.app_name)
+    # check to see if an alternate client ID has been specified by the
+    # environment
+    client_id = lookup_option(ENV_CLIENT_ID_OPTNAME,
+                              environment=GLOBUS_ENV) or CLIENT_ID
+
+    return globus_sdk.NativeAppAuthClient(client_id, app_name=version.app_name)
