@@ -8,6 +8,9 @@ from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.task.helpers import task_id_option
 
 
+_POLLING_INTERVAL_MINIMUM = 0.1
+
+
 @click.command('wait', help='Wait for a Task to complete')
 @common_options
 @task_id_option(helptext='ID of the Task to wait on')
@@ -15,8 +18,10 @@ from globus_cli.services.transfer.task.helpers import task_id_option
               help=('Wait N seconds. If the Task does not terminate by '
                     'then, exit with status 0'))
 @click.option('--polling-interval', default=1, type=float, show_default=True,
-              help=('Number of seconds between Task status checks. '
-                    'Can be a fraction of a second in decimal notation'))
+              help=(('Number of seconds between Task status checks. '
+                     'Can be a fraction of a second in decimal notation, '
+                     'but has a minimum of {0}')
+                    .format(_POLLING_INTERVAL_MINIMUM)))
 @click.option('--heartbeat', '-H', is_flag=True,
               help=('Every polling interval, print "." to stdout to '
                     'indicate that task wait is till active'))
@@ -25,6 +30,11 @@ def task_wait(meow, heartbeat, polling_interval, timeout, task_id):
     """
     Executor for `globus transfer task wait`
     """
+    if polling_interval < _POLLING_INTERVAL_MINIMUM:
+        raise click.UsageError(
+            '--polling-interval was less than minimum of {0}'
+            .format(_POLLING_INTERVAL_MINIMUM))
+
     client = get_client()
 
     def timed_out(waited_time):
