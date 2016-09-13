@@ -65,6 +65,11 @@ def write_option(option, value, section='cli', system=False):
     """
     Write an option to disk -- doesn't handle config reloading
     """
+    # deny rwx to Group and World -- don't bother storing the returned old mask
+    # value, since we'll never restore it in the CLI anyway
+    # do this on every call to ensure that we're always consistent about it
+    os.umask(0o077)
+
     # FIXME: DRY violation with config_commands.helpers
     conf = _get_config_obj(system=system)
 

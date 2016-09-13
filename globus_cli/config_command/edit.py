@@ -12,4 +12,5 @@ def edit_command():
     Executor for `globus config edit`
     """
     editor = os.environ.get('EDITOR', 'nano')
+    os.umask(0o077)
     subprocess.call([editor, os.path.expanduser('~/.globus.cfg')])
