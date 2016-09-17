@@ -1,10 +1,13 @@
 import click
 
-from globus_cli.helpers import (
-    CaseInsensitiveChoice, common_options, print_json_response)
-from globus_cli.services.transfer.helpers import (
-    get_client, endpoint_id_option, assemble_generic_doc)
+from globus_cli.parsing import (
+    CaseInsensitiveChoice, common_options, endpoint_id_option)
+from globus_cli.helpers import print_json_response
+
 from globus_cli.services.auth import maybe_lookup_identity_id
+
+from globus_cli.services.transfer.helpers import (
+    get_client, assemble_generic_doc)
 
 
 @click.command('update-rule', help='Update an ACL rule')

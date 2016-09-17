@@ -3,9 +3,9 @@ import sys
 import time
 
 from globus_cli.safeio import safeprint
-from globus_cli.helpers import common_options, HiddenOption
+from globus_cli.parsing import HiddenOption, common_options, task_id_option
+
 from globus_cli.services.transfer.helpers import get_client
-from globus_cli.services.transfer.task.helpers import task_id_option
 
 
 _POLLING_INTERVAL_MINIMUM = 0.1

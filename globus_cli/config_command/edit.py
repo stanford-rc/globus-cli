@@ -2,7 +2,7 @@ import click
 import os
 import subprocess
 
-from globus_cli.helpers import common_options
+from globus_cli.parsing import common_options
 
 
 @click.command('edit', help='Edit your Globus Config file')

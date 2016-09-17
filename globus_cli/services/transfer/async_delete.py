@@ -4,10 +4,12 @@ from globus_sdk import DeleteData
 
 
 from globus_cli.safeio import safeprint
-from globus_cli.helpers import (
-    common_options, outformat_is_json, print_json_response)
+from globus_cli.parsing import (
+    common_options, endpoint_id_option, submission_id_option)
+from globus_cli.helpers import outformat_is_json, print_json_response
+
 from globus_cli.services.transfer.helpers import (
-    get_client, endpoint_id_option, shlex_process_stdin, submission_id_option)
+    get_client, shlex_process_stdin)
 from globus_cli.services.transfer.activation import autoactivate
 
 

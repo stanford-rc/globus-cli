@@ -3,9 +3,8 @@ import textwrap
 import click
 
 from globus_cli.safeio import safeprint
-from globus_cli.helpers import common_options
+from globus_cli.parsing import CaseInsensitiveChoice, common_options
 from globus_cli.config import write_option, OUTPUT_FORMAT_OPTNAME
-from globus_cli.helpers.param_types import CaseInsensitiveChoice
 
 
 @click.command('init',

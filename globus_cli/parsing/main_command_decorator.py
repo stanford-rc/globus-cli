@@ -10,11 +10,7 @@ import sys
 import click
 
 from globus_cli.parsing.excepthook import custom_except_hook
-from globus_cli.helpers import common_options
-
-
-# there is a single global object for all click contexts, a shared dict
-_global_click_obj = {}
+from globus_cli.parsing.shared_options import common_options
 
 
 class TopLevelGroup(click.Group):
@@ -32,7 +28,6 @@ class TopLevelGroup(click.Group):
 
 
 def globus_main_func(f):
-    f = click.group('globus', context_settings=dict(obj=_global_click_obj),
-                    cls=TopLevelGroup)(f)
+    f = click.group('globus', cls=TopLevelGroup)(f)
     f = common_options(f)
     return f

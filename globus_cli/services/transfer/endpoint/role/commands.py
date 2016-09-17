@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.helpers import common_options
+from globus_cli.parsing import common_options
 
 from globus_cli.services.transfer.endpoint.role.list import role_list
 from globus_cli.services.transfer.endpoint.role.show import role_show

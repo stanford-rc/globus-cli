@@ -1,8 +1,9 @@
 import click
 
-from globus_cli.helpers import common_options, print_table, outformat_is_json
+from globus_cli.parsing import common_options, endpoint_id_option
+from globus_cli.helpers import print_table, outformat_is_json
 from globus_cli.services.transfer.helpers import (
-    get_client, endpoint_id_option, print_json_from_iterator)
+    get_client, print_json_from_iterator)
 
 
 @click.command('list', help='List all servers belonging to an Endpoint')

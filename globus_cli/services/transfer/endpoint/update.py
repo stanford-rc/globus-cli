@@ -1,17 +1,17 @@
 import click
 
 from globus_cli.safeio import safeprint
-from globus_cli.helpers import (
-    outformat_is_json, common_options, print_json_response)
+from globus_cli.parsing import (
+    common_options, endpoint_id_option, endpoint_create_and_update_opts)
+from globus_cli.helpers import outformat_is_json, print_json_response
+
 from globus_cli.services.transfer.helpers import (
-    get_client, assemble_generic_doc, endpoint_id_option)
-from globus_cli.services.transfer.endpoint.helpers import (
-    create_and_update_opts)
+    get_client, assemble_generic_doc)
 
 
 @click.command('update', help='Update attributes of an Endpoint')
 @common_options
-@create_and_update_opts(create=False)
+@endpoint_create_and_update_opts(create=False)
 @endpoint_id_option
 def endpoint_update(endpoint_id, display_name, description, organization,
                     contact_email, contact_info, info_link, public,

@@ -1,15 +1,14 @@
 import click
 
-from globus_cli.helpers import common_options, print_json_response
+from globus_cli.parsing import common_options, endpoint_create_and_update_opts
+from globus_cli.helpers import print_json_response
 from globus_cli.services.transfer.helpers import (
     get_client, assemble_generic_doc)
-from globus_cli.services.transfer.endpoint.helpers import (
-    create_and_update_opts)
 
 
 @click.command('create', help='Create a new Share, hosted on an Endpoint')
 @common_options
-@create_and_update_opts(create=True, shared_ep=True)
+@endpoint_create_and_update_opts(create=True, shared_ep=True)
 @click.option('--host-endpoint-id', required=True,
               help='ID of the endpoint on which this Share is hosted')
 def share_create(host_endpoint_id, display_name, description, organization,
