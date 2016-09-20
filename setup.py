@@ -11,7 +11,12 @@ setup(
     name="globus-cli",
     version=version,
     packages=find_packages(),
-    install_requires=['click', 'globus-sdk==0.3.1', 'configobj'],
+    install_requires=[
+        'globus-sdk==0.4.0',
+        'click>=6.6,<7.0',
+        'configobj>=5.0.6,<6.0.0',
+        'six>=1.0.0,<2.0.0'
+    ],
 
     entry_points={
         'console_scripts': ['globus = globus_cli:main']
@@ -30,9 +35,7 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: POSIX",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5"
