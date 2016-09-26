@@ -66,14 +66,14 @@ Globus CLI in a global location.
 First, you'll need to follow the `Homebrew installation guide \
 <http://brew.sh/>`_.
 
-Next, install python, and add the homebrew directory to your bash profile:
+Next, install python:
 
 .. code-block:: bash
 
     brew install python
-    echo 'PATH=/usr/local/share/:$PATH' >> ~/.bashrc
 
-(You may need to start a new terminal session to load the new ``PATH``.)
+You should start a new terminal session to ensure that you are working with the
+newly installed python.
 
 Homebrew python comes with ``pip``, so you can now install using ``pip``, per
 our :ref:`typical instructions <pip_install_command>`.
@@ -105,7 +105,7 @@ Getting Started
 Installing the ``globus-cli`` python packge will provide you with the
 ``globus`` command.
 However, most CLI commands will require authentication to Globus services, so
-start out by getting tokens:
+start out by getting logged in:
 
 .. code-block:: bash
 
@@ -120,19 +120,9 @@ First, check that you can access Globus Auth:
 .. code-block:: bash
 
     $ globus auth get-identities --usernames 'go@globusid.org'
-    {
-      "identities": [
-        {
-          "username": "go@globusid.org", 
-          "status": "used", 
-          "name": "www.globus.org", 
-          "id": "c699d42e-d274-11e5-bf75-1fc5bf53bb24", 
-          "identity_provider": "41143743-f3c8-4d60-bbdb-eeecaba85bd9", 
-          "organization": "Globus", 
-          "email": "noreply@globus.org"
-        }
-      ]
-    }
+    ID                                   | Full Name      | Username        | Organization | Email Address
+    ------------------------------------ | -------------- | --------------- | ------------ | ------------------
+    c699d42e-d274-11e5-bf75-1fc5bf53bb24 | www.globus.org | go@globusid.org | Globus       | noreply@globus.org
 
 Your output should be the same as above.
 If you are not authenticated, you will see a message similar to:
@@ -140,10 +130,10 @@ If you are not authenticated, you will see a message similar to:
 .. code-block:: bash
 
     $ globus auth get-identities --usernames 'go@globusid.org'
-    Globus CLI Error: A Globus API Error Occurred.
-    HTTP status: 401
-    code: UNAUTHORIZED
-    message: Call must be authenticated
+    Globus CLI Error: A GLobus API Error Occurred.
+    HTTP status:      401
+    code:             UNAUTHORIZED
+    message:          Call must be authenticated
 
 Next, check that you can reach the Globus Transfer API:
 
@@ -152,12 +142,12 @@ Next, check that you can reach the Globus Transfer API:
     # --filter-owner-id is the ID of 'go@globusid.org', fetched above
     $ globus transfer endpoint search \
         --filter-fulltext 'Globus Tutorial Endpoint' \
-        --filter-owner-id 'c699d42e-d274-11e5-bf75-1fc5bf53bb24'  
-    Owner                            | ID                                   | Display Name
-    -------------------------------- | ------------------------------------ | ------------
-    go@globusid.org                  | ddb59aef-6d04-11e5-ba46-22000b92c6ec | Globus Tutorial Endpoint 1
-    go@globusid.org                  | ddb59af0-6d04-11e5-ba46-22000b92c6ec | Globus Tutorial Endpoint 2
-    go@globusid.org                  | cf9bcaa5-6d04-11e5-ba46-22000b92c6ec | Globus S3 Tutorial Endpoint
+        --filter-owner-id 'c699d42e-d274-11e5-bf75-1fc5bf53bb24'
+    Owner           | ID                                   | Display Name
+    --------------- | ------------------------------------ | ---------------------------
+    go@globusid.org | ddb59aef-6d04-11e5-ba46-22000b92c6ec | Globus Tutorial Endpoint 1
+    go@globusid.org | ddb59af0-6d04-11e5-ba46-22000b92c6ec | Globus Tutorial Endpoint 2
+    go@globusid.org | cf9bcaa5-6d04-11e5-ba46-22000b92c6ec | Globus S3 Tutorial Endpoint
 
 If you are not authenticated, you will get an error like the following:
 
@@ -165,11 +155,12 @@ If you are not authenticated, you will get an error like the following:
 
     $ globus transfer endpoint search \
         --filter-fulltext 'Globus Tutorial Endpoint' \
-        --filter-owner-id 'c699d42e-d274-11e5-bf75-1fc5bf53bb24'  
+        --filter-owner-id 'c699d42e-d274-11e5-bf75-1fc5bf53bb24'
     Globus CLI Error: A Transfer API Error Occurred.
-    request_id: I33fDzZPp
-    code: AuthenticationFailed
-    message: Token is not active
+    HTTP status:      401
+    request_id:       1AghTj1F6
+    code:             AuthenticationFailed
+    message:          Token is not active
 
 Now we have the endpoint IDs for the tutorial endpoints, and can do a test
 directory listing:
