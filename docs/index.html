@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Globus CLI &mdash; globus-cli 0.4.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.4.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="globus-cli 0.4.0.0 documentation" href="#" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">globus-cli 0.4.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="globus-cli">
+<h1>Globus CLI<a class="headerlink" href="#globus-cli" title="Permalink to this headline">¶</a></h1>
+<p>This CLI provides a convenient shell interface to
+<a class="reference external" href="https://www.globus.org">Globus</a> APIs,
+including the Transfer API and the Globus Auth API.</p>
+<p>Documentation for the APIs is available at <a class="reference external" href="https://docs.globus.org">https://docs.globus.org</a></p>
+<p>You can always view CLI help by passing the <cite>&#8211;help</cite> flag to a command. That
+will show you any subcommands and options supported by that command.</p>
+<p>Source code is available at <a class="reference external" href="https://github.com/globus/globus-cli">https://github.com/globus/globus-cli</a></p>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>The Globus CLI is maintained as a python package, built on the
+<a class="reference external" href="https://globus.github.io/globus-sdk-python">Globus Python SDK</a>.
+Like the SDK, it therefore requires <a class="reference external" href="https://www.python.org/">Python</a> 2.7+ or
+3.3+.
+If a supported version of Python is not already installed on your system, see
+this <a class="reference external" href="http://docs.python-guide.org/en/latest/starting/installation/">Python installation guide </a>.</p>
+<p>The simplest way to install the Globus CLI is using the <code class="docutils literal"><span class="pre">pip</span></code> package manager
+(<a class="reference external" href="https://pypi.python.org/pypi/pip">https://pypi.python.org/pypi/pip</a>), which is included in most Python
+installations:</p>
+<div class="highlight-bash" id="pip-install-command"><div class="highlight"><pre><span></span>pip install globus-cli
+</pre></div>
+</div>
+<p>This will install the CLI and it&#8217;s dependencies.</p>
+<p>Bleeding edge versions of the Globus SDK can be installed by checking out the
+git repository and installing it manually:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>git clone https://github.com/globus/globus-cli.git
+<span class="nb">cd</span> globus-cli
+python setup.py install
+</pre></div>
+</div>
+<div class="section" id="macos-users">
+<h2>macOS Users<a class="headerlink" href="#macos-users" title="Permalink to this headline">¶</a></h2>
+<p>Because the version of python used on macOS is used internally by Apple&#8217;s
+software, it is <em>not</em> possible to install the CLI globally into this version of
+python (we conflict with packages that Apple is using to build macOS).
+Instead, we recommend taking one of the two following approaches:</p>
+<div class="section" id="option-1-homebrew">
+<h3>Option 1: Homebrew<a class="headerlink" href="#option-1-homebrew" title="Permalink to this headline">¶</a></h3>
+<p>To get around this problem, you can use homebrew to install an alternate
+version of python owned by you, the user, instead of the operating system. This
+neatly eliminates any conflicts you may have, and allows you to install the
+Globus CLI in a global location.</p>
+<p>First, you&#8217;ll need to follow the <a class="reference external" href="http://brew.sh/">Homebrew installation guide </a>.</p>
+<p>Next, install python, and add the homebrew directory to your bash profile:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>brew install python
+<span class="nb">echo</span> <span class="s1">&#39;PATH=/usr/local/share/:$PATH&#39;</span> &gt;&gt; ~/.bashrc
+</pre></div>
+</div>
+<p>(You may need to start a new terminal session to load the new <code class="docutils literal"><span class="pre">PATH</span></code>.)</p>
+<p>Homebrew python comes with <code class="docutils literal"><span class="pre">pip</span></code>, so you can now install using <code class="docutils literal"><span class="pre">pip</span></code>, per
+our <a class="reference internal" href="#pip-install-command"><span class="std std-ref">typical instructions</span></a>.</p>
+</div>
+<div class="section" id="option-2-virtualenv">
+<h3>Option 2: virtualenv<a class="headerlink" href="#option-2-virtualenv" title="Permalink to this headline">¶</a></h3>
+<p>Using virtualenvs for python projects is a standard best-practice, and will
+guarantee you a working version of the CLI. However, as noted above, it&#8217;s less
+convenient than a global install.</p>
+<p>Your steps are</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>sudo easy_install pip
+sudo pip install virtualenv
+virtualenv globus-cli-virtualenv
+<span class="nb">source</span> globus-cli-virtualenv/bin/activate
+pip install globus-cli
+</pre></div>
+</div>
+<p>Note that you will have to <code class="docutils literal"><span class="pre">source</span> <span class="pre">globus-cli-virtualenv/bin/activate</span></code> every
+time you want to use the Globus CLI.</p>
+</div>
+</div>
+</div>
+<div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>Installing the <code class="docutils literal"><span class="pre">globus-cli</span></code> python packge will provide you with the
+<code class="docutils literal"><span class="pre">globus</span></code> command.
+However, most CLI commands will require authentication to Globus services, so
+start out by getting tokens:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus login
+<span class="c1"># follow instructions to get setup</span>
+</pre></div>
+</div>
+<p>You can check that you can correctly authenticate to the Globus APIs with two
+quick commands.</p>
+<p>First, check that you can access Globus Auth:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus auth get-identities --usernames <span class="s1">&#39;go@globusid.org&#39;</span>
+<span class="o">{</span>
+  <span class="s2">&quot;identities&quot;</span>: <span class="o">[</span>
+    <span class="o">{</span>
+      <span class="s2">&quot;username&quot;</span>: <span class="s2">&quot;go@globusid.org&quot;</span>,
+      <span class="s2">&quot;status&quot;</span>: <span class="s2">&quot;used&quot;</span>,
+      <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;www.globus.org&quot;</span>,
+      <span class="s2">&quot;id&quot;</span>: <span class="s2">&quot;c699d42e-d274-11e5-bf75-1fc5bf53bb24&quot;</span>,
+      <span class="s2">&quot;identity_provider&quot;</span>: <span class="s2">&quot;41143743-f3c8-4d60-bbdb-eeecaba85bd9&quot;</span>,
+      <span class="s2">&quot;organization&quot;</span>: <span class="s2">&quot;Globus&quot;</span>,
+      <span class="s2">&quot;email&quot;</span>: <span class="s2">&quot;noreply@globus.org&quot;</span>
+    <span class="o">}</span>
+  <span class="o">]</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Your output should be the same as above.
+If you are not authenticated, you will see a message similar to:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus auth get-identities --usernames <span class="s1">&#39;go@globusid.org&#39;</span>
+Globus CLI Error: A Globus API Error Occurred.
+HTTP status: 401
+code: UNAUTHORIZED
+message: Call must be authenticated
+</pre></div>
+</div>
+<p>Next, check that you can reach the Globus Transfer API:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># --filter-owner-id is the ID of &#39;go@globusid.org&#39;, fetched above</span>
+$ globus transfer endpoint search <span class="se">\</span>
+    --filter-fulltext <span class="s1">&#39;Globus Tutorial Endpoint&#39;</span> <span class="se">\</span>
+    --filter-owner-id <span class="s1">&#39;c699d42e-d274-11e5-bf75-1fc5bf53bb24&#39;</span>
+Owner                            <span class="p">|</span> ID                                   <span class="p">|</span> Display Name
+-------------------------------- <span class="p">|</span> ------------------------------------ <span class="p">|</span> ------------
+go@globusid.org                  <span class="p">|</span> ddb59aef-6d04-11e5-ba46-22000b92c6ec <span class="p">|</span> Globus Tutorial Endpoint 1
+go@globusid.org                  <span class="p">|</span> ddb59af0-6d04-11e5-ba46-22000b92c6ec <span class="p">|</span> Globus Tutorial Endpoint 2
+go@globusid.org                  <span class="p">|</span> cf9bcaa5-6d04-11e5-ba46-22000b92c6ec <span class="p">|</span> Globus S3 Tutorial Endpoint
+</pre></div>
+</div>
+<p>If you are not authenticated, you will get an error like the following:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus transfer endpoint search <span class="se">\</span>
+    --filter-fulltext <span class="s1">&#39;Globus Tutorial Endpoint&#39;</span> <span class="se">\</span>
+    --filter-owner-id <span class="s1">&#39;c699d42e-d274-11e5-bf75-1fc5bf53bb24&#39;</span>
+Globus CLI Error: A Transfer API Error Occurred.
+request_id: I33fDzZPp
+code: AuthenticationFailed
+message: Token is not active
+</pre></div>
+</div>
+<p>Now we have the endpoint IDs for the tutorial endpoints, and can do a test
+directory listing:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus transfer ls <span class="se">\</span>
+    --endpoint-id <span class="s1">&#39;ddb59aef-6d04-11e5-ba46-22000b92c6ec&#39;</span> <span class="se">\</span>
+    --path <span class="s1">&#39;/&#39;</span>
+home
+mnt
+not shareable
+share
+</pre></div>
+</div>
+<p>Start exploring the CLI!
+Use <code class="docutils literal"><span class="pre">globus</span> <span class="pre">list-commands</span></code> to see all of the commands in the CLI, and to get
+more detailed help for a specific information on a command, run that command
+with the <code class="docutils literal"><span class="pre">--help</span></code> flag.</p>
+</div>
+<div class="section" id="license">
+<h1>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
+<p>Copyright 2016 University of Chicago</p>
+<p>Licensed under the Apache License, Version 2.0 (the &#8220;License&#8221;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<p><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#8220;AS IS&#8221; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Globus CLI</a></li>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#macos-users">macOS Users</a><ul>
+<li><a class="reference internal" href="#option-1-homebrew">Option 1: Homebrew</a></li>
+<li><a class="reference internal" href="#option-2-virtualenv">Option 2: virtualenv</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">globus-cli 0.4.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Globus.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>

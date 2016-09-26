@@ -19,8 +19,8 @@ Installation
 
 The Globus CLI is maintained as a python package, built on the
 `Globus Python SDK <https://globus.github.io/globus-sdk-python>`_.
-Like the SDK, it therefore requires `Python <https://www.python.org/>`_ 2.6+ or
-3.2+.
+Like the SDK, it therefore requires `Python <https://www.python.org/>`_ 2.7+ or
+3.3+.
 If a supported version of Python is not already installed on your system, see
 this `Python installation guide \
 <http://docs.python-guide.org/en/latest/starting/installation/>`_.
@@ -28,6 +28,8 @@ this `Python installation guide \
 The simplest way to install the Globus CLI is using the ``pip`` package manager
 (https://pypi.python.org/pypi/pip), which is included in most Python
 installations:
+
+.. _pip_install_command:
 
 .. code-block:: bash
 
@@ -43,6 +45,58 @@ git repository and installing it manually:
     git clone https://github.com/globus/globus-cli.git
     cd globus-cli
     python setup.py install
+
+
+macOS Users
+-----------
+
+Because the version of python used on macOS is used internally by Apple's
+software, it is *not* possible to install the CLI globally into this version of
+python (we conflict with packages that Apple is using to build macOS).
+Instead, we recommend taking one of the two following approaches:
+
+Option 1: Homebrew
+~~~~~~~~~~~~~~~~~~
+
+To get around this problem, you can use homebrew to install an alternate
+version of python owned by you, the user, instead of the operating system. This
+neatly eliminates any conflicts you may have, and allows you to install the
+Globus CLI in a global location.
+
+First, you'll need to follow the `Homebrew installation guide \
+<http://brew.sh/>`_.
+
+Next, install python, and add the homebrew directory to your bash profile:
+
+.. code-block:: bash
+
+    brew install python
+    echo 'PATH=/usr/local/share/:$PATH' >> ~/.bashrc
+
+(You may need to start a new terminal session to load the new ``PATH``.)
+
+Homebrew python comes with ``pip``, so you can now install using ``pip``, per
+our :ref:`typical instructions <pip_install_command>`.
+
+Option 2: virtualenv
+~~~~~~~~~~~~~~~~~~~~
+
+Using virtualenvs for python projects is a standard best-practice, and will
+guarantee you a working version of the CLI. However, as noted above, it's less
+convenient than a global install.
+
+Your steps are
+
+.. code-block:: bash
+
+    sudo easy_install pip
+    sudo pip install virtualenv
+    virtualenv globus-cli-virtualenv
+    source globus-cli-virtualenv/bin/activate
+    pip install globus-cli
+
+Note that you will have to ``source globus-cli-virtualenv/bin/activate`` every
+time you want to use the Globus CLI.
 
 
 Getting Started
