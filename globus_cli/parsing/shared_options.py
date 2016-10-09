@@ -1,7 +1,8 @@
 import click
 
 from globus_cli.version import get_versions
-from globus_cli.parsing.command_state import format_option, debug_option
+from globus_cli.parsing.command_state import (
+    format_option, debug_option, map_http_status_option)
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
 
 
@@ -80,6 +81,10 @@ def common_options(*args, **kwargs):
         # if the format option is being allowed, it needs to be applied to `f`
         if not kwargs.get('no_format_option'):
             f = format_option(f)
+
+        # if the --map-http-status option is being allowed, ...
+        if not kwargs.get('no_map_http_status_option'):
+            f = map_http_status_option(f)
 
         return f
 
