@@ -49,17 +49,23 @@ def print_table(iterable, headers_and_keys, print_headers=True):
     # the same order as the headers_and_keys array
     # use a special function to handle empty iterable
     def get_max_colwidth(kf):
-        lengths = [len(str(kf(i))) for i in iterable]
+        def _safelen(x):
+            try:
+                return len(x)
+            except TypeError:
+                return len(str(x))
+        lengths = [_safelen(kf(i)) for i in iterable]
         if not lengths:
             return 0
         else:
             return max(lengths)
+
     widths = [get_max_colwidth(kf) for kf in keyfuncs]
     # handle the case in which the column header is the widest thing
     widths = [max(w, len(h)) for w, h in zip(widths, headers)]
 
     # create a format string based on column widths
-    format_str = ' | '.join('{:' + str(w) + '}' for w in widths)
+    format_str = six.u(' | '.join('{:' + str(w) + '}' for w in widths))
 
     def none_to_null(val):
         if val is None:
