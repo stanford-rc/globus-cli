@@ -61,12 +61,12 @@ If a supported version of Python is not already installed on your system, see
 this <a class="reference external" href="http://docs.python-guide.org/en/latest/starting/installation/">Python installation guide</a>.</p>
 <p class="rubric">For macOS Users</p>
 <p>For <strong>macOS</strong>, you must install pip first:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>sudo easy_install pip
+<div class="highlight-bash"><div class="highlight"><pre><span></span>which pip <span class="o">||</span> sudo easy_install pip
 </pre></div>
 </div>
 <p class="rubric">For All Platforms</p>
 <p>To install, run the following commands:</p>
-<div class="highlight-bash" id="install-script"><div class="highlight"><pre><span></span>sudo pip install virtualenv
+<div class="highlight-bash" id="install-script"><div class="highlight"><pre><span></span>which virtualenv <span class="o">||</span> sudo pip install virtualenv
 virtualenv <span class="nv">$HOME</span>/.globus-cli-virtualenv
 <span class="nb">source</span> <span class="nv">$HOME</span>/.globus-cli-virtualenv/bin/activate
 pip install globus-cli
@@ -75,7 +75,7 @@ deactivate
 <span class="nb">echo</span> <span class="s1">&#39;export PATH=&quot;$PATH:$HOME/.globus-cli-virtualenv/bin&quot;&#39;</span> &gt;&gt; ~/.bashrc
 </pre></div>
 </div>
-<p>This will install the CLI and it&#8217;s dependencies into
+<p>This will install the CLI and its dependencies into
 <code class="docutils literal"><span class="pre">~/.globus-cli-virtualenv</span></code>, and add it to your shell.</p>
 <p>See that the CLI is installed:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>globus --help
@@ -85,6 +85,9 @@ deactivate
 <p>If you shell is not Bash, you will have to add
 <code class="docutils literal"><span class="pre">export</span> <span class="pre">PATH=&quot;$PATH:$HOME/.globus-cli-virtualenv/bin&quot;</span></code> to your shell&#8217;s
 initialization file.</p>
+<p class="rubric">Updating and Removing</p>
+<p>For more info, see the instructions on <a class="reference internal" href="#updating-and-removing"><span class="std std-ref">Updating and Removing CLI
+Versions</span></a>.</p>
 </div>
 <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
@@ -153,6 +156,27 @@ Use <code class="docutils literal"><span class="pre">globus</span> <span class="
 more detailed help for a specific information on a command, run that command
 with the <code class="docutils literal"><span class="pre">--help</span></code> flag.</p>
 </div>
+<div class="section" id="updating-removing-the-cli">
+<span id="updating-and-removing"></span><h1>Updating &amp; Removing the CLI<a class="headerlink" href="#updating-removing-the-cli" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="update">
+<h2>Update<a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h2>
+<p>To update your version of the CLI to the latest:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">source</span> <span class="nv">$HOME</span>/.globus-cli-virtualenv/bin/activate
+pip install -U globus-cli
+deactivate
+</pre></div>
+</div>
+</div>
+<div class="section" id="uninstall">
+<h2>Uninstall<a class="headerlink" href="#uninstall" title="Permalink to this headline">¶</a></h2>
+<p>To remove the CLI:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>rm -r <span class="nv">$HOME</span>/.globus-cli-virtualenv
+</pre></div>
+</div>
+<p>You should also edit your <code class="docutils literal"><span class="pre">$HOME/.bashrc</span></code> and remove the line that reads
+<code class="docutils literal"><span class="pre">export</span> <span class="pre">PATH=&quot;$PATH:$HOME/.globus-cli-virtualenv/bin&quot;</span></code>.</p>
+</div>
+</div>
 <div class="section" id="license">
 <h1>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
 <p>Copyright 2016 University of Chicago</p>
@@ -178,6 +202,11 @@ limitations under the License.</p>
 <li><a class="reference internal" href="#">Globus CLI</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#updating-removing-the-cli">Updating &amp; Removing the CLI</a><ul>
+<li><a class="reference internal" href="#update">Update</a></li>
+<li><a class="reference internal" href="#uninstall">Uninstall</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#license">License</a></li>
 </ul>
 

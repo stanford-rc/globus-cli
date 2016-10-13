@@ -31,7 +31,7 @@ For **macOS**, you must install pip first:
 
 .. code-block:: bash
 
-    sudo easy_install pip
+    which pip || sudo easy_install pip
 
 .. rubric:: For All Platforms
 
@@ -41,7 +41,7 @@ To install, run the following commands:
 
 .. code-block:: bash
 
-    sudo pip install virtualenv
+    which virtualenv || sudo pip install virtualenv
     virtualenv $HOME/.globus-cli-virtualenv
     source $HOME/.globus-cli-virtualenv/bin/activate
     pip install globus-cli
@@ -49,7 +49,7 @@ To install, run the following commands:
     export PATH="$PATH:$HOME/.globus-cli-virtualenv/bin"
     echo 'export PATH="$PATH:$HOME/.globus-cli-virtualenv/bin"' >> ~/.bashrc
 
-This will install the CLI and it's dependencies into
+This will install the CLI and its dependencies into
 ``~/.globus-cli-virtualenv``, and add it to your shell.
 
 See that the CLI is installed:
@@ -63,6 +63,12 @@ See that the CLI is installed:
 If you shell is not Bash, you will have to add
 ``export PATH="$PATH:$HOME/.globus-cli-virtualenv/bin"`` to your shell's
 initialization file.
+
+.. rubric:: Updating and Removing
+
+For more info, see the instructions on :ref:`Updating and Removing CLI
+Versions <updating_and_removing>`.
+
 
 Getting Started
 ===============
@@ -144,6 +150,34 @@ Start exploring the CLI!
 Use ``globus list-commands`` to see all of the commands in the CLI, and to get
 more detailed help for a specific information on a command, run that command
 with the ``--help`` flag.
+
+.. _updating_and_removing:
+
+Updating & Removing the CLI
+===========================
+
+Update
+------
+
+To update your version of the CLI to the latest:
+
+.. code-block:: bash
+
+    source $HOME/.globus-cli-virtualenv/bin/activate
+    pip install -U globus-cli
+    deactivate
+
+Uninstall
+---------
+
+To remove the CLI:
+
+.. code-block:: bash
+
+    rm -r $HOME/.globus-cli-virtualenv
+
+You should also edit your ``$HOME/.bashrc`` and remove the line that reads
+``export PATH="$PATH:$HOME/.globus-cli-virtualenv/bin"``.
 
 License
 =======
