@@ -47,7 +47,7 @@ def async_delete_command(batch, ignore_missing, recursive, path, endpoint_id,
                              recursive=recursive,
                              ignore_missing=ignore_missing)
 
-    if batch is not None:
+    if batch:
         # although this sophisticated structure (like that in async-transfer)
         # isn't strictly necessary, it gives us the ability to add options in
         # the future to these lines with trivial modifications
