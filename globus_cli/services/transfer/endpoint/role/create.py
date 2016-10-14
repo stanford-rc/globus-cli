@@ -20,9 +20,11 @@ from globus_cli.services.transfer.helpers import (
 @click.option('--principal', required=True,
               help=('Entity to set a role on. ID of a Group or Identity, or '
                     'a valid Identity Name, like "go@globusid.org"'))
-@click.option('--role', default='access_manager', show_default=True,
-              type=CaseInsensitiveChoice(('access_manager',)),
-              help='A role to assign. Currently only supports access_manager')
+@click.option('--role', required=True,
+              type=CaseInsensitiveChoice(
+                  ('administrator', 'access_manager', 'activity_manager',
+                   'activity_monitor')),
+              help='A role to assign.')
 def role_create(role, principal, principal_type, endpoint_id):
     """
     Executor for `globus transfer endpoint role show`

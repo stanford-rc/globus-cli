@@ -13,9 +13,9 @@ from globus_cli.services.transfer.helpers import (
 @common_options
 @click.option('--filter-scope', default='all', show_default=True,
               type=CaseInsensitiveChoice(
-                  ('all', 'my-endpoints', 'my-gcp-endpoints',
-                   'recently-used', 'in-use', 'shared-by-me',
-                   'shared-with-me')),
+                  ('all', 'administered-by-me', 'my-endpoints',
+                   'my-gcp-endpoints', 'recently-used', 'in-use',
+                   'shared-by-me', 'shared-with-me')),
               help='The set of endpoints to search over.')
 @click.option('--filter-fulltext',
               help='Text filter to apply to the selected set of endpoints')
