@@ -22,81 +22,52 @@ The Globus CLI is maintained as a python package, built on the
 Like the SDK, it therefore requires `Python <https://www.python.org/>`_ 2.7+ or
 3.3+.
 If a supported version of Python is not already installed on your system, see
-this `Python installation guide \
+this `Python installation guide\
 <http://docs.python-guide.org/en/latest/starting/installation/>`_.
 
-The simplest way to install the Globus CLI is using the ``pip`` package manager
-(https://pypi.python.org/pypi/pip), which is included in most Python
-installations:
+.. rubric:: For macOS Users
 
-.. _pip_install_command:
+For **macOS**, you must install pip first:
 
 .. code-block:: bash
 
+    which pip || sudo easy_install pip
+
+.. rubric:: For All Platforms
+
+To install, run the following commands:
+
+.. _install_script:
+
+.. code-block:: bash
+
+    which virtualenv || sudo pip install virtualenv
+    virtualenv "$HOME/.globus-cli-virtualenv"
+    source "$HOME/.globus-cli-virtualenv/bin/activate"
     pip install globus-cli
+    deactivate
+    export PATH="$PATH:$HOME/.globus-cli-virtualenv/bin"
+    echo 'export PATH="$PATH:$HOME/.globus-cli-virtualenv/bin"' >> "$HOME/.bashrc"
 
-This will install the CLI and it's dependencies.
+This will install the CLI and its dependencies into
+``$HOME/.globus-cli-virtualenv``, and add it to your shell.
 
-Bleeding edge versions of the Globus SDK can be installed by checking out the
-git repository and installing it manually:
-
-.. code-block:: bash
-
-    git clone https://github.com/globus/globus-cli.git
-    cd globus-cli
-    python setup.py install
-
-
-macOS Users
------------
-
-Because the version of python used on macOS is used internally by Apple's
-software, it is *not* possible to install the CLI globally into this version of
-python (we conflict with packages that Apple is using to build macOS).
-Instead, we recommend taking one of the two following approaches:
-
-Option 1: Homebrew
-~~~~~~~~~~~~~~~~~~
-
-To get around this problem, you can use homebrew to install an alternate
-version of python owned by you, the user, instead of the operating system. This
-neatly eliminates any conflicts you may have, and allows you to install the
-Globus CLI in a global location.
-
-First, you'll need to follow the `Homebrew installation guide \
-<http://brew.sh/>`_.
-
-Next, install python:
+See that the CLI is installed:
 
 .. code-block:: bash
 
-    brew install python
+    globus --help
 
-You should start a new terminal session to ensure that you are working with the
-newly installed python.
+.. rubric:: Note on Other Shells
 
-Homebrew python comes with ``pip``, so you can now install using ``pip``, per
-our :ref:`typical instructions <pip_install_command>`.
+If you shell is not Bash, you will have to add
+``export PATH="$PATH:$HOME/.globus-cli-virtualenv/bin"`` to your shell's
+initialization file.
 
-Option 2: virtualenv
-~~~~~~~~~~~~~~~~~~~~
+.. rubric:: Updating and Removing
 
-Using virtualenvs for python projects is a standard best-practice, and will
-guarantee you a working version of the CLI. However, as noted above, it's less
-convenient than a global install.
-
-Your steps are
-
-.. code-block:: bash
-
-    sudo easy_install pip
-    sudo pip install virtualenv
-    virtualenv globus-cli-virtualenv
-    source globus-cli-virtualenv/bin/activate
-    pip install globus-cli
-
-Note that you will have to ``source globus-cli-virtualenv/bin/activate`` every
-time you want to use the Globus CLI.
+For more info, see the instructions on :ref:`Updating and Removing CLI
+Versions <updating_and_removing>`.
 
 
 Getting Started
@@ -179,6 +150,34 @@ Start exploring the CLI!
 Use ``globus list-commands`` to see all of the commands in the CLI, and to get
 more detailed help for a specific information on a command, run that command
 with the ``--help`` flag.
+
+.. _updating_and_removing:
+
+Updating & Removing the CLI
+===========================
+
+Update
+------
+
+To update your version of the CLI to the latest:
+
+.. code-block:: bash
+
+    source "$HOME/.globus-cli-virtualenv/bin/activate"
+    pip install -U globus-cli
+    deactivate
+
+Uninstall
+---------
+
+To remove the CLI:
+
+.. code-block:: bash
+
+    rm -r "$HOME/.globus-cli-virtualenv"
+
+You should also edit your ``$HOME/.bashrc`` and remove the line that reads
+``export PATH="$PATH:$HOME/.globus-cli-virtualenv/bin"``.
 
 License
 =======

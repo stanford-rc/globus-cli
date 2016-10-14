@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Globus CLI &mdash; globus-cli 0.4.0.0 documentation</title>
+    <title>Globus CLI &mdash; globus-cli 0.4.2.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.4.0.0',
+        VERSION:     '0.4.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="globus-cli 0.4.0.0 documentation" href="#" /> 
+    <link rel="top" title="globus-cli 0.4.2.0 documentation" href="#" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -32,7 +32,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="#">globus-cli 0.4.0.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="#">globus-cli 0.4.2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -58,60 +58,36 @@ will show you any subcommands and options supported by that command.</p>
 Like the SDK, it therefore requires <a class="reference external" href="https://www.python.org/">Python</a> 2.7+ or
 3.3+.
 If a supported version of Python is not already installed on your system, see
-this <a class="reference external" href="http://docs.python-guide.org/en/latest/starting/installation/">Python installation guide </a>.</p>
-<p>The simplest way to install the Globus CLI is using the <code class="docutils literal"><span class="pre">pip</span></code> package manager
-(<a class="reference external" href="https://pypi.python.org/pypi/pip">https://pypi.python.org/pypi/pip</a>), which is included in most Python
-installations:</p>
-<div class="highlight-bash" id="pip-install-command"><div class="highlight"><pre><span></span>pip install globus-cli
+this <a class="reference external" href="http://docs.python-guide.org/en/latest/starting/installation/">Python installation guide</a>.</p>
+<p class="rubric">For macOS Users</p>
+<p>For <strong>macOS</strong>, you must install pip first:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>which pip <span class="o">||</span> sudo easy_install pip
 </pre></div>
 </div>
-<p>This will install the CLI and it&#8217;s dependencies.</p>
-<p>Bleeding edge versions of the Globus SDK can be installed by checking out the
-git repository and installing it manually:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>git clone https://github.com/globus/globus-cli.git
-<span class="nb">cd</span> globus-cli
-python setup.py install
-</pre></div>
-</div>
-<div class="section" id="macos-users">
-<h2>macOS Users<a class="headerlink" href="#macos-users" title="Permalink to this headline">¶</a></h2>
-<p>Because the version of python used on macOS is used internally by Apple&#8217;s
-software, it is <em>not</em> possible to install the CLI globally into this version of
-python (we conflict with packages that Apple is using to build macOS).
-Instead, we recommend taking one of the two following approaches:</p>
-<div class="section" id="option-1-homebrew">
-<h3>Option 1: Homebrew<a class="headerlink" href="#option-1-homebrew" title="Permalink to this headline">¶</a></h3>
-<p>To get around this problem, you can use homebrew to install an alternate
-version of python owned by you, the user, instead of the operating system. This
-neatly eliminates any conflicts you may have, and allows you to install the
-Globus CLI in a global location.</p>
-<p>First, you&#8217;ll need to follow the <a class="reference external" href="http://brew.sh/">Homebrew installation guide </a>.</p>
-<p>Next, install python:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>brew install python
-</pre></div>
-</div>
-<p>You should start a new terminal session to ensure that you are working with the
-newly installed python.</p>
-<p>Homebrew python comes with <code class="docutils literal"><span class="pre">pip</span></code>, so you can now install using <code class="docutils literal"><span class="pre">pip</span></code>, per
-our <a class="reference internal" href="#pip-install-command"><span class="std std-ref">typical instructions</span></a>.</p>
-</div>
-<div class="section" id="option-2-virtualenv">
-<h3>Option 2: virtualenv<a class="headerlink" href="#option-2-virtualenv" title="Permalink to this headline">¶</a></h3>
-<p>Using virtualenvs for python projects is a standard best-practice, and will
-guarantee you a working version of the CLI. However, as noted above, it&#8217;s less
-convenient than a global install.</p>
-<p>Your steps are</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>sudo easy_install pip
-sudo pip install virtualenv
-virtualenv globus-cli-virtualenv
-<span class="nb">source</span> globus-cli-virtualenv/bin/activate
+<p class="rubric">For All Platforms</p>
+<p>To install, run the following commands:</p>
+<div class="highlight-bash" id="install-script"><div class="highlight"><pre><span></span>which virtualenv <span class="o">||</span> sudo pip install virtualenv
+virtualenv <span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.globus-cli-virtualenv&quot;</span>
+<span class="nb">source</span> <span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.globus-cli-virtualenv/bin/activate&quot;</span>
 pip install globus-cli
+deactivate
+<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/.globus-cli-virtualenv/bin&quot;</span>
+<span class="nb">echo</span> <span class="s1">&#39;export PATH=&quot;$PATH:$HOME/.globus-cli-virtualenv/bin&quot;&#39;</span> &gt;&gt; <span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.bashrc&quot;</span>
 </pre></div>
 </div>
-<p>Note that you will have to <code class="docutils literal"><span class="pre">source</span> <span class="pre">globus-cli-virtualenv/bin/activate</span></code> every
-time you want to use the Globus CLI.</p>
+<p>This will install the CLI and its dependencies into
+<code class="docutils literal"><span class="pre">$HOME/.globus-cli-virtualenv</span></code>, and add it to your shell.</p>
+<p>See that the CLI is installed:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>globus --help
+</pre></div>
 </div>
-</div>
+<p class="rubric">Note on Other Shells</p>
+<p>If you shell is not Bash, you will have to add
+<code class="docutils literal"><span class="pre">export</span> <span class="pre">PATH=&quot;$PATH:$HOME/.globus-cli-virtualenv/bin&quot;</span></code> to your shell&#8217;s
+initialization file.</p>
+<p class="rubric">Updating and Removing</p>
+<p>For more info, see the instructions on <a class="reference internal" href="#updating-and-removing"><span class="std std-ref">Updating and Removing CLI
+Versions</span></a>.</p>
 </div>
 <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
@@ -180,6 +156,27 @@ Use <code class="docutils literal"><span class="pre">globus</span> <span class="
 more detailed help for a specific information on a command, run that command
 with the <code class="docutils literal"><span class="pre">--help</span></code> flag.</p>
 </div>
+<div class="section" id="updating-removing-the-cli">
+<span id="updating-and-removing"></span><h1>Updating &amp; Removing the CLI<a class="headerlink" href="#updating-removing-the-cli" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="update">
+<h2>Update<a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h2>
+<p>To update your version of the CLI to the latest:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">source</span> <span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.globus-cli-virtualenv/bin/activate&quot;</span>
+pip install -U globus-cli
+deactivate
+</pre></div>
+</div>
+</div>
+<div class="section" id="uninstall">
+<h2>Uninstall<a class="headerlink" href="#uninstall" title="Permalink to this headline">¶</a></h2>
+<p>To remove the CLI:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>rm -r <span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.globus-cli-virtualenv&quot;</span>
+</pre></div>
+</div>
+<p>You should also edit your <code class="docutils literal"><span class="pre">$HOME/.bashrc</span></code> and remove the line that reads
+<code class="docutils literal"><span class="pre">export</span> <span class="pre">PATH=&quot;$PATH:$HOME/.globus-cli-virtualenv/bin&quot;</span></code>.</p>
+</div>
+</div>
 <div class="section" id="license">
 <h1>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
 <p>Copyright 2016 University of Chicago</p>
@@ -203,15 +200,13 @@ limitations under the License.</p>
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Globus CLI</a></li>
-<li><a class="reference internal" href="#installation">Installation</a><ul>
-<li><a class="reference internal" href="#macos-users">macOS Users</a><ul>
-<li><a class="reference internal" href="#option-1-homebrew">Option 1: Homebrew</a></li>
-<li><a class="reference internal" href="#option-2-virtualenv">Option 2: virtualenv</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#updating-removing-the-cli">Updating &amp; Removing the CLI</a><ul>
+<li><a class="reference internal" href="#update">Update</a></li>
+<li><a class="reference internal" href="#uninstall">Uninstall</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#license">License</a></li>
 </ul>
 
@@ -242,7 +237,7 @@ limitations under the License.</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="#">globus-cli 0.4.0.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="#">globus-cli 0.4.2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
