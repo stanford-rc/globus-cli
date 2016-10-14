@@ -42,15 +42,15 @@ To install, run the following commands:
 .. code-block:: bash
 
     which virtualenv || sudo pip install virtualenv
-    virtualenv $HOME/.globus-cli-virtualenv
-    source $HOME/.globus-cli-virtualenv/bin/activate
+    virtualenv "$HOME/.globus-cli-virtualenv"
+    source "$HOME/.globus-cli-virtualenv/bin/activate"
     pip install globus-cli
     deactivate
     export PATH="$PATH:$HOME/.globus-cli-virtualenv/bin"
-    echo 'export PATH="$PATH:$HOME/.globus-cli-virtualenv/bin"' >> ~/.bashrc
+    echo 'export PATH="$PATH:$HOME/.globus-cli-virtualenv/bin"' >> "$HOME/.bashrc"
 
 This will install the CLI and its dependencies into
-``~/.globus-cli-virtualenv``, and add it to your shell.
+``$HOME/.globus-cli-virtualenv``, and add it to your shell.
 
 See that the CLI is installed:
 
@@ -163,7 +163,7 @@ To update your version of the CLI to the latest:
 
 .. code-block:: bash
 
-    source $HOME/.globus-cli-virtualenv/bin/activate
+    source "$HOME/.globus-cli-virtualenv/bin/activate"
     pip install -U globus-cli
     deactivate
 
@@ -174,7 +174,7 @@ To remove the CLI:
 
 .. code-block:: bash
 
-    rm -r $HOME/.globus-cli-virtualenv
+    rm -r "$HOME/.globus-cli-virtualenv"
 
 You should also edit your ``$HOME/.bashrc`` and remove the line that reads
 ``export PATH="$PATH:$HOME/.globus-cli-virtualenv/bin"``.

@@ -67,16 +67,16 @@ this <a class="reference external" href="http://docs.python-guide.org/en/latest/
 <p class="rubric">For All Platforms</p>
 <p>To install, run the following commands:</p>
 <div class="highlight-bash" id="install-script"><div class="highlight"><pre><span></span>which virtualenv <span class="o">||</span> sudo pip install virtualenv
-virtualenv <span class="nv">$HOME</span>/.globus-cli-virtualenv
-<span class="nb">source</span> <span class="nv">$HOME</span>/.globus-cli-virtualenv/bin/activate
+virtualenv <span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.globus-cli-virtualenv&quot;</span>
+<span class="nb">source</span> <span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.globus-cli-virtualenv/bin/activate&quot;</span>
 pip install globus-cli
 deactivate
 <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/.globus-cli-virtualenv/bin&quot;</span>
-<span class="nb">echo</span> <span class="s1">&#39;export PATH=&quot;$PATH:$HOME/.globus-cli-virtualenv/bin&quot;&#39;</span> &gt;&gt; ~/.bashrc
+<span class="nb">echo</span> <span class="s1">&#39;export PATH=&quot;$PATH:$HOME/.globus-cli-virtualenv/bin&quot;&#39;</span> &gt;&gt; <span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.bashrc&quot;</span>
 </pre></div>
 </div>
 <p>This will install the CLI and its dependencies into
-<code class="docutils literal"><span class="pre">~/.globus-cli-virtualenv</span></code>, and add it to your shell.</p>
+<code class="docutils literal"><span class="pre">$HOME/.globus-cli-virtualenv</span></code>, and add it to your shell.</p>
 <p>See that the CLI is installed:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>globus --help
 </pre></div>
@@ -161,7 +161,7 @@ with the <code class="docutils literal"><span class="pre">--help</span></code> f
 <div class="section" id="update">
 <h2>Update<a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h2>
 <p>To update your version of the CLI to the latest:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">source</span> <span class="nv">$HOME</span>/.globus-cli-virtualenv/bin/activate
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">source</span> <span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.globus-cli-virtualenv/bin/activate&quot;</span>
 pip install -U globus-cli
 deactivate
 </pre></div>
@@ -170,7 +170,7 @@ deactivate
 <div class="section" id="uninstall">
 <h2>Uninstall<a class="headerlink" href="#uninstall" title="Permalink to this headline">¶</a></h2>
 <p>To remove the CLI:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>rm -r <span class="nv">$HOME</span>/.globus-cli-virtualenv
+<div class="highlight-bash"><div class="highlight"><pre><span></span>rm -r <span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.globus-cli-virtualenv&quot;</span>
 </pre></div>
 </div>
 <p>You should also edit your <code class="docutils literal"><span class="pre">$HOME/.bashrc</span></code> and remove the line that reads
