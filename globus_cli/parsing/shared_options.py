@@ -18,7 +18,10 @@ def version_option(f):
                         current, latest,
                         'You are running the latest version of the Globus CLI'
                         if current == latest else
-                        'You should update your version of the Globus CLI'
+                        ('You should update your version of the Globus CLI\n'
+                         'Update instructions: '
+                         'https://globus.github.io/globus-cli/'
+                         '#updating-and-removing')
                         if current < latest else
                         'You are running a preview version of the Globus CLI'
             )
