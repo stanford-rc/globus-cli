@@ -2,10 +2,10 @@ import click
 
 from globus_sdk import TransferData
 
-from globus_cli.safeio import safeprint
 from globus_cli.parsing import (
     CaseInsensitiveChoice, common_options, submission_id_option)
-from globus_cli.helpers import outformat_is_json, print_json_response
+from globus_cli.helpers import (
+    outformat_is_json, print_json_response, colon_formatted_print)
 
 from globus_cli.services.transfer.helpers import (
     get_client, shlex_process_stdin)
@@ -163,4 +163,5 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
     if outformat_is_json():
         print_json_response(res)
     else:
-        safeprint(res['message'])
+        fields = (('Message', 'message'), ('Task ID', 'task_id'))
+        colon_formatted_print(res, fields)
