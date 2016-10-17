@@ -1,8 +1,36 @@
 import click
 
-from globus_cli.version import __version__
+from globus_cli.version import get_versions
 from globus_cli.parsing.command_state import format_option
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
+
+
+def version_option(f):
+    """
+    Largely a custom clone of click.version_option -- almost identical, but
+    makes more assumptions and prints our special output.
+    """
+    def callback(ctx, param, value):
+        latest, current = get_versions()
+        click.echo(('Installed Version: {0}\n'
+                    'Latest Version:    {1}\n'
+                    '\n{2}').format(
+                        current, latest,
+                        'You are running the latest version of the Globus CLI'
+                        if current == latest else
+                        ('You should update your version of the Globus CLI\n'
+                         'Update instructions: '
+                         'https://globus.github.io/globus-cli/'
+                         '#updating-and-removing')
+                        if current < latest else
+                        'You are running a preview version of the Globus CLI'
+            )
+        )
+        ctx.exit()
+
+    return click.option('--version', help='Show the version and exit.',
+                        is_flag=True, expose_value=False, is_eager=True,
+                        callback=callback)(f)
 
 
 def common_options(*args, **kwargs):
@@ -40,7 +68,7 @@ def common_options(*args, **kwargs):
         Work of actually decorating a function -- wrapped in here because we
         want to dispatch depending on how `common_options` is invoked
         """
-        f = click.version_option(__version__)(f)
+        f = version_option(f)
         f = click.help_option('-h', '--help')(f)
 
         # if the format option is being allowed, it needs to be applied to `f`
