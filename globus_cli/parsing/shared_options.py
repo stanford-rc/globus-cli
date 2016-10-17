@@ -11,6 +11,11 @@ def version_option(f):
     makes more assumptions and prints our special output.
     """
     def callback(ctx, param, value):
+        # copied from click.decorators.version_option
+        # no idea what resilient_parsing means, but...
+        if not value or ctx.resilient_parsing:
+            return
+
         latest, current = get_versions()
         click.echo(('Installed Version: {0}\n'
                     'Latest Version:    {1}\n'
