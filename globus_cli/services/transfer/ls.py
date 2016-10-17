@@ -34,9 +34,13 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth):
     Note about paths: because the "path" key always has a trailing slash, and
     item names never have leading slashes, we can just string concat.
     """
+    ls_kwargs = {}
+    if path is not None:
+        ls_kwargs = {'path': path}
+
     # non-recursive ls is simple -- just make the call and return the result
     if not recursive:
-        return client.operation_ls(endpoint_id, path=path)
+        return client.operation_ls(endpoint_id, **ls_kwargs)
 
     # the rest of this is the recursive case
 
@@ -46,7 +50,7 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth):
 
     if depth >= 0:
         # do an `ls` call against current path, use it to seed the result_doc
-        res = client.operation_ls(endpoint_id, path=path)
+        res = client.operation_ls(endpoint_id, **ls_kwargs)
         result_doc['DATA'] = [item for item in res]
         # set path in order to get trailing slash, if necessary
         result_doc['path'] = res['path']
@@ -82,8 +86,8 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth):
               help=('Limit to number of directories to traverse in '
                     '`--recursive` listings. A value of 0 indicates that '
                     'this should behave like a non-recursive `ls`'))
-@click.option('--path', default='/~/', show_default=True,
-              help='Path on the remote endpoint to list.')
+@click.option('--path', help=("Path on the remote endpoint to list. "
+                              "Defaults to the endpoint's default_directory"))
 def ls_command(path, recursive_depth_limit, recursive, long, endpoint_id):
     """
     Executor for `globus transfer ls`
@@ -94,6 +98,7 @@ def ls_command(path, recursive_depth_limit, recursive, long, endpoint_id):
     autoactivate(client, endpoint_id, if_expires_in=60)
 
     # get the `ls` result
+    # note that `path` can be None
     res = _get_ls_res(client, path, endpoint_id, recursive,
                       recursive_depth_limit)
 
