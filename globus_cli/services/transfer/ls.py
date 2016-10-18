@@ -8,6 +8,10 @@ from globus_cli.helpers import (
 from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.activation import autoactivate
 
+# we need to pull path_type.metavar because Argument.make_metavar()
+# behaves poorly even when a ParamType supplies get_metavar()
+path_type = EndpointPlusPath(path_required=False)
+
 
 class DummyLSIterable(dict):
     """
@@ -71,11 +75,6 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth, show_hidden):
                 result_doc['DATA'].append(nested_item)
 
     return result_doc
-
-
-# we need to pull path_type.metavar because Argument.make_metavar()
-# behaves poorly even when a ParamType supplies get_metavar()
-path_type = EndpointPlusPath(path_required=False)
 
 
 @click.command('ls', help='List the contents of a directory on an Endpoint',
