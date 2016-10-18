@@ -23,18 +23,19 @@ def bookmark_locate(bookmark_id_or_name):
     # service outright forbids it for bookmark names, so we can strip it off
     bookmark_id_or_name = bookmark_id_or_name.strip()
 
+    res = None
     try:
         UUID(bookmark_id_or_name)  # raises ValueError if argument not a UUID
-        res = client.get_bookmark(bookmark_id_or_name.lower())
+    except ValueError:
+        pass
+    else:
+        try:
+            res = client.get_bookmark(bookmark_id_or_name.lower())
+        except TransferAPIError as exception:
+            if exception.code != 'BookmarkNotFound':
+                raise
 
-    except (ValueError, TransferAPIError) as ex:
-        if isinstance(ex, TransferAPIError) and ex.code != 'BookmarkNotFound':
-            raise
-
-        # either the user provided a string that isn't a UUID (ValueError) or
-        # the provided UUID doesn't identity a bookmark (TransferAPIError with
-        # code='BookmarkNotFound'); fallback to matching a bookmark by name
-
+    if not res:  # non-UUID input or UUID not found; fallback to match by name
         try:
             # n.b. case matters to the Transfer service for bookmark names, so
             # two bookmarks can exist whose names vary only by their case
