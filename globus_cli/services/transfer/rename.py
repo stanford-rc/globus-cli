@@ -10,10 +10,10 @@ from globus_cli.services.transfer.activation import autoactivate
 
 @click.command('rename', help='Rename a file or directory on an Endpoint')
 @common_options
-@click.argument('source', required=True,
-                metavar='ENDPOINT_ID:SOURCE_PATH', type=EndpointPlusPath())
-@click.argument('destination', required=True,
-                metavar='ENDPOINT_ID:DEST_PATH', type=EndpointPlusPath())
+@click.argument('source', metavar='ENDPOINT_ID:SOURCE_PATH',
+                type=EndpointPlusPath())
+@click.argument('destination', metavar='ENDPOINT_ID:DEST_PATH',
+                type=EndpointPlusPath())
 def rename_command(source, destination):
     """
     Executor for `globus transfer rename`
