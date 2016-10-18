@@ -18,6 +18,22 @@ from globus_cli.parsing.command_state import CommandState
 from globus_cli.safeio import safeprint, write_error_info, PrintableErrorField
 
 
+def exit_with_mapped_status(http_status):
+    """
+    Given an HTTP Status, exit with either an error status of 1 or the
+    status mapped by what we were given.
+    """
+    # get the mapping by looking up the state and getting the mapping attr
+    mapping = (click.get_current_context().ensure_object(CommandState)
+               .http_status_map)
+
+    # if there is a mapped exit code, exit with that. Otherwise, exit 1
+    if http_status in mapping:
+        sys.exit(mapping[http_status])
+    else:
+        sys.exit(1)
+
+
 def pagination_overrun_hook():
     write_error_info(
         'Internal Paging Error',
@@ -33,6 +49,7 @@ def transferapi_hook(exception):
          PrintableErrorField('request_id', exception.request_id),
          PrintableErrorField('code', exception.code),
          PrintableErrorField('message', exception.message, multiline=True)])
+    exit_with_mapped_status(exception.http_status)
 
 
 def globusapi_hook(exception):
@@ -41,6 +58,7 @@ def globusapi_hook(exception):
         [PrintableErrorField('HTTP status', exception.http_status),
          PrintableErrorField('code', exception.code),
          PrintableErrorField('message', exception.message, multiline=True)])
+    exit_with_mapped_status(exception.http_status)
 
 
 def globus_generic_hook(exception):
@@ -48,6 +66,7 @@ def globus_generic_hook(exception):
         'Globus Error',
         [PrintableErrorField('error_type', exception.__class__.__name__),
          PrintableErrorField('message', str(exception), multiline=True)])
+    sys.exit(1)
 
 
 def custom_except_hook(exc_info):
@@ -100,3 +119,4 @@ def custom_except_hook(exc_info):
         # out, basically
         else:
             safeprint('{}: {}'.format(exception_type.__name__, exception))
+            sys.exit(1)
