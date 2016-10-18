@@ -101,7 +101,8 @@ from globus_cli.services.transfer.activation import autoactivate
               help=('source-path and dest-path are both directories, do a '
                     'recursive dir transfer. Ignored in batchmode'))
 @click.option('--sync-level', default="mtime", show_default=True,
-              type=CaseInsensitiveChoice(("exists", "mtime", "checksum")),
+              type=CaseInsensitiveChoice(
+                  ("exists", "size", "mtime", "checksum")),
               help=('How will the Transfer Task determine whether or not to '
                     'actually transfer a file over the network?'))
 @click.option('--batch', is_flag=True,
