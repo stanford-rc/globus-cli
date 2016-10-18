@@ -8,12 +8,13 @@ Define an except hook per exception type that we want to treat specially,
 generally types of SDK errors, and dispatch onto tht set of hooks.
 """
 import sys
-import os
 
 import click
 from six import reraise
 
 from globus_sdk import exc
+
+from globus_cli.parsing.command_state import CommandState
 from globus_cli.safeio import safeprint, write_error_info, PrintableErrorField
 
 
@@ -68,7 +69,9 @@ def custom_except_hook(exc_info):
     exception_type, exception, traceback = exc_info
 
     # check if we're in debug mode, and run the real excepthook if we are
-    if os.environ.get('GLOBUS_CLI_DEBUGMODE', None) is not None:
+    ctx = click.get_current_context()
+    state = ctx.ensure_object(CommandState)
+    if state.debug:
         sys.excepthook(exception_type, exception, traceback)
 
     # we're not in debug mode, do custom handling

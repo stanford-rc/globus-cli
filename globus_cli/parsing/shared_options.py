@@ -1,7 +1,7 @@
 import click
 
 from globus_cli.version import get_versions
-from globus_cli.parsing.command_state import format_option
+from globus_cli.parsing.command_state import format_option, debug_option
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
 
 
@@ -74,6 +74,7 @@ def common_options(*args, **kwargs):
         want to dispatch depending on how `common_options` is invoked
         """
         f = version_option(f)
+        f = debug_option(f)
         f = click.help_option('-h', '--help')(f)
 
         # if the format option is being allowed, it needs to be applied to `f`

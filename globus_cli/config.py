@@ -1,3 +1,4 @@
+import logging.config
 import os
 from configobj import ConfigObj
 
@@ -100,3 +101,30 @@ def internal_auth_client():
                               environment=GLOBUS_ENV) or CLIENT_ID
 
     return globus_sdk.NativeAppAuthClient(client_id, app_name=version.app_name)
+
+
+def setup_debug_logging():
+    conf = {
+        'version': 1,
+        'formatters': {
+            'basic': {
+                'format':
+                '[%(levelname)s] %(name)s::%(funcName)s() %(message)s'
+            }
+        },
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'level': 'DEBUG',
+                'formatter': 'basic'
+            }
+        },
+        'loggers': {
+            'globus_sdk': {
+                'level': 'DEBUG',
+                'handlers': ['console']
+            }
+        }
+    }
+
+    logging.config.dictConfig(conf)
