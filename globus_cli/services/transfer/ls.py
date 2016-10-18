@@ -25,7 +25,7 @@ class DummyLSIterable(dict):
         return self
 
 
-def _get_ls_res(client, path, endpoint_id, recursive, depth):
+def _get_ls_res(client, path, endpoint_id, recursive, depth, show_hidden):
     """
     Do recursive or non-recursive listing, and either return the GlobusResponse
     that we got back, or an artificial DummyLSIterable, formatted to look like
@@ -34,9 +34,11 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth):
     Note about paths: because the "path" key always has a trailing slash, and
     item names never have leading slashes, we can just string concat.
     """
-    ls_kwargs = {}
+    ls_kwargs = {
+        'show_hidden': int(show_hidden)
+    }
     if path is not None:
-        ls_kwargs = {'path': path}
+        ls_kwargs.update({'path': path})
 
     # non-recursive ls is simple -- just make the call and return the result
     if not recursive:
@@ -75,6 +77,8 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth):
                short_help='List Endpoint directory contents')
 @common_options
 @endpoint_id_option
+@click.option('--all', '-a', is_flag=True,
+              help=('Show files and directories that start with `.`'))
 @click.option('--long', is_flag=True,
               help=('For text output only. Do long form output, kind '
                     'of like `ls -l`'))
@@ -88,7 +92,7 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth):
                     'this should behave like a non-recursive `ls`'))
 @click.option('--path', help=("Path on the remote endpoint to list. "
                               "Defaults to the endpoint's default_directory"))
-def ls_command(path, recursive_depth_limit, recursive, long, endpoint_id):
+def ls_command(path, recursive_depth_limit, recursive, long, all, endpoint_id):
     """
     Executor for `globus transfer ls`
     """
@@ -100,7 +104,7 @@ def ls_command(path, recursive_depth_limit, recursive, long, endpoint_id):
     # get the `ls` result
     # note that `path` can be None
     res = _get_ls_res(client, path, endpoint_id, recursive,
-                      recursive_depth_limit)
+                      recursive_depth_limit, all)
 
     # and then print it, per formatting rules
     if outformat_is_json():
@@ -112,4 +116,4 @@ def ls_command(path, recursive_depth_limit, recursive, long, endpoint_id):
                           ('file type', 'type'), ('filename', 'name')])
     else:
         for item in res:
-            safeprint(item['name'])
+            safeprint(item['name'] + ('/' if item['type'] == 'dir' else ''))
