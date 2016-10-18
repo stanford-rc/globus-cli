@@ -116,4 +116,4 @@ def ls_command(path, recursive_depth_limit, recursive, long, all, endpoint_id):
                           ('file type', 'type'), ('filename', 'name')])
     else:
         for item in res:
-            safeprint(item['name'])
+            safeprint(item['name'] + ('/' if item['type'] == 'dir' else ''))
