@@ -35,8 +35,14 @@ def endpoint_create(endpoint_type, display_name, description, organization,
         myproxy_server=myproxy_server, myproxy_dn=myproxy_dn,
         oauth_server=oauth_server)
     if endpoint_type == 's3':
-        raise NotImplementedError(
-            'S3 Endpoints cannot be created through the new CLI yet.')
+        raise click.ClickException(
+            'At this time, S3-backed endpoints can only be created via the '
+            'legacy hosted Globus CLI.\n'
+            '\n'
+            'For more information, see:\n'
+            '- https://docs.globus.org/cli/using-the-cli\n'
+            '- https://docs.globus.org/how-to/amazon-aws-s3-endpoints'
+        )
     elif endpoint_type in ('globus-connect-personal', 'gcp'):
         ep_doc['is_globus_connect'] = True
     elif endpoint_type in ('globus-connect-server', 'gcs'):
