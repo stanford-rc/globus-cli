@@ -11,13 +11,17 @@ __all__ = [
     # option name constants
     'OUTPUT_FORMAT_OPTNAME',
     'AUTH_RT_OPTNAME',
+    'AUTH_AT_OPTNAME',
+    'AUTH_AT_EXPIRES_OPTNAME',
     'TRANSFER_RT_OPTNAME',
+    'TRANSFER_AT_OPTNAME',
+    'AUTH_AT_EXPIRES_OPTNAME',
 
     'internal_auth_client',
 
     'get_output_format',
-    'get_auth_refresh_token',
-    'get_transfer_refresh_token',
+    'get_auth_tokens',
+    'get_transfer_tokens',
 
     'write_option',
     'lookup_option',
@@ -35,7 +39,11 @@ ENV_CLIENT_ID_OPTNAME = 'cli_client_id'
 # constants for global use
 OUTPUT_FORMAT_OPTNAME = 'output_format'
 AUTH_RT_OPTNAME = 'auth_refresh_token'
+AUTH_AT_OPTNAME = 'auth_access_token'
+AUTH_AT_EXPIRES_OPTNAME = 'auth_access_token_expires'
 TRANSFER_RT_OPTNAME = 'transfer_refresh_token'
+TRANSFER_AT_OPTNAME = 'transfer_access_token'
+TRANSFER_AT_EXPIRES_OPTNAME = 'transfer_access_token_expires'
 
 # get the environment from env var (not exported)
 GLOBUS_ENV = os.environ.get('GLOBUS_SDK_ENVIRONMENT')
@@ -44,7 +52,13 @@ GLOBUS_ENV = os.environ.get('GLOBUS_SDK_ENVIRONMENT')
 # prefix
 if GLOBUS_ENV:
     AUTH_RT_OPTNAME = '{0}_auth_refresh_token'.format(GLOBUS_ENV)
+    AUTH_AT_OPTNAME = '{0}_auth_access_token'.format(GLOBUS_ENV)
+    AUTH_AT_EXPIRES_OPTNAME = '{0}_auth_access_token_expires'.format(
+        GLOBUS_ENV)
     TRANSFER_RT_OPTNAME = '{0}_transfer_refresh_token'.format(GLOBUS_ENV)
+    TRANSFER_AT_OPTNAME = '{0}_transfer_access_token'.format(GLOBUS_ENV)
+    TRANSFER_AT_EXPIRES_OPTNAME = '{0}_transfer_access_token_expires'.format(
+        GLOBUS_ENV)
 
 
 def _get_config_obj(system=False):
@@ -86,12 +100,38 @@ def get_output_format():
     return lookup_option(OUTPUT_FORMAT_OPTNAME)
 
 
-def get_auth_refresh_token():
-    return lookup_option(AUTH_RT_OPTNAME)
+def get_auth_tokens():
+    expires = lookup_option(AUTH_AT_EXPIRES_OPTNAME)
+    if expires is not None:
+        expires = int(expires)
+
+    return {
+        'refresh_token': lookup_option(AUTH_RT_OPTNAME),
+        'access_token': lookup_option(AUTH_AT_OPTNAME),
+        'access_token_expires': expires
+    }
 
 
-def get_transfer_refresh_token():
-    return lookup_option(TRANSFER_RT_OPTNAME)
+def set_auth_access_token(token, expires_at):
+    write_option(AUTH_AT_OPTNAME, token)
+    write_option(AUTH_AT_EXPIRES_OPTNAME, expires_at)
+
+
+def get_transfer_tokens():
+    expires = lookup_option(TRANSFER_AT_EXPIRES_OPTNAME)
+    if expires is not None:
+        expires = int(expires)
+
+    return {
+        'refresh_token': lookup_option(TRANSFER_RT_OPTNAME),
+        'access_token': lookup_option(TRANSFER_AT_OPTNAME),
+        'access_token_expires': expires
+    }
+
+
+def set_transfer_access_token(token, expires_at):
+    write_option(TRANSFER_AT_OPTNAME, token)
+    write_option(TRANSFER_AT_EXPIRES_OPTNAME, expires_at)
 
 
 def internal_auth_client():

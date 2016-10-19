@@ -1,18 +1,27 @@
 from globus_sdk import AuthClient, RefreshTokenAuthorizer
 
 from globus_cli import version
-from globus_cli.config import get_auth_refresh_token, internal_auth_client
+from globus_cli.config import (get_auth_tokens, internal_auth_client,
+                               set_auth_access_token)
 from globus_cli.helpers import is_valid_identity_name
 
 
+def _update_access_tokens(token_response):
+    tokens = token_response.by_resource_server['auth.globus.org']
+    set_auth_access_token(tokens['access_token'],
+                          tokens['expires_at_seconds'])
+
+
 def get_auth_client():
-    auth_rt = get_auth_refresh_token()
+    tokens = get_auth_tokens()
     authorizer = None
 
     # if there's a refresh token, use it to build the authorizer
-    if auth_rt is not None:
+    if tokens['refresh_token'] is not None:
         authorizer = RefreshTokenAuthorizer(
-            auth_rt, internal_auth_client())
+            tokens['refresh_token'], internal_auth_client(),
+            tokens['access_token'], tokens['access_token_expires'],
+            on_refresh=_update_access_tokens)
 
     client = AuthClient(authorizer=authorizer, app_name=version.app_name)
     return client
