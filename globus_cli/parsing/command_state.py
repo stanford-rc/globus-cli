@@ -1,3 +1,4 @@
+import warnings
 import click
 
 from globus_cli import config
@@ -45,11 +46,12 @@ def format_option(f):
 
 def debug_option(f):
     def callback(ctx, param, value):
-        # copied from click.decorators.version_option
-        # no idea what resilient_parsing means, but...
         if not value or ctx.resilient_parsing:
+            # turn off warnings altogether
+            warnings.simplefilter('ignore')
             return
 
+        warnings.simplefilter('default')
         state = ctx.ensure_object(CommandState)
         state.debug = True
         config.setup_debug_logging()
