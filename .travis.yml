@@ -14,3 +14,4 @@ install:
 cache: pip
 script:
   - flake8
+  - globus --help  # poor man's test: detect catastrophic parsing failures
