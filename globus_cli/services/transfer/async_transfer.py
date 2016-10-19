@@ -4,7 +4,7 @@ from globus_sdk import TransferData
 
 from globus_cli.parsing import (
     CaseInsensitiveChoice, common_options, submission_id_option,
-    EndpointPlusPath)
+    ENDPOINT_PLUS_OPTPATH)
 from globus_cli.helpers import (
     outformat_is_json, print_json_response, colon_formatted_print)
 
@@ -116,9 +116,9 @@ from globus_cli.services.transfer.activation import autoactivate
                     'Uses SOURCE_ENDPOINT_ID and DEST_ENDPOINT_ID as passed '
                     'on the commandline.'))
 @click.argument('source', metavar='SOURCE_ENDPOINT_ID[:SOURCE_PATH]',
-                type=EndpointPlusPath(path_required=False))
+                type=ENDPOINT_PLUS_OPTPATH)
 @click.argument('destination', metavar='DEST_ENDPOINT_ID[:DEST_PATH]',
-                type=EndpointPlusPath(path_required=False))
+                type=ENDPOINT_PLUS_OPTPATH)
 def async_transfer_command(batch, sync_level, recursive, destination, source,
                            label, preserve_mtime, verify_checksum, encrypt,
                            submission_id):

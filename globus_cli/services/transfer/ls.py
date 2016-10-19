@@ -1,16 +1,12 @@
 import click
 
 from globus_cli.safeio import safeprint
-from globus_cli.parsing import common_options, EndpointPlusPath
+from globus_cli.parsing import common_options, ENDPOINT_PLUS_OPTPATH
 from globus_cli.helpers import (
     outformat_is_json, print_json_response, print_table)
 
 from globus_cli.services.transfer.helpers import get_client
 from globus_cli.services.transfer.activation import autoactivate
-
-# we need to pull path_type.metavar because Argument.make_metavar()
-# behaves poorly even when a ParamType supplies get_metavar()
-path_type = EndpointPlusPath(path_required=False)
 
 
 class DummyLSIterable(dict):
@@ -80,8 +76,8 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth, show_hidden):
 @click.command('ls', help='List the contents of a directory on an Endpoint',
                short_help='List Endpoint directory contents')
 @common_options
-@click.argument('endpoint_plus_path', metavar=path_type.metavar,
-                type=path_type)
+@click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_OPTPATH.metavar,
+                type=ENDPOINT_PLUS_OPTPATH)
 @click.option('--all', '-a', is_flag=True,
               help=('Show files and directories that start with `.`'))
 @click.option('--long', is_flag=True,

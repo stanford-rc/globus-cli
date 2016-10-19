@@ -47,7 +47,7 @@ class EndpointPlusPath(click.ParamType):
         # split the value on the first colon, leave the rest intact
         splitval = value.split(':', 1)
         # first element is the endpoint_id
-        endpoint_id = splitval[0]
+        endpoint_id = click.UUID(splitval[0])
 
         # get the second element, defaulting to `None` if there was no colon in
         # the original value
@@ -63,3 +63,7 @@ class EndpointPlusPath(click.ParamType):
             self.fail('The path component is required', param=param)
 
         return (endpoint_id, path)
+
+
+ENDPOINT_PLUS_OPTPATH = EndpointPlusPath(path_required=False)
+ENDPOINT_PLUS_REQPATH = EndpointPlusPath(path_required=True)

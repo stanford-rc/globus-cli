@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import common_options, endpoint_id_option
+from globus_cli.parsing import common_options, endpoint_id_arg
 from globus_cli.helpers import print_table, outformat_is_json
 from globus_cli.services.transfer.helpers import (
     get_client, print_json_from_iterator)
@@ -8,7 +8,7 @@ from globus_cli.services.transfer.helpers import (
 
 @click.command('list', help='List all servers belonging to an Endpoint')
 @common_options
-@endpoint_id_option
+@endpoint_id_arg
 def server_list(endpoint_id):
     """
     Executor for `globus transfer endpoint server list`

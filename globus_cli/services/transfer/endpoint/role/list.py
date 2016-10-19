@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import common_options, endpoint_id_option
+from globus_cli.parsing import common_options, endpoint_id_arg
 from globus_cli.helpers import (
     outformat_is_json, print_json_response, print_table)
 
@@ -11,7 +11,7 @@ from globus_cli.services.transfer.helpers import get_client
 
 @click.command('list', help='List of assigned Roles on an Endpoint')
 @common_options
-@endpoint_id_option
+@endpoint_id_arg
 def role_list(endpoint_id):
     """
     Executor for `globus transfer access endpoint-role-list`

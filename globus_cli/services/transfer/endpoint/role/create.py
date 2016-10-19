@@ -2,7 +2,7 @@ import click
 
 from globus_cli.safeio import safeprint
 from globus_cli.parsing import (
-    CaseInsensitiveChoice, common_options, endpoint_id_option)
+    CaseInsensitiveChoice, common_options, endpoint_id_arg)
 from globus_cli.helpers import outformat_is_json, print_json_response
 
 from globus_cli.services.auth import maybe_lookup_identity_id
@@ -13,7 +13,7 @@ from globus_cli.services.transfer.helpers import (
 
 @click.command('create', help='Create a Role on an Endpoint')
 @common_options
-@endpoint_id_option
+@endpoint_id_arg
 @click.option('--principal-type', required=True,
               type=CaseInsensitiveChoice(('identity', 'group')),
               help='Type of entity to set a role on')

@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import common_options, endpoint_id_option
+from globus_cli.parsing import common_options, endpoint_id_arg
 from globus_cli.helpers import (
     outformat_is_json, print_table, print_json_response)
 from globus_cli.services.auth import lookup_identity_name
@@ -9,7 +9,7 @@ from globus_cli.services.transfer.helpers import get_client
 
 @click.command('list', help='List of Access Control List rules on an Endpoint')
 @common_options
-@endpoint_id_option
+@endpoint_id_arg
 def acl_list(endpoint_id):
     """
     Executor for `globus transfer acl list`
