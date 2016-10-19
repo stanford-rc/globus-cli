@@ -60,7 +60,7 @@ def debug_option(f):
 
 
 def map_http_status_option(f):
-    exit_stat_set = [0, 1] + range(50, 100)
+    exit_stat_set = [0, 1] + list(range(50, 100))
 
     def per_val_callback(ctx, value):
         if value is None:
