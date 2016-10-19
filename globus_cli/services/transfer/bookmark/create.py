@@ -21,7 +21,7 @@ def bookmark_create(name, endpoint_plus_path):
     client = get_client()
 
     submit_data = {
-        'endpoint_id': endpoint_id,
+        'endpoint_id': str(endpoint_id),
         'path': path,
         'name': name
     }
