@@ -114,6 +114,8 @@ from globus_cli.services.transfer.activation import autoactivate
 @click.option('--verify-checksum/--no-verify-checksum', default=True,
               show_default=True,
               help=('Verify checksum after transfer.'))
+@click.option('--encrypt', is_flag=True, default=False,
+              help=('Encrypt data sent through the network.'))
 @click.option('--batch', is_flag=True,
               help=('Accept a batch of source/dest path pairs on stdin (i.e. '
                     'run in batchmode). '
@@ -121,7 +123,7 @@ from globus_cli.services.transfer.activation import autoactivate
                     'the commandline.'))
 def async_transfer_command(batch, sync_level, recursive, dest_path,
                            source_path, dest_endpoint, source_endpoint,
-                           label, preserve_mtime, verify_checksum,
+                           label, preserve_mtime, verify_checksum, encrypt,
                            submission_id):
     """
     Executor for `globus transfer async-transfer`
@@ -140,7 +142,7 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
     transfer_data = TransferData(
         client, source_endpoint, dest_endpoint,
         label=label, sync_level=sync_level, verify_checksum=verify_checksum,
-        preserve_timestamp=preserve_mtime)
+        preserve_timestamp=preserve_mtime, encrypt_data=encrypt)
 
     if batch:
         @click.command()
