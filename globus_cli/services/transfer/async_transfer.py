@@ -77,6 +77,9 @@ from globus_cli.services.transfer.activation import autoactivate
     EXISTS: Determine whether or not to transfer based on file existence.
     If the destination file is absent, do the transfer.
 
+    SIZE: Determine whether or not to transfer based on the size of the file.
+    If destination file size does not match the source, do the transfer.
+
     MTIME: Determine whether or not to transfer based on modification times.
     If source has a newer modififed time than the destination, do the transfer.
 
