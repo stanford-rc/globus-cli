@@ -21,6 +21,7 @@ from globus_cli.services.transfer.activation import autoactivate
 @endpoint_id_option(help='ID of the Endpoint from which to delete file(s)')
 @click.option('--path', help='Path to the file/dir to delete')
 @click.option('--recursive', is_flag=True, help='Recursively delete dirs')
+@click.option('--label', default=None, help=('Set a label for this task'))
 @click.option('--ignore-missing', is_flag=True,
               help="Don't throw errors if the file or dir is absent")
 @click.option('--batch', is_flag=True,
@@ -28,7 +29,7 @@ from globus_cli.services.transfer.activation import autoactivate
                     'batchmode). Uses --endpoint-id as passed on the '
                     'commandline.'))
 def async_delete_command(batch, ignore_missing, recursive, path, endpoint_id,
-                         submission_id):
+                         label, submission_id):
     """
     Executor for `globus transfer async-delete`
     """
@@ -43,7 +44,7 @@ def async_delete_command(batch, ignore_missing, recursive, path, endpoint_id,
     autoactivate(client, endpoint_id, if_expires_in=60)
 
     delete_data = DeleteData(client, endpoint_id,
-                             label='globus-cli delete',
+                             label=label,
                              recursive=recursive,
                              ignore_missing=ignore_missing)
 
