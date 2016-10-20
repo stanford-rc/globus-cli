@@ -1,3 +1,4 @@
+import uuid
 import json
 import sys
 import shlex
@@ -54,9 +55,11 @@ def endpoint_list_to_text(iterator):
 
 def assemble_generic_doc(datatype, **kwargs):
     doc = {'DATA_TYPE': datatype}
-    for argname in kwargs:
-        if kwargs[argname] is not None:
-            doc[argname] = kwargs[argname]
+    for key, val in kwargs.items():
+        if isinstance(val, uuid.UUID):
+            val = str(val)
+        if val is not None:
+            doc[key] = val
     return doc
 
 
