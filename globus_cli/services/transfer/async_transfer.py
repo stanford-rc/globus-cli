@@ -106,6 +106,8 @@ from globus_cli.services.transfer.activation import autoactivate
                   ("exists", "size", "mtime", "checksum")),
               help=('How will the Transfer Task determine whether or not to '
                     'actually transfer a file over the network?'))
+@click.option('--preserve-mtime', is_flag=True, default=False,
+              help=('Preserve file and directory modification times.'))
 @click.option('--verify-checksum/--no-verify-checksum', default=True,
               show_default=True,
               help=('Verify checksum after transfer.'))
@@ -116,7 +118,8 @@ from globus_cli.services.transfer.activation import autoactivate
                     'the commandline.'))
 def async_transfer_command(batch, sync_level, recursive, dest_path,
                            source_path, dest_endpoint, source_endpoint,
-                           label, verify_checksum, submission_id):
+                           label, preserve_mtime, verify_checksum,
+                           submission_id):
     """
     Executor for `globus transfer async-transfer`
     """
@@ -133,7 +136,8 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
     client = get_client()
     transfer_data = TransferData(
         client, source_endpoint, dest_endpoint,
-        label=label, sync_level=sync_level, verify_checksum=verify_checksum)
+        label=label, sync_level=sync_level, verify_checksum=verify_checksum,
+        preserve_timestamp=preserve_mtime)
 
     if batch:
         @click.command()
