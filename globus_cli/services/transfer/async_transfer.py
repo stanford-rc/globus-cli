@@ -101,11 +101,14 @@ from globus_cli.services.transfer.activation import autoactivate
               help=('source-path and dest-path are both directories, do a '
                     'recursive dir transfer. Ignored in batchmode'))
 @click.option('--label', default=None, help=('Set a label for this task.'))
-@click.option('--sync-level', default="mtime", show_default=True,
+@click.option('--sync-level', default=None, show_default=True,
               type=CaseInsensitiveChoice(
                   ("exists", "size", "mtime", "checksum")),
               help=('How will the Transfer Task determine whether or not to '
                     'actually transfer a file over the network?'))
+@click.option('--verify-checksum/--no-verify-checksum', default=True,
+              show_default=True,
+              help=('Verify checksum after transfer.'))
 @click.option('--batch', is_flag=True,
               help=('Accept a batch of source/dest path pairs on stdin (i.e. '
                     'run in batchmode). '
@@ -113,7 +116,7 @@ from globus_cli.services.transfer.activation import autoactivate
                     'the commandline.'))
 def async_transfer_command(batch, sync_level, recursive, dest_path,
                            source_path, dest_endpoint, source_endpoint,
-                           label, submission_id):
+                           label, verify_checksum, submission_id):
     """
     Executor for `globus transfer async-transfer`
     """
@@ -130,7 +133,7 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
     client = get_client()
     transfer_data = TransferData(
         client, source_endpoint, dest_endpoint,
-        label=label, sync_level=sync_level)
+        label=label, sync_level=sync_level, verify_checksum=verify_checksum)
 
     if batch:
         @click.command()
