@@ -1,7 +1,7 @@
 import click
 
 from globus_cli.parsing import (
-    CaseInsensitiveChoice, common_options, ENDPOINT_PLUS_OPTPATH)
+    CaseInsensitiveChoice, common_options, ENDPOINT_PLUS_REQPATH)
 from globus_cli.helpers import print_json_response
 
 from globus_cli.services.auth import maybe_lookup_identity_id
@@ -23,8 +23,8 @@ from globus_cli.services.transfer.helpers import (
               type=CaseInsensitiveChoice(('identity', 'group', 'anonymous',
                                           'all_authenticated_users')),
               help='Principal type to grant permissions to')
-@click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_OPTPATH.metavar,
-                type=ENDPOINT_PLUS_OPTPATH)
+@click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_REQPATH.metavar,
+                type=ENDPOINT_PLUS_REQPATH)
 def add_acl_rule(principal_type, principal, permissions, endpoint_plus_path):
     """
     Executor for `globus transfer acl add-rule`
