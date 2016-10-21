@@ -2,14 +2,14 @@ import click
 import sys
 
 from globus_cli.safeio import safeprint
-from globus_cli.parsing import HiddenOption, common_options, task_id_option
+from globus_cli.parsing import HiddenOption, common_options, task_id_arg
 
 from globus_cli.services.transfer.helpers import get_client
 
 
 @click.command('wait', help='Wait for a Task to complete')
 @common_options
-@task_id_option(helptext='ID of the Task to wait on')
+@task_id_arg
 @click.option('--timeout', type=int, metavar='N',
               help=('Wait N seconds. If the Task does not terminate by '
                     'then, exit with status 0'))
