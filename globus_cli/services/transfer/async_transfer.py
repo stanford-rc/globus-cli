@@ -1,3 +1,4 @@
+import json
 import click
 
 from globus_sdk import TransferData
@@ -5,6 +6,7 @@ from globus_sdk import TransferData
 from globus_cli.parsing import (
     CaseInsensitiveChoice, common_options, submission_id_option,
     ENDPOINT_PLUS_OPTPATH)
+from globus_cli.safeio import safeprint
 from globus_cli.helpers import (
     outformat_is_json, print_json_response, colon_formatted_print)
 
@@ -94,6 +96,9 @@ from globus_cli.services.transfer.activation import autoactivate
     """))
 @common_options
 @submission_id_option
+@click.option('--dry-run', is_flag=True,
+              help=("Don't actually perform the transfer, print submission "
+                    "data instead"))
 @click.option('--recursive', is_flag=True,
               help=('source-path and dest-path are both directories, do a '
                     'recursive dir transfer. Ignored in batchmode'))
@@ -121,7 +126,7 @@ from globus_cli.services.transfer.activation import autoactivate
                 type=ENDPOINT_PLUS_OPTPATH)
 def async_transfer_command(batch, sync_level, recursive, destination, source,
                            label, preserve_mtime, verify_checksum, encrypt,
-                           submission_id):
+                           submission_id, dry_run):
     """
     Executor for `globus transfer async-transfer`
     """
@@ -162,6 +167,12 @@ def async_transfer_command(batch, sync_level, recursive, destination, source,
 
     if submission_id is not None:
         transfer_data['submission_id'] = submission_id
+
+    if dry_run:
+        # don't bother dispatching out output format -- just print as JSON
+        safeprint(json.dumps(transfer_data, indent=2))
+        # exit safely
+        return
 
     # autoactivate after parsing all args and putting things together
     autoactivate(client, source_endpoint, if_expires_in=60)

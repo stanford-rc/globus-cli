@@ -1,3 +1,4 @@
+import json
 import click
 
 from globus_sdk import DeleteData
@@ -5,6 +6,7 @@ from globus_sdk import DeleteData
 
 from globus_cli.parsing import (
     common_options, submission_id_option, ENDPOINT_PLUS_OPTPATH)
+from globus_cli.safeio import safeprint
 from globus_cli.helpers import (
     outformat_is_json, print_json_response, colon_formatted_print)
 
@@ -18,6 +20,9 @@ from globus_cli.services.transfer.activation import autoactivate
                      'asynchronous task.'))
 @common_options
 @submission_id_option
+@click.option('--dry-run', is_flag=True,
+              help=("Don't actually perform the delete, print submission "
+                    "data instead"))
 @click.option('--recursive', is_flag=True, help='Recursively delete dirs')
 @click.option('--label', default=None, help=('Set a label for this task'))
 @click.option('--ignore-missing', is_flag=True,
@@ -29,7 +34,7 @@ from globus_cli.services.transfer.activation import autoactivate
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_OPTPATH.metavar,
                 type=ENDPOINT_PLUS_OPTPATH)
 def async_delete_command(batch, ignore_missing, recursive, endpoint_plus_path,
-                         label, submission_id):
+                         label, submission_id, dry_run):
     """
     Executor for `globus transfer async-delete`
     """
@@ -67,6 +72,12 @@ def async_delete_command(batch, ignore_missing, recursive, endpoint_plus_path,
 
     if submission_id is not None:
         delete_data['submission_id'] = submission_id
+
+    if dry_run:
+        # don't bother dispatching out output format -- just print as JSON
+        safeprint(json.dumps(delete_data, indent=2))
+        # exit safely
+        return
 
     res = client.submit_delete(delete_data)
 
