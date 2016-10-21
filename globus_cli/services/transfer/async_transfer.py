@@ -77,6 +77,9 @@ from globus_cli.services.transfer.activation import autoactivate
     EXISTS: Determine whether or not to transfer based on file existence.
     If the destination file is absent, do the transfer.
 
+    SIZE: Determine whether or not to transfer based on the size of the file.
+    If destination file size does not match the source, do the transfer.
+
     MTIME: Determine whether or not to transfer based on modification times.
     If source has a newer modififed time than the destination, do the transfer.
 
@@ -100,11 +103,19 @@ from globus_cli.services.transfer.activation import autoactivate
 @click.option('--recursive', is_flag=True,
               help=('source-path and dest-path are both directories, do a '
                     'recursive dir transfer. Ignored in batchmode'))
-@click.option('--sync-level', default="mtime", show_default=True,
+@click.option('--label', default=None, help=('Set a label for this task.'))
+@click.option('--sync-level', default=None, show_default=True,
               type=CaseInsensitiveChoice(
                   ("exists", "size", "mtime", "checksum")),
               help=('How will the Transfer Task determine whether or not to '
                     'actually transfer a file over the network?'))
+@click.option('--preserve-mtime', is_flag=True, default=False,
+              help=('Preserve file and directory modification times.'))
+@click.option('--verify-checksum/--no-verify-checksum', default=True,
+              show_default=True,
+              help=('Verify checksum after transfer.'))
+@click.option('--encrypt', is_flag=True, default=False,
+              help=('Encrypt data sent through the network.'))
 @click.option('--batch', is_flag=True,
               help=('Accept a batch of source/dest path pairs on stdin (i.e. '
                     'run in batchmode). '
@@ -112,6 +123,7 @@ from globus_cli.services.transfer.activation import autoactivate
                     'the commandline.'))
 def async_transfer_command(batch, sync_level, recursive, dest_path,
                            source_path, dest_endpoint, source_endpoint,
+                           label, preserve_mtime, verify_checksum, encrypt,
                            submission_id):
     """
     Executor for `globus transfer async-transfer`
@@ -129,7 +141,8 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
     client = get_client()
     transfer_data = TransferData(
         client, source_endpoint, dest_endpoint,
-        label='globus-cli transfer', sync_level=sync_level)
+        label=label, sync_level=sync_level, verify_checksum=verify_checksum,
+        preserve_timestamp=preserve_mtime, encrypt_data=encrypt)
 
     if batch:
         @click.command()
