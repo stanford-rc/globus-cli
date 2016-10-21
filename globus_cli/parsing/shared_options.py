@@ -231,20 +231,18 @@ def submission_id_option(f):
     return f
 
 
-def role_id_option(f):
+def role_id_arg(f):
     """
-    Unmodifiable `--role-id` option for Transfer Endpoint Role management.
+    Unmodifiable `ROLE_ID` argument for Transfer Endpoint Role management.
     """
-    f = click.option('--role-id', required=True, help='ID of the Role')(f)
-    return f
+    return click.argument('role_id')(f)
 
 
-def server_id_option(f):
+def server_id_arg(f):
     """
-    Unmodifiable `--server-id` option for Transfer Endpoint Server management.
+    Unmodifiable `SERVER_ID` argument for Transfer Endpoint Server management.
     """
-    f = click.option('--server-id', required=True, help='ID of the Server')(f)
-    return f
+    return click.argument('server_id')(f)
 
 
 def server_add_and_update_opts(*args, **kwargs):
