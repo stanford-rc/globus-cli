@@ -9,11 +9,10 @@ from globus_cli.services.transfer.helpers import get_client
 
 @click.command('create', help='Create a Bookmark for the current user')
 @common_options
-@click.option('--name', required=True,
-              help='Name for the Bookmark')
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_REQPATH.metavar,
                 type=ENDPOINT_PLUS_REQPATH)
-def bookmark_create(name, endpoint_plus_path):
+@click.argument('bookmark_name')
+def bookmark_create(endpoint_plus_path, bookmark_name):
     """
     Executor for `globus transfer bookmark create`
     """
@@ -23,7 +22,7 @@ def bookmark_create(name, endpoint_plus_path):
     submit_data = {
         'endpoint_id': str(endpoint_id),
         'path': path,
-        'name': name
+        'name': bookmark_name
     }
 
     res = client.create_bookmark(submit_data)

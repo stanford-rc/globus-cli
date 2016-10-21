@@ -9,7 +9,7 @@ from globus_cli.services.transfer.helpers import get_client
 
 @click.command('delete', help='Delete a Bookmark')
 @common_options
-@click.option('--bookmark-id', required=True, help='ID of the Bookmark')
+@click.argument('bookmark_id')
 def bookmark_delete(bookmark_id):
     """
     Executor for `globus transfer bookmark delete`

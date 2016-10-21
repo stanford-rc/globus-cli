@@ -9,16 +9,16 @@ from globus_cli.services.transfer.helpers import get_client
 
 @click.command('rename', help='Change a Bookmark\'s name')
 @common_options
-@click.option('--bookmark-id', required=True, help='ID of the Bookmark')
-@click.option('--name', required=True, help='New name for the Bookmark')
-def bookmark_rename(name, bookmark_id):
+@click.argument('bookmark_id')
+@click.argument('new_bookmark_name')
+def bookmark_rename(bookmark_id, new_bookmark_name):
     """
     Executor for `globus transfer bookmark rename`
     """
     client = get_client()
 
     submit_data = {
-        'name': name
+        'name': new_bookmark_name
     }
 
     res = client.update_bookmark(bookmark_id, submit_data)
