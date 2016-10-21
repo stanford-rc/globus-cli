@@ -99,8 +99,7 @@ def common_options(*args, **kwargs):
     # will probably confuse someone in the future when their arguments are
     # silently discarded
     elif len(args) != 0:
-        raise ValueError(
-            'common_options() cannot take positional args')
+        raise ValueError('common_options() cannot take positional args')
 
     # final case: got 0 or more kwargs, no positionals
     # do the function-which-returns-a-decorator dance to produce a
@@ -111,21 +110,22 @@ def common_options(*args, **kwargs):
         return inner_decorator
 
 
-def endpoint_id_option(*args, **kwargs):
+def endpoint_id_arg(*args, **kwargs):
     """
-    This is the `--endpoint-id` option consumed by many Transfer endpoint
-    related operations. It accepts variable helptext, but can also be applied
-    as a direct decorator.
+    This is the `ENDPOINT_ID` argument consumed by many Transfer endpoint
+    related operations. It accepts alternate metavars for cases when another
+    name is desirable (e.x. `SHARE_ID`, `HOST_ENDPOINT_ID`), but can also be
+    applied as a direct decorator if no specialized metavar is being passed.
 
     Usage:
 
-    >>> @endpoint_id_option
+    >>> @endpoint_id_arg
     >>> def command_func(endpoint_id):
     >>>     ...
 
     or
 
-    >>> @endpoint_id_option(help='ID of the Share')
+    >>> @endpoint_id_arg(metavar='HOST_ENDPOINT_ID')
     >>> def command_func(endpoint_id):
     >>>     ...
     """
@@ -134,8 +134,8 @@ def endpoint_id_option(*args, **kwargs):
         Work of actually decorating a function -- wrapped in here because we
         want to dispatch depending on how this is invoked
         """
-        help = kwargs.get('help', 'ID of the Endpoint')
-        f = click.option('--endpoint-id', required=True, help=help)(f)
+        metavar = kwargs.get('metavar', 'ENDPOINT_ID')
+        f = click.argument('endpoint_id', metavar=metavar, type=click.UUID)(f)
         return f
 
     # special behavior when invoked with only one non-keyword argument: act as
@@ -149,8 +149,7 @@ def endpoint_id_option(*args, **kwargs):
     # will probably confuse someone in the future when their arguments are
     # silently discarded
     elif len(args) != 0:
-        raise ValueError(
-            'endpoint_id_option() cannot take positional args')
+        raise ValueError('endpoint_id_arg() cannot take positional args')
 
     # final case: got 0 or more kwargs, no positionals
     # do the function-which-returns-a-decorator dance to produce a

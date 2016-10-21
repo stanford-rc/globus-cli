@@ -3,7 +3,8 @@ import click
 from globus_sdk import TransferData
 
 from globus_cli.parsing import (
-    CaseInsensitiveChoice, common_options, submission_id_option)
+    CaseInsensitiveChoice, common_options, submission_id_option,
+    ENDPOINT_PLUS_OPTPATH)
 from globus_cli.helpers import (
     outformat_is_json, print_json_response, colon_formatted_print)
 
@@ -28,7 +29,7 @@ from globus_cli.services.transfer.activation import autoactivate
     Single-item has behavior similar to `cp` and `cp -r`, across endpoints of
     course.
 
-    It is the behavior you get if you use `--source-path` and `--dest-path`.
+    It is the behavior you get if you use `SOURCE_PATH` and `DEST_PATH`.
 
     ---
 
@@ -62,6 +63,9 @@ from globus_cli.services.transfer.activation import autoactivate
             --batch --sync-level checksum \\
             --source-endpoint "..." --dest-endpoint "..."
 
+    You can use `--batch` in addition to a single SOURCE_PATH, DEST_PATH pair
+    given in the commandline.
+
     \b
     Sync Levels
     ===
@@ -90,16 +94,6 @@ from globus_cli.services.transfer.activation import autoactivate
     """))
 @common_options
 @submission_id_option
-@click.option('--source-endpoint', required=True,
-              help='ID of the Endpoint from which to transfer')
-@click.option('--dest-endpoint', required=True,
-              help='ID of the Endpoint to which to transfer')
-@click.option('--source-path',
-              help=('Path to the file/dir to move on source-endpoint in '
-                    'single-item mode'))
-@click.option('--dest-path',
-              help=('Desired location of the file/dir on dest-endpoint in '
-                    'single-item mode'))
 @click.option('--recursive', is_flag=True,
               help=('source-path and dest-path are both directories, do a '
                     'recursive dir transfer. Ignored in batchmode'))
@@ -119,24 +113,25 @@ from globus_cli.services.transfer.activation import autoactivate
 @click.option('--batch', is_flag=True,
               help=('Accept a batch of source/dest path pairs on stdin (i.e. '
                     'run in batchmode). '
-                    'Uses --source-endpoint and --dest-endpoint as passed on '
-                    'the commandline.'))
-def async_transfer_command(batch, sync_level, recursive, dest_path,
-                           source_path, dest_endpoint, source_endpoint,
+                    'Uses SOURCE_ENDPOINT_ID and DEST_ENDPOINT_ID as passed '
+                    'on the commandline.'))
+@click.argument('source', metavar='SOURCE_ENDPOINT_ID[:SOURCE_PATH]',
+                type=ENDPOINT_PLUS_OPTPATH)
+@click.argument('destination', metavar='DEST_ENDPOINT_ID[:DEST_PATH]',
+                type=ENDPOINT_PLUS_OPTPATH)
+def async_transfer_command(batch, sync_level, recursive, destination, source,
                            label, preserve_mtime, verify_checksum, encrypt,
                            submission_id):
     """
     Executor for `globus transfer async-transfer`
     """
+    source_endpoint, source_path = source
+    dest_endpoint, dest_path = destination
+
     if (source_path is None or dest_path is None) and (not batch):
         raise click.UsageError(
-            ('async-transfer requires either --source-path and --dest-path OR '
+            ('async-transfer requires either SOURCE_PATH and DEST_PATH or '
              '--batch'))
-    if ((source_path is not None and batch) or
-            (dest_path is not None and batch)):
-        raise click.UsageError(
-            ('async-transfer cannot take --batch in addition to --source-path '
-             'or --dest-path'))
 
     client = get_client()
     transfer_data = TransferData(
@@ -144,6 +139,9 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
         label=label, sync_level=sync_level, verify_checksum=verify_checksum,
         preserve_timestamp=preserve_mtime, encrypt_data=encrypt)
 
+    if source_path and dest_path:
+        transfer_data.add_item(source_path, dest_path,
+                               recursive=recursive)
     if batch:
         @click.command()
         @click.option('--recursive', is_flag=True)
@@ -161,9 +159,6 @@ def async_transfer_command(batch, sync_level, recursive, dest_path,
             process_batch_line,
             ('Enter transfers, line by line, as\n\n'
              '    [--recursive] source-path dest-path\n'))
-    else:
-        transfer_data.add_item(source_path, dest_path,
-                               recursive=recursive)
 
     if submission_id is not None:
         transfer_data['submission_id'] = submission_id

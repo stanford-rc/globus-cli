@@ -1,7 +1,7 @@
 import click
 
 from globus_cli.parsing import (
-    common_options, endpoint_id_option, role_id_option)
+    common_options, endpoint_id_arg, role_id_option)
 from globus_cli.helpers import (
     outformat_is_json, print_json_response, colon_formatted_print)
 
@@ -12,8 +12,8 @@ from globus_cli.services.transfer.helpers import get_client
 
 @click.command('show', help='Show full info for a Role on an Endpoint')
 @common_options
-@endpoint_id_option
 @role_id_option
+@endpoint_id_arg
 def role_show(role_id, endpoint_id):
     """
     Executor for `globus transfer endpoint role show`

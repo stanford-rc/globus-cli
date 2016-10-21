@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import common_options, endpoint_id_option
+from globus_cli.parsing import common_options, endpoint_id_arg
 from globus_cli.helpers import (
     outformat_is_json, print_json_response, colon_formatted_print)
 
@@ -9,7 +9,7 @@ from globus_cli.services.transfer.helpers import get_client
 
 @click.command('show', help='Display a detailed Endpoint definition')
 @common_options
-@endpoint_id_option
+@endpoint_id_arg
 def endpoint_show(endpoint_id):
     """
     Executor for `globus transfer endpoint show`

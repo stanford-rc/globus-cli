@@ -2,7 +2,7 @@ import click
 
 from globus_cli.safeio import safeprint
 from globus_cli.parsing import (
-    common_options, endpoint_id_option, server_add_and_update_opts)
+    common_options, endpoint_id_arg, server_add_and_update_opts)
 from globus_cli.helpers import print_json_response, outformat_is_json
 
 from globus_cli.services.transfer.helpers import (
@@ -12,7 +12,7 @@ from globus_cli.services.transfer.helpers import (
 @click.command('add', help='Add a server to an Endpoint')
 @common_options
 @server_add_and_update_opts(add=True)
-@endpoint_id_option
+@endpoint_id_arg
 def server_add(endpoint_id, subject, port, scheme, hostname):
     """
     Executor for `globus transfer endpoint server add`

@@ -1,7 +1,7 @@
 import click
 
 from globus_cli.safeio import safeprint
-from globus_cli.parsing import common_options, endpoint_id_option
+from globus_cli.parsing import common_options, ENDPOINT_PLUS_OPTPATH
 from globus_cli.helpers import (
     outformat_is_json, print_json_response, print_table)
 
@@ -76,7 +76,8 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth, show_hidden):
 @click.command('ls', help='List the contents of a directory on an Endpoint',
                short_help='List Endpoint directory contents')
 @common_options
-@endpoint_id_option
+@click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_OPTPATH.metavar,
+                type=ENDPOINT_PLUS_OPTPATH)
 @click.option('--all', '-a', is_flag=True,
               help=('Show files and directories that start with `.`'))
 @click.option('--long', is_flag=True,
@@ -90,12 +91,13 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth, show_hidden):
               help=('Limit to number of directories to traverse in '
                     '`--recursive` listings. A value of 0 indicates that '
                     'this should behave like a non-recursive `ls`'))
-@click.option('--path', help=("Path on the remote endpoint to list. "
-                              "Defaults to the endpoint's default_directory"))
-def ls_command(path, recursive_depth_limit, recursive, long, all, endpoint_id):
+def ls_command(endpoint_plus_path, recursive_depth_limit,
+               recursive, long, all):
     """
     Executor for `globus transfer ls`
     """
+    endpoint_id, path = endpoint_plus_path
+
     # do autoactivation before the `ls` call so that recursive invocations
     # won't do this repeatedly, and won't have to instantiate new clients
     client = get_client()

@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import common_options, endpoint_id_option
+from globus_cli.parsing import common_options, endpoint_id_arg
 from globus_cli.helpers import print_json_response
 
 from globus_cli.services.transfer.helpers import get_client
@@ -8,7 +8,7 @@ from globus_cli.services.transfer.helpers import get_client
 
 @click.command('deactivate', help='Deactivate an Endpoint')
 @common_options
-@endpoint_id_option
+@endpoint_id_arg
 def endpoint_deactivate(endpoint_id):
     """
     Executor for `globus transfer endpoint deactivate`

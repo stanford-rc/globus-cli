@@ -1,7 +1,7 @@
 import click
 
 from globus_cli.parsing import (
-    CaseInsensitiveChoice, common_options, endpoint_id_option)
+    CaseInsensitiveChoice, common_options, ENDPOINT_PLUS_REQPATH)
 from globus_cli.helpers import print_json_response
 
 from globus_cli.services.auth import maybe_lookup_identity_id
@@ -12,7 +12,6 @@ from globus_cli.services.transfer.helpers import (
 
 @click.command('add-rule', help='Add an ACL rule')
 @common_options
-@endpoint_id_option
 @click.option('--permissions', required=True,
               type=CaseInsensitiveChoice(('r', 'rw')),
               help='Permissions to add. Read-Only or Read/Write')
@@ -24,12 +23,13 @@ from globus_cli.services.transfer.helpers import (
               type=CaseInsensitiveChoice(('identity', 'group', 'anonymous',
                                           'all_authenticated_users')),
               help='Principal type to grant permissions to')
-@click.option('--path', required=True,
-              help='Path on which the rule grants permissions')
-def add_acl_rule(path, principal_type, principal, permissions, endpoint_id):
+@click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_REQPATH.metavar,
+                type=ENDPOINT_PLUS_REQPATH)
+def add_acl_rule(principal_type, principal, permissions, endpoint_plus_path):
     """
     Executor for `globus transfer acl add-rule`
     """
+    endpoint_id, path = endpoint_plus_path
     client = get_client()
 
     if principal_type == 'identity':

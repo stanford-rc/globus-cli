@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import common_options, endpoint_id_option
+from globus_cli.parsing import common_options, endpoint_id_arg
 from globus_cli.helpers import outformat_is_json
 
 from globus_cli.services.transfer.helpers import (
@@ -11,7 +11,7 @@ from globus_cli.services.transfer.helpers import (
     'my-shared-endpoint-list',
     help='List all Shared Endpoints on an Endpoint by the current user')
 @common_options
-@endpoint_id_option
+@endpoint_id_arg
 def my_shared_endpoint_list(endpoint_id):
     """
     Executor for `globus transfer endpoint my-shared-endpoint-list`
