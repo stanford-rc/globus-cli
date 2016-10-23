@@ -1,8 +1,10 @@
 from globus_cli.parsing.main_command_decorator import globus_main_func
 
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
+from globus_cli.parsing.task_path import TaskPath
 from globus_cli.parsing.endpoint_plus_path import (
-    EndpointPlusPath, ENDPOINT_PLUS_OPTPATH, ENDPOINT_PLUS_REQPATH)
+    ENDPOINT_PLUS_OPTPATH, ENDPOINT_PLUS_REQPATH)
+
 from globus_cli.parsing.hidden_option import HiddenOption
 
 from globus_cli.parsing.shared_options import (
@@ -16,7 +18,9 @@ __all__ = [
     'globus_main_func',
 
     'CaseInsensitiveChoice',
-    'EndpointPlusPath', 'ENDPOINT_PLUS_OPTPATH', 'ENDPOINT_PLUS_REQPATH',
+    'ENDPOINT_PLUS_OPTPATH', 'ENDPOINT_PLUS_REQPATH',
+    'TaskPath',
+
     'HiddenOption',
 
     'common_options',

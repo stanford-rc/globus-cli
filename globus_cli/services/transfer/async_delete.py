@@ -5,7 +5,7 @@ from globus_sdk import DeleteData
 
 
 from globus_cli.parsing import (
-    common_options, submission_id_option, ENDPOINT_PLUS_OPTPATH)
+    common_options, submission_id_option, TaskPath, ENDPOINT_PLUS_OPTPATH)
 from globus_cli.safeio import safeprint
 from globus_cli.helpers import (
     outformat_is_json, print_json_response, colon_formatted_print)
@@ -30,7 +30,8 @@ from globus_cli.services.transfer.activation import autoactivate
 @click.option('--batch', is_flag=True,
               help=('Accept a batch of paths on stdin (i.e. run in '
                     'batchmode). Uses ENDPOINT_ID as passed on the '
-                    'commandline, and includes any commandline PATH given'))
+                    'commandline. Any commandline PATH given will be used as '
+                    'a prefix to all paths given'))
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_OPTPATH.metavar,
                 type=ENDPOINT_PLUS_OPTPATH)
 def async_delete_command(batch, ignore_missing, recursive, endpoint_plus_path,
@@ -51,24 +52,23 @@ def async_delete_command(batch, ignore_missing, recursive, endpoint_plus_path,
                              recursive=recursive,
                              ignore_missing=ignore_missing)
 
-    if path:
-        delete_data.add_item(path)
-
     if batch:
         # although this sophisticated structure (like that in async-transfer)
         # isn't strictly necessary, it gives us the ability to add options in
         # the future to these lines with trivial modifications
         @click.command()
-        @click.argument('path')
+        @click.argument('path', type=TaskPath(base_dir=path))
         def process_batch_line(path):
             """
             Parse a line of batch input and add it to the delete submission
             item.
             """
-            delete_data.add_item(path)
+            delete_data.add_item(str(path))
 
         shlex_process_stdin(
             process_batch_line, 'Enter paths to delete, line by line.')
+    else:
+        delete_data.add_item(path)
 
     if submission_id is not None:
         delete_data['submission_id'] = submission_id
