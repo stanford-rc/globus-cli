@@ -42,8 +42,14 @@ def cancel_task(all, task_id):
             raise click.ClickException('You have no in-progress tasks.')
 
         if outformat_is_json():
-            safeprint(json.dumps([client.cancel_task(task_id).data
-                                  for task_id in task_ids], indent=2))
+            safeprint(json.dumps(
+                {
+                    'results': [client.cancel_task(task_id).data
+                                for task_id in task_ids],
+                    'task_ids': task_ids,
+                },
+                indent=2,
+            ))
 
         else:
             task_count = len(task_ids)
