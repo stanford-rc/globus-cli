@@ -36,7 +36,7 @@ from globus_cli.services.transfer.activation import autoactivate
     ---
 
     Batchmode is the way in which `async-transfer` can be used to
-    submit a Task which transfers of multiple files or directories, and it is
+    submit a Task which transfers multiple files or directories, and it is
     used to accept paths to transfer on stdin.
 
     Batchmode splits each line on spaces, and treats every line as a file or
@@ -46,7 +46,7 @@ from globus_cli.services.transfer.activation import autoactivate
 
     \b
     Lines are of the form
-    [--recursive] SOURCE_PATH [DEST_PATH]
+    [--recursive] SOURCE_PATH DEST_PATH
 
     Skips empty lines and allows comments beginning with "#".
 
@@ -56,25 +56,22 @@ from globus_cli.services.transfer.activation import autoactivate
         # file 1, simple
         ~/dir1/sourcepath1 /abspath/destpath1
 
+    \b
         # file 2, with spaces in dest path
         # paths without / or ~ are relative to the default_directory of the
         # endpoint they are on
         dir2/sourcepath2   "path with spaces/dest2"
 
+    \b
         # dir 1, requires --recursive option
         --recursive ~/srcdir1/ /somepath/destdir1
 
-        # if dest path is omitted, the source path is copied
-        # the lines below are therefore equivalent to
-        #   --recursive ~/srcdir1/ ~/srcdir1/
-        #   file_to_copy file_to_copy
-        --recursive ~/srcdir1/
-        file_to_copy
     \b
         $ cat dat | globus transfer async-transfer \\
             --batch --sync-level checksum \\
             "$SOURCE_ENDPOINT_ID" "$DEST_ENDPOINT_ID"
 
+    \b
     You can use `--batch` with a commandline SOURCE_PATH and/or DEST_PATH.
     In that case, these paths will be used as dir prefixes to any paths in the
     batch input.
@@ -112,7 +109,7 @@ from globus_cli.services.transfer.activation import autoactivate
                     "data instead"))
 @click.option('--recursive', is_flag=True,
               help=('SOURCE_PATH and DEST_PATH are both directories, do a '
-                    'recursive dir transfer. Ignored in batchmode'))
+                    'recursive dir transfer'))
 @click.option('--label', default=None, help=('Set a label for this task.'))
 @click.option('--sync-level', default=None, show_default=True,
               type=CaseInsensitiveChoice(
@@ -160,23 +157,19 @@ def async_transfer_command(batch, sync_level, recursive, destination, source,
         @click.command()
         @click.option('--recursive', is_flag=True)
         @click.argument('source_path', type=TaskPath(base_dir=cmd_source_path))
-        @click.argument('dest_path', type=TaskPath(base_dir=cmd_dest_path),
-                        required=False)
+        @click.argument('dest_path', type=TaskPath(base_dir=cmd_dest_path))
         def process_batch_line(dest_path, source_path, recursive):
             """
             Parse a line of batch input and turn it into a transfer submission
             item.
             """
-            if not dest_path:
-                dest_path = str(TaskPath(base_dir=cmd_dest_path)
-                                .convert(source_path.orig_path, None, None))
             transfer_data.add_item(str(source_path), str(dest_path),
                                    recursive=recursive)
 
         shlex_process_stdin(
             process_batch_line,
             ('Enter transfers, line by line, as\n\n'
-             '    [--recursive] SOURCE_PATH [DEST_PATH]\n'))
+             '    [--recursive] SOURCE_PATH DEST_PATH\n'))
     else:
         transfer_data.add_item(cmd_source_path, cmd_dest_path,
                                recursive=recursive)
