@@ -44,8 +44,7 @@ def cancel_task(all, task_id):
         if outformat_is_json():
             safeprint(json.dumps(
                 {
-                    'results': [client.cancel_task(task_id).data
-                                for task_id in task_ids],
+                    'results': [client.cancel_task(i).data for i in task_ids],
                     'task_ids': task_ids,
                 },
                 indent=2,
