@@ -62,7 +62,8 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth, show_hidden):
         for item in [i for i in res if i['type'] == 'dir']:
             # do a recursive ls on each dir
             nested_res = _get_ls_res(
-                client, path + item['name'], endpoint_id, True, depth - 1)
+                client, path + item['name'], endpoint_id, True, depth - 1,
+                show_hidden)
 
             # walk the recursive ls results from this dir
             for nested_item in nested_res:
