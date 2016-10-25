@@ -9,8 +9,8 @@ from globus_cli.services.transfer.helpers import get_client
 @click.command('del-rule', help='Remove an ACL rule')
 @common_options
 @endpoint_id_arg
-@click.option('--rule-id', required=True, help='ID of the rule to display')
-def del_acl_rule(rule_id, endpoint_id):
+@click.argument('rule_id')
+def del_acl_rule(endpoint_id, rule_id):
     """
     Executor for `globus transfer acl del-rule`
     """
