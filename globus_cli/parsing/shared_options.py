@@ -242,7 +242,7 @@ def endpoint_create_and_update_opts(create=False, shared_ep=False):
     return inner_decorator
 
 
-def task_id_option(helptext='ID of the Task'):
+def task_id_option(helptext='ID of the Task', required=True):
     """
     This is the `--task-id` option consumed by many Transfer Task operations.
     It accepts variable helptext, and cannot be applied as a direct decorator
@@ -259,9 +259,12 @@ def task_id_option(helptext='ID of the Task'):
     >>> @task_id_option(helptext='ID of Task to inspect')
     >>> def command_func(task_id):
     >>>     ...
+
+    By default, the task ID is made required; pass `required=False` to the
+    decorator arguments to make it optional.
     """
     def inner_decorator(f):
-        f = click.option('--task-id', required=True, help=helptext)(f)
+        f = click.option('--task-id', required=required, help=helptext)(f)
         return f
     return inner_decorator
 
