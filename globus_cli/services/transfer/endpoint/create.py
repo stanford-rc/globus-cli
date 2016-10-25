@@ -1,7 +1,7 @@
 import click
 
 from globus_cli.parsing import (
-    CaseInsensitiveChoice, common_options, endpoint_create_and_update_opts)
+    CaseInsensitiveChoice, common_options, endpoint_create_and_update_params)
 from globus_cli.helpers import print_json_response
 
 from globus_cli.services.transfer.helpers import (
@@ -10,7 +10,7 @@ from globus_cli.services.transfer.helpers import (
 
 @click.command('create', help='Create a new Endpoint')
 @common_options
-@endpoint_create_and_update_opts(create=True)
+@endpoint_create_and_update_params(create=True)
 @click.option('--endpoint-type', required=True,
               help=('Type of endpoint to create. "gcp" and "gcs" are just '
                     'shorthand for "globus-connect-personal" and '

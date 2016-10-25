@@ -10,7 +10,7 @@ from globus_cli.parsing.hidden_option import HiddenOption
 from globus_cli.parsing.shared_options import (
     common_options,
     endpoint_id_arg, task_id_arg, submission_id_option,
-    endpoint_create_and_update_opts, role_id_arg,
+    endpoint_create_and_update_params, role_id_arg,
     server_id_arg, server_add_and_update_opts)
 
 
@@ -26,6 +26,6 @@ __all__ = [
     'common_options',
     # Transfer options
     'endpoint_id_arg', 'task_id_arg', 'submission_id_option',
-    'endpoint_create_and_update_opts', 'role_id_arg',
+    'endpoint_create_and_update_params', 'role_id_arg',
     'server_id_arg', 'server_add_and_update_opts',
 ]

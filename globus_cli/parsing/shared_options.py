@@ -111,7 +111,7 @@ def endpoint_id_arg(*args, **kwargs):
     return detect_and_decorate(decorate, args, kwargs)
 
 
-def endpoint_create_and_update_opts(*args, **kwargs):
+def endpoint_create_and_update_params(*args, **kwargs):
     """
     Collection of options consumed by Transfer endpoint create and update
     operations -- in addition to shared endpoint create and update.
@@ -122,7 +122,7 @@ def endpoint_create_and_update_opts(*args, **kwargs):
 
     Usage:
 
-    >>> @endpoint_create_and_update_opts
+    >>> @endpoint_create_and_update_params
     >>> def command_func(display_name, description, organization,
     >>>                  contact_email, contact_info, info_link, public,
     >>>                  default_directory, force_encryption, oauth_server,
@@ -131,7 +131,7 @@ def endpoint_create_and_update_opts(*args, **kwargs):
 
     or
 
-    >>> @endpoint_create_and_update_opts(create=False)
+    >>> @endpoint_create_and_update_params(create=False)
     >>> def command_func(display_name, description, organization,
     >>>                  contact_email, contact_info, info_link, public,
     >>>                  default_directory, force_encryption, oauth_server,
@@ -140,54 +140,72 @@ def endpoint_create_and_update_opts(*args, **kwargs):
 
     or
 
-    >>> @endpoint_create_and_update_opts(shared_ep=True)
+    >>> @endpoint_create_and_update_params(shared_ep=True)
     >>> def command_func(display_name, description, organization,
     >>>                  contact_email, contact_info, info_link, public):
     >>>     ...
     """
-    def inner_decorator(f, create=False, shared_ep=False):
-        def _mkopt(*args, **kwargs):
-            # ensure that diffhelp gets removed -- otherwise, click.option
-            # will see it and be sad
-            if kwargs.pop('diffhelp', False) and not create:
-                kwargs['help'] = 'New ' + kwargs['help']
+    def apply_non_shared_params(f):
+        f = click.option(
+            '--myproxy-dn',
+            help=('Only available on Globus Connect Server. '
+                  'Set the MyProxy Server DN'))(f)
+        f = click.option(
+            '--myproxy-server',
+            help=('Only available on Globus Connect Server. '
+                  'Set the MyProxy Server URI'))(f)
+        f = click.option(
+            '--oauth-server',
+            help=('Only available on Globus Connect Server. '
+                  'Set the OAuth Server URI'))(f)
+        f = click.option(
+            '--force-encryption/--no-force-encryption', default=None,
+            help=('Only available on Globus Connect Server. '
+                  '(Un)Force transfers to use encryption'))(f)
+        f = click.option(
+            '--default-directory',
+            help=('Only available on Globus Connect Server. '
+                  'Set the default directory'))(f)
+        f = click.option(
+            '--public/--private', 'public',
+            help='Set the Endpoint to be public or private')(f)
 
-            return click.option(*args, **kwargs)
+        return f
+
+    def inner_decorator(f, create=False, shared_ep=False):
+        update_help_prefix = (not create and 'New ') or ''
 
         ep_or_share = 'Share'
         if not shared_ep:
             ep_or_share = 'Endpoint'
-            f = _mkopt('--myproxy-dn',
-                       help=('Only available on Globus Connect Server. '
-                             'Set the MyProxy Server DN'))(f)
-            f = _mkopt('--myproxy-server',
-                       help=('Only available on Globus Connect Server. '
-                             'Set the MyProxy Server URI'))(f)
-            f = _mkopt('--oauth-server',
-                       help=('Only available on Globus Connect Server. '
-                             'Set the OAuth Server URI'))(f)
-            f = _mkopt('--force-encryption/--no-force-encryption',
-                       default=None,
-                       help=('Only available on Globus Connect Server. '
-                             '(Un)Force transfers to use encryption'))(f)
-            f = _mkopt('--default-directory',
-                       help=('Only available on Globus Connect Server. '
-                             'Set the default directory'))(f)
-        f = _mkopt('--public/--private', 'public',
-                   help='Set the {0} to be public or private'
-                   .format(ep_or_share))(f)
-        f = _mkopt('--info-link', diffhelp=True,
-                   help='Link for Info about the {0}'.format(ep_or_share))(f)
-        f = _mkopt('--contact-info', diffhelp=True,
-                   help='Contact Info for the {0}'.format(ep_or_share))(f)
-        f = _mkopt('--contact-email', diffhelp=True,
-                   help='Contact Email for the {0}'.format(ep_or_share))(f)
-        f = _mkopt('--organization', diffhelp=True,
-                   help='Organization for the {0}'.format(ep_or_share))(f)
-        f = _mkopt('--description', diffhelp=True,
-                   help='Description for the {0}'.format(ep_or_share))(f)
-        f = _mkopt('--display-name', required=create, diffhelp=True,
-                   help='Name for the {0}'.format(ep_or_share))(f)
+            f = apply_non_shared_params(f)
+        f = click.option(
+            '--info-link',
+            help=(update_help_prefix +
+                  'Link for Info about the {0}'.format(ep_or_share)))(f)
+        f = click.option(
+            '--contact-info',
+            help=(update_help_prefix +
+                  'Contact Info for the {0}'.format(ep_or_share)))(f)
+        f = click.option(
+            '--contact-email',
+            help=(update_help_prefix +
+                  'Contact Email for the {0}'.format(ep_or_share)))(f)
+        f = click.option(
+            '--organization',
+            help=(update_help_prefix +
+                  'Organization for the {0}'.format(ep_or_share)))(f)
+        f = click.option(
+            '--description',
+            help=(update_help_prefix +
+                  'Description for the {0}'.format(ep_or_share)))(f)
+        if create:
+            f = click.argument('display_name')(f)
+        else:
+            f = click.option(
+                '--display-name',
+                help=(update_help_prefix +
+                      'Name for the {0}'.format(ep_or_share)))(f)
         return f
 
     return detect_and_decorate(inner_decorator, args, kwargs)
