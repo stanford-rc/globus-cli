@@ -210,6 +210,7 @@ def endpoint_create_and_update_params(*args, **kwargs):
 
     return detect_and_decorate(inner_decorator, args, kwargs)
 
+
 def task_id_arg(*args, **kwargs):
     """
     This is the `TASK_ID` argument consumed by many Transfer Task operations.
@@ -302,4 +303,41 @@ def server_add_and_update_opts(*args, **kwargs):
                   'unspecified, the CN must match the server hostname.'))(f)
 
         return f
+    return detect_and_decorate(inner_decorator, args, kwargs)
+
+
+def security_principal_opts(*args, **kwargs):
+    def inner_decorator(
+            f, allow_anonymous=False, allow_all_authenticated=False):
+        flag_name = 'principal'
+
+        def id_callback(ctx, param, value):
+            if value is None:
+                return None
+            return ('identity', value)
+        f = click.option('--identity', flag_name, callback=id_callback,
+                         metavar='IDENTITY_ID_OR_NAME',
+                         help='Identity to use as a security principal')(f)
+
+        def group_callback(ctx, param, value):
+            if value is None:
+                return None
+            return ('group', value)
+        f = click.option('--group', flag_name, metavar='GROUP_ID',
+                         help='Group to use as a security principal')(f)
+
+        if allow_anonymous:
+            f = click.option(
+                '--anonymous', flag_name, flag_value=('anonymous', None),
+                help=('Allow anyone access, even without logging in '
+                      '(treated as a security principal)'))(f)
+        if allow_all_authenticated:
+            f = click.option(
+                '--all-authenticated', flag_name,
+                flag_value=('all_authenticated_users', None),
+                help=('Allow anyone access, as long as they login'
+                      '(treated as a security principal)'))(f)
+
+        return f
+
     return detect_and_decorate(inner_decorator, args, kwargs)
