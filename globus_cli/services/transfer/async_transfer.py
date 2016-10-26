@@ -142,6 +142,12 @@ def async_transfer_command(batch, sync_level, recursive, destination, source,
     source_endpoint, cmd_source_path = source
     dest_endpoint, cmd_dest_path = destination
 
+    if recursive and batch:
+        raise click.UsageError(
+            ('You cannot use --recursive in addition to --batch. '
+             'Instead, use --recursive on lines of --batch input '
+             'which need it'))
+
     if (cmd_source_path is None or cmd_dest_path is None) and (not batch):
         raise click.UsageError(
             ('async-transfer requires either SOURCE_PATH and DEST_PATH or '
