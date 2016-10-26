@@ -16,6 +16,10 @@ __all__ = [
     'TRANSFER_RT_OPTNAME',
     'TRANSFER_AT_OPTNAME',
     'AUTH_AT_EXPIRES_OPTNAME',
+    'WHOAMI_ID_OPTNAME',
+    'WHOAMI_USERNAME_OPTNAME',
+    'WHOAMI_EMAIL_OPTNAME',
+    'WHOAMI_NAME_OPTNAME',
 
     'internal_auth_client',
 
@@ -44,6 +48,10 @@ AUTH_AT_EXPIRES_OPTNAME = 'auth_access_token_expires'
 TRANSFER_RT_OPTNAME = 'transfer_refresh_token'
 TRANSFER_AT_OPTNAME = 'transfer_access_token'
 TRANSFER_AT_EXPIRES_OPTNAME = 'transfer_access_token_expires'
+WHOAMI_ID_OPTNAME = 'whoami_identity_id'
+WHOAMI_USERNAME_OPTNAME = 'whoami_identity_username'
+WHOAMI_EMAIL_OPTNAME = 'whoami_identity_email'
+WHOAMI_NAME_OPTNAME = 'whoami_identity_display_name'
 
 # get the environment from env var (not exported)
 GLOBUS_ENV = os.environ.get('GLOBUS_SDK_ENVIRONMENT')
@@ -59,6 +67,10 @@ if GLOBUS_ENV:
     TRANSFER_AT_OPTNAME = '{0}_transfer_access_token'.format(GLOBUS_ENV)
     TRANSFER_AT_EXPIRES_OPTNAME = '{0}_transfer_access_token_expires'.format(
         GLOBUS_ENV)
+    WHOAMI_ID_OPTNAME = '{0}_whoami_identity_id'.format(GLOBUS_ENV)
+    WHOAMI_USERNAME_OPTNAME = '{0}_whoami_identity_username'.format(GLOBUS_ENV)
+    WHOAMI_EMAIL_OPTNAME = '{0}_whoami_identity_email'.format(GLOBUS_ENV)
+    WHOAMI_NAME_OPTNAME = '{0}_whoami_identity_display_name'.format(GLOBUS_ENV)
 
 
 def _get_config_obj(system=False):
