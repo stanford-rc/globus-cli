@@ -21,6 +21,8 @@ __all__ = [
     'WHOAMI_EMAIL_OPTNAME',
     'WHOAMI_NAME_OPTNAME',
 
+    'GLOBUS_ENV',
+
     'internal_auth_client',
 
     'get_output_format',
