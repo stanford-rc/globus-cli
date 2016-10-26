@@ -307,34 +307,63 @@ def server_add_and_update_opts(*args, **kwargs):
 
 
 def security_principal_opts(*args, **kwargs):
+    def preprocess_security_principals(f):
+        def decorator(*args, **kwargs):
+            identity = kwargs.pop('identity', None)
+            group = kwargs.pop('group', None)
+            if kwargs.get('principal') is not None:
+                if identity or group:
+                    raise click.UsageError(
+                        'You may only pass one security principal')
+            else:
+                if identity and group:
+                    raise click.UsageError(
+                        ('You have passed both an identity and a group. '
+                         'Please only pass one principal type'))
+                elif not identity and not group:
+                    raise click.UsageError(
+                        ('You must provide at least one principal '
+                         '(identity, group, etc.)'))
+
+                if identity:
+                    kwargs['principal'] = ('identity', identity)
+                else:
+                    kwargs['principal'] = ('group', group)
+
+            return f(*args, **kwargs)
+        return decorator
+
     def inner_decorator(
             f, allow_anonymous=False, allow_all_authenticated=False):
-        flag_name = 'principal'
 
-        def id_callback(ctx, param, value):
-            if value is None:
-                return None
-            return ('identity', value)
-        f = click.option('--identity', flag_name, callback=id_callback,
-                         metavar='IDENTITY_ID_OR_NAME',
+        # order matters here -- the preprocessor must run after option
+        # application, so it has to be applied first
+        if isinstance(f, click.Command):
+            # if we're decorating a command, put the preprocessor on its
+            # callback, not on `f` itself
+            f.callback = preprocess_security_principals(f.callback)
+        else:
+            # otherwise, we're applying to a function, but other decorators may
+            # have been applied to give it params
+            # so, copy __click_params__ to preserve those parameters
+            oldfun = f
+            f = preprocess_security_principals(f)
+            f.__click_params__ = getattr(oldfun, '__click_params__', [])
+
+        f = click.option('--identity', metavar='IDENTITY_ID_OR_NAME',
                          help='Identity to use as a security principal')(f)
-
-        def group_callback(ctx, param, value):
-            if value is None:
-                return None
-            return ('group', value)
-        f = click.option('--group', flag_name, metavar='GROUP_ID',
+        f = click.option('--group', metavar='GROUP_ID',
                          help='Group to use as a security principal')(f)
 
         if allow_anonymous:
             f = click.option(
-                '--anonymous', flag_name, flag_value=('anonymous', None),
+                '--anonymous', 'principal', flag_value=('anonymous', ""),
                 help=('Allow anyone access, even without logging in '
                       '(treated as a security principal)'))(f)
         if allow_all_authenticated:
             f = click.option(
-                '--all-authenticated', flag_name,
-                flag_value=('all_authenticated_users', None),
+                '--all-authenticated', 'principal',
+                flag_value=('all_authenticated_users', ""),
                 help=('Allow anyone access, as long as they login'
                       '(treated as a security principal)'))(f)
 
