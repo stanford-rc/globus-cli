@@ -11,7 +11,7 @@ from globus_cli.services.transfer.helpers import (
 @click.command('update-rule', help='Update an ACL rule')
 @endpoint_id_arg
 @common_options
-@click.option('--rule-id', required=True, help='ID of the rule to modify')
+@click.argument('rule_id')
 @click.option('--permissions', required=True,
               type=CaseInsensitiveChoice(('r', 'rw')),
               help='Permissions to add. Read-Only or Read/Write')

@@ -4,6 +4,7 @@ from globus_cli.version import get_versions
 from globus_cli.parsing.command_state import (
     format_option, debug_option, map_http_status_option)
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
+from globus_cli.parsing.detect_and_decorate import detect_and_decorate
 
 
 def version_option(f):
@@ -43,31 +44,19 @@ def common_options(*args, **kwargs):
     """
     This is a multi-purpose decorator for applying a "base" set of options
     shared by all commands.
-    It has two modes of operation.
+    It can be applied either directly, or given keyword arguments.
 
-    Mode I: Basic Behavior
-    Apply as a decorator that consumes a single callable as its only argument.
-    This is typical decorator syntax "without arguments" as in
+    Usage:
+
     >>> @common_options
     >>> def mycommand(abc, xyz):
     >>>     ...
 
-    Note that `common_options` doesn't have parens, so it's taking `mycommand`
-    as its only argument, and as a positional argument.
+    or
 
-    Mode II: Customized by Keywords
-    Apply as a decorator that takes keyword arguments of its own. In this case,
-    `common_options` is a higher order function that produces a decorator,
-    based on its keyword arguments. This is used to change or override
-    behaviors that are seen in more typical "Mode I" usage. For example
     >>> @common_options(no_format_option=True)
     >>> def mycommand(abc, xyz):
     >>>     ...
-
-    In this case, `common_options` sees no `*args` and a `**kwargs` containing
-    `{'no_format_option': True}`
-    It produces and returns a decorator based on that optional argument, which
-    is, in turn, applied to `mycommand`.
     """
     def decorate(f, **kwargs):
         """
@@ -88,26 +77,7 @@ def common_options(*args, **kwargs):
 
         return f
 
-    # special behavior when invoked with only one non-keyword argument: act as
-    # a normal decorator, decorating and returning that argument with
-    # click.option
-    if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
-        return decorate(args[0])
-
-    # if we're not doing that, we should see no positional args
-    # the alternative behavior is to fall through and discard *args, but this
-    # will probably confuse someone in the future when their arguments are
-    # silently discarded
-    elif len(args) != 0:
-        raise ValueError('common_options() cannot take positional args')
-
-    # final case: got 0 or more kwargs, no positionals
-    # do the function-which-returns-a-decorator dance to produce a
-    # new decorator based on the arguments given
-    else:
-        def inner_decorator(f):
-            return decorate(f, **kwargs)
-        return inner_decorator
+    return detect_and_decorate(decorate, args, kwargs)
 
 
 def endpoint_id_arg(*args, **kwargs):
@@ -138,41 +108,21 @@ def endpoint_id_arg(*args, **kwargs):
         f = click.argument('endpoint_id', metavar=metavar, type=click.UUID)(f)
         return f
 
-    # special behavior when invoked with only one non-keyword argument: act as
-    # a normal decorator, decorating and returning that argument with
-    # click.option
-    if len(args) == 1 and len(kwargs) == 0:
-        return decorate(args[0])
-
-    # if we're not doing that, we should see no positional args
-    # the alternative behavior is to fall through and discard *args, but this
-    # will probably confuse someone in the future when their arguments are
-    # silently discarded
-    elif len(args) != 0:
-        raise ValueError('endpoint_id_arg() cannot take positional args')
-
-    # final case: got 0 or more kwargs, no positionals
-    # do the function-which-returns-a-decorator dance to produce a
-    # new decorator based on the arguments given
-    else:
-        def inner_decorator(f):
-            return decorate(f, **kwargs)
-        return inner_decorator
+    return detect_and_decorate(decorate, args, kwargs)
 
 
-def endpoint_create_and_update_opts(create=False, shared_ep=False):
+def endpoint_create_and_update_params(*args, **kwargs):
     """
     Collection of options consumed by Transfer endpoint create and update
     operations -- in addition to shared endpoint create and update.
-    It accepts toggles regarding create vs. update and shared EP vs. normal EP,
-    but can also be applied as a direct decorator.
+    It accepts toggles regarding create vs. update and shared EP vs. normal EP
 
     Importantly, when given `shared_ep=True`, the options it applies are more
     limited -- so the signature of the decorated function is different.
 
     Usage:
 
-    >>> @endpoint_create_and_update_opts
+    >>> @endpoint_create_and_update_params
     >>> def command_func(display_name, description, organization,
     >>>                  contact_email, contact_info, info_link, public,
     >>>                  default_directory, force_encryption, oauth_server,
@@ -181,7 +131,7 @@ def endpoint_create_and_update_opts(create=False, shared_ep=False):
 
     or
 
-    >>> @endpoint_create_and_update_opts(create=False)
+    >>> @endpoint_create_and_update_params(create=False)
     >>> def command_func(display_name, description, organization,
     >>>                  contact_email, contact_info, info_link, public,
     >>>                  default_directory, force_encryption, oauth_server,
@@ -190,83 +140,101 @@ def endpoint_create_and_update_opts(create=False, shared_ep=False):
 
     or
 
-    >>> @endpoint_create_and_update_opts(shared_ep=True)
+    >>> @endpoint_create_and_update_params(shared_ep=True)
     >>> def command_func(display_name, description, organization,
     >>>                  contact_email, contact_info, info_link, public):
     >>>     ...
     """
-    def _mkopt(*args, **kwargs):
-        # ensure that diffhelp gets removed -- otherwise, click.option will see
-        # it and be sad
-        if kwargs.pop('diffhelp', False) and not create:
-            kwargs['help'] = 'New ' + kwargs['help']
+    def apply_non_shared_params(f):
+        f = click.option(
+            '--myproxy-dn',
+            help=('Only available on Globus Connect Server. '
+                  'Set the MyProxy Server DN'))(f)
+        f = click.option(
+            '--myproxy-server',
+            help=('Only available on Globus Connect Server. '
+                  'Set the MyProxy Server URI'))(f)
+        f = click.option(
+            '--oauth-server',
+            help=('Only available on Globus Connect Server. '
+                  'Set the OAuth Server URI'))(f)
+        f = click.option(
+            '--force-encryption/--no-force-encryption', default=None,
+            help=('Only available on Globus Connect Server. '
+                  '(Un)Force transfers to use encryption'))(f)
+        f = click.option(
+            '--default-directory',
+            help=('Only available on Globus Connect Server. '
+                  'Set the default directory'))(f)
+        f = click.option(
+            '--public/--private', 'public',
+            help='Set the Endpoint to be public or private')(f)
 
-        return click.option(*args, **kwargs)
+        return f
 
-    def inner_decorator(f):
+    def inner_decorator(f, create=False, shared_ep=False):
+        update_help_prefix = (not create and 'New ') or ''
+
         ep_or_share = 'Share'
         if not shared_ep:
             ep_or_share = 'Endpoint'
-            f = _mkopt('--myproxy-dn',
-                       help=('Only available on Globus Connect Server. '
-                             'Set the MyProxy Server DN'))(f)
-            f = _mkopt('--myproxy-server',
-                       help=('Only available on Globus Connect Server. '
-                             'Set the MyProxy Server URI'))(f)
-            f = _mkopt('--oauth-server',
-                       help=('Only available on Globus Connect Server. '
-                             'Set the OAuth Server URI'))(f)
-            f = _mkopt('--force-encryption/--no-force-encryption',
-                       default=None,
-                       help=('Only available on Globus Connect Server. '
-                             '(Un)Force transfers to use encryption'))(f)
-            f = _mkopt('--default-directory',
-                       help=('Only available on Globus Connect Server. '
-                             'Set the default directory'))(f)
-        f = _mkopt('--public/--private', 'public',
-                   help='Set the {0} to be public or private'
-                   .format(ep_or_share))(f)
-        f = _mkopt('--info-link', diffhelp=True,
-                   help='Link for Info about the {0}'.format(ep_or_share))(f)
-        f = _mkopt('--contact-info', diffhelp=True,
-                   help='Contact Info for the {0}'.format(ep_or_share))(f)
-        f = _mkopt('--contact-email', diffhelp=True,
-                   help='Contact Email for the {0}'.format(ep_or_share))(f)
-        f = _mkopt('--organization', diffhelp=True,
-                   help='Organization for the {0}'.format(ep_or_share))(f)
-        f = _mkopt('--description', diffhelp=True,
-                   help='Description for the {0}'.format(ep_or_share))(f)
-        f = _mkopt('--display-name', required=create, diffhelp=True,
-                   help='Name for the {0}'.format(ep_or_share))(f)
+            f = apply_non_shared_params(f)
+        f = click.option(
+            '--info-link',
+            help=(update_help_prefix +
+                  'Link for Info about the {0}'.format(ep_or_share)))(f)
+        f = click.option(
+            '--contact-info',
+            help=(update_help_prefix +
+                  'Contact Info for the {0}'.format(ep_or_share)))(f)
+        f = click.option(
+            '--contact-email',
+            help=(update_help_prefix +
+                  'Contact Email for the {0}'.format(ep_or_share)))(f)
+        f = click.option(
+            '--organization',
+            help=(update_help_prefix +
+                  'Organization for the {0}'.format(ep_or_share)))(f)
+        f = click.option(
+            '--description',
+            help=(update_help_prefix +
+                  'Description for the {0}'.format(ep_or_share)))(f)
+        if create:
+            f = click.argument('display_name')(f)
+        else:
+            f = click.option(
+                '--display-name',
+                help=(update_help_prefix +
+                      'Name for the {0}'.format(ep_or_share)))(f)
         return f
-    return inner_decorator
+
+    return detect_and_decorate(inner_decorator, args, kwargs)
 
 
-def task_id_option(helptext='ID of the Task', required=True):
+def task_id_arg(*args, **kwargs):
     """
-    This is the `--task-id` option consumed by many Transfer Task operations.
-    It accepts variable helptext, and cannot be applied as a direct decorator
-    -- it must have arguments, even if they are empty.
+    This is the `TASK_ID` argument consumed by many Transfer Task operations.
+    It accept a toggle on whether or not it is required
 
     Usage:
 
-    >>> @task_id_option()
+    >>> @task_id_option
     >>> def command_func(task_id):
     >>>     ...
 
     or
 
-    >>> @task_id_option(helptext='ID of Task to inspect')
+    >>> @task_id_option(required=False)
     >>> def command_func(task_id):
     >>>     ...
 
     By default, the task ID is made required; pass `required=False` to the
     decorator arguments to make it optional.
     """
-    def inner_decorator(f):
-        f = click.option('--task-id', required=required, help=helptext)(f)
+    def inner_decorator(f, required=True):
+        f = click.argument('TASK_ID', required=required)(f)
         return f
-    return inner_decorator
+    return detect_and_decorate(inner_decorator, args, kwargs)
 
 
 def submission_id_option(f):
@@ -282,32 +250,29 @@ def submission_id_option(f):
     return f
 
 
-def role_id_option(f):
+def role_id_arg(f):
     """
-    Unmodifiable `--role-id` option for Transfer Endpoint Role management.
+    Unmodifiable `ROLE_ID` argument for Transfer Endpoint Role management.
     """
-    f = click.option('--role-id', required=True, help='ID of the Role')(f)
-    return f
+    return click.argument('role_id')(f)
 
 
-def server_id_option(f):
+def server_id_arg(f):
     """
-    Unmodifiable `--server-id` option for Transfer Endpoint Server management.
+    Unmodifiable `SERVER_ID` argument for Transfer Endpoint Server management.
     """
-    f = click.option('--server-id', required=True, help='ID of the Server')(f)
-    return f
+    return click.argument('server_id')(f)
 
 
-def server_add_and_update_opts(add=False):
+def server_add_and_update_opts(*args, **kwargs):
     """
-    Shared collection of options for `globus transfer endpoint server add` and
+    shared collection of options for `globus transfer endpoint server add` and
     `globus transfer endpoint server update`.
-    Cannot be applied directly -- requires arguments even if they are empty.
-    Takes a toggle to know if it's being used as `add` or `update`.
+    Accepts a toggle to know if it's being used as `add` or `update`.
 
-    Usage:
+    usage:
 
-    >>> @server_add_and_update_opts()
+    >>> @server_add_and_update_opts
     >>> def command_func(subject, port, scheme, hostname):
     >>>     ...
 
@@ -317,7 +282,7 @@ def server_add_and_update_opts(add=False):
     >>> def command_func(subject, port, scheme, hostname):
     >>>     ...
     """
-    def inner_decorator(f):
+    def inner_decorator(f, add=False):
         f = click.option('--hostname', required=add,
                          help='Server Hostname.')(f)
 
@@ -338,4 +303,70 @@ def server_add_and_update_opts(add=False):
                   'unspecified, the CN must match the server hostname.'))(f)
 
         return f
-    return inner_decorator
+    return detect_and_decorate(inner_decorator, args, kwargs)
+
+
+def security_principal_opts(*args, **kwargs):
+    def preprocess_security_principals(f):
+        def decorator(*args, **kwargs):
+            identity = kwargs.pop('identity', None)
+            group = kwargs.pop('group', None)
+            if kwargs.get('principal') is not None:
+                if identity or group:
+                    raise click.UsageError(
+                        'You may only pass one security principal')
+            else:
+                if identity and group:
+                    raise click.UsageError(
+                        ('You have passed both an identity and a group. '
+                         'Please only pass one principal type'))
+                elif not identity and not group:
+                    raise click.UsageError(
+                        ('You must provide at least one principal '
+                         '(identity, group, etc.)'))
+
+                if identity:
+                    kwargs['principal'] = ('identity', identity)
+                else:
+                    kwargs['principal'] = ('group', group)
+
+            return f(*args, **kwargs)
+        return decorator
+
+    def inner_decorator(
+            f, allow_anonymous=False, allow_all_authenticated=False):
+
+        # order matters here -- the preprocessor must run after option
+        # application, so it has to be applied first
+        if isinstance(f, click.Command):
+            # if we're decorating a command, put the preprocessor on its
+            # callback, not on `f` itself
+            f.callback = preprocess_security_principals(f.callback)
+        else:
+            # otherwise, we're applying to a function, but other decorators may
+            # have been applied to give it params
+            # so, copy __click_params__ to preserve those parameters
+            oldfun = f
+            f = preprocess_security_principals(f)
+            f.__click_params__ = getattr(oldfun, '__click_params__', [])
+
+        f = click.option('--identity', metavar='IDENTITY_ID_OR_NAME',
+                         help='Identity to use as a security principal')(f)
+        f = click.option('--group', metavar='GROUP_ID',
+                         help='Group to use as a security principal')(f)
+
+        if allow_anonymous:
+            f = click.option(
+                '--anonymous', 'principal', flag_value=('anonymous', ""),
+                help=('Allow anyone access, even without logging in '
+                      '(treated as a security principal)'))(f)
+        if allow_all_authenticated:
+            f = click.option(
+                '--all-authenticated', 'principal',
+                flag_value=('all_authenticated_users', ""),
+                help=('Allow anyone access, as long as they login'
+                      '(treated as a security principal)'))(f)
+
+        return f
+
+    return detect_and_decorate(inner_decorator, args, kwargs)

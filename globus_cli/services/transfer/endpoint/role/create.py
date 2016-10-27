@@ -2,7 +2,8 @@ import click
 
 from globus_cli.safeio import safeprint
 from globus_cli.parsing import (
-    CaseInsensitiveChoice, common_options, endpoint_id_arg)
+    CaseInsensitiveChoice, common_options, endpoint_id_arg,
+    security_principal_opts)
 from globus_cli.helpers import outformat_is_json, print_json_response
 
 from globus_cli.services.auth import maybe_lookup_identity_id
@@ -14,28 +15,25 @@ from globus_cli.services.transfer.helpers import (
 @click.command('create', help='Create a Role on an Endpoint')
 @common_options
 @endpoint_id_arg
-@click.option('--principal-type', required=True,
-              type=CaseInsensitiveChoice(('identity', 'group')),
-              help='Type of entity to set a role on')
-@click.option('--principal', required=True,
-              help=('Entity to set a role on. ID of a Group or Identity, or '
-                    'a valid Identity Name, like "go@globusid.org"'))
+@security_principal_opts
 @click.option('--role', required=True,
               type=CaseInsensitiveChoice(
                   ('administrator', 'access_manager', 'activity_manager',
                    'activity_monitor')),
               help='A role to assign.')
-def role_create(role, principal, principal_type, endpoint_id):
+def role_create(role, principal, endpoint_id):
     """
     Executor for `globus transfer endpoint role show`
     """
+    principal_type, principal_val = principal
+
     client = get_client()
 
     if principal_type == 'identity':
-        principal = maybe_lookup_identity_id(principal)
+        principal_val = maybe_lookup_identity_id(principal_val)
 
     role_doc = assemble_generic_doc(
-        'role', principal_type=principal_type, principal=principal,
+        'role', principal_type=principal_type, principal=principal_val,
         role=role)
 
     res = client.add_endpoint_role(endpoint_id, role_doc)

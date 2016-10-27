@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import common_options, task_id_option
+from globus_cli.parsing import common_options, task_id_arg
 from globus_cli.helpers import outformat_is_json, print_table
 
 from globus_cli.services.transfer.helpers import (
@@ -9,7 +9,7 @@ from globus_cli.services.transfer.helpers import (
 
 @click.command('event-list', help='List Events for a given Task')
 @common_options
-@task_id_option(helptext='ID of the Task for which you want to list Events')
+@task_id_arg
 def task_event_list(task_id):
     """
     Executor for `globus transfer task-event-list`

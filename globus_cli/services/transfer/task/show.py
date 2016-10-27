@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import common_options, task_id_option
+from globus_cli.parsing import common_options, task_id_arg
 from globus_cli.helpers import (
     outformat_is_json, print_json_response, colon_formatted_print)
 
@@ -38,7 +38,7 @@ TRANSFER_FIELDS = [
 
 @click.command('show', help='Show detailed information about a specific Task')
 @common_options
-@task_id_option(helptext='ID of the Task which you want to examine')
+@task_id_arg
 def show_task(task_id):
     """
     Executor for `globus transfer task show`

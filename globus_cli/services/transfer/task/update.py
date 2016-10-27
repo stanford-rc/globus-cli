@@ -1,7 +1,7 @@
 import click
 
 from globus_cli.safeio import safeprint
-from globus_cli.parsing import common_options, task_id_option
+from globus_cli.parsing import common_options, task_id_arg
 from globus_cli.helpers import outformat_is_json, print_json_response
 
 from globus_cli.services.transfer.helpers import (
@@ -11,7 +11,7 @@ from globus_cli.services.transfer.helpers import (
 @click.command('update', short_help='Update a Task',
                help='Update label and/or deadline on an active Task')
 @common_options
-@task_id_option(helptext='ID of the Task which you want to cancel')
+@task_id_arg
 @click.option('--label', help='New Label for the Task')
 @click.option('--deadline', help='New Deadline for the Task')
 def update_task(deadline, label, task_id):

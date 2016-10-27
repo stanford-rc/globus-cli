@@ -17,13 +17,12 @@ from globus_cli.services.transfer.helpers import (
                    'my-gcp-endpoints', 'recently-used', 'in-use',
                    'shared-by-me', 'shared-with-me')),
               help='The set of endpoints to search over.')
-@click.option('--filter-fulltext',
-              help='Text filter to apply to the selected set of endpoints')
 @click.option('--filter-owner-id',
               help=('Filter search results to endpoints owned by a specific '
                     'identity. Can be the Identity ID, or the Identity '
                     'Username, as in "go@globusid.org"'))
-def endpoint_search(filter_owner_id, filter_fulltext, filter_scope):
+@click.argument('filter_fulltext', required=False)
+def endpoint_search(filter_fulltext, filter_owner_id, filter_scope):
     """
     Executor for `globus transfer endpoint-search`
     """

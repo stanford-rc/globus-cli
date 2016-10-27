@@ -2,7 +2,7 @@ import json
 import click
 
 from globus_cli.safeio import safeprint
-from globus_cli.parsing import common_options, task_id_option
+from globus_cli.parsing import common_options, task_id_arg
 from globus_cli.helpers import outformat_is_json, print_json_response
 
 from globus_cli.services.transfer.helpers import get_client
@@ -11,8 +11,7 @@ from globus_cli.services.transfer.helpers import get_client
 @click.command('cancel', short_help='Cancel a Task',
                help='Cancel a Task owned by the current user')
 @common_options
-@task_id_option(helptext='ID of the Task which you want to cancel',
-                required=False)
+@task_id_arg(required=False)
 @click.option('--all', '-a', is_flag=True,
               help='Cancel all in-progress tasks that you own')
 def cancel_task(all, task_id):
