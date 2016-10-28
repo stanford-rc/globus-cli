@@ -7,7 +7,7 @@ from globus_cli.parsing import common_options, HiddenOption
 from globus_cli.helpers import (
     print_json_response, outformat_is_json, print_table)
 
-from globus_cli.services.auth.helpers import get_auth_client
+from globus_cli.services.auth import get_auth_client
 
 
 _USERNAMES_STYLE = 'usernames'
@@ -37,9 +37,9 @@ def _b32_decode(v):
 @click.option('--globus-transfer-decode', 'lookup_style', cls=HiddenOption,
               flag_value=_HIDDEN_TRANSFER_STYLE)
 @click.argument('values', required=True, nargs=-1)
-def get_identities(values, lookup_style):
+def get_identities_command(values, lookup_style):
     """
-    Executor for `globus auth get-identities`
+    Executor for `globus get-identities`
     """
     client = get_auth_client()
 

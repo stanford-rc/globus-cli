@@ -7,7 +7,6 @@ from globus_cli.services.transfer.endpoint import endpoint_command
 from globus_cli.services.transfer.task import task_command
 from globus_cli.services.transfer.async_transfer import async_transfer_command
 from globus_cli.services.transfer.async_delete import async_delete_command
-from globus_cli.services.transfer.ls import ls_command
 from globus_cli.services.transfer.mkdir import mkdir_command
 from globus_cli.services.transfer.rename import rename_command
 
@@ -28,6 +27,5 @@ transfer_command.add_command(task_command)
 # commands
 transfer_command.add_command(async_transfer_command)
 transfer_command.add_command(async_delete_command)
-transfer_command.add_command(ls_command)
 transfer_command.add_command(mkdir_command)
 transfer_command.add_command(rename_command)

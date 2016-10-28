@@ -95,7 +95,7 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth, show_hidden):
 def ls_command(endpoint_plus_path, recursive_depth_limit,
                recursive, long, all):
     """
-    Executor for `globus transfer ls`
+    Executor for `globus ls`
     """
     endpoint_id, path = endpoint_plus_path
 

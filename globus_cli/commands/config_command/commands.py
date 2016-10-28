@@ -2,11 +2,11 @@ import click
 
 from globus_cli.parsing import common_options
 
-from globus_cli.config_command.edit import edit_command
-from globus_cli.config_command.init import init_command
-from globus_cli.config_command.remove import remove_command
-from globus_cli.config_command.set import set_command
-from globus_cli.config_command.show import show_command
+from globus_cli.commands.config_command.edit import edit_command
+from globus_cli.commands.config_command.init import init_command
+from globus_cli.commands.config_command.remove import remove_command
+from globus_cli.commands.config_command.set import set_command
+from globus_cli.commands.config_command.show import show_command
 
 
 @click.group('config', short_help=(

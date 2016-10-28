@@ -1,15 +1,30 @@
+import re
 from globus_sdk import AuthClient, RefreshTokenAuthorizer
 
 from globus_cli import version
 from globus_cli.config import (get_auth_tokens, internal_auth_client,
                                set_auth_access_token)
-from globus_cli.helpers import is_valid_identity_name
+
+# what qualifies as a valid Identity Name?
+_IDENTITY_NAME_REGEX = '^[a-zA-Z0-9]+.*@[a-zA-z0-9-]+\..*[a-zA-Z]+$'
 
 
 def _update_access_tokens(token_response):
     tokens = token_response.by_resource_server['auth.globus.org']
     set_auth_access_token(tokens['access_token'],
                           tokens['expires_at_seconds'])
+
+
+def is_valid_identity_name(identity_name):
+    """
+    Check if a string is a valid identity name.
+    Does not do any preprocessing of the identity name, so you must do so
+    before invocation.
+    """
+    if re.match(_IDENTITY_NAME_REGEX, identity_name) is None:
+        return False
+    else:
+        return True
 
 
 def get_auth_client():

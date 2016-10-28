@@ -29,6 +29,7 @@ __all__ = [
     'get_auth_tokens',
     'get_transfer_tokens',
 
+    'get_config_obj',
     'write_option',
     'lookup_option',
 ]
@@ -75,8 +76,7 @@ if GLOBUS_ENV:
     WHOAMI_NAME_OPTNAME = '{0}_whoami_identity_display_name'.format(GLOBUS_ENV)
 
 
-def _get_config_obj(system=False):
-    # FIXME: DRY violation with config_commands.helpers
+def get_config_obj(system=False):
     if system:
         path = '/etc/globus.cfg'
     else:
@@ -100,7 +100,7 @@ def write_option(option, value, section='cli', system=False):
     os.umask(0o077)
 
     # FIXME: DRY violation with config_commands.helpers
-    conf = _get_config_obj(system=system)
+    conf = get_config_obj(system=system)
 
     # add the section if absent
     if section not in conf:
