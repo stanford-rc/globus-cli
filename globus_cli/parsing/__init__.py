@@ -14,6 +14,8 @@ from globus_cli.parsing.shared_options import (
     server_id_arg, server_add_and_update_opts,
     security_principal_opts)
 
+from globus_cli.parsing.process_stdin import shlex_process_stdin
+
 
 __all__ = [
     'globus_main_func',
@@ -30,4 +32,6 @@ __all__ = [
     'endpoint_create_and_update_params', 'role_id_arg',
     'server_id_arg', 'server_add_and_update_opts',
     'security_principal_opts',
+
+    'shlex_process_stdin',
 ]

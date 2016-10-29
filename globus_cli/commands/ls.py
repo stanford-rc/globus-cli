@@ -5,8 +5,7 @@ from globus_cli.parsing import common_options, ENDPOINT_PLUS_OPTPATH
 from globus_cli.helpers import (
     outformat_is_json, print_json_response, print_table)
 
-from globus_cli.services.transfer.helpers import get_client
-from globus_cli.services.transfer.activation import autoactivate
+from globus_cli.services.transfer import get_client, autoactivate
 
 
 class DummyLSIterable(dict):
