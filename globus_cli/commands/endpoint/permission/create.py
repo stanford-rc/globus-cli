@@ -10,7 +10,8 @@ from globus_cli.services.auth import maybe_lookup_identity_id
 from globus_cli.services.transfer import get_client, assemble_generic_doc
 
 
-@click.command('add-rule', help='Add an ACL rule')
+@click.command('create', help=('Create an access control rule, allowing new '
+                               'permissions'))
 @common_options
 @security_principal_opts(allow_anonymous=True, allow_all_authenticated=True)
 @click.option('--permissions', required=True,
@@ -18,9 +19,9 @@ from globus_cli.services.transfer import get_client, assemble_generic_doc
               help='Permissions to add. Read-Only or Read/Write')
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_REQPATH.metavar,
                 type=ENDPOINT_PLUS_REQPATH)
-def add_acl_rule(principal, permissions, endpoint_plus_path):
+def create_command(principal, permissions, endpoint_plus_path):
     """
-    Executor for `globus acl add-rule`
+    Executor for `globus endpoint permission create`
     """
     if not principal:
         raise click.UsageError(

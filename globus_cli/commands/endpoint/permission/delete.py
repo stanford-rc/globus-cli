@@ -6,13 +6,14 @@ from globus_cli.helpers import print_json_response
 from globus_cli.services.transfer import get_client
 
 
-@click.command('del-rule', help='Remove an ACL rule')
+@click.command('delete', help=('Delete an access control rule, removing '
+                               'permissions'))
 @common_options
 @endpoint_id_arg
 @click.argument('rule_id')
-def del_acl_rule(endpoint_id, rule_id):
+def delete_command(endpoint_id, rule_id):
     """
-    Executor for `globus acl del-rule`
+    Executor for `globus endpoint permission delete`
     """
     client = get_client()
 

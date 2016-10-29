@@ -7,16 +7,17 @@ from globus_cli.helpers import print_json_response
 from globus_cli.services.transfer import get_client, assemble_generic_doc
 
 
-@click.command('update-rule', help='Update an ACL rule')
+@click.command('update', help=('Update an access control rule, changing '
+                               'permissions on an endpoint'))
 @endpoint_id_arg
 @common_options
 @click.argument('rule_id')
 @click.option('--permissions', required=True,
               type=CaseInsensitiveChoice(('r', 'rw')),
               help='Permissions to add. Read-Only or Read/Write')
-def update_acl_rule(permissions, rule_id, endpoint_id):
+def update_command(permissions, rule_id, endpoint_id):
     """
-    Executor for `globus acl update-acl-rule`
+    Executor for `globus endpoint permission update`
     """
     client = get_client()
 

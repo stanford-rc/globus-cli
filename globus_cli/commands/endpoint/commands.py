@@ -2,7 +2,7 @@ import click
 
 from globus_cli.parsing import common_options
 
-from globus_cli.commands.endpoint.acl import acl_command
+from globus_cli.commands.endpoint.permission import permission_command
 from globus_cli.commands.endpoint.role import role_command
 from globus_cli.commands.endpoint.server import server_command
 
@@ -25,7 +25,7 @@ def endpoint_command():
 
 
 # groups
-endpoint_command.add_command(acl_command)
+endpoint_command.add_command(permission_command)
 endpoint_command.add_command(role_command)
 endpoint_command.add_command(server_command)
 

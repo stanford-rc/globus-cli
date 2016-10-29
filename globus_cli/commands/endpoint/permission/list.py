@@ -7,12 +7,12 @@ from globus_cli.services.auth import lookup_identity_name
 from globus_cli.services.transfer import get_client
 
 
-@click.command('list', help='List of Access Control List rules on an Endpoint')
+@click.command('list', help='List of Permissions on an Endpoint')
 @common_options
 @endpoint_id_arg
-def acl_list(endpoint_id):
+def list_command(endpoint_id):
     """
-    Executor for `globus acl list`
+    Executor for `globus endpoint permission list`
     """
     client = get_client()
 
