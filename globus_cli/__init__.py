@@ -1,4 +1,4 @@
-from globus_cli.run import main
+from globus_cli.commands import main
 from globus_cli.version import __version__
 
 
