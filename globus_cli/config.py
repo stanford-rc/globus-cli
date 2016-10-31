@@ -31,6 +31,7 @@ __all__ = [
 
     'get_config_obj',
     'write_option',
+    'remove_option',
     'lookup_option',
 ]
 
@@ -88,6 +89,20 @@ def get_config_obj(system=False):
 def lookup_option(option, section='cli', environment=None):
     p = globus_sdk.config._get_parser()
     return p.get(option, section=section, environment=environment)
+
+
+def remove_option(option, section='cli', system=False):
+    conf = get_config_obj(system=system)
+    section = conf[section]
+
+    opt_val = section[option]
+
+    # remove value and flush to disk
+    del section[option]
+    conf.write()
+
+    # return the just-deleted value
+    return opt_val
 
 
 def write_option(option, value, section='cli', system=False):
