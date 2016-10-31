@@ -49,8 +49,8 @@ def endpoint_is_activated(endpoint_id, until, absolute_time):
         _print_out(msg.format(endpoint_id, *format_params), res)
         click.get_current_context().exit(0)
 
-    # autoactivation always means success, so short-circuit out of here
-    if res.supports_auto_activation:
+    # eternally active endpoints have a special expires_in value
+    if res['expires_in'] == -1:
         success('{} does not require activation')
 
     # if --until was not passed
