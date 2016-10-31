@@ -19,7 +19,7 @@ from globus_cli.config import (
                help=('Get credentials for the Globus CLI. '
                      'Necessary before any Globus CLI commands which require '
                      'authentication will work'))
-@common_options
+@common_options(no_format_option=True, no_map_http_status_option=True)
 def login_command():
     # build the NativeApp client object
     native_client = internal_auth_client()

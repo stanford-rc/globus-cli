@@ -95,11 +95,14 @@ def remove_option(option, section='cli', system=False):
     conf = get_config_obj(system=system)
     section = conf[section]
 
-    opt_val = section[option]
+    try:
+        opt_val = section[option]
 
-    # remove value and flush to disk
-    del section[option]
-    conf.write()
+        # remove value and flush to disk
+        del section[option]
+        conf.write()
+    except KeyError:
+        opt_val = None
 
     # return the just-deleted value
     return opt_val
