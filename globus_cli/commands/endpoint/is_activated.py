@@ -25,8 +25,8 @@ def _print_out(text_message, response_obj):
                     'with status 1'))
 @click.option('--absolute-time', is_flag=True,
               show_default=True, default=False,
-              help=('Treat the value of --until as a POSIX timestamp, not a '
-                    'number of seconds into the future.'))
+              help=('Treat the value of --until as a POSIX timestamp (seconds '
+                    'since Epoch), not a number of seconds into the future.'))
 def endpoint_is_activated(endpoint_id, until, absolute_time):
     """
     Executor for `globus endpoint is-activated`
