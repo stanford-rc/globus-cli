@@ -28,6 +28,8 @@ def list_command(endpoint_id):
             elif rule['principal_type'] == 'group':
                 return ('https://www.globus.org/app/groups/{}'
                         ).format(principal)
+            else:
+                principal = rule['principal_type']
             return principal
 
         print_table(rules, [('Rule ID', 'id'), ('Permissions', 'permissions'),
