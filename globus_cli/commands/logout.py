@@ -54,7 +54,7 @@ def logout_command(yes):
             click.get_current_context().exit(1)
 
     # prompt
-    _confirm("Are you sure you'd like to logout?")
+    _confirm("Are you sure you want to logout?")
 
     # check for username -- if not set, probably not logged in
     username = lookup_option(WHOAMI_USERNAME_OPTNAME)
