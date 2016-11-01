@@ -15,17 +15,13 @@ from globus_cli.config import (
 
 _LOGIN_EPILOG = ("""\
 
-SUCCESS
-You have logged in to the Globus CLI as {}
-
-A set of valid tokens for accessing Globus have been saved for you in
-~/.globus.cfg and are valid indefinitely unless revoked.
+You have successfully logged in to the Globus CLI as {}
 
 
 You can always check your current identity with
   globus whoami
 
-Logout and invalidate these credentials at any time with
+Logout of the Globus CLI with
   globus logout
 """)
 
