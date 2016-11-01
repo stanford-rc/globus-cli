@@ -135,7 +135,7 @@ def endpoint_create_and_update_params(*args, **kwargs):
             help=('Only available on Globus Connect Server. '
                   'Set the default directory'))(f)
         f = click.option(
-            '--public/--private', 'public',
+            '--public/--private', 'public', default=None,
             help='Set the Endpoint to be public or private')(f)
 
         return f
