@@ -13,6 +13,19 @@ from globus_cli.config import (
     internal_auth_client, write_option)
 
 
+_LOGIN_EPILOG = ("""\
+
+You have successfully logged in to the Globus CLI as {}
+
+
+You can always check your current identity with
+  globus whoami
+
+Logout of the Globus CLI with
+  globus logout
+""")
+
+
 @click.command('login',
                short_help=('Login to Globus to get credentials for '
                            'the Globus CLI'),
@@ -81,3 +94,5 @@ def login_command():
     write_option(WHOAMI_USERNAME_OPTNAME, identity['username'])
     write_option(WHOAMI_EMAIL_OPTNAME, identity['email'])
     write_option(WHOAMI_NAME_OPTNAME, identity['name'])
+
+    safeprint(_LOGIN_EPILOG.format(identity['username']))
