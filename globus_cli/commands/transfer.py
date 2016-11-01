@@ -155,7 +155,8 @@ def transfer_command(batch, sync_level, recursive, destination, source, label,
     transfer_data = TransferData(
         client, source_endpoint, dest_endpoint,
         label=label, sync_level=sync_level, verify_checksum=verify_checksum,
-        preserve_timestamp=preserve_mtime, encrypt_data=encrypt)
+        preserve_timestamp=preserve_mtime, encrypt_data=encrypt,
+        submission_id=submission_id)
 
     if batch:
         @click.command()
@@ -177,9 +178,6 @@ def transfer_command(batch, sync_level, recursive, destination, source, label,
     else:
         transfer_data.add_item(cmd_source_path, cmd_dest_path,
                                recursive=recursive)
-
-    if submission_id is not None:
-        transfer_data['submission_id'] = submission_id
 
     if dry_run:
         # don't bother dispatching out output format -- just print as JSON

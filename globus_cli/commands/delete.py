@@ -49,7 +49,8 @@ def delete_command(batch, ignore_missing, recursive, endpoint_plus_path,
     delete_data = DeleteData(client, endpoint_id,
                              label=label,
                              recursive=recursive,
-                             ignore_missing=ignore_missing)
+                             ignore_missing=ignore_missing,
+                             submission_id=submission_id)
 
     if batch:
         # although this sophisticated structure (like that in transfer)
@@ -68,9 +69,6 @@ def delete_command(batch, ignore_missing, recursive, endpoint_plus_path,
             process_batch_line, 'Enter paths to delete, line by line.')
     else:
         delete_data.add_item(path)
-
-    if submission_id is not None:
-        delete_data['submission_id'] = submission_id
 
     if dry_run:
         # don't bother dispatching out output format -- just print as JSON
