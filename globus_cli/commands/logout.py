@@ -19,6 +19,7 @@ The logout command only revokes tokens that it can see in its storage.
 If you are concerned that logout may have failed to revoke a token,
 you may want to manually rescind the Globus CLI consent on the
 Manage Consents Page:
+
     https://auth.globus.org/consents
 
 """
@@ -39,28 +40,14 @@ Before attempting any further CLI commands, you will have to login again using
                      'Removes your Globus tokens from local storage, '
                      'and revokes them so that they cannot be used anymore'))
 @common_options(no_format_option=True, no_map_http_status_option=True)
-@click.option('--yes', help='Automatically say "Yes" to all prompts',
-              is_flag=True, default=False)
-def logout_command(yes):
-    def _confirm(prompt, default=False):
-        """
-        Handy confirmation prompt that respects --yes and exits if confirmation
-        fails.
-        """
-        if yes:
-            return
-        confirmed = click.confirm(prompt, default=default)
-        if not confirmed:
-            click.get_current_context().exit(1)
-
-    # prompt
-    _confirm("Are you sure you want to logout?")
-
+@click.confirmation_option(prompt='Are you sure you want to logout?',
+                           help='Automatically say "yes" to all prompts')
+def logout_command():
     # check for username -- if not set, probably not logged in
     username = lookup_option(WHOAMI_USERNAME_OPTNAME)
     if not username:
-        _confirm(("Your username is not set. You may not be logged in. "
-                  "Would you like to try to logout anyway?"), default=True)
+        safeprint(("Your username is not set. You may not be logged in. "
+                   "Attempting logout anyway...\n"))
     safeprint('Logging out of Globus{}\n'.format(' as ' + username
                                                  if username else ''))
 

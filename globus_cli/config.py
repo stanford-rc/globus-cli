@@ -93,7 +93,12 @@ def lookup_option(option, section='cli', environment=None):
 
 def remove_option(option, section='cli', system=False):
     conf = get_config_obj(system=system)
-    section = conf[section]
+
+    # if there's no section for the option we're removing, just return None
+    try:
+        section = conf[section]
+    except KeyError:
+        return None
 
     try:
         opt_val = section[option]
