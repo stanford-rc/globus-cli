@@ -13,6 +13,23 @@ from globus_cli.config import (
     internal_auth_client, write_option)
 
 
+_LOGIN_EPILOG = ("""\
+
+SUCCESS
+You have logged in to the Globus CLI as {}
+
+A set of valid tokens for accessing Globus have been saved for you in
+~/.globus.cfg and are valid indefinitely unless revoked.
+
+
+You can always check your current identity with
+  globus whoami
+
+Logout and invalidate these credentials at any time with
+  globus logout
+""")
+
+
 @click.command('login',
                short_help=('Login to Globus to get credentials for '
                            'the Globus CLI'),
@@ -81,3 +98,5 @@ def login_command():
     write_option(WHOAMI_USERNAME_OPTNAME, identity['username'])
     write_option(WHOAMI_EMAIL_OPTNAME, identity['email'])
     write_option(WHOAMI_NAME_OPTNAME, identity['name'])
+
+    safeprint(_LOGIN_EPILOG.format(identity['username']))
