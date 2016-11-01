@@ -123,26 +123,27 @@ def endpoint_create_and_update_params(*args, **kwargs):
     Usage:
 
     >>> @endpoint_create_and_update_params
-    >>> def command_func(display_name, description, organization,
-    >>>                  contact_email, contact_info, info_link, public,
-    >>>                  default_directory, force_encryption, oauth_server,
-    >>>                  myproxy_server, myproxy_dn):
+    >>> def command_func(display_name, description, organization, department,
+    >>>                  keywords, contact_email, contact_info, info_link,
+    >>>                  public, default_directory, force_encryption,
+    >>>                  oauth_server, myproxy_server, myproxy_dn):
     >>>     ...
 
     or
 
     >>> @endpoint_create_and_update_params(create=False)
-    >>> def command_func(display_name, description, organization,
-    >>>                  contact_email, contact_info, info_link, public,
-    >>>                  default_directory, force_encryption, oauth_server,
-    >>>                  myproxy_server, myproxy_dn):
+    >>> def command_func(display_name, description, organization, department,
+    >>>                  keywords, contact_email, contact_info, info_link,
+    >>>                  public, default_directory, force_encryption,
+    >>>                  oauth_server, myproxy_server, myproxy_dn):
     >>>     ...
 
     or
 
     >>> @endpoint_create_and_update_params(shared_ep=True)
-    >>> def command_func(display_name, description, organization,
-    >>>                  contact_email, contact_info, info_link, public):
+    >>> def command_func(display_name, description, organization, department,
+    >>>                  keywords, contact_email, contact_info, info_link,
+    >>>                  public):
     >>>     ...
     """
     def apply_non_shared_params(f):
@@ -199,6 +200,15 @@ def endpoint_create_and_update_params(*args, **kwargs):
             '--description',
             help=(update_help_prefix +
                   'Description for the {0}'.format(ep_or_share)))(f)
+        f = click.option(
+            '--department',
+            help=(update_help_prefix +
+                  'Department which operates the {0}'.format(ep_or_share)))(f)
+        f = click.option(
+            '--keywords',
+            help=(update_help_prefix +
+                  'Keywords to help searches for the {0}'
+                  .format(ep_or_share)))(f)
         if create:
             f = click.argument('display_name')(f)
         else:

@@ -13,8 +13,8 @@ from globus_cli.services.transfer import (
                 type=ENDPOINT_PLUS_REQPATH)
 @endpoint_create_and_update_params(create=True, shared_ep=True)
 def endpoint_create_share(endpoint_plus_path, display_name, description,
-                          organization, contact_email, contact_info,
-                          info_link):
+                          department, keywords, organization, contact_email,
+                          contact_info, info_link):
     """
     Executor for `globus share create`
     """
@@ -24,8 +24,9 @@ def endpoint_create_share(endpoint_plus_path, display_name, description,
         'shared_endpoint',
         host_endpoint=endpoint_id, host_path=host_path,
         display_name=display_name, description=description,
-        organization=organization, contact_email=contact_email,
-        contact_info=contact_info, info_link=info_link, public=True)
+        department=department, keywords=keywords, organization=organization,
+        contact_email=contact_email, contact_info=contact_info,
+        info_link=info_link, public=True)
 
     client = get_client()
     autoactivate(client, endpoint_id, if_expires_in=60)
