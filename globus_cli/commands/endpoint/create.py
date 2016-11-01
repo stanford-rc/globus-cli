@@ -16,9 +16,9 @@ from globus_cli.services.transfer import get_client, assemble_generic_doc
               flag_value='personal', default=True, show_default=True,
               help='This endpoint is a Globus Connect Personal endpoint')
 def endpoint_create(endpoint_type, display_name, description, organization,
-                    contact_email, contact_info, info_link, public,
-                    default_directory, force_encryption, oauth_server,
-                    myproxy_server, myproxy_dn):
+                    department, keywords, contact_email, contact_info,
+                    info_link, public, default_directory, force_encryption,
+                    oauth_server, myproxy_server, myproxy_dn):
     """
     Executor for `globus endpoint create`
     """
@@ -27,7 +27,8 @@ def endpoint_create(endpoint_type, display_name, description, organization,
         # omit this key if not personal, but include as True if personal
         is_globus_connect=(endpoint_type == 'personal' or None),
         display_name=display_name, description=description,
-        organization=organization, contact_email=contact_email,
+        organization=organization, department=department,
+        keywords=keywords, contact_email=contact_email,
         contact_info=contact_info, info_link=info_link,
         force_encryption=force_encryption, public=public,
         default_directory=default_directory,

@@ -23,5 +23,6 @@ def endpoint_show(endpoint_id):
     else:
         fields = (('Display Name', 'display_name'), ('ID', 'id'),
                   ('Owner', 'owner_string'), ('Activated', 'activated'),
-                  ('Shareable', 'shareable'))
+                  ('Shareable', 'shareable'),
+                  ('Department', 'department'), ('Keywords', 'keywords'))
         colon_formatted_print(res, fields)
