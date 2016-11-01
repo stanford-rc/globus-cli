@@ -12,6 +12,27 @@ from globus_cli.config import (
     internal_auth_client, remove_option, lookup_option)
 
 
+_RESCIND_HELP = """\
+Rescinding Consents
+-------------------
+The logout command only revokes tokens that it can see in its storage.
+If you are concerned that logout may have failed to revoke a token,
+you may want to manually rescind the Globus CLI consent on the
+Manage Consents Page:
+    https://auth.globus.org/consents
+
+"""
+
+
+_LOGOUT_EPILOG = """\
+\nYou are now successfully logged out of the Globus CLI.
+Before attempting any further CLI commands, you will have to login again using
+
+  globus login
+
+"""
+
+
 @click.command('logout',
                short_help='Logout of the Globus CLI',
                help=('Logout of the Globus CLI. '
@@ -40,20 +61,23 @@ def logout_command(yes):
     if not username:
         _confirm(("Your username is not set. You may not be logged in. "
                   "Would you like to try to logout anyway?"), default=True)
-    safeprint('Logging out of Globus{}'.format(' as ' + username
-                                               if username else ''))
+    safeprint('Logging out of Globus{}\n'.format(' as ' + username
+                                                 if username else ''))
 
     # build the NativeApp client object
     native_client = internal_auth_client()
 
     # remove tokens from config and revoke them
+    # also, track whether or not we should print the rescind help
+    print_rescind_help = False
     for token_opt in (TRANSFER_RT_OPTNAME, TRANSFER_AT_OPTNAME,
-                      TRANSFER_AT_EXPIRES_OPTNAME,
-                      AUTH_RT_OPTNAME, AUTH_AT_OPTNAME,
-                      AUTH_AT_EXPIRES_OPTNAME):
+                      AUTH_RT_OPTNAME, AUTH_AT_OPTNAME):
         # first lookup the token -- if not found we'll continue
         token = lookup_option(token_opt)
         if not token:
+            safeprint(('Warning: Found no token named "{}"! '
+                       'Recommend rescinding consent').format(token_opt))
+            print_rescind_help = True
             continue
         # token was found, so try to revoke it
         try:
@@ -68,7 +92,21 @@ def logout_command(yes):
         # finally, we revoked, so it's safe to remove the token
         remove_option(token_opt)
 
+    # remove expiration times, just for cleanliness
+    for expires_opt in (TRANSFER_AT_EXPIRES_OPTNAME,
+                        AUTH_AT_EXPIRES_OPTNAME):
+        remove_option(expires_opt)
+
     # remove whoami data
     for whoami_opt in (WHOAMI_ID_OPTNAME, WHOAMI_USERNAME_OPTNAME,
                        WHOAMI_EMAIL_OPTNAME, WHOAMI_NAME_OPTNAME):
         remove_option(whoami_opt)
+
+    safeprint(_LOGOUT_EPILOG)
+
+    # if some token wasn't found in the config, it means its possible that the
+    # config file was removed without logout
+    # in that case, the user should rescind the CLI consent to invalidate any
+    # potentially leaked refresh tokens, so print the help on that
+    if print_rescind_help:
+        safeprint(_RESCIND_HELP)
