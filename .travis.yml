@@ -14,9 +14,4 @@ install:
 cache: pip
 script:
   - flake8
-  # poor man's testsuite: run a bunch of commands and confirm that they don't
-  # crash and burn catastrophically
-  - globus --help  # parsing failures
-  - globus list-commands  # actually running a command
-  - globus get-identities 'abc@globus.org' --map-http-status "401=0"  # auth call (noauth)
-  - globus ls 'ddb59aef-6d04-11e5-ba46-22000b92c6ec' --map-http-status "400=0"  # transfer call (noauth)
+  - bash basic_tests.sh
