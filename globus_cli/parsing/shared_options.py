@@ -259,6 +259,28 @@ def server_add_and_update_opts(*args, **kwargs):
     >>> def command_func(subject, port, scheme, hostname):
     >>>     ...
     """
+
+    def port_range_callback(ctx, param, value):
+        if not value:
+            return None
+
+        value = value.lower().strip()
+        if value == 'unspecified':
+            return None, None
+        if value == 'unrestricted':
+            return 1024, 65535
+
+        try:
+            lower, upper = map(int, value.split('-'))
+        except ValueError:  # too many/few values from split or non-integer(s)
+            raise click.BadParameter("must specify as 'unspecified', "
+                                     "'unrestricted', or as range separated "
+                                     "by a hyphen (e.g. '50000-51000')")
+        if not 1024 <= lower <= 65535 or not 1024 <= upper <= 65535:
+            raise click.BadParameter("must be within the 1024-65535 range")
+
+        return (lower, upper) if lower <= upper else (upper, lower)
+
     def inner_decorator(f, add=False):
         f = click.option('--hostname', required=add,
                          help='Server Hostname.')(f)
@@ -278,6 +300,21 @@ def server_add_and_update_opts(*args, **kwargs):
             '--subject',
             help=('Subject of the X509 Certificate of the server. When '
                   'unspecified, the CN must match the server hostname.'))(f)
+
+        for adjective, our_preposition, their_preposition in [
+            ('incoming', 'to', 'from'),
+            ('outgoing', 'from', 'to'),
+        ]:
+            f = click.option(
+              '--{}-data-ports'.format(adjective),
+              callback=port_range_callback,
+              help="Indicate to firewall administrators at other sites how to "
+                   "allow {} traffic {} this server {} their own. Specify as "
+                   "either 'unspecified', 'unrestricted', or as range of "
+                   "ports separated by a hyphen (e.g. '50000-51000') within "
+                   "the 1024-65535 range.".format(adjective, our_preposition,
+                                                  their_preposition)
+            )(f)
 
         return f
     return detect_and_decorate(inner_decorator, args, kwargs)

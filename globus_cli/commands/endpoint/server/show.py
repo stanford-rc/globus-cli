@@ -22,5 +22,19 @@ def server_show(endpoint_id, server_id):
     if outformat_is_json():
         print_json_response(server_doc)
     else:
-        fields = (('ID', 'id'), ('URI', 'uri'), ('Subject', 'subject'))
+        def advertised_port_summary(server):
+            def get_range_summary(start, end):
+                return ('unspecified' if not start and not end
+                        else 'unrestricted' if start == 1024 and end == 65535
+                        else '{}-{}'.format(start, end))
+
+            return "incoming {}, outgoing {}".format(
+                       get_range_summary(server['incoming_data_port_start'],
+                                         server['incoming_data_port_end']),
+                       get_range_summary(server['outgoing_data_port_start'],
+                                         server['outgoing_data_port_end']),
+                   )
+
+        fields = (('ID', 'id'), ('URI', 'uri'), ('Subject', 'subject'),
+                  ('Data Ports', advertised_port_summary))
         colon_formatted_print(server_doc, fields)
