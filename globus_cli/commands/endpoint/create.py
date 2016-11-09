@@ -2,9 +2,20 @@ import click
 
 from globus_cli.parsing import (
     common_options, endpoint_create_and_update_params)
-from globus_cli.helpers import print_json_response
+from globus_cli.helpers import (
+    outformat_is_json, print_json_response, colon_formatted_print)
 
 from globus_cli.services.transfer import get_client, assemble_generic_doc
+
+
+COMMON_FIELDS = [
+    ('Message', 'message'),
+    ('Endpoint ID', 'id'),
+]
+
+GCP_FIELDS = [
+    ('Setup Key', 'globus_connect_setup_key'),
+]
 
 
 @click.command('create', help='Create a new Endpoint')
@@ -22,10 +33,12 @@ def endpoint_create(endpoint_type, display_name, description, organization,
     """
     Executor for `globus endpoint create`
     """
+
+    # omit the `is_globus_connect` key if not GCP, otherwise include as `True`
+    is_globus_connect = endpoint_type == 'personal' or None
     ep_doc = assemble_generic_doc(
         'endpoint',
-        # omit this key if not personal, but include as True if personal
-        is_globus_connect=(endpoint_type == 'personal' or None),
+        is_globus_connect=is_globus_connect,
         display_name=display_name, description=description,
         organization=organization, department=department,
         keywords=keywords, contact_email=contact_email,
@@ -37,4 +50,10 @@ def endpoint_create(endpoint_type, display_name, description, organization,
 
     client = get_client()
     res = client.create_endpoint(ep_doc)
-    print_json_response(res)
+
+    if outformat_is_json():
+        print_json_response(res)
+        return
+
+    fields = COMMON_FIELDS + GCP_FIELDS if is_globus_connect else COMMON_FIELDS
+    colon_formatted_print(res, fields)

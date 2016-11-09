@@ -3,7 +3,8 @@ import click
 from globus_cli.parsing import (
     CaseInsensitiveChoice, common_options, ENDPOINT_PLUS_REQPATH,
     security_principal_opts)
-from globus_cli.helpers import print_json_response
+from globus_cli.helpers import (
+    outformat_is_json, print_json_response, colon_formatted_print)
 
 from globus_cli.services.auth import maybe_lookup_identity_id
 
@@ -41,4 +42,8 @@ def create_command(principal, permissions, endpoint_plus_path):
 
     res = client.add_endpoint_acl_rule(endpoint_id, rule_data)
 
-    print_json_response(res)
+    if outformat_is_json():
+        print_json_response(res)
+    else:
+        colon_formatted_print(res, [('Message', 'message'),
+                                    ('Rule ID', 'access_id')])
