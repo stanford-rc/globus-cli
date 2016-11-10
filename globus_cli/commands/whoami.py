@@ -24,13 +24,14 @@ def whoami_command(verbose):
                   'logging in again.')
         return
 
-    safeprint('Logged in as: {}'.format(username))
-
     if verbose:
         name = lookup_option(WHOAMI_NAME_OPTNAME, environment=GLOBUS_ENV)
         identity_id = lookup_option(WHOAMI_ID_OPTNAME, environment=GLOBUS_ENV)
         email = lookup_option(WHOAMI_EMAIL_OPTNAME, environment=GLOBUS_ENV)
 
+        safeprint('Username: {}'.format(username))
         safeprint('Name: {}'.format(name))
-        safeprint('Id: {}'.format(identity_id))
+        safeprint('ID: {}'.format(identity_id))
         safeprint('Email: {}'.format(email))
+    else:
+        safeprint(username)
