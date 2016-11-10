@@ -26,6 +26,13 @@ def endpoint_search(filter_fulltext, filter_owner_id, filter_scope):
     """
     Executor for `globus endpoint search`
     """
+    if filter_scope == 'all' and not filter_fulltext:
+        raise click.UsageError(
+            'When searching all endpoints (--filter-scope=all, the default), '
+            'a full-text search filter is required. Other scopes (e.g. '
+            '--filter-scope=recently-used) may be used without specifying '
+            'an additional filter.')
+
     client = get_client()
 
     owner_id = filter_owner_id
