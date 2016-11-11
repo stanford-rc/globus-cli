@@ -43,6 +43,16 @@
             
   <div class="section" id="globus-cli">
 <h1>Globus CLI<a class="headerlink" href="#globus-cli" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>This page refers to the beta version of the new Globus CLI, which is an
+application you download and locally install.
+Please try out the new CLI, and send us your feedback at <a class="reference external" href="mailto:support&#37;&#52;&#48;globus&#46;org">support<span>&#64;</span>globus<span>&#46;</span>org</a></p>
+<p>This CLI is still in beta and updates and changes to the interfaces are
+expected as newer versions are released.</p>
+<p class="last">If you are looking for the current CLI available in production please see
+<a class="reference external" href="https://docs.globus.org/cli">https://docs.globus.org/cli</a></p>
+</div>
 <p>This CLI provides a convenient shell interface to
 <a class="reference external" href="https://www.globus.org">Globus</a> APIs,
 including the Transfer API and the Globus Auth API.</p>
@@ -102,7 +112,7 @@ start out by getting logged in:</p>
 <p>You can check that you can correctly authenticate to the Globus APIs with two
 quick commands.</p>
 <p>First, check that you can access Globus Auth:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus auth get-identities --usernames <span class="s1">&#39;go@globusid.org&#39;</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus get-identities <span class="s1">&#39;go@globusid.org&#39;</span>
 ID                                   <span class="p">|</span> Full Name      <span class="p">|</span> Username        <span class="p">|</span> Organization <span class="p">|</span> Email Address
 ------------------------------------ <span class="p">|</span> -------------- <span class="p">|</span> --------------- <span class="p">|</span> ------------ <span class="p">|</span> ------------------
 c699d42e-d274-11e5-bf75-1fc5bf53bb24 <span class="p">|</span> www.globus.org <span class="p">|</span> go@globusid.org <span class="p">|</span> Globus       <span class="p">|</span> noreply@globus.org
@@ -110,7 +120,7 @@ c699d42e-d274-11e5-bf75-1fc5bf53bb24 <span class="p">|</span> www.globus.org <sp
 </div>
 <p>Your output should be the same as above.
 If you are not authenticated, you will see a message similar to:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus auth get-identities --usernames <span class="s1">&#39;go@globusid.org&#39;</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus get-identities <span class="s1">&#39;go@globusid.org&#39;</span>
 Globus CLI Error: A GLobus API Error Occurred.
 HTTP status:      401
 code:             UNAUTHORIZED
@@ -119,8 +129,7 @@ message:          Call must be authenticated
 </div>
 <p>Next, check that you can reach the Globus Transfer API:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># --filter-owner-id is the ID of &#39;go@globusid.org&#39;, fetched above</span>
-$ globus transfer endpoint search <span class="se">\</span>
-    --filter-fulltext <span class="s1">&#39;Globus Tutorial Endpoint&#39;</span> <span class="se">\</span>
+$ globus endpoint search <span class="s1">&#39;Globus Tutorial Endpoint&#39;</span> <span class="se">\</span>
     --filter-owner-id <span class="s1">&#39;c699d42e-d274-11e5-bf75-1fc5bf53bb24&#39;</span>
 Owner           <span class="p">|</span> ID                                   <span class="p">|</span> Display Name
 --------------- <span class="p">|</span> ------------------------------------ <span class="p">|</span> ---------------------------
@@ -130,8 +139,7 @@ go@globusid.org <span class="p">|</span> cf9bcaa5-6d04-11e5-ba46-22000b92c6ec <s
 </pre></div>
 </div>
 <p>If you are not authenticated, you will get an error like the following:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus transfer endpoint search <span class="se">\</span>
-    --filter-fulltext <span class="s1">&#39;Globus Tutorial Endpoint&#39;</span> <span class="se">\</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus endpoint search <span class="s1">&#39;Globus Tutorial Endpoint&#39;</span> <span class="se">\</span>
     --filter-owner-id <span class="s1">&#39;c699d42e-d274-11e5-bf75-1fc5bf53bb24&#39;</span>
 Globus CLI Error: A Transfer API Error Occurred.
 HTTP status:      401
@@ -142,17 +150,15 @@ message:          Token is not active
 </div>
 <p>Now we have the endpoint IDs for the tutorial endpoints, and can do a test
 directory listing:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus transfer ls <span class="se">\</span>
-    --endpoint-id <span class="s1">&#39;ddb59aef-6d04-11e5-ba46-22000b92c6ec&#39;</span> <span class="se">\</span>
-    --path <span class="s1">&#39;/&#39;</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus ls <span class="s1">&#39;ddb59aef-6d04-11e5-ba46-22000b92c6ec:/&#39;</span>
 home
 mnt
 not shareable
 share
 </pre></div>
 </div>
-<p>Start exploring the CLI!
-Use <code class="docutils literal"><span class="pre">globus</span> <span class="pre">list-commands</span></code> to see all of the commands in the CLI, and to get
+<p>Start exploring the CLI!</p>
+<p>Use <code class="docutils literal"><span class="pre">globus</span> <span class="pre">list-commands</span></code> to see all of the commands in the CLI, and to get
 more detailed help for a specific information on a command, run that command
 with the <code class="docutils literal"><span class="pre">--help</span></code> flag.</p>
 </div>
