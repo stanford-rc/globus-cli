@@ -3,6 +3,17 @@
 Globus CLI
 ==========
 
+.. warning::
+    This page refers to the beta version of the new Globus CLI, which is an
+    application you download and locally install.
+    Please try out the new CLI, and send us your feedback at support@globus.org
+
+    This CLI is still in beta and updates and changes to the interfaces are
+    expected as newer versions are released.
+
+    If you are looking for the current CLI available in production please see
+    https://docs.globus.org/cli
+
 This CLI provides a convenient shell interface to
 `Globus <https://www.globus.org>`_ APIs,
 including the Transfer API and the Globus Auth API.
@@ -90,7 +101,7 @@ First, check that you can access Globus Auth:
 
 .. code-block:: bash
 
-    $ globus auth get-identities --usernames 'go@globusid.org'
+    $ globus get-identities 'go@globusid.org'
     ID                                   | Full Name      | Username        | Organization | Email Address
     ------------------------------------ | -------------- | --------------- | ------------ | ------------------
     c699d42e-d274-11e5-bf75-1fc5bf53bb24 | www.globus.org | go@globusid.org | Globus       | noreply@globus.org
@@ -100,7 +111,7 @@ If you are not authenticated, you will see a message similar to:
 
 .. code-block:: bash
 
-    $ globus auth get-identities --usernames 'go@globusid.org'
+    $ globus get-identities 'go@globusid.org'
     Globus CLI Error: A GLobus API Error Occurred.
     HTTP status:      401
     code:             UNAUTHORIZED
@@ -111,8 +122,7 @@ Next, check that you can reach the Globus Transfer API:
 .. code-block:: bash
 
     # --filter-owner-id is the ID of 'go@globusid.org', fetched above
-    $ globus transfer endpoint search \
-        --filter-fulltext 'Globus Tutorial Endpoint' \
+    $ globus endpoint search 'Globus Tutorial Endpoint' \
         --filter-owner-id 'c699d42e-d274-11e5-bf75-1fc5bf53bb24'
     Owner           | ID                                   | Display Name
     --------------- | ------------------------------------ | ---------------------------
@@ -124,8 +134,7 @@ If you are not authenticated, you will get an error like the following:
 
 .. code-block:: bash
 
-    $ globus transfer endpoint search \
-        --filter-fulltext 'Globus Tutorial Endpoint' \
+    $ globus endpoint search 'Globus Tutorial Endpoint' \
         --filter-owner-id 'c699d42e-d274-11e5-bf75-1fc5bf53bb24'
     Globus CLI Error: A Transfer API Error Occurred.
     HTTP status:      401
@@ -138,15 +147,14 @@ directory listing:
 
 .. code-block:: bash
 
-    $ globus transfer ls \
-        --endpoint-id 'ddb59aef-6d04-11e5-ba46-22000b92c6ec' \
-        --path '/'
+    $ globus ls 'ddb59aef-6d04-11e5-ba46-22000b92c6ec:/'
     home
     mnt
     not shareable
     share
 
 Start exploring the CLI!
+
 Use ``globus list-commands`` to see all of the commands in the CLI, and to get
 more detailed help for a specific information on a command, run that command
 with the ``--help`` flag.
