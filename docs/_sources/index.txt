@@ -3,7 +3,7 @@
 Globus CLI
 ==========
 
-.. warning::
+.. note::
     This page refers to the beta version of the new Globus CLI, which is an
     application you download and locally install.
     Please try out the new CLI, and send us your feedback at support@globus.org
