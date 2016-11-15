@@ -12,7 +12,8 @@ from globus_cli.services.transfer import get_client
 @task_id_arg
 @click.option('--timeout', type=int, metavar='N',
               help=('Wait N seconds. If the Task does not terminate by '
-                    'then, exit with status 0'))
+                    'then, or terminates with an unsuccessful status, '
+                    'exit with status 1'))
 @click.option('--polling-interval', default=1, type=int, show_default=True,
               help='Number of seconds between Task status checks.')
 @click.option('--heartbeat', '-H', is_flag=True,
@@ -51,7 +52,14 @@ def task_wait(meow, heartbeat, polling_interval, timeout, task_id):
  ==._.==         ;
       \ i _..._ /,
       {_;/   {_//""")
-            sys.exit(1)
+
+            # TODO: possibly update TransferClient.task_wait so that we don't
+            # need to do an extra fetch to get the task status after completion
+            status = client.get_task(task_id)['status']
+            if status == 'SUCCEEDED':
+                click.get_current_context().exit(0)
+            else:
+                click.get_current_context().exit(1)
 
         return completed
 
@@ -65,7 +73,7 @@ def task_wait(meow, heartbeat, polling_interval, timeout, task_id):
 
     waited_time = 0
     while (not timed_out(waited_time) and
-            not check_completed()):
+           not check_completed()):
         if heartbeat:
             safeprint('.', newline=False)
             sys.stdout.flush()
@@ -75,3 +83,5 @@ def task_wait(meow, heartbeat, polling_interval, timeout, task_id):
     # add a trailing newline to heartbeats if we fail
     if heartbeat:
         safeprint('')
+
+    click.get_current_context().exit(1)
