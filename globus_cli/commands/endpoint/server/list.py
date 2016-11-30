@@ -1,7 +1,10 @@
+import json
 import click
 
+from globus_cli.safeio import safeprint
 from globus_cli.parsing import common_options, endpoint_id_arg
-from globus_cli.helpers import print_table, outformat_is_json
+from globus_cli.helpers import (colon_formatted_print, print_table,
+                                outformat_is_json)
 from globus_cli.services.transfer import get_client, print_json_from_iterator
 
 
@@ -28,6 +31,14 @@ def server_list(endpoint_id):
             format(**endpoint.data)
         )
 
+    if endpoint['s3_url']:  # not GCS -- this is an S3 endpoint
+        if outformat_is_json():
+            safeprint(json.dumps({'s3_uri': endpoint['s3_url']}, indent=2))
+        else:
+            colon_formatted_print(endpoint, [("S3 URL", 's3_url')])
+        return
+
+    # regular GCS host endpoint; use Transfer's server list API
     server_iterator = client.endpoint_server_list(endpoint_id)
 
     if outformat_is_json():
