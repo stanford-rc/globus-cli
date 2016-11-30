@@ -14,6 +14,20 @@ def server_list(endpoint_id):
     """
     client = get_client()
 
+    endpoint = client.get_endpoint(endpoint_id)
+
+    if endpoint['host_endpoint_id']:  # not GCS -- this is a share endpoint
+        raise click.UsageError(
+            "{id} ({display_name}) is a share and does not have servers.\n"
+            "\n"
+            "To see details of the share, use\n"
+            "    globus endpoint show {id}\n"
+            "\n"
+            "To list the servers on the share's host endpoint, use\n"
+            "    globus endpoint server list {host_endpoint_id}".
+            format(**endpoint.data)
+        )
+
     server_iterator = client.endpoint_server_list(endpoint_id)
 
     if outformat_is_json():
