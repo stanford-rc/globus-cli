@@ -1,4 +1,5 @@
 import json
+from textwrap import dedent
 import click
 
 from globus_cli.safeio import safeprint
@@ -20,16 +21,15 @@ def server_list(endpoint_id):
     endpoint = client.get_endpoint(endpoint_id)
 
     if endpoint['host_endpoint_id']:  # not GCS -- this is a share endpoint
-        raise click.UsageError(
-            "{id} ({display_name}) is a share and does not have servers.\n"
-            "\n"
-            "To see details of the share, use\n"
-            "    globus endpoint show {id}\n"
-            "\n"
-            "To list the servers on the share's host endpoint, use\n"
-            "    globus endpoint server list {host_endpoint_id}".
-            format(**endpoint.data)
-        )
+        raise click.UsageError(dedent("""\
+            {id} ({display_name}) is a share and does not have servers.
+
+            To see details of the share, use
+                globus endpoint show {id}
+
+            To list the servers on the share's host endpoint, use
+                globus endpoint server list {host_endpoint_id}
+        """).format(**endpoint.data))
 
     if endpoint['s3_url']:  # not GCS -- this is an S3 endpoint
         if outformat_is_json():
