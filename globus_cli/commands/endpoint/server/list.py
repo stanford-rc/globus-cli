@@ -45,4 +45,7 @@ def server_list(endpoint_id):
     if outformat_is_json():
         print_json_from_iterator(server_iterator)
     else:
-        print_table(server_iterator, [('ID', 'id'), ('URI', 'uri')])
+        print_table(server_iterator, [
+            ('ID', 'id'),
+            ('URI', lambda s: s['uri'] or "none (Globus Connect Personal)"),
+        ])
