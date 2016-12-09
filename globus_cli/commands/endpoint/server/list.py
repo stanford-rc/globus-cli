@@ -33,7 +33,7 @@ def server_list(endpoint_id):
 
     if endpoint['s3_url']:  # not GCS -- this is an S3 endpoint
         if outformat_is_json():
-            safeprint(json.dumps({'s3_uri': endpoint['s3_url']}, indent=2))
+            safeprint(json.dumps({'s3_url': endpoint['s3_url']}, indent=2))
         else:
             colon_formatted_print(endpoint, [("S3 URL", 's3_url')])
         return
