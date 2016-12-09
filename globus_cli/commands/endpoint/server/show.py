@@ -21,6 +21,12 @@ def server_show(endpoint_id, server_id):
 
     if outformat_is_json():
         print_json_response(server_doc)
+
+    elif not server_doc['uri']:  # GCP endpoint server
+        fields = (('ID', 'id'), ('Is Connected', 'is_connected'),
+                  ('Is Paused (macOS only)', 'is_paused'))
+        colon_formatted_print(server_doc, fields)
+
     else:
         def advertised_port_summary(server):
             def get_range_summary(start, end):
