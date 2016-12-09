@@ -1,4 +1,5 @@
 import json
+from six import string_types
 
 from globus_cli.helpers import outformat_is_json
 from globus_cli.safeio.write import safeprint
@@ -24,7 +25,8 @@ class PrintableErrorField(object):
         str(PrintableErrorField) is good for textmode printing
         """
         name = self.name + ':'
-        if not self.multiline or '\n' not in self.value:
+        if not self.multiline or not isinstance(self.value, string_types) or \
+                '\n' not in self.value:
             return '{0} {1}'.format(name.ljust(self._text_prefix_len),
                                     self.value)
         else:
