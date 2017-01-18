@@ -49,12 +49,13 @@
 another shell you may need to modify the non globus commands and syntax
 found in these examples</p>
 <p>The following examples also assume the user has already successfully
-authenticated with Globus Auth. To do so run</p>
+logged into Globus. To do so run</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus login
 </pre></div>
 </div>
 <p class="last">and follow the instructions.
-If you are having problems with authorization, consult <a class="reference external" href="https://globus.github.io/globus-cli/#getting-started">Getting Started</a></p>
+If you are having problems with authorization, consult
+<a class="reference internal" href="index.html#getting-started"><span class="std std-ref">Getting Started</span></a></p>
 </div>
 <div class="section" id="finding-an-endpoint">
 <h2>Finding an Endpoint<a class="headerlink" href="#finding-an-endpoint" title="Permalink to this headline">¶</a></h2>
@@ -69,10 +70,25 @@ $ <span class="nv">ep1</span><span class="o">=</span>ddb59aef-6d04-11e5-ba46-220
 $ globus endpoint show <span class="nv">$ep1</span>
 </pre></div>
 </div>
+<p>Sample output. (search results truncated for readability)</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Owner                      | ID                                   | Display Name
+-------------------------- | ------------------------------------ | -------------------------------------
+go@globusid.org            | ddb59aef-6d04-11e5-ba46-22000b92c6ec | Globus Tutorial Endpoint 1
+go@globusid.org            | ddb59af0-6d04-11e5-ba46-22000b92c6ec | Globus Tutorial Endpoint 2
+
+Display Name: Globus Tutorial Endpoint 1
+ID:           ddb59aef-6d04-11e5-ba46-22000b92c6ec
+Owner:        go@globusid.org
+Activated:    False
+Shareable:    True
+Department:   None
+Keywords:     None
+</pre></div>
+</div>
 </div>
 <div class="section" id="endpoint-manipulation">
 <h2>Endpoint Manipulation<a class="headerlink" href="#endpoint-manipulation" title="Permalink to this headline">¶</a></h2>
-<p>Demonstrates the synchronous commands of mkdir, rename, and ls</p>
+<p>Demonstrates the synchronous commands of mkdir, rename, and ls.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># Tutorial Endpoint ID found from &#39;globus endpoint search Tutorial&#39;</span>
 $ <span class="nv">ep1</span><span class="o">=</span>ddb59aef-6d04-11e5-ba46-22000b92c6ec
 
@@ -84,6 +100,14 @@ $ globus rename <span class="nv">$ep1</span>:~/cli_example_dir <span class="nv">
 
 <span class="c1"># Show the directory contents after the changes</span>
 $ globus ls <span class="nv">$ep1</span>:~/
+</pre></div>
+</div>
+<p>Sample output when ~/ was empty before running.</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>The directory was created successfully
+
+File or directory renamed successfully
+
+cli_example_dir_renamed/
 </pre></div>
 </div>
 </div>
@@ -104,16 +128,24 @@ $ globus transfer <span class="nv">$ep1</span>:/share/godata <span class="nv">$e
     --recursive --label <span class="s2">&quot;CLI single folder&quot;</span>
 </pre></div>
 </div>
+<p>Sample output.</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Message: The transfer has been accepted and a task has been created and queued for execution
+Task ID: 466a5962-dda0-11e6-9d11-22000a1e3b52
+
+Message: The transfer has been accepted and a task has been created and queued for execution
+Task ID: 47477b62-dda0-11e6-9d11-22000a1e3b52
+</pre></div>
+</div>
 </div>
 <div class="section" id="batch-transfers">
 <h2>Batch Transfers<a class="headerlink" href="#batch-transfers" title="Permalink to this headline">¶</a></h2>
 <p>Uses a .txt file to request multiple files in one transfer request.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># this is the contents of in.txt:</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># this is the contents of in.txt:</span>
 <span class="c1"># a list of source paths followed by destination paths</span>
 
-<span class="n">file1</span><span class="o">.</span><span class="n">txt</span> <span class="n">file1</span><span class="o">.</span><span class="n">txt</span>
-<span class="n">file2</span><span class="o">.</span><span class="n">txt</span> <span class="n">file2</span><span class="o">.</span><span class="n">txt</span>
-<span class="n">file3</span><span class="o">.</span><span class="n">txt</span> <span class="n">file3</span><span class="o">.</span><span class="n">txt</span>
+file1.txt file1.txt
+file2.txt file2.txt
+file3.txt file3.txt
 </pre></div>
 </div>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># Tutorial Endpoint IDs found from &#39;globus endpoint search Tutorial&#39;</span>
@@ -121,10 +153,15 @@ $ <span class="nv">ep1</span><span class="o">=</span>ddb59aef-6d04-11e5-ba46-220
 $ <span class="nv">ep2</span><span class="o">=</span>ddb59af0-6d04-11e5-ba46-22000b92c6ec
 
 <span class="c1"># since batch mode reads from stdin, we can direct input from a .txt file</span>
-<span class="c1"># to add all the items listed there to one transfer</span>
 <span class="c1"># note that all paths from stdin are relative to the paths supplied here</span>
 $ globus transfer <span class="nv">$ep1</span>:/share/godata/ <span class="nv">$ep2</span>:~/ <span class="se">\</span>
     --batch --label <span class="s2">&quot;CLI Batch&quot;</span> &lt; in.txt
+</pre></div>
+</div>
+<p>Sample output. Note that only one task was needed even though there are
+multiple files to be transfered.</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Message: The transfer has been accepted and a task has been created and queued for execution
+Task ID: 306900e0-dda1-11e6-9d11-22000a1e3b52
 </pre></div>
 </div>
 </div>
@@ -133,12 +170,12 @@ $ globus transfer <span class="nv">$ep1</span>:/share/godata/ <span class="nv">$
 <p>Submits delete task requests for the files transfered by the previous two
 examples. Note that even if the target files are non-existent this example will
 still submit delete tasks without error, but the tasks themselves will fail.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># this is the contents of in.txt:</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># this is the contents of in.txt:</span>
 <span class="c1"># a list of source paths</span>
 
-<span class="n">file1</span><span class="o">.</span><span class="n">txt</span>
-<span class="n">file2</span><span class="o">.</span><span class="n">txt</span>
-<span class="n">file3</span><span class="o">.</span><span class="n">txt</span>
+file1.txt
+file2.txt
+file3.txt
 </pre></div>
 </div>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># Tutorial Endpoint ID found from &#39;globus endpoint search Tutorial&#39;</span>
@@ -150,6 +187,13 @@ $ globus delete <span class="nv">$ep2</span>:~/godata --recursive --label <span 
 <span class="c1"># batch deletion of multiple files</span>
 <span class="c1"># we are again using a .txt file for our batch stdin</span>
 $ globus delete <span class="nv">$ep2</span>:~/ --batch --label <span class="s2">&quot;CLI batch delete&quot;</span> &lt; in.txt
+</pre></div>
+</div>
+<p>Sample output.</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Message: The delete has been accepted and a task has been created and queued for execution
+Task ID: a3ec193a-dda1-11e6-9d11-22000a1e3b52
+Message: The delete has been accepted and a task has been created and queued for execution
+Task ID: a4761f4a-dda1-11e6-9d11-22000a1e3b52
 </pre></div>
 </div>
 </div>
@@ -176,6 +220,28 @@ $ globus task show <span class="nv">$task_id</span>
 $ globus task cancel <span class="nv">$task_id</span>
 </pre></div>
 </div>
+<p>Sample output. Note the Details field reads PERMISSION_DENIED, but the status
+filed is still ACTIVE. Globus would eventually time out such a request when the
+Deadline field was up, but the user has until then to refresh any permissions
+that might have timed out.</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Message: The transfer has been accepted and a task has been created and queued for execution
+Task ID: 67d6e4ba-dda2-11e6-9d11-22000a1e3b52
+
+Label:                Unauthorized Transfer
+Task ID:              67d6e4ba-dda2-11e6-9d11-22000a1e3b52
+Type:                 TRANSFER
+Directories:          1
+Files:                3
+Status:               ACTIVE
+Request Time:         2017-01-18 17:20:28+00:00
+Deadline:             2017-01-19 17:20:28+00:00
+Details:              PERMISSION_DENIED
+Source Endpoint:      Globus Tutorial Endpoint 1
+Destination Endpoint: Globus Tutorial Endpoint 2
+
+The task has been cancelled successfully.
+</pre></div>
+</div>
 </div>
 <div class="section" id="bookmarks">
 <h2>Bookmarks<a class="headerlink" href="#bookmarks" title="Permalink to this headline">¶</a></h2>
@@ -192,6 +258,19 @@ $ globus bookmark list
 <span class="c1"># The bookmark can now be used to get a path without any UUIDs</span>
 $ <span class="nv">path</span><span class="o">=</span><span class="k">$(</span>globus bookmark locate <span class="s2">&quot;Example Bookmark&quot;</span><span class="k">)</span>
 $ globus ls <span class="nv">$path</span>
+</pre></div>
+</div>
+<p>Sample output. Note that you could use the Bookmark ID shown instead of the name
+if desired.</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Bookmark ID: ab45785a-dda3-11e6-9d11-22000a1e3b52
+
+Name             | Endpoint ID                          | Bookmark ID                          | Path
+---------------- | ------------------------------------ | ------------------------------------ | --------------
+Example Bookmark | ddb59aef-6d04-11e5-ba46-22000b92c6ec | ab45785a-dda3-11e6-9d11-22000a1e3b52 | /share/godata/
+
+file1.txt
+file2.txt
+file3.txt
 </pre></div>
 </div>
 </div>
@@ -219,12 +298,31 @@ $ <span class="nv">shared</span><span class="o">=</span>&lt;paste here&gt;
 $ globus endpoint permission create <span class="nv">$shared</span>:/ <span class="se">\</span>
     --permissions r --all-authenticated
 
-<span class="c1"># the new permission will now appear along with the default owner permissions</span>
-<span class="c1"># on the endpoints permission list</span>
+<span class="c1"># the new permission will now appear on the endpoints permission list</span>
 $ globus endpoint permission list <span class="nv">$shared</span>
 
 <span class="c1"># the endpoint itself also shows up on your list of shared endpoints</span>
 $ globus endpoint search --filter-scope shared-by-me
+</pre></div>
+</div>
+<p>Sample output. Note that in addition to the new permission we created appears
+along-side the owner&#8217;s automatic read-write permissions.</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>The directory was created successfully
+
+Message:     Shared endpoint created successfully
+Endpoint ID: 3e4efafe-dda4-11e6-9d11-22000a1e3b52
+
+Message: Access rule created successfully.
+Rule ID: 62f909c6-dda4-11e6-9d11-22000a1e3b52
+
+Rule ID                              | Permissions | Shared With             | Path
+------------------------------------ | ----------- | ----------------------- | ----
+62f909c6-dda4-11e6-9d11-22000a1e3b52 | r           | all_authenticated_users | /
+NULL                                 | rw          | example@globusid.org    | /
+
+Owner                 | ID                                   | Display Name
+--------------------- | ------------------------------------ | ---------------------------
+example@globusid.org  | 3e4efafe-dda4-11e6-9d11-22000a1e3b52 | CLI Example Shared Endpoint
 </pre></div>
 </div>
 </div>
@@ -239,10 +337,9 @@ $ <span class="nv">ep1</span><span class="o">=</span>ddb59aef-6d04-11e5-ba46-220
 $ <span class="nv">ep2</span><span class="o">=</span>ddb59af0-6d04-11e5-ba46-22000b92c6ec
 
 <span class="c1"># generate and store a UUID for the submission-id</span>
-<span class="nv">sub_id</span><span class="o">=</span><span class="k">$(</span>globus task generate-submission-id<span class="k">)</span>
+$ <span class="nv">sub_id</span><span class="o">=</span><span class="k">$(</span>globus task generate-submission-id<span class="k">)</span>
 
 <span class="c1"># submit multiple transfers using the same submission-id</span>
-<span class="c1"># note that only one will finish with a success message and a task ID</span>
 $ globus transfer <span class="nv">$ep1</span>:/share/godata <span class="nv">$ep2</span>:~/godata --recursive <span class="se">\</span>
     --submission-id <span class="nv">$sub_id</span> --label <span class="s2">&quot;1st submission&quot;</span>
 $ globus transfer <span class="nv">$ep1</span>:/share/godata <span class="nv">$ep2</span>:~/godata --recursive <span class="se">\</span>
@@ -252,6 +349,22 @@ $ globus transfer <span class="nv">$ep1</span>:/share/godata <span class="nv">$e
 
 <span class="c1"># view the task list to confirm only one task was submitted</span>
 $ globus task list
+</pre></div>
+</div>
+<p>Sample output. Note that only one submission has a success message, but all
+return the ID for the Task that only gets carried out once.</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Message: The transfer has been accepted and a task has been created and queued for execution
+Task ID: 8b43c4e2-dda5-11e6-9d11-22000a1e3b52
+
+Message: A transfer with id &#39;8b43c4e3-dda5-11e6-9d11-22000a1e3b52&#39; was already submitted
+Task ID: 8b43c4e2-dda5-11e6-9d11-22000a1e3b52
+
+Message: A transfer with id &#39;8b43c4e3-dda5-11e6-9d11-22000a1e3b52&#39; was already submitted
+Task ID: 8b43c4e2-dda5-11e6-9d11-22000a1e3b52
+
+Task ID                              | Status    | Type     | Source Display Name        | Dest Display Name          | Label
+------------------------------------ | --------- | -------- | -------------------------- | -------------------------- | ---------------------
+8b43c4e2-dda5-11e6-9d11-22000a1e3b52 | SUCCEEDED | TRANSFER | Globus Tutorial Endpoint 1 | Globus Tutorial Endpoint 2 | 1st submission
 </pre></div>
 </div>
 </div>

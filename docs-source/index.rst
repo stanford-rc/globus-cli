@@ -80,6 +80,7 @@ initialization file.
 For more info, see the instructions on :ref:`Updating and Removing CLI
 Versions <updating_and_removing>`.
 
+.. _getting_started:
 
 Getting Started
 ===============
