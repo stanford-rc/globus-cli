@@ -2,6 +2,7 @@ import click
 
 from globus_cli.safeio import safeprint
 from globus_cli.parsing import common_options
+from globus_cli.helpers import colon_formatted_print
 from globus_cli.config import (
     WHOAMI_ID_OPTNAME, WHOAMI_USERNAME_OPTNAME,
     WHOAMI_EMAIL_OPTNAME, WHOAMI_NAME_OPTNAME,
@@ -25,13 +26,14 @@ def whoami_command(verbose):
         return
 
     if verbose:
-        name = lookup_option(WHOAMI_NAME_OPTNAME, environment=GLOBUS_ENV)
-        identity_id = lookup_option(WHOAMI_ID_OPTNAME, environment=GLOBUS_ENV)
-        email = lookup_option(WHOAMI_EMAIL_OPTNAME, environment=GLOBUS_ENV)
-
-        safeprint('Username: {}'.format(username))
-        safeprint('Name: {}'.format(name))
-        safeprint('ID: {}'.format(identity_id))
-        safeprint('Email: {}'.format(email))
+        fields = tuple((x, x) for x in ('Username', 'Name', 'ID', 'Email'))
+        user_doc = {
+            'Username': username,
+            'Name': lookup_option(WHOAMI_NAME_OPTNAME, environment=GLOBUS_ENV),
+            'ID': lookup_option(WHOAMI_ID_OPTNAME, environment=GLOBUS_ENV),
+            'Email': lookup_option(WHOAMI_EMAIL_OPTNAME,
+                                   environment=GLOBUS_ENV)
+        }
+        colon_formatted_print(user_doc, fields)
     else:
         safeprint(username)
