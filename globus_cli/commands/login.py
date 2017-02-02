@@ -10,12 +10,10 @@ from globus_cli.config import (
     AUTH_AT_EXPIRES_OPTNAME, TRANSFER_AT_EXPIRES_OPTNAME,
     WHOAMI_ID_OPTNAME, WHOAMI_USERNAME_OPTNAME,
     WHOAMI_EMAIL_OPTNAME, WHOAMI_NAME_OPTNAME,
-    internal_auth_client, write_option)
+    internal_auth_client, write_option, lookup_option)
 
 
-_LOGIN_EPILOG = ("""\
-
-You have successfully logged in to the Globus CLI as {}
+_SHARED_EPILOG = ("""\
 
 
 You can always check your current identity with
@@ -25,6 +23,18 @@ Logout of the Globus CLI with
   globus logout
 """)
 
+_LOGIN_EPILOG = ("""\
+
+You have successfully logged in to the Globus CLI as {}
+""") + _SHARED_EPILOG
+
+_LOGGED_IN_RESPONSE = ("""\
+You are already logged in!
+
+You may force a new login with
+  globus login --force
+""") + _SHARED_EPILOG
+
 
 @click.command('login',
                short_help=('Login to Globus to get credentials for '
@@ -33,7 +43,39 @@ Logout of the Globus CLI with
                      'Necessary before any Globus CLI commands which require '
                      'authentication will work'))
 @common_options(no_format_option=True, no_map_http_status_option=True)
-def login_command():
+@click.option('--force', is_flag=True,
+              help=('Do a fresh login, ignoring any existing credentials'))
+def login_command(force):
+    if not force and check_logged_in():
+        safeprint(_LOGGED_IN_RESPONSE)
+
+    if force or not check_logged_in():
+        do_login_flow()
+
+
+def check_logged_in():
+    # first, pull up all of the data from config and see what we can get
+    # we can skip the access tokens and their expiration times as those are not
+    # strictly necessary
+    transfer_rt = lookup_option(TRANSFER_RT_OPTNAME)
+    auth_rt = lookup_option(AUTH_RT_OPTNAME)
+    # whoami data -- consider required for now
+    whoami_id = lookup_option(WHOAMI_ID_OPTNAME)
+    whoami_username = lookup_option(WHOAMI_USERNAME_OPTNAME)
+    whoami_email = lookup_option(WHOAMI_EMAIL_OPTNAME)
+    whoami_name = lookup_option(WHOAMI_NAME_OPTNAME)
+
+    # if any of these values are null return False
+    if (transfer_rt is None or auth_rt is None or
+            whoami_id is None or whoami_username is None or
+            whoami_email is None or whoami_name is None):
+        return False
+
+    # TODO: check that the tokens are valid
+    return True
+
+
+def do_login_flow():
     # build the NativeApp client object
     native_client = internal_auth_client()
 
