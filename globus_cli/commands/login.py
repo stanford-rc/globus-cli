@@ -15,7 +15,6 @@ from globus_cli.config import (
 
 _SHARED_EPILOG = ("""\
 
-
 You can always check your current identity with
   globus whoami
 
