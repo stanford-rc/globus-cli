@@ -21,16 +21,14 @@ you may want to manually rescind the Globus CLI consent on the
 Manage Consents Page:
 
     https://auth.globus.org/consents
-
 """
 
 
 _LOGOUT_EPILOG = """\
-\nYou are now successfully logged out of the Globus CLI.
+You are now successfully logged out of the Globus CLI.
 Before attempting any further CLI commands, you will have to login again using
 
   globus login
-
 """
 
 
@@ -89,7 +87,9 @@ def logout_command():
                        WHOAMI_EMAIL_OPTNAME, WHOAMI_NAME_OPTNAME):
         remove_option(whoami_opt)
 
-    safeprint(_LOGOUT_EPILOG)
+    # if print_rescind_help is true, we printed warnings above
+    # so, jam out an extra newline as a separator
+    safeprint(("\n" if print_rescind_help else "") + _LOGOUT_EPILOG)
 
     # if some token wasn't found in the config, it means its possible that the
     # config file was removed without logout
