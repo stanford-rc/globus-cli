@@ -87,7 +87,7 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth, show_hidden):
               help=('Do a recursive listing, up to the depth limit. '
                     'Similar to `ls -R`'))
 @click.option('--recursive-depth-limit', default=3, show_default=True,
-              type=click.IntRange(min=0),
+              type=click.IntRange(min=0), metavar='INTEGER',
               help=('Limit to number of directories to traverse in '
                     '`--recursive` listings. A value of 0 indicates that '
                     'this should behave like a non-recursive `ls`'))
