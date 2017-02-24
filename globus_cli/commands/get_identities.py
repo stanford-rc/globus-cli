@@ -60,7 +60,7 @@ def get_identities_command(values, lookup_style):
     else:
         ids = res['identities']
 
-        print_table(ids, [('ID', 'id'), ('Full Name', 'name'),
-                          ('Username', 'username'),
+        print_table(ids, [('ID', 'id'), ('Username', 'username'),
+                          ('Full Name', 'name'),
                           ('Organization', 'organization'),
                           ('Email Address', 'email')])
