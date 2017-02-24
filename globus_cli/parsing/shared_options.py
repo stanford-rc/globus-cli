@@ -116,24 +116,20 @@ def endpoint_create_and_update_params(*args, **kwargs):
     def apply_non_shared_params(f):
         f = click.option(
             '--myproxy-dn',
-            help=('Only available on Globus Connect Server. '
-                  'Set the MyProxy Server DN'))(f)
+            help='Set the MyProxy Server DN (Globus Connect Server only)')(f)
         f = click.option(
             '--myproxy-server',
-            help=('Only available on Globus Connect Server. '
-                  'Set the MyProxy Server URI'))(f)
+            help='Set the MyProxy Server URI (Globus Connect Server only)')(f)
         f = click.option(
             '--oauth-server',
-            help=('Only available on Globus Connect Server. '
-                  'Set the OAuth Server URI'))(f)
+            help='Set the OAuth Server URI (Globus Connect Server only)')(f)
         f = click.option(
             '--force-encryption/--no-force-encryption', default=None,
-            help=('Only available on Globus Connect Server. '
-                  '(Un)Force transfers to use encryption'))(f)
+            help=('(Un)Force transfers to use encryption '
+                  '(Globus Connect Server only)'))(f)
         f = click.option(
             '--default-directory',
-            help=('Only available on Globus Connect Server. '
-                  'Set the default directory'))(f)
+            help='Set the default directory (Globus Connect Server only)')(f)
         f = click.option(
             '--public/--private', 'public', default=None,
             help='Set the Endpoint to be public or private')(f)
