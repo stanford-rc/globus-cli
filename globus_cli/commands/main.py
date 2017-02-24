@@ -1,6 +1,7 @@
 from globus_cli.parsing import globus_main_func
 
 from globus_cli.commands.list_commands import list_commands
+from globus_cli.commands.version import version_command
 from globus_cli.commands.config import config_command
 
 from globus_cli.commands.login import login_command
@@ -25,6 +26,7 @@ def main():
 
 
 main.add_command(list_commands)
+main.add_command(version_command)
 main.add_command(config_command)
 
 main.add_command(login_command)
