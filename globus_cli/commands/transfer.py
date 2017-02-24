@@ -19,28 +19,17 @@ from globus_cli.services.transfer import get_client, autoactivate
     task.
 
     \b
-    Single-Item Mode vs. Batch Mode
+    Batched Input
     ===
 
-    Has two modes of operation: single-item, and batchmode.
+    If you use `SOURCE_PATH` and `DEST_PATH` without the `--batch` flag, you
+    will submit a single-file or single-directory transfer Task.
+    This has behavior similar to `cp` and `cp -r`, across endpoints of course.
 
-    ---
-
-    Single-item has behavior similar to `cp` and `cp -r`, across endpoints of
-    course.
-
-    It is the behavior you get if you use `SOURCE_PATH` and `DEST_PATH`.
-
-    ---
-
-    Batchmode is the way in which `transfer` can be used to
-    submit a Task which transfers multiple files or directories, and it is
-    used to accept paths to transfer on stdin.
-
-    Batchmode splits each line on spaces, and treats every line as a file or
-    directory item to transfer.
-    Splitting is done using Python shlex in POSIX mode:
-    https://docs.python.org/2/library/shlex.html
+    Using `--batch`, `globus transfer` can submit a Task which transfers
+    multiple files or directories. Paths to transfer are taken from stdin.
+    Lines are split on spaces, respecting quotes, and every line is treated as
+    a file or directory to transfer.
 
     \b
     Lines are of the form
@@ -49,42 +38,15 @@ from globus_cli.services.transfer import get_client, autoactivate
     Skips empty lines and allows comments beginning with "#".
 
     \b
-    Example of --batch usage:
-        $ cat dat
-        # file 1, simple
-        ~/dir1/sourcepath1 /abspath/destpath1
-
-    \b
-        # file 2, with spaces in dest path
-        # paths without / or ~ are relative to the default_directory of the
-        # endpoint they are on
-        dir2/sourcepath2   "path with spaces/dest2"
-
-    \b
-        # dir 1, requires --recursive option
-        --recursive ~/srcdir1/ /somepath/destdir1
-
-    \b
-        $ cat dat | globus transfer \\
-            --batch --sync-level checksum \\
-            "$SOURCE_ENDPOINT_ID" "$DEST_ENDPOINT_ID"
-
-    \b
-    You can use `--batch` with a commandline SOURCE_PATH and/or DEST_PATH.
-    In that case, these paths will be used as dir prefixes to any paths in the
-    batch input.
+    If you use `--batch` and a commandline SOURCE_PATH and/or DEST_PATH, these
+    paths will be used as dir prefixes to any paths on stdin.
 
     \b
     Sync Levels
     ===
 
-    Sync Levels are ways in which the Task determines whether or not to
-    actually move a file over the network.
-    Choosing a higher sync level will reduce your network traffic when files in
-    your transfer already exist on the destination, but will increase local IO
-    and CPU load marginally at each end of the transfer.
-    We recommend using high sync levels for tasks where you know or suspect
-    that a non-negligible percentage of files already exist on the destination.
+    Sync Levels are ways to decide whether or not files are copied, with the
+    following definitions:
 
     EXISTS: Determine whether or not to transfer based on file existence.
     If the destination file is absent, do the transfer.
@@ -99,6 +61,9 @@ from globus_cli.services.transfer import get_client, autoactivate
     contents.
     If source and destination contents differ, as determined by a checksum of
     their contents, do the transfer.
+
+    If a transfer fails, CHECKSUM must be used to restart the transfer.
+    All other levels can lead to data corruption.
     """))
 @common_options
 @submission_id_option

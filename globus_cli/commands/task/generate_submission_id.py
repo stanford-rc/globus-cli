@@ -9,8 +9,8 @@ from globus_cli.services.transfer import get_client
 
 @click.command('generate-submission-id', short_help='Get a submission ID',
                help=("Generate a new Task submission ID for use in "
-                     "async-transfer and async-delete. Submission IDs allow "
-                     "you to safely retry submission of a Task in the "
+                     "`globus transfer` and `gloubs delete`. Submission IDs "
+                     "allow you to safely retry submission of a Task in the "
                      "presence of network errors. No matter how many times "
                      "you submit a Task with a given ID, it will only be "
                      "accepted and executed once. The response status may "
