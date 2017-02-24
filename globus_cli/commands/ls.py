@@ -108,14 +108,18 @@ def ls_command(endpoint_plus_path, recursive_depth_limit,
     res = _get_ls_res(client, path, endpoint_id, recursive,
                       recursive_depth_limit, all)
 
+    def cleaned_item_name(item):
+        return item['name'] + ('/' if item['type'] == 'dir' else '')
+
     # and then print it, per formatting rules
     if outformat_is_json():
         print_json_response(res)
     elif long:
-        print_table(res, [('permissions', 'permissions'), ('user', 'user'),
-                          ('group', 'group'), ('size', 'size'),
-                          ('last_modified', 'last_modified'),
-                          ('file type', 'type'), ('filename', 'name')])
+        print_table(res, [('Permissions', 'permissions'), ('User', 'user'),
+                          ('Group', 'group'), ('Size', 'size'),
+                          ('Last Modified', 'last_modified'),
+                          ('File Type', 'type'),
+                          ('Filename', cleaned_item_name)])
     else:
         for item in res:
-            safeprint(item['name'] + ('/' if item['type'] == 'dir' else ''))
+            safeprint(cleaned_item_name(item))
