@@ -47,7 +47,7 @@ def print_json_from_iterator(iterator):
 
 
 def endpoint_list_to_text(iterator):
-    print_table(iterator, [('Owner', 'owner_string'), ('ID', 'id'),
+    print_table(iterator, [('ID', 'id'), ('Owner', 'owner_string'),
                            ('Display Name', display_name_or_cname)])
 
 
