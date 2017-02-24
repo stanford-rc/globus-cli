@@ -102,7 +102,5 @@ def map_http_status_option(f):
     return click.option(
         '--map-http-status',
         help=('Map HTTP statuses to any of these exit codes: 0,1,50-99. '
-              'Given by providing both values separated by an "=", as in '
-              '\'--map-http-status "404=0"\' or '
-              '--map-http-status "404=50,403=51"'),
+              'e.g. "404=50,403=51"'),
         expose_value=False, callback=callback, multiple=True)(f)
