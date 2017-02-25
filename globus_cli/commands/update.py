@@ -10,10 +10,11 @@ from globus_cli.parsing import common_options, HiddenOption
 @common_options(no_format_option=True, no_map_http_status_option=True)
 @click.option('--yes', is_flag=True,
               help='Automatically say "yes" to all prompts')
-# hidden options to fetch branches or tags from GitHub -- one turns this mode
+# hidden options to fetch branches or tags from GitHub. One turns this mode
 # on or off, and the other is used to set a non-master target
+# --development-version implies --development
 @click.option('--development', is_flag=True, cls=HiddenOption)
-@click.option('--development-version', cls=HiddenOption, default="master")
+@click.option('--development-version', cls=HiddenOption, default=None)
 def update_command(yes, development, development_version):
     """
     Executor for `globus update`
@@ -47,9 +48,14 @@ def update_command(yes, development, development_version):
                   "Please install pip and try again")
         click.get_current_context().exit(1)
 
+    # --development-version implies --development
+    development = development or (development_version is not None)
+
     # if we're running with `--development`, then the target version is a
     # tarball from GitHub, and we can skip out on the safety checks
     if development:
+        # default to master
+        development_version = development_version or "master"
         target_version = (
             "https://github.com/globus/globus-cli/archive/{}"
             ".tar.gz#egg=globus-cli"
