@@ -1,3 +1,5 @@
+import platform
+
 import click
 
 from globus_sdk import AuthClient, AccessTokenAuthorizer
@@ -78,8 +80,12 @@ def do_login_flow():
     # build the NativeApp client object
     native_client = internal_auth_client()
 
-    # and do the Native App Grant flow
-    native_client.oauth2_start_flow_native_app(refresh_tokens=True)
+    # and do the Native App Grant flow, prefilling the
+    # named grant label on the consent page if we can get a
+    # hostname for the local system
+    label = platform.node() or None
+    native_client.oauth2_start_flow(
+        refresh_tokens=True, prefill_named_grant=label)
 
     # prompt
     linkprompt = 'Please login to Globus here'
