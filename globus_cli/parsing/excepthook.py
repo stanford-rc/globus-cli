@@ -34,14 +34,6 @@ def exit_with_mapped_status(http_status):
         sys.exit(1)
 
 
-def pagination_overrun_hook():
-    write_error_info(
-        'Internal Paging Error',
-        [PrintableErrorField(
-            'details', ('Some kind of paging error happened. '
-                        'Likely an issue with the CLI or Globus SDK.'))])
-
-
 def transferapi_hook(exception):
     write_error_info(
         'Transfer API Error',
@@ -102,8 +94,6 @@ def custom_except_hook(exc_info):
 
         # handle the Globus-raised errors with our special hooks
         # these will present the output (on stderr) as JSON
-        elif exception_type is exc.PaginationOverrunError:
-            pagination_overrun_hook()
         elif exception_type is exc.TransferAPIError:
             transferapi_hook(exception)
         elif exception_type is exc.GlobusAPIError:
