@@ -188,6 +188,13 @@ To remove the CLI:
 You should also edit your ``$HOME/.bashrc`` and remove the line that reads
 ``export PATH="$PATH:$HOME/.globus-cli-virtualenv/bin"``.
 
+Table of Contents
+=================
+.. toctree::
+   :maxdepth: 1
+
+   examples
+
 License
 =======
 
