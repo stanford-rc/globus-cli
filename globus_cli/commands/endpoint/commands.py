@@ -1,6 +1,4 @@
-import click
-
-from globus_cli.parsing import common_options
+from globus_cli.parsing import globus_group, common_options
 
 from globus_cli.commands.endpoint.permission import permission_command
 from globus_cli.commands.endpoint.role import role_command
@@ -18,7 +16,7 @@ from globus_cli.commands.endpoint.my_shared_endpoint_list import (
     my_shared_endpoint_list)
 
 
-@click.group(name='endpoint', help='Manage Globus Endpoint definitions')
+@globus_group(name='endpoint', help='Manage Globus Endpoint definitions')
 @common_options
 def endpoint_command():
     pass

@@ -1,6 +1,4 @@
-import click
-
-from globus_cli.parsing import common_options
+from globus_cli.parsing import globus_group, common_options
 
 from globus_cli.commands.endpoint.server.list import server_list
 from globus_cli.commands.endpoint.server.show import server_show
@@ -9,11 +7,12 @@ from globus_cli.commands.endpoint.server.update import server_update
 from globus_cli.commands.endpoint.server.delete import server_delete
 
 
-@click.group(name='server', short_help='Manage servers for a Globus Endpoint',
-             help=('Manage the servers which back a Globus Endpoint. '
-                   'This typically refers to a Globus Connect Server endpoint '
-                   'running on multiple servers. Each GridFTP server is '
-                   'registered as a server backing the endpoint.'))
+@globus_group(
+    name='server', short_help='Manage servers for a Globus Endpoint',
+    help=('Manage the servers which back a Globus Endpoint. '
+          'This typically refers to a Globus Connect Server endpoint '
+          'running on multiple servers. Each GridFTP server is '
+          'registered as a server backing the endpoint.'))
 @common_options
 def server_command():
     pass
