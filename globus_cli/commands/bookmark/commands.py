@@ -1,4 +1,4 @@
-from globus_cli.parsing import globus_group, common_options
+from globus_cli.parsing import globus_group
 
 from globus_cli.commands.bookmark.list import bookmark_list
 from globus_cli.commands.bookmark.create import bookmark_create
@@ -9,7 +9,6 @@ from globus_cli.commands.bookmark.locate import bookmark_locate
 
 
 @globus_group(name='bookmark', help='Manage Endpoint Bookmarks')
-@common_options
 def bookmark_command():
     pass
 

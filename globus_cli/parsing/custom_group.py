@@ -1,6 +1,7 @@
 import click
 
 from globus_cli.safeio import safeprint
+from globus_cli.parsing.shared_options import common_options
 
 
 class GlobusCommandGroup(click.Group):
@@ -38,5 +39,7 @@ def globus_group(*args, **kwargs):
     stuff)
     """
     def inner_decorator(f):
-        return click.group(*args, cls=GlobusCommandGroup, **kwargs)(f)
+        f = click.group(*args, cls=GlobusCommandGroup, **kwargs)(f)
+        f = common_options(f)
+        return f
     return inner_decorator

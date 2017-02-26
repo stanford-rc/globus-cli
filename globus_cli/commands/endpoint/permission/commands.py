@@ -1,4 +1,4 @@
-from globus_cli.parsing import globus_group, common_options
+from globus_cli.parsing import globus_group
 
 from globus_cli.commands.endpoint.permission.list import list_command
 from globus_cli.commands.endpoint.permission.create import create_command
@@ -9,7 +9,6 @@ from globus_cli.commands.endpoint.permission.delete import delete_command
 
 @globus_group(name='permission', help=('Manage Endpoint Permissions '
                                        '(Access Control Lists)'))
-@common_options
 def permission_command():
     pass
 

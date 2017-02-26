@@ -1,4 +1,4 @@
-from globus_cli.parsing import globus_group, common_options
+from globus_cli.parsing import globus_group
 
 from globus_cli.commands.endpoint.role.list import role_list
 from globus_cli.commands.endpoint.role.show import role_show
@@ -7,7 +7,6 @@ from globus_cli.commands.endpoint.role.delete import role_delete
 
 
 @globus_group(name='role', help='Manage endpoint roles')
-@common_options
 def role_command():
     pass
 

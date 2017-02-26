@@ -1,4 +1,4 @@
-from globus_cli.parsing import globus_group, common_options
+from globus_cli.parsing import globus_group
 
 from globus_cli.commands.config.edit import edit_command
 from globus_cli.commands.config.init import init_command
@@ -27,7 +27,6 @@ from globus_cli.commands.config.show import show_command
         $ globus config show general.auth_token
     to show the same value more explicitly.
     """))
-@common_options
 def config_command():
     pass
 

@@ -1,4 +1,4 @@
-from globus_cli.parsing import globus_group, common_options
+from globus_cli.parsing import globus_group
 
 from globus_cli.commands.endpoint.server.list import server_list
 from globus_cli.commands.endpoint.server.show import server_show
@@ -13,7 +13,6 @@ from globus_cli.commands.endpoint.server.delete import server_delete
           'This typically refers to a Globus Connect Server endpoint '
           'running on multiple servers. Each GridFTP server is '
           'registered as a server backing the endpoint.'))
-@common_options
 def server_command():
     pass
 
