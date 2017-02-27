@@ -1,6 +1,4 @@
-import click
-
-from globus_cli.parsing import common_options
+from globus_cli.parsing import globus_group
 
 from globus_cli.commands.bookmark.list import bookmark_list
 from globus_cli.commands.bookmark.create import bookmark_create
@@ -10,8 +8,7 @@ from globus_cli.commands.bookmark.show import bookmark_show
 from globus_cli.commands.bookmark.locate import bookmark_locate
 
 
-@click.group(name='bookmark', help='Manage Endpoint Bookmarks')
-@common_options
+@globus_group(name='bookmark', help='Manage Endpoint Bookmarks')
 def bookmark_command():
     pass
 

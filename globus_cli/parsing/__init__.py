@@ -1,3 +1,4 @@
+from globus_cli.parsing.custom_group import globus_group
 from globus_cli.parsing.main_command_decorator import globus_main_func
 
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
@@ -18,6 +19,7 @@ from globus_cli.parsing.process_stdin import shlex_process_stdin
 
 
 __all__ = [
+    'globus_group',
     'globus_main_func',
 
     'CaseInsensitiveChoice',

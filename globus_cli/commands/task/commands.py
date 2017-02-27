@@ -1,6 +1,4 @@
-import click
-
-from globus_cli.parsing import common_options
+from globus_cli.parsing import globus_group
 
 from globus_cli.commands.task.list import task_list
 from globus_cli.commands.task.show import show_task
@@ -15,8 +13,7 @@ from globus_cli.commands.task.generate_submission_id import (
     generate_submission_id)
 
 
-@click.group(name='task', help='Manage asynchronous Tasks')
-@common_options
+@globus_group(name='task', help='Manage asynchronous Tasks')
 def task_command():
     pass
 

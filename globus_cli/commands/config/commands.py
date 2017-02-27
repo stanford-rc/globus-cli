@@ -1,6 +1,4 @@
-import click
-
-from globus_cli.parsing import common_options
+from globus_cli.parsing import globus_group
 
 from globus_cli.commands.config.edit import edit_command
 from globus_cli.commands.config.init import init_command
@@ -9,7 +7,7 @@ from globus_cli.commands.config.set import set_command
 from globus_cli.commands.config.show import show_command
 
 
-@click.group('config', short_help=(
+@globus_group('config', short_help=(
     'Modify, view, and manage your Globus CLI config.'), help=("""\
     Modify, view, and manage your Globus CLI config.
 
@@ -29,7 +27,6 @@ from globus_cli.commands.config.show import show_command
         $ globus config show general.auth_token
     to show the same value more explicitly.
     """))
-@common_options
 def config_command():
     pass
 

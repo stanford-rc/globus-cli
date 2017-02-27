@@ -9,12 +9,13 @@ and all other components will be hidden internals.
 import sys
 import click
 
+from globus_cli.parsing.custom_group import GlobusCommandGroup
 from globus_cli.parsing.shell_completion import shell_complete_option
 from globus_cli.parsing.excepthook import custom_except_hook
 from globus_cli.parsing.shared_options import common_options
 
 
-class TopLevelGroup(click.Group):
+class TopLevelGroup(GlobusCommandGroup):
     """
     This is a custom command type which is basically a click.Group, but is
     designed specifically for the top level command.
