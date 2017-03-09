@@ -70,11 +70,11 @@ from globus_cli.services.transfer import get_client, autoactivate
 @click.option('--dry-run', is_flag=True,
               help=("Don't actually perform the transfer, print submission "
                     "data instead"))
-@click.option('--recursive', is_flag=True,
+@click.option('--recursive', '-r', is_flag=True,
               help=('SOURCE_PATH and DEST_PATH are both directories, do a '
                     'recursive dir transfer'))
 @click.option('--label', default=None, help=('Set a label for this task.'))
-@click.option('--sync-level', default=None, show_default=True,
+@click.option('--sync-level', '-s', default=None, show_default=True,
               type=CaseInsensitiveChoice(
                   ("exists", "size", "mtime", "checksum")),
               help=('How will the Transfer Task determine whether or not to '
@@ -125,7 +125,7 @@ def transfer_command(batch, sync_level, recursive, destination, source, label,
 
     if batch:
         @click.command()
-        @click.option('--recursive', is_flag=True)
+        @click.option('--recursive', '-r', is_flag=True)
         @click.argument('source_path', type=TaskPath(base_dir=cmd_source_path))
         @click.argument('dest_path', type=TaskPath(base_dir=cmd_dest_path))
         def process_batch_line(dest_path, source_path, recursive):

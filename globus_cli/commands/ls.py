@@ -80,10 +80,10 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth, show_hidden):
                 type=ENDPOINT_PLUS_OPTPATH)
 @click.option('--all', '-a', is_flag=True,
               help=('Show files and directories that start with `.`'))
-@click.option('--long', is_flag=True,
+@click.option('--long', '-l', is_flag=True,
               help=('For text output only. Do long form output, kind '
                     'of like `ls -l`'))
-@click.option('--recursive', is_flag=True, show_default=True,
+@click.option('--recursive', '-r', is_flag=True, show_default=True,
               help=('Do a recursive listing, up to the depth limit. '
                     'Similar to `ls -R`'))
 @click.option('--recursive-depth-limit', default=3, show_default=True,
