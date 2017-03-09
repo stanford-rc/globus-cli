@@ -22,9 +22,10 @@ from globus_cli.services.transfer import get_client, autoactivate
 @click.option('--dry-run', is_flag=True,
               help=("Don't actually perform the delete, print submission "
                     "data instead"))
-@click.option('--recursive', is_flag=True, help='Recursively delete dirs')
+@click.option(
+    '--recursive', '-r', is_flag=True, help='Recursively delete dirs')
 @click.option('--label', default=None, help=('Set a label for this task'))
-@click.option('--ignore-missing', is_flag=True,
+@click.option('--ignore-missing', '-f', is_flag=True,
               help="Don't throw errors if the file or dir is absent")
 @click.option('--batch', is_flag=True,
               help=('Accept a batch of paths on stdin (i.e. run in '
