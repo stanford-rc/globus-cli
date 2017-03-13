@@ -52,7 +52,10 @@ class CliTestCase(unittest.TestCase):
         Then replaces that data with known values for testing
         """
         self.conf = get_config_obj()
-        self.stored_config = self.conf["cli"]
+        try:
+            self.stored_config = self.conf["cli"]
+        except: KeyError:
+            self.stored_config = {}
         write_test_config(self.conf)
 
     @classmethod
