@@ -54,7 +54,7 @@ class CliTestCase(unittest.TestCase):
         self.conf = get_config_obj()
         try:
             self.stored_config = self.conf["cli"]
-        except: KeyError:
+        except KeyError:
             self.stored_config = {}
         write_test_config(self.conf)
 
