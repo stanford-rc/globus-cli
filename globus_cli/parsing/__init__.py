@@ -7,6 +7,7 @@ from globus_cli.parsing.endpoint_plus_path import (
     ENDPOINT_PLUS_OPTPATH, ENDPOINT_PLUS_REQPATH)
 
 from globus_cli.parsing.hidden_option import HiddenOption
+from globus_cli.parsing.iso_time import ISOTimeType
 
 from globus_cli.parsing.shared_options import (
     common_options,
@@ -27,6 +28,7 @@ __all__ = [
     'TaskPath',
 
     'HiddenOption',
+    'ISOTimeType',
 
     'common_options',
     # Transfer options
