@@ -18,6 +18,8 @@ class CommandState(object):
         self.output_format = config.get_output_format() or TEXT_FORMAT
         # default is always False
         self.debug = False
+        # default is 0
+        self.verbosity = 0
         # by default, empty dict
         self.http_status_map = {}
 
@@ -26,6 +28,9 @@ class CommandState(object):
 
     def outformat_is_json(self):
         return self.output_format == JSON_FORMAT
+
+    def is_verbose(self):
+        return self.verbosity > 0
 
 
 def format_option(f):
@@ -59,6 +64,41 @@ def debug_option(f):
     return click.option(
         '--debug', is_flag=True, cls=HiddenOption,
         expose_value=False, callback=callback, is_eager=True)(f)
+
+
+def verbose_option(f):
+    def callback(ctx, param, value):
+        # set state verbosity value from option
+        state = ctx.ensure_object(CommandState)
+        state.verbosity = value
+
+        # no verbosity
+        # all warnings are ignored
+        if value == 0:
+            warnings.simplefilter("ignore")
+
+        # verbosity level 1
+        # warnings set to once
+        elif value == 1:
+            warnings.simplefilter("once")
+
+        # verbosity level 2
+        # warnings set to default
+        elif value == 2:
+            warnings.simplefilter("default")
+
+        # verbosity level 3+
+        # warnings set to always
+        # turns on debug
+        elif value >= 3:
+            warnings.simplefilter("always")
+            state.debug = True
+            config.setup_debug_logging()
+
+    return click.option(
+        "--verbose", "-v", count=True,
+        expose_value=False, callback=callback, is_eager=True,
+        help="Control level of output")(f)
 
 
 def map_http_status_option(f):
