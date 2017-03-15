@@ -1,6 +1,7 @@
 from globus_cli.helpers.printing import (
     print_json_response, colon_formatted_print, print_table)
-from globus_cli.helpers.options import outformat_is_json, outformat_is_text
+from globus_cli.helpers.options import (
+    outformat_is_json, outformat_is_text, verbosity, is_verbose)
 from globus_cli.helpers.version import print_version
 
 
@@ -9,5 +10,5 @@ __all__ = [
 
     'print_version',
 
-    'outformat_is_json', 'outformat_is_text'
+    'outformat_is_json', 'outformat_is_text', 'verbosity', 'is_verbose'
 ]
