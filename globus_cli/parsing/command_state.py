@@ -59,7 +59,7 @@ def debug_option(f):
         warnings.simplefilter('default')
         state = ctx.ensure_object(CommandState)
         state.debug = True
-        config.setup_debug_logging()
+        config.setup_logging(level="DEBUG")
 
     return click.option(
         '--debug', is_flag=True, cls=HiddenOption,
@@ -74,26 +74,32 @@ def verbose_option(f):
 
         # no verbosity
         # all warnings are ignored
+        # logging is not turned on
         if value == 0:
             warnings.simplefilter("ignore")
 
         # verbosity level 1
         # warnings set to once
-        elif value == 1:
+        # logging set to error
+        if value == 1:
             warnings.simplefilter("once")
+            config.setup_logging(level="ERROR")
 
         # verbosity level 2
         # warnings set to default
-        elif value == 2:
+        # logging set to info
+        if value == 2:
             warnings.simplefilter("default")
+            config.setup_logging(level="INFO")
 
         # verbosity level 3+
         # warnings set to always
-        # turns on debug
-        elif value >= 3:
+        # logging set to debug
+        # sets debug flag to true
+        if value >= 3:
             warnings.simplefilter("always")
             state.debug = True
-            config.setup_debug_logging()
+            config.setup_logging(level="DEBUG")
 
     return click.option(
         "--verbose", "-v", count=True,
