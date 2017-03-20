@@ -185,7 +185,7 @@ def internal_auth_client():
     return globus_sdk.NativeAppAuthClient(client_id, app_name=version.app_name)
 
 
-def setup_debug_logging():
+def setup_logging(level="DEBUG"):
     conf = {
         'version': 1,
         'formatters': {
@@ -197,13 +197,13 @@ def setup_debug_logging():
         'handlers': {
             'console': {
                 'class': 'logging.StreamHandler',
-                'level': 'DEBUG',
+                'level': level,
                 'formatter': 'basic'
             }
         },
         'loggers': {
             'globus_sdk': {
-                'level': 'DEBUG',
+                'level': level,
                 'handlers': ['console']
             }
         }
