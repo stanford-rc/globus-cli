@@ -1,6 +1,9 @@
 import unittest
-from click.testing import CliRunner
 import shlex
+from click.testing import CliRunner
+from datetime import datetime, timedelta
+
+import globus_sdk
 
 from globus_cli import main
 from globus_cli.config import (
@@ -8,10 +11,38 @@ from globus_cli.config import (
     TRANSFER_RT_OPTNAME, TRANSFER_AT_OPTNAME, TRANSFER_AT_EXPIRES_OPTNAME,
     WHOAMI_ID_OPTNAME, WHOAMI_USERNAME_OPTNAME, WHOAMI_NAME_OPTNAME,
     WHOAMI_EMAIL_OPTNAME, get_config_obj)
+from globus_cli.services.transfer import get_client
+from globus_cli.services.auth import get_auth_client
 
 from tests.framework.constants import (CLITESTER1A_TRANSFER_RT,
-                                       CLITESTER1A_AUTH_RT)
+                                       CLITESTER1A_AUTH_RT, GO_EP1_ID)
 from tests.framework.tools import get_user_data
+
+
+def clean_sharing():
+    """
+    Cleans out any files in ~/.globus/sharing/ on go#ep1 older than an hour
+    TODO: remove this once deleting shared directories does full cleanup
+    """
+    tc = get_client()
+
+    path = "~/.globus/sharing/"
+    hour_ago = datetime.utcnow() - timedelta(hours=1)
+    filter_string = "last_modified:," + hour_ago.strftime("%Y-%m-%d %H:%M:%S")
+    try:
+        old_files = tc.operation_ls(
+            GO_EP1_ID, path=path, filter=filter_string, num_results=None)
+    except globus_sdk.TransferAPIError:
+        return
+
+    kwargs = {"notify_on_succeeded": False, "notify_on_fail": False}
+    ddata = globus_sdk.DeleteData(tc, GO_EP1_ID, **kwargs)
+
+    for item in old_files:
+        ddata.add_item(path + item["name"])
+
+    if len(ddata["DATA"]):
+        tc.submit_delete(ddata)
 
 
 def write_test_config(conf):
@@ -50,6 +81,8 @@ class CliTestCase(unittest.TestCase):
         """
         Stores any existing config data in the cli environment of .globus.cfg
         Then replaces that data with known values for testing
+        Creates a transfer client and an auth client for any direct SDK calls
+        Cleans any old sharing data created by previous test runs
         """
         self.conf = get_config_obj()
         try:
@@ -57,6 +90,10 @@ class CliTestCase(unittest.TestCase):
         except KeyError:
             self.stored_config = {}
         write_test_config(self.conf)
+        self.tc = get_client()
+        self.ac = get_auth_client()
+
+        clean_sharing()
 
     @classmethod
     def tearDownClass(self):
@@ -77,7 +114,12 @@ class CliTestCase(unittest.TestCase):
         # run the line. globus_cli.main is the "globus" part of the line
         result = self._runner.invoke(main, args[1:], input=batch_input)
         # confirm expected exit_code and exception
-        self.assertEqual(result.exit_code, assert_exit_code)
+        if result.exit_code != assert_exit_code:
+            raise(Exception(
+                ("CliTest run_line exit_code assertion failed!\n"
+                 "Line: {}\nexited with {} when expecting {}\n"
+                 "Output: {}".format(line, result.exit_code,
+                                     assert_exit_code, result.output))))
         # return the output for further testing
         return result.output
 
