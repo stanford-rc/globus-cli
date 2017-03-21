@@ -1,10 +1,12 @@
 import click
 
 from globus_cli.parsing.command_state import (
-    format_option, debug_option, map_http_status_option, verbose_option)
+    format_option, debug_option, map_http_status_option,
+    verbose_option, HiddenOption)
 from globus_cli.parsing.version_option import version_option
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
 from globus_cli.parsing.detect_and_decorate import detect_and_decorate
+from globus_cli.parsing.location import LocationType
 
 
 def common_options(*args, **kwargs):
@@ -82,107 +84,158 @@ def endpoint_id_arg(*args, **kwargs):
 def endpoint_create_and_update_params(*args, **kwargs):
     """
     Collection of options consumed by Transfer endpoint create and update
-    operations -- in addition to shared endpoint create and update.
-    It accepts toggles regarding create vs. update and shared EP vs. normal EP
-
-    Importantly, when given `shared_ep=True`, the options it applies are more
-    limited -- so the signature of the decorated function is different.
+    operations -- accepts toggle regarding create vs. update that makes
+    display_name required vs. optional.
 
     Usage:
 
-    >>> @endpoint_create_and_update_params
-    >>> def command_func(display_name, description, organization, department,
-    >>>                  keywords, contact_email, contact_info, info_link,
-    >>>                  public, default_directory, force_encryption,
-    >>>                  oauth_server, myproxy_server, myproxy_dn):
-    >>>     ...
-
-    or
-
-    >>> @endpoint_create_and_update_params(create=False)
-    >>> def command_func(display_name, description, organization, department,
-    >>>                  keywords, contact_email, contact_info, info_link,
-    >>>                  public, default_directory, force_encryption,
-    >>>                  oauth_server, myproxy_server, myproxy_dn):
-    >>>     ...
-
-    or
-
-    >>> @endpoint_create_and_update_params(shared_ep=True)
-    >>> def command_func(display_name, description, organization, department,
-    >>>                  keywords, contact_email, contact_info, info_link,
-    >>>                  public):
+    >>> @endpoint_create_and_update_params(create=True)
+    >>> def command_func(display_name, description, info_link, contact_info,
+    >>>                  contact_email, organization, department, keywords,
+    >>>                  public, location, disable_verify, myproxy_dn,
+    >>>                  myproxy_server, oauth_server, force_encryption,
+    >>>                  default_directory, subscription_id, network_use,
+    >>>                  max_concurrency, preferred_concurrency,
+    >>>                  max_parallelism, preferred_parallelism):
     >>>     ...
     """
-    def apply_non_shared_params(f):
-        f = click.option(
-            '--myproxy-dn',
-            help='Set the MyProxy Server DN (Globus Connect Server only)')(f)
-        f = click.option(
-            '--myproxy-server',
-            help='Set the MyProxy Server URI (Globus Connect Server only)')(f)
-        f = click.option(
-            '--oauth-server',
-            help='Set the OAuth Server URI (Globus Connect Server only)')(f)
-        f = click.option(
-            '--force-encryption/--no-force-encryption', default=None,
-            help=('(Un)Force transfers to use encryption '
-                  '(Globus Connect Server only)'))(f)
-        f = click.option(
-            '--default-directory',
-            help='Set the default directory (Globus Connect Server only)')(f)
-        f = click.option(
-            '--public/--private', 'public', default=None,
-            help='Set the Endpoint to be public or private')(f)
-
-        return f
-
-    def inner_decorator(f, create=False, shared_ep=False):
+    def inner_decorator(f, create=False):
         update_help_prefix = (not create and 'New ') or ''
 
-        ep_or_share = 'Share'
-        if not shared_ep:
-            ep_or_share = 'Endpoint'
-            f = apply_non_shared_params(f)
-        f = click.option(
-            '--info-link',
-            help=(update_help_prefix +
-                  'Link for Info about the {0}'.format(ep_or_share)))(f)
-        f = click.option(
-            '--contact-info',
-            help=(update_help_prefix +
-                  'Contact Info for the {0}'.format(ep_or_share)))(f)
-        f = click.option(
-            '--contact-email',
-            help=(update_help_prefix +
-                  'Contact Email for the {0}'.format(ep_or_share)))(f)
-        f = click.option(
-            '--organization',
-            help=(update_help_prefix +
-                  'Organization for the {0}'.format(ep_or_share)))(f)
-        f = click.option(
-            '--description',
-            help=(update_help_prefix +
-                  'Description for the {0}'.format(ep_or_share)))(f)
-        f = click.option(
-            '--department',
-            help=(update_help_prefix +
-                  'Department which operates the {0}'.format(ep_or_share)))(f)
-        f = click.option(
-            '--keywords',
-            help=(update_help_prefix +
-                  'Keywords to help searches for the {0}'
-                  .format(ep_or_share)))(f)
+        # display name is required for create, not update
         if create:
             f = click.argument('display_name')(f)
         else:
             f = click.option(
                 '--display-name',
                 help=(update_help_prefix +
-                      'Name for the {0}'.format(ep_or_share)))(f)
+                      'Name for the endpoint'))(f)
+
+        # Options available to any endpoint
+        f = click.option(
+            "--description",
+            help=(update_help_prefix +
+                  "Description for the endpoint"))(f)
+        f = click.option(
+            "--info-link",
+            help=(update_help_prefix +
+                  "Link for Info about the endpoint"))(f)
+        f = click.option(
+            "--contact-info",
+            help=(update_help_prefix +
+                  "Contact Info for the endpoint"))(f)
+        f = click.option(
+            "--contact-email",
+            help=(update_help_prefix +
+                  "Contact Email for the endpoint"))(f)
+        f = click.option(
+            "--organization",
+            help=(update_help_prefix +
+                  "Organization for the endpoint"))(f)
+        f = click.option(
+            "--department",
+            help=(update_help_prefix +
+                  "Department which operates the endpoint"))(f)
+        f = click.option(
+            "--keywords",
+            help=(update_help_prefix +
+                  "Comma seperated list of keywords to help searches"
+                  "for the endpoint"))(f)
+        f = click.option(
+            "--default-directory",
+            help=("Set the default directory"))(f)
+        f = click.option(
+            "--force-encryption/--no-force-encryption", default=None,
+            help=("(Un)Force the endpoint to encrypt transfers"))(f)
+        f = click.option(
+            "--disable-verify/--no-disable-verify", is_flag=True,
+            help="(Un)Set the endpoint to ignore checksum verification")(f)
+
+        # GCS only options
+        f = click.option(
+            "--public/--private", "public", default=None,
+            help=("Set the Endpoint to be public or private "
+                  "(Globus Connect Server only)"))(f)
+        f = click.option(
+            "--myproxy-dn",
+            help=("Set the MyProxy Server DN (Globus Connect Server only)"))(f)
+        f = click.option(
+            "--myproxy-server",
+            help=("Set the MyProxy Server URI "
+                  "(Globus Connect Server only)"))(f)
+        f = click.option(
+            "--oauth-server",
+            help=("Set the OAuth Server URI (Globus Connect Server only)"))(f)
+        f = click.option(
+            "--location", type=LocationType(), default=None,
+            help="Manually set the endpoint's latitude and longitude "
+                 "(Globus Connect Server only)")(f)
+
+        # Managed Endpoint options
+        f = click.option(
+            "--subscription-id", type=click.UUID, default=None,
+            cls=HiddenOption,
+            help=("Set the endpoint as a managed endpoint with the given "
+                  "subscription ID"))(f)
+        f = click.option(
+            "--network-use", default=None,
+            type=click.Choice(["normal", "minimal", "aggressive", "custom"]),
+            help=("Set the endpoint's network use level. If using custom, "
+                  "the endpoint's max and preferred concurrency must be set "
+                  "(Managed endpoints only) (Globus Connect Server only)"))(f)
+        f = click.option(
+            "--max-concurrency", type=int, default=None,
+            help=("Set the endpoint's max concurrency "
+                  "(Managed endpoints only) (Globus Connect Server only)"))(f)
+        f = click.option(
+            "--preferred-concurrency", type=int, default=None,
+            help=("Set the endpoint's preferred concurrency "
+                  "(Managed endpoints only) (Globus Connect Server only)"))(f)
+        f = click.option(
+            "--max-parallelism", type=int, default=None,
+            help=("Set the endpoint's max parallelism "
+                  "(Managed endpoints only) (Globus Connect Server only)"))(f)
+        f = click.option(
+            "--preferred-parallelism", type=int, default=None,
+            help=("Set the endpoint's preferred parallelism "
+                  "(Managed endpoints only) (Globus Connect Server only)"))(f)
+
         return f
 
     return detect_and_decorate(inner_decorator, args, kwargs)
+
+
+def validate_endpoint_create_and_update_params(endpoint_type, managed, params):
+    """
+    Given an endpoint type of "shared" "server" or "personal" and option values
+    Confirms the option values are valid for the given endpoint
+    """
+    # options only allowed for GCS endpoints
+    if endpoint_type != "server":
+        # catch params with two option flags
+        if params["public"] is False:
+            raise click.UsageError("Option --private only allowed "
+                                   "for Globus Connect Server endpoints")
+        # catch any params only usable with GCS
+        for option in ["public", "myproxy_dn", "myproxy_server",
+                       "oauth_server", "location", "network_use",
+                       "max_concurrency", "preferred_concurrency",
+                       "max_parallelism", "preferred_parallelism"]:
+            if params[option] is not None:
+                raise click.UsageError(
+                    ("Option --{} can only be used with Globus Connect Server "
+                     "endpoints".format(option.replace("_", "-"))))
+
+    # if the endpoint was not previously managed, and is not being passed
+    # a subscription id, it cannot use managed endpoint only fields
+    if (not managed) and (not params["subscription_id"]):
+        for option in ["network_use", "max_concurrency",
+                       "preferred_concurrency", "max_parallelism",
+                       "preferred_parallelism"]:
+            if params[option] is not None:
+                raise click.UsageError(
+                    ("Option --{} can only be used with managed "
+                     "endpoints".format(option.replace("_", "-"))))
 
 
 def task_id_arg(*args, **kwargs):
