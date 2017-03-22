@@ -5,7 +5,8 @@ import click
 
 from globus_sdk import AuthClient, AccessTokenAuthorizer
 
-from globus_cli.helpers import start_local_server, is_remote_session
+from globus_cli.helpers import (
+    start_local_server, is_remote_session, LocalServerError)
 from globus_cli.safeio import safeprint
 from globus_cli.parsing import common_options
 from globus_cli.config import (
@@ -138,6 +139,10 @@ def do_local_server_login_flow():
     webbrowser.open(url, new=1)
     auth_code = server.wait_for_code()
     server.shutdown()
+
+    if isinstance(auth_code, LocalServerError):
+        safeprint('Login failed: {}'.format(auth_code), write_to_stderr=True)
+        click.get_current_context().exit(1)
 
     # finish login flow
     exchange_code_and_store_config(native_client, auth_code)

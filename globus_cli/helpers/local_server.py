@@ -1,6 +1,5 @@
 import logging
 import os
-import ssl
 import threading
 
 try:
@@ -19,9 +18,13 @@ except ImportError:
     import queue as Queue
 
 try:
-    from urlparse import urlparse, parse_qs
+    from urlparse import urlparse, parse_qsl
 except ImportError:
-    from urllib.parse import urlparse, parse_qs
+    from urllib.parse import urlparse, parse_qsl
+
+
+class LocalServerError(Exception):
+    pass
 
 
 def enable_requests_logging():
@@ -40,14 +43,21 @@ def is_remote_session():
 
 class RedirectHandler(BaseHTTPRequestHandler):
 
-        def do_GET(self):
+        def do_GET(self): # noqa
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             self.wfile.write(b'You\'re all set, you can close this window!')
 
-            code = parse_qs(urlparse(self.path).query).get('code', [''])[0]
-            self.server.return_code(code)
+            query_params = dict(parse_qsl(urlparse(self.path).query))
+            code = query_params.get('code')
+            if code:
+                self.server.return_code(code)
+            else:
+                msg = query_params.get(
+                    'error_description', query_params.get('error'))
+
+                self.server.return_code(LocalServerError(msg))
 
         def log_message(self, format, *args):
             return
@@ -55,14 +65,10 @@ class RedirectHandler(BaseHTTPRequestHandler):
 
 class RedirectHTTPServer(HTTPServer, object):
 
-    def __init__(self, listen, handler_class, https=False):
+    def __init__(self, listen, handler_class):
         super(RedirectHTTPServer, self).__init__(listen, handler_class)
 
         self._auth_code_queue = Queue.Queue()
-
-        if https:
-            self.socket = ssl.wrap_socket(
-                self.socket, certfile='./ssl/server.pem', server_side=True)
 
     def return_code(self, code):
         self._auth_code_queue.put_nowait(code)
@@ -71,7 +77,7 @@ class RedirectHTTPServer(HTTPServer, object):
         return self._auth_code_queue.get(block=True)
 
 
-def start_local_server(listen=('', 4443)):
+def start_local_server(listen=('', 0)):
     server = RedirectHTTPServer(listen, RedirectHandler)
     thread = threading.Thread(target=server.serve_forever)
     thread.daemon = True
