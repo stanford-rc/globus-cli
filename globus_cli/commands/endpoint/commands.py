@@ -4,6 +4,7 @@ from globus_cli.commands.endpoint.permission import permission_command
 from globus_cli.commands.endpoint.role import role_command
 from globus_cli.commands.endpoint.server import server_command
 
+from globus_cli.commands.endpoint.activate import endpoint_activate
 from globus_cli.commands.endpoint.search import endpoint_search
 from globus_cli.commands.endpoint.show import endpoint_show
 from globus_cli.commands.endpoint.create import endpoint_create
@@ -34,6 +35,7 @@ endpoint_command.add_command(endpoint_create_share)
 endpoint_command.add_command(endpoint_update)
 endpoint_command.add_command(endpoint_delete)
 
+endpoint_command.add_command(endpoint_activate)
 endpoint_command.add_command(endpoint_is_activated)
 endpoint_command.add_command(endpoint_deactivate)
 
