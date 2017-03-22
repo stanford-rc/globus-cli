@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Globus CLI Examples &mdash; globus-cli 0.5.1.0 documentation</title>
+    <title>Globus CLI Examples &mdash; globus-cli 0.6.0.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.5.1.0',
+        VERSION:     '0.6.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="globus-cli 0.5.1.0 documentation" href="index.html" />
+    <link rel="top" title="globus-cli 0.6.0.0 documentation" href="index.html" />
     <link rel="prev" title="Globus CLI" href="index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="index.html" title="Globus CLI"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">globus-cli 0.5.1.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">globus-cli 0.6.0.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -68,15 +68,15 @@ allow for human-readable calls to further globus endpoint commands.</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus endpoint search <span class="s2">&quot;Globus Tutorial Endpoint&quot;</span>
 Owner                      <span class="p">|</span> ID                                   <span class="p">|</span> Display Name
 -------------------------- <span class="p">|</span> ------------------------------------ <span class="p">|</span> --------------------------
-go@globusid.org            <span class="p">|</span> ddb59aef-6d04-11e5-ba46-22000b92c6ec <span class="p">|</span> Globus Tutorial Endpoint 1
-go@globusid.org            <span class="p">|</span> ddb59af0-6d04-11e5-ba46-22000b92c6ec <span class="p">|</span> Globus Tutorial Endpoint 2
+go@globusid.org            <span class="p">|</span> ddb59aef-6d04-11e5-ba46-22000b92c6ec <span class="p">|</span> Globus Tutorial Endpoint <span class="m">1</span>
+go@globusid.org            <span class="p">|</span> ddb59af0-6d04-11e5-ba46-22000b92c6ec <span class="p">|</span> Globus Tutorial Endpoint <span class="m">2</span>
 
 <span class="c1"># copy and paste the desired Endpoint ID from the search results</span>
 $ <span class="nv">ep1</span><span class="o">=</span>ddb59aef-6d04-11e5-ba46-22000b92c6ec
 
 <span class="c1"># now we can use the endpoint in a human readable fashion</span>
 $ globus endpoint show <span class="nv">$ep1</span>
-Display Name: Globus Tutorial Endpoint 1
+Display Name: Globus Tutorial Endpoint <span class="m">1</span>
 ID:           ddb59aef-6d04-11e5-ba46-22000b92c6ec
 Owner:        go@globusid.org
 Activated:    False
@@ -208,14 +208,14 @@ $ globus task show <span class="nv">$task_id</span>
 Label:                Unauthorized Transfer
 Task ID:              67d6e4ba-dda2-11e6-9d11-22000a1e3b52
 Type:                 TRANSFER
-Directories:          1
-Files:                3
+Directories:          <span class="m">1</span>
+Files:                <span class="m">3</span>
 Status:               ACTIVE
-Request Time:         2017-01-18 17:20:28+00:00
-Deadline:             2017-01-19 17:20:28+00:00
+Request Time:         <span class="m">2017</span>-01-18 <span class="m">17</span>:20:28+00:00
+Deadline:             <span class="m">2017</span>-01-19 <span class="m">17</span>:20:28+00:00
 Details:              PERMISSION_DENIED
-Source Endpoint:      Globus Tutorial Endpoint 1
-Destination Endpoint: Globus Tutorial Endpoint 2
+Source Endpoint:      Globus Tutorial Endpoint <span class="m">1</span>
+Destination Endpoint: Globus Tutorial Endpoint <span class="m">2</span>
 
 <span class="c1"># cancel the task</span>
 $ globus task cancel <span class="nv">$task_id</span>
@@ -393,7 +393,7 @@ the Task, which only gets carried out once.</p>
         <li class="right" >
           <a href="index.html" title="Globus CLI"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">globus-cli 0.5.1.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">globus-cli 0.6.0.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
