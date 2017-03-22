@@ -122,26 +122,29 @@ def do_local_server_login_flow():
     and gets the code redirected to the server (no copy and pasting required)
     """
     # start local server and create matching redirect_uri
-    server = start_local_server(listen=('127.0.0.1', 0))
-    _, port = server.socket.getsockname()
-    redirect_uri = 'http://localhost:{}'.format(port)
+    with start_local_server(listen=('127.0.0.1', 0)) as server:
+        _, port = server.socket.getsockname()
+        redirect_uri = 'http://localhost:{}'.format(port)
 
-    # get the NativeApp client object and start a flow
-    # if available, use the system-name to prefill the grant
-    label = platform.node() or None
-    native_client = internal_auth_client()
-    native_client.oauth2_start_flow(
-        refresh_tokens=True, prefill_named_grant=label,
-        redirect_uri=redirect_uri)
-    url = native_client.oauth2_get_authorize_url()
+        # get the NativeApp client object and start a flow
+        # if available, use the system-name to prefill the grant
+        label = platform.node() or None
+        native_client = internal_auth_client()
+        native_client.oauth2_start_flow(
+            refresh_tokens=True, prefill_named_grant=label,
+            redirect_uri=redirect_uri)
+        url = native_client.oauth2_get_authorize_url()
 
-    # open web-browser for user to log in, get auth code, then shut server down
-    webbrowser.open(url, new=1)
-    auth_code = server.wait_for_code()
-    server.shutdown()
+        # open web-browser for user to log in, get auth code
+        webbrowser.open(url, new=1)
+        auth_code = server.wait_for_code()
 
     if isinstance(auth_code, LocalServerError):
         safeprint('Login failed: {}'.format(auth_code), write_to_stderr=True)
+        click.get_current_context().exit(1)
+    elif isinstance(auth_code, Exception):
+        safeprint('Login failed with unexpected error:\n{}'.format(auth_code),
+                  write_to_stderr=True)
         click.get_current_context().exit(1)
 
     # finish login flow
