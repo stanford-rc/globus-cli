@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Globus CLI &mdash; globus-cli 0.5.1.0 documentation</title>
+    <title>Globus CLI &mdash; globus-cli 0.6.0.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.5.1.0',
+        VERSION:     '0.6.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="globus-cli 0.5.1.0 documentation" href="#" />
+    <link rel="top" title="globus-cli 0.6.0.0 documentation" href="#" />
     <link rel="next" title="Globus CLI Examples" href="examples.html" /> 
   </head>
   <body role="document">
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="examples.html" title="Globus CLI Examples"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">globus-cli 0.5.1.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="#">globus-cli 0.6.0.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -126,7 +126,7 @@ c699d42e-d274-11e5-bf75-1fc5bf53bb24 <span class="p">|</span> www.globus.org <sp
 If you are not authenticated, you will see a message similar to:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus get-identities <span class="s1">&#39;go@globusid.org&#39;</span>
 Globus CLI Error: A GLobus API Error Occurred.
-HTTP status:      401
+HTTP status:      <span class="m">401</span>
 code:             UNAUTHORIZED
 message:          Call must be authenticated
 </pre></div>
@@ -137,8 +137,8 @@ $ globus endpoint search <span class="s1">&#39;Globus Tutorial Endpoint&#39;</sp
     --filter-owner-id <span class="s1">&#39;c699d42e-d274-11e5-bf75-1fc5bf53bb24&#39;</span>
 Owner           <span class="p">|</span> ID                                   <span class="p">|</span> Display Name
 --------------- <span class="p">|</span> ------------------------------------ <span class="p">|</span> ---------------------------
-go@globusid.org <span class="p">|</span> ddb59aef-6d04-11e5-ba46-22000b92c6ec <span class="p">|</span> Globus Tutorial Endpoint 1
-go@globusid.org <span class="p">|</span> ddb59af0-6d04-11e5-ba46-22000b92c6ec <span class="p">|</span> Globus Tutorial Endpoint 2
+go@globusid.org <span class="p">|</span> ddb59aef-6d04-11e5-ba46-22000b92c6ec <span class="p">|</span> Globus Tutorial Endpoint <span class="m">1</span>
+go@globusid.org <span class="p">|</span> ddb59af0-6d04-11e5-ba46-22000b92c6ec <span class="p">|</span> Globus Tutorial Endpoint <span class="m">2</span>
 go@globusid.org <span class="p">|</span> cf9bcaa5-6d04-11e5-ba46-22000b92c6ec <span class="p">|</span> Globus S3 Tutorial Endpoint
 </pre></div>
 </div>
@@ -146,7 +146,7 @@ go@globusid.org <span class="p">|</span> cf9bcaa5-6d04-11e5-ba46-22000b92c6ec <s
 <div class="highlight-bash"><div class="highlight"><pre><span></span>$ globus endpoint search <span class="s1">&#39;Globus Tutorial Endpoint&#39;</span> <span class="se">\</span>
     --filter-owner-id <span class="s1">&#39;c699d42e-d274-11e5-bf75-1fc5bf53bb24&#39;</span>
 Globus CLI Error: A Transfer API Error Occurred.
-HTTP status:      401
+HTTP status:      <span class="m">401</span>
 request_id:       1AghTj1F6
 code:             AuthenticationFailed
 message:          Token is not active
@@ -262,7 +262,7 @@ limitations under the License.</p>
         <li class="right" >
           <a href="examples.html" title="Globus CLI Examples"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">globus-cli 0.5.1.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="#">globus-cli 0.6.0.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
