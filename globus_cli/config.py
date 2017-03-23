@@ -9,6 +9,7 @@ from globus_cli import version
 __all__ = [
     # option name constants
     'OUTPUT_FORMAT_OPTNAME',
+    'MYPROXY_USERNAME_OPTNAME',
     'AUTH_RT_OPTNAME',
     'AUTH_AT_OPTNAME',
     'AUTH_AT_EXPIRES_OPTNAME',
@@ -45,6 +46,7 @@ ENV_CLIENT_ID_OPTNAME = 'cli_client_id'
 
 # constants for global use
 OUTPUT_FORMAT_OPTNAME = 'output_format'
+MYPROXY_USERNAME_OPTNAME = 'default_myproxy_username'
 AUTH_RT_OPTNAME = 'auth_refresh_token'
 AUTH_AT_OPTNAME = 'auth_access_token'
 AUTH_AT_EXPIRES_OPTNAME = 'auth_access_token_expires'
