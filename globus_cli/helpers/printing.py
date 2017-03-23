@@ -1,13 +1,13 @@
 import json
 import six
 
-from globus_sdk import GlobusHTTPResponse
+from globus_sdk import GlobusResponse
 
 from globus_cli.safeio import safeprint
 
 
 def print_json_response(res):
-    if isinstance(res, GlobusHTTPResponse):
+    if isinstance(res, GlobusResponse):
         safeprint(json.dumps(res.data, indent=2))
     elif isinstance(res, dict):
         safeprint(json.dumps(res, indent=2))
