@@ -1,7 +1,9 @@
 import logging
 import os
+import sys
 import threading
 from string import Template
+from contextlib import contextmanager
 
 import six
 
@@ -125,6 +127,10 @@ class RedirectHTTPServer(HTTPServer, object):
 
         self._auth_code_queue = Queue.Queue()
 
+    def handle_error(self, request, client_address):
+        exctype, excval, exctb = sys.exc_info()
+        self._auth_code_queue.put(excval)
+
     def return_code(self, code):
         self._auth_code_queue.put_nowait(code)
 
@@ -132,10 +138,13 @@ class RedirectHTTPServer(HTTPServer, object):
         return self._auth_code_queue.get(block=True)
 
 
+@contextmanager
 def start_local_server(listen=('', 0)):
     server = RedirectHTTPServer(listen, RedirectHandler)
     thread = threading.Thread(target=server.serve_forever)
     thread.daemon = True
     thread.start()
 
-    return server
+    yield server
+
+    server.shutdown()
