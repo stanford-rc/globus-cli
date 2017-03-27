@@ -1,5 +1,6 @@
 from tests.framework.cli_testcase import CliTestCase
 from tests.framework.constants import GO_EP1_ID, GO_EP2_ID
+from tests.framework.tools import get_user_data
 
 
 class BasicTests(CliTestCase):
@@ -51,7 +52,7 @@ class BasicTests(CliTestCase):
         Runs whoami to confirm test config successfully setup
         """
         output = self.run_line("globus whoami")
-        self.assertIn("clitester1a@globusid.org", output)
+        self.assertIn(get_user_data()["clitester1a"]["username"], output)
 
     def test_whoami_no_auth(self):
         """
@@ -65,7 +66,8 @@ class BasicTests(CliTestCase):
         Runs get-identities without auth, confirms 401
         """
         output = self.run_line_no_auth(
-            "globus get-identities clitester1a@globusid.org",
+            "globus get-identities " +
+            get_user_data()["clitester1a"]["username"],
             assert_exit_code=1)
         self.assertIn("A GLobus API Error Occurred", output)
         self.assertIn("401", output)
@@ -76,8 +78,9 @@ class BasicTests(CliTestCase):
         test auth refresh token is live and configured correctly
         """
         output = self.run_line(
-            "globus get-identities clitester1a@globusid.org")
-        self.assertIn("clitester1a@globusid.org", output)
+            "globus get-identities " +
+            get_user_data()["clitester1a"]["username"])
+        self.assertIn(get_user_data()["clitester1a"]["id"], output)
 
     def test_transfer_call_no_auth(self):
         """
