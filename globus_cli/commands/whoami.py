@@ -1,10 +1,9 @@
 import click
-from globus_sdk import GlobusResponse
 
-from globus_cli.safeio import safeprint
+from globus_cli.safeio import (
+    safeprint, formatted_print, FORMAT_TEXT_RECORD, FORMAT_TEXT_RAW)
 from globus_cli.parsing import common_options
-from globus_cli.helpers import (
-    print_json_response, outformat_is_json, is_verbose, colon_formatted_print)
+from globus_cli.helpers import is_verbose
 from globus_cli.config import (
     WHOAMI_ID_OPTNAME, WHOAMI_USERNAME_OPTNAME,
     WHOAMI_EMAIL_OPTNAME, WHOAMI_NAME_OPTNAME,
@@ -26,18 +25,13 @@ def whoami_command():
                   'logging in again.', write_to_stderr=True)
         click.get_current_context().exit(1)
 
-    if is_verbose() or outformat_is_json():
-        fields = tuple((x, x) for x in ('Username', 'Name', 'ID', 'Email'))
-        user_doc = {
+    fields = tuple((x, x) for x in ('Username', 'Name', 'ID', 'Email'))
+    formatted_print({
             'Username': username,
             'Name': lookup_option(WHOAMI_NAME_OPTNAME, environment=GLOBUS_ENV),
             'ID': lookup_option(WHOAMI_ID_OPTNAME, environment=GLOBUS_ENV),
             'Email': lookup_option(WHOAMI_EMAIL_OPTNAME,
                                    environment=GLOBUS_ENV)
-        }
-        if outformat_is_json():
-            print_json_response(GlobusResponse(user_doc))
-        else:
-            colon_formatted_print(user_doc, fields)
-    else:
-        safeprint(username)
+        }, fields=fields,
+        text_format=(FORMAT_TEXT_RECORD if is_verbose() else FORMAT_TEXT_RAW),
+        response_key=None if is_verbose() else 'Username')

@@ -4,10 +4,10 @@ import click
 
 from globus_sdk import GlobusResponse
 
-from globus_cli.safeio import safeprint
+from globus_cli.safeio import safeprint, formatted_print, FORMAT_TEXT_TABLE
 from globus_cli.parsing import common_options, HiddenOption
-from globus_cli.helpers import (
-    print_json_response, outformat_is_json, print_table, is_verbose)
+from globus_cli.helpers import is_verbose
+
 from globus_cli.services.auth import get_auth_client
 
 
@@ -63,25 +63,11 @@ def get_identities_command(values, lookup_style):
             results += client.get_identities(usernames=usernames)["identities"]
         res = GlobusResponse({"identities": results})
 
-    # json output
-    if outformat_is_json():
-        print_json_response(res)
-
-    # verbose output is a table. Order not guaranteed, may contain duplicates
-    elif is_verbose():
-        ids = res["identities"]
-
-        print_table(ids, [("ID", "id"), ("Username", "username"),
-                          ("Full Name", "name"),
-                          ("Organization", "organization"),
-                          ("Email Address", "email")])
-
-    # standard output is one resolved identity per line in the same order
-    # as the inputs. A resolved identity is either a username if given a UUID
-    # vice versa, or "NO_SUCH_IDENTITY" if the identity could not be found
-    else:
-
-        def resolve_identity(identities, value):
+    def _custom_text_format(identities):
+        """
+        Non-verbose text output is customized
+        """
+        def resolve_identity(value):
             """
             helper to deal with variable inputs and uncertain response order
             """
@@ -92,5 +78,20 @@ def get_identities_command(values, lookup_style):
                     return identity["id"]
             return "NO_SUCH_IDENTITY"
 
+        # standard output is one resolved identity per line in the same order
+        # as the inputs. A resolved identity is either a username if given a
+        # UUID vice versa, or "NO_SUCH_IDENTITY" if the identity could not be
+        # found
         for val in values:
-            safeprint(resolve_identity(res["identities"], val))
+            safeprint(resolve_identity(val))
+
+    formatted_print(
+        res, response_key='identities',
+        fields=[('ID', 'id'), ('Username', 'username'),
+                ('Full Name', 'name'), ('Organization', 'organization'),
+                ('Email Address', 'email')],
+        # verbose output is a table. Order not guaranteed, may contain
+        # duplicates
+        text_format=(FORMAT_TEXT_TABLE
+                     if is_verbose() else
+                     _custom_text_format))

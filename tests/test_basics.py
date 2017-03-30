@@ -104,10 +104,22 @@ class BasicTests(CliTestCase):
         Dry-runs a transfer in batchmode, confirms batchmode inputs received
         """
         batch_input = "abc /def\n/xyz p/q/r\n"
-        output = self.run_line("globus transfer --batch --dry-run " +
+        output = self.run_line("globus transfer -F json --batch --dry-run " +
                                str(GO_EP1_ID) + " " + str(GO_EP2_ID),
                                batch_input=batch_input)
         self.assertIn('"source_path": "abc"', output)
         self.assertIn('"destination_path": "/def"', output)
         self.assertIn('"source_path": "/xyz"', output)
         self.assertIn('"destination_path": "p/q/r"', output)
+
+    def test_delete_batchmode_dryrun(self):
+        """
+        Dry-runs a delete in batchmode
+        """
+        batch_input = "abc/def\n/xyz\n"
+        output = self.run_line("globus delete --batch --dry-run " +
+                               str(GO_EP1_ID), batch_input=batch_input)
+        self.assertEqual("\n".join(("Path   ",
+                                    "-------",
+                                    "abc/def",
+                                    "/xyz   \n")), output)

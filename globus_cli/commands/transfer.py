@@ -1,4 +1,3 @@
-import json
 import click
 
 from globus_sdk import TransferData
@@ -6,9 +5,7 @@ from globus_sdk import TransferData
 from globus_cli.parsing import (
     CaseInsensitiveChoice, common_options, submission_id_option,
     TaskPath, ENDPOINT_PLUS_OPTPATH, shlex_process_stdin)
-from globus_cli.safeio import safeprint
-from globus_cli.helpers import (
-    outformat_is_json, print_json_response, colon_formatted_print)
+from globus_cli.safeio import formatted_print, FORMAT_TEXT_RECORD
 
 from globus_cli.services.transfer import get_client, autoactivate
 
@@ -148,8 +145,11 @@ def transfer_command(batch, sync_level, recursive, destination, source, label,
                                recursive=recursive)
 
     if dry_run:
-        # don't bother dispatching out output format -- just print as JSON
-        safeprint(json.dumps(transfer_data, indent=2))
+        formatted_print(
+            transfer_data, response_key='DATA',
+            fields=(('Source Path', 'source_path'),
+                    ('Dest Path', 'destination_path'),
+                    ('Recursive', 'recursive')))
         # exit safely
         return
 
@@ -158,9 +158,5 @@ def transfer_command(batch, sync_level, recursive, destination, source, label,
     autoactivate(client, dest_endpoint, if_expires_in=60)
 
     res = client.submit_transfer(transfer_data)
-
-    if outformat_is_json():
-        print_json_response(res)
-    else:
-        fields = (('Message', 'message'), ('Task ID', 'task_id'))
-        colon_formatted_print(res, fields)
+    formatted_print(res, text_format=FORMAT_TEXT_RECORD,
+                    fields=(('Message', 'message'), ('Task ID', 'task_id')))
