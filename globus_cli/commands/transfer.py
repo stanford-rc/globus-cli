@@ -3,7 +3,7 @@ import click
 from globus_sdk import TransferData
 
 from globus_cli.parsing import (
-    CaseInsensitiveChoice, common_options, submission_id_option,
+    CaseInsensitiveChoice, common_options, task_submission_options,
     TaskPath, ENDPOINT_PLUS_OPTPATH, shlex_process_stdin)
 from globus_cli.safeio import formatted_print, FORMAT_TEXT_RECORD
 
@@ -63,14 +63,10 @@ from globus_cli.services.transfer import get_client, autoactivate
     All other levels can lead to data corruption.
     """))
 @common_options
-@submission_id_option
-@click.option('--dry-run', is_flag=True,
-              help=("Don't actually perform the transfer, print submission "
-                    "data instead"))
+@task_submission_options
 @click.option('--recursive', '-r', is_flag=True,
               help=('SOURCE_PATH and DEST_PATH are both directories, do a '
                     'recursive dir transfer'))
-@click.option('--label', default=None, help=('Set a label for this task.'))
 @click.option('--sync-level', '-s', default=None, show_default=True,
               type=CaseInsensitiveChoice(
                   ("exists", "size", "mtime", "checksum")),
@@ -98,7 +94,7 @@ from globus_cli.services.transfer import get_client, autoactivate
                 type=ENDPOINT_PLUS_OPTPATH)
 def transfer_command(batch, sync_level, recursive, destination, source, label,
                      preserve_mtime, verify_checksum, encrypt, submission_id,
-                     dry_run, delete):
+                     dry_run, delete, deadline):
     """
     Executor for `globus transfer`
     """
@@ -121,7 +117,8 @@ def transfer_command(batch, sync_level, recursive, destination, source, label,
         client, source_endpoint, dest_endpoint,
         label=label, sync_level=sync_level, verify_checksum=verify_checksum,
         preserve_timestamp=preserve_mtime, encrypt_data=encrypt,
-        submission_id=submission_id, delete_destination_extra=delete)
+        submission_id=submission_id, delete_destination_extra=delete,
+        deadline=deadline)
 
     if batch:
         @click.command()
