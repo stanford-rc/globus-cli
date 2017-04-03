@@ -4,10 +4,9 @@ import inspect
 from globus_cli.parsing import (
     common_options, endpoint_create_and_update_params,
     validate_endpoint_create_and_update_params, ENDPOINT_PLUS_REQPATH)
-from globus_cli.helpers import (
-    outformat_is_json, print_json_response, colon_formatted_print)
 from globus_cli.services.transfer import (
     autoactivate, get_client, assemble_generic_doc)
+from globus_cli.safeio import formatted_print, FORMAT_TEXT_RECORD
 
 
 COMMON_FIELDS = [
@@ -70,10 +69,7 @@ def endpoint_create(endpoint_type, shared, display_name, description,
         ep_doc = assemble_generic_doc('endpoint', **params)
         res = client.create_endpoint(ep_doc)
 
-    # output response
-    if outformat_is_json():
-        print_json_response(res)
-    else:
-        fields = (COMMON_FIELDS + GCP_FIELDS if is_globus_connect
-                  else COMMON_FIELDS)
-        colon_formatted_print(res, fields)
+    # output
+    formatted_print(res, fields=(COMMON_FIELDS + GCP_FIELDS
+                    if is_globus_connect else COMMON_FIELDS),
+                    text_format=FORMAT_TEXT_RECORD)

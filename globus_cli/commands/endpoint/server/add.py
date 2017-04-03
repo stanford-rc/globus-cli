@@ -1,9 +1,8 @@
 import click
 
-from globus_cli.safeio import safeprint
 from globus_cli.parsing import (
     common_options, endpoint_id_arg, server_add_and_update_opts)
-from globus_cli.helpers import print_json_response, outformat_is_json
+from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
 
 from globus_cli.services.transfer import get_client, assemble_generic_doc
 
@@ -33,9 +32,4 @@ def server_add(endpoint_id, subject, port, scheme, hostname,
                           outgoing_data_port_end=outgoing_data_ports[1])
 
     res = client.add_endpoint_server(endpoint_id, server_doc)
-
-    if outformat_is_json():
-        print_json_response(res)
-    else:
-        safeprint(res['message'])
-        safeprint('ID: {}'.format(res['id']))
+    formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key='message')

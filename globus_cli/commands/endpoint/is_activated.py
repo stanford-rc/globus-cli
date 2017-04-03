@@ -1,16 +1,8 @@
 import click
 
 from globus_cli.parsing import common_options, endpoint_id_arg
-from globus_cli.safeio import safeprint
-from globus_cli.helpers import outformat_is_json, print_json_response
 from globus_cli.services.transfer import get_client
-
-
-def _print_out(text_message, response_obj):
-    if outformat_is_json():
-        print_json_response(response_obj)
-    else:
-        safeprint(text_message)
+from globus_cli.safeio import formatted_print
 
 
 @click.command('is-activated', short_help='Check if an Endpoint is activated',
@@ -39,14 +31,17 @@ def endpoint_is_activated(endpoint_id, until, absolute_time):
         if deadline is not None:
             exp_string = ' or will expire before {}'.format(deadline)
 
-        _print_out(('{0} is not activated{1}\n'
-                    'To activate, please go to the following page:\n\n'
-                    '  https://www.globus.org/app/endpoints/{0}/activate\n')
-                   .format(endpoint_id, exp_string), res)
+        formatted_print(
+            res, simple_text=(
+                '{0} is not activated{1}\n'
+                'To activate, please go to the following page:\n\n'
+                '  https://www.globus.org/app/endpoints/{0}/activate\n'
+                ).format(endpoint_id, exp_string))
         click.get_current_context().exit(1)
 
     def success(msg, *format_params):
-        _print_out(msg.format(endpoint_id, *format_params), res)
+        formatted_print(
+            res, simple_text=(msg.format(endpoint_id, *format_params)))
         click.get_current_context().exit(0)
 
     # eternally active endpoints have a special expires_in value

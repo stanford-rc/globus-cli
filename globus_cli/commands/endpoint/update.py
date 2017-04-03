@@ -1,11 +1,10 @@
 import click
 import inspect
 
-from globus_cli.safeio import safeprint
 from globus_cli.parsing import (
     common_options, endpoint_id_arg, endpoint_create_and_update_params,
     validate_endpoint_create_and_update_params)
-from globus_cli.helpers import outformat_is_json, print_json_response
+from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
 
 from globus_cli.services.transfer import get_client, assemble_generic_doc
 
@@ -45,8 +44,4 @@ def endpoint_update(endpoint_id, display_name, description, info_link,
     # make the update
     ep_doc = assemble_generic_doc('endpoint', **params)
     res = client.update_endpoint(endpoint_id, ep_doc)
-
-    if outformat_is_json():
-        print_json_response(res)
-    else:
-        safeprint(res['message'])
+    formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key='message')

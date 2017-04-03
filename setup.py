@@ -12,7 +12,7 @@ setup(
     version=version,
     packages=find_packages(),
     install_requires=[
-        'globus-sdk==0.5.1',
+        'globus-sdk==0.6.0',
         'click>=6.6,<7.0',
         'configobj>=5.0.6,<6.0.0',
         'requests>=2.0.0,<3.0.0',
@@ -39,6 +39,7 @@ setup(
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5"
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6"
     ],
 )
