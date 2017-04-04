@@ -1,10 +1,11 @@
 import click
 
 from globus_cli.parsing import (
-    common_options, endpoint_create_and_update_params)
+    common_options, endpoint_create_and_update_params,
+    validate_endpoint_create_and_update_params, ENDPOINT_PLUS_REQPATH)
+from globus_cli.services.transfer import (
+    autoactivate, get_client, assemble_generic_doc)
 from globus_cli.safeio import formatted_print, FORMAT_TEXT_RECORD
-
-from globus_cli.services.transfer import get_client, assemble_generic_doc
 
 
 COMMON_FIELDS = [
@@ -25,32 +26,43 @@ GCP_FIELDS = [
 @click.option('--globus-connect-personal', 'endpoint_type',
               flag_value='personal', default=True, show_default=True,
               help='This endpoint is a Globus Connect Personal endpoint')
-def endpoint_create(endpoint_type, display_name, description, organization,
-                    department, keywords, contact_email, contact_info,
-                    info_link, public, default_directory, force_encryption,
-                    oauth_server, myproxy_server, myproxy_dn):
+@click.option("--shared", default=None, type=ENDPOINT_PLUS_REQPATH,
+              metavar=ENDPOINT_PLUS_REQPATH.metavar,
+              help=("This endpoint is a shared endpoint hosted "
+                    "on the given endpoint and path"))
+def endpoint_create(**kwargs):
     """
     Executor for `globus endpoint create`
     """
-
-    # omit the `is_globus_connect` key if not GCP, otherwise include as `True`
-    is_globus_connect = endpoint_type == 'personal' or None
-    ep_doc = assemble_generic_doc(
-        'endpoint',
-        is_globus_connect=is_globus_connect,
-        display_name=display_name, description=description,
-        organization=organization, department=department,
-        keywords=keywords, contact_email=contact_email,
-        contact_info=contact_info, info_link=info_link,
-        force_encryption=force_encryption, public=public,
-        default_directory=default_directory,
-        myproxy_server=myproxy_server, myproxy_dn=myproxy_dn,
-        oauth_server=oauth_server)
-
     client = get_client()
-    res = client.create_endpoint(ep_doc)
+
+    # validate options
+    endpoint_type = kwargs.pop("endpoint_type")
+    shared = kwargs.pop("shared")
+    if shared:  # shared overwrites personal or server endpoint types
+        endpoint_type = "shared"
+
+    is_globus_connect = endpoint_type == "personal" or None
+    kwargs["is_globus_connect"] = is_globus_connect
+    validate_endpoint_create_and_update_params(endpoint_type, False, kwargs)
+
+    # shared endpoint creation
+    if shared:
+        endpoint_id, host_path = shared
+        kwargs["host_endpoint"] = endpoint_id
+        kwargs["host_path"] = host_path
+
+        ep_doc = assemble_generic_doc('shared_endpoint', **kwargs)
+        autoactivate(client, endpoint_id, if_expires_in=60)
+        res = client.create_shared_endpoint(ep_doc)
+
+    # non shared endpoint creation
+    else:
+        # omit `is_globus_connect` key if not GCP, otherwise include as `True`
+        ep_doc = assemble_generic_doc('endpoint', **kwargs)
+        res = client.create_endpoint(ep_doc)
+
+    # output
     formatted_print(res, fields=(COMMON_FIELDS + GCP_FIELDS
-                                 if is_globus_connect else
-                                 COMMON_FIELDS),
-                    text_format=FORMAT_TEXT_RECORD
-                    )
+                    if is_globus_connect else COMMON_FIELDS),
+                    text_format=FORMAT_TEXT_RECORD)
