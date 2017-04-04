@@ -18,32 +18,47 @@ GCP_FIELDS = [
 ]
 
 
-@click.command('create', help='Create a new Endpoint')
+@click.command(
+    "create", short_help="Create a new endpoint",
+    help=("Create a new endpoint. Requires a display name and exactly one of "
+          "--personal, --server, or --shared to make a Globus Connect "
+          "Personal, Globus Connect Server, or Shared endpoint respectively."))
 @common_options
 @endpoint_create_and_update_params(create=True)
-@click.option('--globus-connect-server', 'endpoint_type', flag_value='server',
-              help='This endpoint is a Globus Connect Server endpoint')
-@click.option('--globus-connect-personal', 'endpoint_type',
-              flag_value='personal', default=True, show_default=True,
-              help='This endpoint is a Globus Connect Personal endpoint')
+@click.option("--personal", is_flag=True,
+              help=("Create a Globus Connect Personal endpoint. "
+                    "Mutually exclusive with --server and --shared. "))
+@click.option("--server", is_flag=True,
+              help=("Create a Globus Connect Server endpoint. "
+                    "Mutually exclusive with --personal and --shared."))
 @click.option("--shared", default=None, type=ENDPOINT_PLUS_REQPATH,
               metavar=ENDPOINT_PLUS_REQPATH.metavar,
-              help=("This endpoint is a shared endpoint hosted "
-                    "on the given endpoint and path"))
+              help=("Create a shared endpoint hosted on the given endpoint "
+                    "and path. Mutually exclusive with --personal and "
+                    "--server."))
 def endpoint_create(**kwargs):
     """
     Executor for `globus endpoint create`
     """
     client = get_client()
 
-    # validate options
-    endpoint_type = kwargs.pop("endpoint_type")
+    # get endpoint type, ensure unambiguous.
+    personal = kwargs.pop("personal")
+    server = kwargs.pop("server")
     shared = kwargs.pop("shared")
-    if shared:  # shared overwrites personal or server endpoint types
-        endpoint_type = "shared"
 
-    is_globus_connect = endpoint_type == "personal" or None
-    kwargs["is_globus_connect"] = is_globus_connect
+    if personal and (not server) and (not shared):
+        endpoint_type = "personal"
+    elif server and (not personal) and (not shared):
+        endpoint_type = "server"
+    elif shared and (not personal) and (not server):
+        endpoint_type = "shared"
+    else:
+        raise click.UsageError(
+            "Exactly one of --personal, --server, or --shared is required.")
+
+    # validate options
+    kwargs["is_globus_connect"] = personal or None
     validate_endpoint_create_and_update_params(endpoint_type, False, kwargs)
 
     # shared endpoint creation
@@ -64,5 +79,5 @@ def endpoint_create(**kwargs):
 
     # output
     formatted_print(res, fields=(COMMON_FIELDS + GCP_FIELDS
-                    if is_globus_connect else COMMON_FIELDS),
+                    if personal else COMMON_FIELDS),
                     text_format=FORMAT_TEXT_RECORD)

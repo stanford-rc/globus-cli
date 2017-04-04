@@ -24,12 +24,13 @@ class EndpointCreateTests(CliTestCase):
         for endpoint_id in self.asset_cleanup:
             self.tc.delete_endpoint(endpoint_id)
 
-    def test_basic_creation(self):
+    def test_gcp_creation(self):
         """
-        Runs endpoint create with only the required display name
-        Confirms endpoint is created successfully
+        Runs endpoint create with --personal
+        Confirms personal endpoint is created successfully
         """
-        output = self.run_line("globus endpoint create basic_create -F json")
+        output = self.run_line(
+            "globus endpoint create --personal personal_create -F json")
         res = json.loads(output)
         self.assertEqual(res["DATA_TYPE"], "endpoint_create_result")
         self.assertEqual(res["code"], "Created")
@@ -54,11 +55,11 @@ class EndpointCreateTests(CliTestCase):
 
     def test_gcs_creation(self):
         """
-        Runs endpoint create with --globus-connect-server
+        Runs endpoint create with --server
         Confirms endpoint is created successfully
         """
         output = self.run_line("globus endpoint create gcs_create "
-                               "--globus-connect-server -F json")
+                               "--server -F json")
         res = json.loads(output)
         self.assertEqual(res["DATA_TYPE"], "endpoint_create_result")
         self.assertEqual(res["code"], "Created")
@@ -74,14 +75,14 @@ class EndpointCreateTests(CliTestCase):
         """
         # GCP
         output = self.run_line(
-            "globus endpoint create gcp_text --globus-connect-personal")
+            "globus endpoint create gcp_text --personal")
         self.assertIn("Setup Key:", output)
         ep_id = re.search("Endpoint ID:\s*(\S*)", output).group(1)
         self.asset_cleanup.append(ep_id)
 
         # GCS
         output = self.run_line(
-            "globus endpoint create gcs_text --globus-connect-server")
+            "globus endpoint create gcs_text --server")
         self.assertNotIn("Setup Key:", output)
         ep_id = re.search("Endpoint ID:\s*(\S*)", output).group(1)
         self.asset_cleanup.append(ep_id)
@@ -113,8 +114,8 @@ class EndpointCreateTests(CliTestCase):
 
         # for each endpoint type
         for ep_type in ["--shared {}:/~/".format(GO_EP1_ID),
-                        "--globus-connect-personal",
-                        "--globus-connect-server"]:
+                        "--personal",
+                        "--server"]:
 
             # make and run the line, get and track the id for cleanup
             line = ("globus endpoint create general_options "
@@ -151,7 +152,7 @@ class EndpointCreateTests(CliTestCase):
 
         # make and run the line, get and track the id for cleanup
         line = ("globus endpoint create valid_gcs "
-                "--globus-connect-server -F json ")
+                "--server -F json ")
         for item in same_value_dict + diff_value_dict:
             line += "{} {} ".format(item["opt"], item["val"])
         ep_id = json.loads(self.run_line(line))["id"]
@@ -177,7 +178,7 @@ class EndpointCreateTests(CliTestCase):
                    "--location 1,1"]
         for opt in options:
             for ep_type in ["--shared {}:/~/".format(GO_EP1_ID),
-                            "--globus-connect-personal"]:
+                            "--personal"]:
                 output = self.run_line(("globus endpoint create invalid_gcs "
                                         "{} {} ".format(ep_type, opt)),
                                        assert_exit_code=2)
@@ -193,6 +194,6 @@ class EndpointCreateTests(CliTestCase):
                    "--preferred-parallelism 1"]
         for opt in options:
             output = self.run_line(("globus endpoint create invalid_managed "
-                                    "--globus-connect-server {}".format(opt)),
+                                    "--server {}".format(opt)),
                                    assert_exit_code=2)
             self.assertIn("managed endpoints", output)
