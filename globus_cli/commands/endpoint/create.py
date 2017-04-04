@@ -1,5 +1,4 @@
 import click
-import inspect
 
 from globus_cli.parsing import (
     common_options, endpoint_create_and_update_params,
@@ -31,42 +30,36 @@ GCP_FIELDS = [
               metavar=ENDPOINT_PLUS_REQPATH.metavar,
               help=("This endpoint is a shared endpoint hosted "
                     "on the given endpoint and path"))
-def endpoint_create(endpoint_type, shared, display_name, description,
-                    info_link, contact_info, contact_email, organization,
-                    department, keywords, public, location, disable_verify,
-                    myproxy_dn, myproxy_server, oauth_server, force_encryption,
-                    default_directory, subscription_id, network_use,
-                    max_concurrency, preferred_concurrency,
-                    max_parallelism, preferred_parallelism):
+def endpoint_create(**kwargs):
     """
     Executor for `globus endpoint create`
     """
     client = get_client()
 
-    # validate params
-    if shared:
+    # validate options
+    endpoint_type = kwargs.pop("endpoint_type")
+    shared = kwargs.pop("shared")
+    if shared:  # shared overwrites personal or server endpoint types
         endpoint_type = "shared"
-    args, _, _, values = inspect.getargvalues(inspect.currentframe())
-    params = dict((k, values[k]) for k in args)
 
-    is_globus_connect = params.pop("endpoint_type") == 'personal' or None
-    params["is_globus_connect"] = is_globus_connect
-    validate_endpoint_create_and_update_params(endpoint_type, False, params)
+    is_globus_connect = endpoint_type == "personal" or None
+    kwargs["is_globus_connect"] = is_globus_connect
+    validate_endpoint_create_and_update_params(endpoint_type, False, kwargs)
 
     # shared endpoint creation
     if shared:
-        endpoint_id, host_path = params.pop("shared")
-        params["host_endpoint"] = endpoint_id
-        params["host_path"] = host_path
+        endpoint_id, host_path = shared
+        kwargs["host_endpoint"] = endpoint_id
+        kwargs["host_path"] = host_path
 
-        ep_doc = assemble_generic_doc('shared_endpoint', **params)
+        ep_doc = assemble_generic_doc('shared_endpoint', **kwargs)
         autoactivate(client, endpoint_id, if_expires_in=60)
         res = client.create_shared_endpoint(ep_doc)
 
     # non shared endpoint creation
     else:
         # omit `is_globus_connect` key if not GCP, otherwise include as `True`
-        ep_doc = assemble_generic_doc('endpoint', **params)
+        ep_doc = assemble_generic_doc('endpoint', **kwargs)
         res = client.create_endpoint(ep_doc)
 
     # output

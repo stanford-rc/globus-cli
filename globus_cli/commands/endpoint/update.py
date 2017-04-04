@@ -1,5 +1,4 @@
 import click
-import inspect
 
 from globus_cli.parsing import (
     common_options, endpoint_id_arg, endpoint_create_and_update_params,
@@ -13,22 +12,14 @@ from globus_cli.services.transfer import get_client, assemble_generic_doc
 @common_options
 @endpoint_id_arg
 @endpoint_create_and_update_params(create=False)
-def endpoint_update(endpoint_id, display_name, description, info_link,
-                    contact_info, contact_email, organization, department,
-                    keywords, public, location, disable_verify, myproxy_dn,
-                    myproxy_server, oauth_server, force_encryption,
-                    default_directory, subscription_id, network_use,
-                    max_concurrency, preferred_concurrency,
-                    max_parallelism, preferred_parallelism):
+def endpoint_update(**kwargs):
     """
     Executor for `globus endpoint update`
     """
     # validate params. Requires a get call to check the endpoint type
-    args, _, _, values = inspect.getargvalues(inspect.currentframe())
-    params = dict((k, values[k]) for k in args)
-
     client = get_client()
-    get_res = client.get_endpoint(params.pop("endpoint_id"))
+    endpoint_id = kwargs.pop("endpoint_id")
+    get_res = client.get_endpoint(endpoint_id)
 
     if get_res["host_endpoint_id"]:
         endpoint_type = "shared"
@@ -39,9 +30,9 @@ def endpoint_update(endpoint_id, display_name, description, info_link,
     else:
         endpoint_type = "server"
     validate_endpoint_create_and_update_params(
-        endpoint_type, get_res["subscription_id"], params)
+        endpoint_type, get_res["subscription_id"], kwargs)
 
     # make the update
-    ep_doc = assemble_generic_doc('endpoint', **params)
+    ep_doc = assemble_generic_doc('endpoint', **kwargs)
     res = client.update_endpoint(endpoint_id, ep_doc)
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key='message')
