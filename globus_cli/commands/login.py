@@ -185,18 +185,21 @@ def exchange_code_and_store_config(native_client, auth_code):
     # in the list is the primary.
     identity = res['identities'][0]
 
-    # write data to config
-    # TODO: remove once we deprecate these fully
-    write_option('transfer_token', transfer_at, section='general')
-    write_option('auth_token', auth_at, section='general')
-    # new values we want to use moving forward
+    # revoke any existing tokens
+    for token_opt in (TRANSFER_RT_OPTNAME, TRANSFER_AT_OPTNAME,
+                      AUTH_RT_OPTNAME, AUTH_AT_OPTNAME):
+        token = lookup_option(token_opt)
+        if token:
+            native_client.oauth2_revoke_token(token)
+
+    # write new tokens to config
     write_option(TRANSFER_RT_OPTNAME, transfer_rt)
     write_option(TRANSFER_AT_OPTNAME, transfer_at)
     write_option(TRANSFER_AT_EXPIRES_OPTNAME, transfer_at_expires)
     write_option(AUTH_RT_OPTNAME, auth_rt)
     write_option(AUTH_AT_OPTNAME, auth_at)
     write_option(AUTH_AT_EXPIRES_OPTNAME, auth_at_expires)
-    # whoami data
+    # write whoami data to config
     write_option(WHOAMI_ID_OPTNAME, identity['id'])
     write_option(WHOAMI_USERNAME_OPTNAME, identity['username'])
     write_option(WHOAMI_EMAIL_OPTNAME, identity['email'])
