@@ -2,7 +2,7 @@ import click
 
 from globus_cli.parsing import common_options, ENDPOINT_PLUS_OPTPATH
 from globus_cli.safeio import formatted_print
-
+from globus_cli.helpers import is_verbose
 from globus_cli.services.transfer import get_client, autoactivate
 
 
@@ -115,5 +115,5 @@ def ls_command(endpoint_plus_path, recursive_depth_limit,
                      ('Group', 'group'), ('Size', 'size'),
                      ('Last Modified', 'last_modified'), ('File Type', 'type'),
                      ('Filename', cleaned_item_name)],
-        simple_text=(None if long else
+        simple_text=(None if long or is_verbose() else
                      "\n".join(cleaned_item_name(x) for x in res)))
