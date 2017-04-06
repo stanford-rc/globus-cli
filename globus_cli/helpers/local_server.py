@@ -64,7 +64,7 @@ HTML_TEMPLATE = Template("""
   <main>
     <h1>Globus CLI</h1>
     <p>
-      Log in attempt finished. You may close this tab.
+      $login_result. You may close this tab.
     <p>
       $post_login_message
     </p>
@@ -104,7 +104,9 @@ class RedirectHandler(BaseHTTPRequestHandler):
             if code:
                 self.wfile.write(
                     six.b(
-                        HTML_TEMPLATE.substitute(post_login_message=DOC_URL)))
+                        HTML_TEMPLATE.substitute(
+                            post_login_message=DOC_URL,
+                            login_result='Login successful')))
                 self.server.return_code(code)
             else:
                 msg = query_params.get(
@@ -112,7 +114,9 @@ class RedirectHandler(BaseHTTPRequestHandler):
 
                 self.wfile.write(
                     six.b(
-                        HTML_TEMPLATE.substitute(post_login_message=msg)))
+                        HTML_TEMPLATE.substitute(
+                            post_login_message=msg,
+                            login_result='Login failed')))
 
                 self.server.return_code(LocalServerError(msg))
 
