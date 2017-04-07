@@ -39,13 +39,26 @@ allow for human-readable calls to further globus endpoint commands.
 
     # now we can use the endpoint in a human readable fashion
     $ globus endpoint show $ep1
-    Display Name: Globus Tutorial Endpoint 1
-    ID:           ddb59aef-6d04-11e5-ba46-22000b92c6ec
-    Owner:        go@globusid.org
-    Activated:    False
-    Shareable:    True
-    Department:   None
-    Keywords:     None
+    Display Name:              Globus Tutorial Endpoint 1
+    ID:                        ddb59aef-6d04-11e5-ba46-22000b92c6ec
+    Owner:                     go@globusid.org
+    Activated:                 True
+    Shareable:                 True
+    Department:                None
+    Keywords:                  None
+    Endpoint Info Link:        None
+    Contact E-mail:            None
+    Organization:              None
+    Department:                None
+    Other Contact Info:        None
+    Visibility:                True
+    Default Directory:         None
+    Force Encryption:          False
+    Managed Endpoint:          True
+    Subscription ID:           964be8f5-5f9b-11e4-b64e-12313940394d
+    Legacy Name:               go#ep1
+    Local User Info Available: False
+
 
 Search results truncated for readability.
 
@@ -229,8 +242,7 @@ Creates a bookmark then demonstrates how they can be used in place of UUIDs
     Example Bookmark | ddb59aef-6d04-11e5-ba46-22000b92c6ec | ab45785a-dda3-11e6-9d11-22000a1e3b52 | /share/godata/
 
     # The bookmark can now be used to get a path without any UUIDs
-    $ path=$(globus bookmark locate "Example Bookmark")
-    $ globus ls $path
+    $ globus ls $(globus bookmark show "Example Bookmark")
     file1.txt
     file2.txt
     file3.txt
@@ -253,7 +265,7 @@ creates a permission for that endpoint.
     The directory was created successfully
 
     # set up the directory as a shared endpoint
-    $ globus endpoint share $ep1:/~/shared_dir "CLI Example Shared Endpoint" \
+    $ globus endpoint create --shared $ep1:/~/shared_dir "CLI Example Shared Endpoint" \
         --description "Example endpoint created using the Globus CLI"
     Message:     Shared endpoint created successfully
     Endpoint ID: 3e4efafe-dda4-11e6-9d11-22000a1e3b52
