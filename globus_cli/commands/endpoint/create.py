@@ -22,7 +22,7 @@ GCP_FIELDS = [
     "create", short_help="Create a new endpoint",
     help=("Create a new endpoint. Requires a display name and exactly one of "
           "--personal, --server, or --shared to make a Globus Connect "
-          "Personal, Globus Connect Server, or Shared endpoint respectively."))
+          "Personal, Globus Connect Server, or shared endpoint respectively."))
 @common_options
 @endpoint_create_and_update_params(create=True)
 @click.option("--personal", is_flag=True,
