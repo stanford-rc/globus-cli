@@ -19,11 +19,11 @@ Name, ID and email are displayed as well.
 
 == OPTIONS
 
-include::format_option.adoc[]
+include::include/format_option.adoc[]
 
-include::help_option.adoc[]
+include::include/help_option.adoc[]
 
-include::verbose_option.adoc[]
+include::include/verbose_option.adoc[]
 
 == EXAMPLES
 
