@@ -14,7 +14,7 @@ def remove_command(parameter):
     """
     conf = get_config_obj()
 
-    section = 'general'
+    section = "cli"
     if '.' in parameter:
         section, parameter = parameter.split('.', 1)
 

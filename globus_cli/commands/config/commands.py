@@ -15,15 +15,15 @@ from globus_cli.commands.config.show import show_command
     dot is used as the config section name, and the remainder is the name of
     an option in that section.
 
-    The default section name is always "general", which is where most Globus
+    The default section name is 'cli', which is where most Globus CLI
     Config values are kept.
 
     \b
     For example, you might use
-        $ globus config show auth_token
-    to display your current 'auth_token' from the 'general' section.
+        $ globus config show output_format
+    to display your current 'output_format' from the 'cli' section.
     You can equally well use
-        $ globus config show general.auth_token
+        $ globus config show cli.output_format
     to show the same value more explicitly.
     """))
 def config_command():

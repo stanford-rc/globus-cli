@@ -12,7 +12,7 @@ def show_command(parameter):
     """
     Executor for `globus config show`
     """
-    section = 'general'
+    section = "cli"
     if '.' in parameter:
         section, parameter = parameter.split('.', 1)
 
