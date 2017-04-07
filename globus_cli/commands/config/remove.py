@@ -5,7 +5,7 @@ from globus_cli.parsing import common_options
 from globus_cli.config import get_config_obj
 
 
-@click.command('remove', help='Remove a value from the Globus Config')
+@click.command('remove', help='Remove a value from the Globus config file')
 @common_options(no_format_option=True)
 @click.argument('parameter', required=True)
 def remove_command(parameter):
@@ -14,7 +14,7 @@ def remove_command(parameter):
     """
     conf = get_config_obj()
 
-    section = 'general'
+    section = "cli"
     if '.' in parameter:
         section, parameter = parameter.split('.', 1)
 
