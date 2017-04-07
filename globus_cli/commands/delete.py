@@ -12,7 +12,7 @@ from globus_cli.services.transfer import get_client, autoactivate
 
 
 @click.command('delete', short_help='Submit a delete task',
-               help=('Delete a file or directory from one Endpoint as an '
+               help=('Delete a file or directory from one endpoint as an '
                      'asynchronous task.'))
 @common_options
 @task_submission_options
