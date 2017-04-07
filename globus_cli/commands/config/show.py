@@ -5,7 +5,7 @@ from globus_cli.parsing import common_options
 from globus_cli.config import lookup_option
 
 
-@click.command('show', help='Show a value from the Globus Config')
+@click.command('show', help='Show a value from the Globus config file')
 @common_options(no_format_option=True)
 @click.argument('parameter', required=True)
 def show_command(parameter):

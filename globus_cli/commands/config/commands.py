@@ -7,16 +7,19 @@ from globus_cli.commands.config.show import show_command
 
 
 @globus_group('config', short_help=(
-    'Modify, view, and manage your Globus CLI config.'), help=("""\
-    Modify, view, and manage your Globus CLI config.
+    'Manage your Globus config file. (Advanced Users)'), help=("""\
+    Manage your Globus config file.
 
-    Many commands accept PARAMETERs, names which identify settings in the
-    config file. If a PARAMETER includes any dots, the part prior to its first
-    dot is used as the config section name, and the remainder is the name of
-    an option in that section.
+    Be aware that these commands are for advanced users with a strong
+    understanding of the underlying Globus API.
 
-    The default section name is 'cli', which is where most Globus CLI
-    Config values are kept.
+    Many commands accept PARAMETER names which identify settings in the
+    config file. If a PARAMETER includes any dots '.', the part prior to its
+    first dot is used as the config section name, and the remainder is the
+    name of an option in that section.
+
+    The default section name is 'cli', which is where most config values
+    used by the Globus CLI are kept.
 
     \b
     For example, you might use

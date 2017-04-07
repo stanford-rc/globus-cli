@@ -9,8 +9,21 @@ from globus_cli.config import (
 
 
 @click.command('init',
-               help=('Initialize your Globus Config file with any settings '
-                     'you may want for the SDK and CLI'))
+               short_help='Initialize all settings in the Globus Config file',
+               help="""
+Initialize your Clobus Config file with a series of prompts or passed
+options to set values used by the Globus CLI.
+
+Current settings that can be configured are:
+
+output_format: either 'text' for normal output or 'json' to display
+the machine parsable json used in the underlying Globus API.
+
+default_myproxy_username: a default username to use with 'globus endpoint
+activate --myproxy' If this value is set, the username prompt will be skipped
+when using myproxy authorization. This value can be overridden with an
+explicit use of --myproxy-username.
+""")
 @common_options(no_format_option=True)
 @click.option('--default-output-format',
               help='The default format for the CLI to use when printing.',
