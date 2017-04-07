@@ -4,10 +4,31 @@ Map non success HTTP response codes to exit codes other than 1.
 e.g. "--map-http-satus 403=0,404=0" would exit with 0 even if a 403
 or 404 http error code was received. Valid exit codes are 0,1,50-99.
 
-include::format_option.adoc[]
+*-F, --format* '[json|text]'::
 
-include::jmespath_option.adoc[]
+Set the output format for stdout. Defaults to "text".
 
-include::help_option.adoc[]
+*--jq, --jmespath* 'EXPR'::
 
-include::verbose_option.adoc[]
+Supply a JMESPath expression to apply to json output.
+Takes precedence over any specified '--format' and forces the format to be json
+processed by this expression.
++
+A full specification of the JMESPath language for querying JSON structures may
+be found at https://jmespath.org/
+
+*-h, --help*::
+
+Show help text for this command.
+
+*-v, --verbose*::
+
+Control the level of output. 
++
+Use -v or --verbose to show warnings and any additional text output.
++ 
+Use -vv to add informative logging.
++
+Use -vvv to add debug logging and full stack on any errors. (equivalent to
+-v --debug)
+
