@@ -6,7 +6,7 @@ from globus_cli.safeio import formatted_print
 from globus_cli.services.transfer import get_client
 
 
-@click.command('create', help='Create a Bookmark for the current user')
+@click.command('create', help='Create a bookmark for the current user')
 @common_options
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_REQPATH.metavar,
                 type=ENDPOINT_PLUS_REQPATH)

@@ -10,7 +10,7 @@ from globus_cli.services.auth import maybe_lookup_identity_id
 from globus_cli.services.transfer import get_client, assemble_generic_doc
 
 
-@click.command('create', help='Create a Role on an Endpoint')
+@click.command('create', help='Create a role on an endpoint')
 @common_options
 @endpoint_id_arg
 @security_principal_opts

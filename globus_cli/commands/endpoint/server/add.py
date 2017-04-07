@@ -7,7 +7,7 @@ from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
 from globus_cli.services.transfer import get_client, assemble_generic_doc
 
 
-@click.command('add', help='Add a server to an Endpoint')
+@click.command('add', help='Add a server to an endpoint')
 @common_options
 @server_add_and_update_opts(add=True)
 @endpoint_id_arg

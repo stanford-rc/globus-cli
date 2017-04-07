@@ -7,7 +7,7 @@ from globus_cli.commands.bookmark.rename import bookmark_rename
 from globus_cli.commands.bookmark.show import bookmark_show
 
 
-@globus_group(name='bookmark', help='Manage Endpoint Bookmarks')
+@globus_group(name='bookmark', help='Manage endpoint bookmarks')
 def bookmark_command():
     pass
 

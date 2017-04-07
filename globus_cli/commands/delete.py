@@ -11,7 +11,7 @@ from globus_cli.safeio import formatted_print, FORMAT_TEXT_RECORD
 from globus_cli.services.transfer import get_client, autoactivate
 
 
-@click.command('delete', short_help='Submit a Delete Task',
+@click.command('delete', short_help='Submit a delete task',
                help=('Delete a file or directory from one Endpoint as an '
                      'asynchronous task.'))
 @common_options

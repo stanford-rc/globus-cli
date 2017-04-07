@@ -6,7 +6,7 @@ from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
 from globus_cli.services.transfer import get_client
 
 
-@click.command('delete', help='Remove a Role from an Endpoint')
+@click.command('delete', help='Remove a role from an endpoint')
 @common_options
 @endpoint_id_arg
 @role_id_arg

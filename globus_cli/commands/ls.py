@@ -71,8 +71,8 @@ def _get_ls_res(client, path, endpoint_id, recursive, depth, show_hidden):
     return result_doc
 
 
-@click.command('ls', help='List the contents of a directory on an Endpoint',
-               short_help='List Endpoint directory contents')
+@click.command('ls', help='List the contents of a directory on an endpoint',
+               short_help='List endpoint directory contents')
 @common_options
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_OPTPATH.metavar,
                 type=ENDPOINT_PLUS_OPTPATH)

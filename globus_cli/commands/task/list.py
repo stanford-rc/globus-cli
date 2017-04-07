@@ -7,7 +7,7 @@ from globus_cli.safeio import formatted_print
 from globus_cli.services.transfer import iterable_response_to_dict, get_client
 
 
-@click.command('list', help='List Tasks for the current user')
+@click.command('list', help='List tasks for the current user')
 @common_options
 @click.option(
     "--limit", default=10, show_default=True, help="Limit number of results.")

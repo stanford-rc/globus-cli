@@ -6,7 +6,7 @@ from globus_cli.safeio import formatted_print
 from globus_cli.services.transfer import iterable_response_to_dict, get_client
 
 
-@click.command('event-list', help='List Events for a given Task')
+@click.command('event-list', help='List Events for a given task')
 @common_options
 @task_id_arg
 @click.option(

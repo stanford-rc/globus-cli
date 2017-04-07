@@ -6,7 +6,7 @@ from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
 from globus_cli.services.transfer import get_client
 
 
-@click.command('delete', help='Delete a server belonging to an Endpoint')
+@click.command('delete', help='Delete a server belonging to an endpoint')
 @common_options
 @endpoint_id_arg
 @server_id_arg

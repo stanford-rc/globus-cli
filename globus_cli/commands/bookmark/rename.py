@@ -6,7 +6,7 @@ from globus_cli.safeio import formatted_print
 from globus_cli.services.transfer import get_client
 
 
-@click.command('rename', help='Change a Bookmark\'s name')
+@click.command('rename', help='Change a bookmark\'s name')
 @common_options
 @click.argument('bookmark_id')
 @click.argument('new_bookmark_name')

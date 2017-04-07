@@ -6,7 +6,7 @@ from globus_cli.safeio import formatted_print, FORMAT_TEXT_RECORD
 from globus_cli.services.transfer import get_client
 
 
-@click.command('show', help='Show a server belonging to an Endpoint')
+@click.command('show', help='Show a server belonging to an endpoint')
 @common_options
 @endpoint_id_arg
 @server_id_arg

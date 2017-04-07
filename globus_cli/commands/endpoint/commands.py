@@ -16,7 +16,7 @@ from globus_cli.commands.endpoint.my_shared_endpoint_list import (
     my_shared_endpoint_list)
 
 
-@globus_group(name='endpoint', help='Manage Globus Endpoint definitions')
+@globus_group(name='endpoint', help='Manage Globus endpoint definitions')
 def endpoint_command():
     pass
 

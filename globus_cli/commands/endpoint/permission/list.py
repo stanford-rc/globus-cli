@@ -6,7 +6,7 @@ from globus_cli.services.auth import lookup_identity_name
 from globus_cli.services.transfer import get_client
 
 
-@click.command('list', help='List of Permissions on an Endpoint')
+@click.command('list', help='List of permissions on an endpoint')
 @common_options
 @endpoint_id_arg
 def list_command(endpoint_id):

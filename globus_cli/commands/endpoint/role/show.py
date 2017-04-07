@@ -12,7 +12,7 @@ def lookup_principal(role):
     return lookup_identity_name(role['principal'])
 
 
-@click.command('show', help='Show full info for a Role on an Endpoint')
+@click.command('show', help='Show full info for a role on an endpoint')
 @common_options
 @endpoint_id_arg
 @role_id_arg

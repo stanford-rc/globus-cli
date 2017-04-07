@@ -6,7 +6,7 @@ from globus_cli.safeio import formatted_print, FORMAT_TEXT_RECORD
 from globus_cli.services.transfer import get_client
 
 
-@click.command('show', help='Display a detailed Endpoint definition')
+@click.command('show', help='Display a detailed endpoint definition')
 @common_options
 @endpoint_id_arg
 def endpoint_show(endpoint_id):

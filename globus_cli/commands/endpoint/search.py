@@ -9,7 +9,7 @@ from globus_cli.services.transfer import (
     ENDPOINT_LIST_FIELDS, get_client, iterable_response_to_dict)
 
 
-@click.command('search', help='Search for Globus Endpoints')
+@click.command('search', help='Search for Globus endpoints')
 @common_options
 @click.option('--filter-scope', default='all', show_default=True,
               type=CaseInsensitiveChoice(

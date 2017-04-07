@@ -7,7 +7,7 @@ from globus_cli.services.transfer import (
     iterable_response_to_dict, get_client, display_name_or_cname)
 
 
-@click.command('list', help='List Bookmarks for the current user')
+@click.command('list', help='List bookmarks for the current user')
 @common_options
 def bookmark_list():
     """

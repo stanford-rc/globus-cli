@@ -6,7 +6,7 @@ from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
 from globus_cli.services.transfer import get_client
 
 
-@click.command('delete', help='Delete a Bookmark')
+@click.command('delete', help='Delete a bookmark')
 @common_options
 @click.argument('bookmark_id')
 def bookmark_delete(bookmark_id):

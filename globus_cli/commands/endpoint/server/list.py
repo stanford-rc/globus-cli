@@ -7,7 +7,7 @@ from globus_cli.safeio import (
 from globus_cli.services.transfer import (display_name_or_cname, get_client)
 
 
-@click.command('list', help='List all servers belonging to an Endpoint')
+@click.command('list', help='List all servers belonging to an endpoint')
 @common_options
 @endpoint_id_arg
 def server_list(endpoint_id):

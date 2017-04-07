@@ -10,9 +10,9 @@ from globus_cli.safeio import formatted_print, FORMAT_TEXT_RECORD
 from globus_cli.services.transfer import get_client, autoactivate
 
 
-@click.command('transfer', short_help='Submit a Transfer Task',
+@click.command('transfer', short_help='Submit a transfer task',
                help=("""\
-    Copy a file or directory from one Endpoint to another as an asynchronous
+    Copy a file or directory from one endpoint to another as an asynchronous
     task.
 
     \b
@@ -20,10 +20,10 @@ from globus_cli.services.transfer import get_client, autoactivate
     ===
 
     If you use `SOURCE_PATH` and `DEST_PATH` without the `--batch` flag, you
-    will submit a single-file or single-directory transfer Task.
+    will submit a single-file or single-directory transfer task.
     This has behavior similar to `cp` and `cp -r`, across endpoints of course.
 
-    Using `--batch`, `globus transfer` can submit a Task which transfers
+    Using `--batch`, `globus transfer` can submit a task which transfers
     multiple files or directories. Paths to transfer are taken from stdin.
     Lines are split on spaces, respecting quotes, and every line is treated as
     a file or directory to transfer.
@@ -70,7 +70,7 @@ from globus_cli.services.transfer import get_client, autoactivate
 @click.option('--sync-level', '-s', default=None, show_default=True,
               type=CaseInsensitiveChoice(
                   ("exists", "size", "mtime", "checksum")),
-              help=('How will the Transfer Task determine whether or not to '
+              help=('How will the Transfer task determine whether or not to '
                     'actually transfer a file over the network?'))
 @click.option('--preserve-mtime', is_flag=True, default=False,
               help=('Preserve file and directory modification times.'))

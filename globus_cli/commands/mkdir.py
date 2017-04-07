@@ -6,7 +6,7 @@ from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
 from globus_cli.services.transfer import get_client, autoactivate
 
 
-@click.command('mkdir', help='Make a directory on an Endpoint')
+@click.command('mkdir', help='Make a directory on an endpoint')
 @common_options
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_REQPATH.metavar,
                 type=ENDPOINT_PLUS_REQPATH)
