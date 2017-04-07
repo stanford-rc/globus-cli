@@ -155,7 +155,7 @@ def endpoint_create_and_update_params(*args, **kwargs):
         # GCS only options
         f = click.option(
             "--public/--private", "public", default=None,
-            help=("Set the Endpoint to be public or private "
+            help=("Set the endpoint to be public or private "
                   "(Globus Connect Server only)"))(f)
         f = click.option(
             "--myproxy-dn",

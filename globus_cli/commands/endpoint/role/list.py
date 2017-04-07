@@ -15,7 +15,7 @@ def principal_str(role):
     return principal
 
 
-@click.command('list', help='List of assigned Roles on an Endpoint')
+@click.command('list', help='List of assigned roles on an endpoint')
 @common_options
 @endpoint_id_arg
 def role_list(endpoint_id):

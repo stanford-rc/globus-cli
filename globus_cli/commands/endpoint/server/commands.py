@@ -8,8 +8,8 @@ from globus_cli.commands.endpoint.server.delete import server_delete
 
 
 @globus_group(
-    name='server', short_help='Manage servers for a Globus Endpoint',
-    help=('Manage the servers which back a Globus Endpoint. '
+    name='server', short_help='Manage servers for a Globus endpoint',
+    help=('Manage the servers which back a Globus endpoint. '
           'This typically refers to a Globus Connect Server endpoint '
           'running on multiple servers. Each GridFTP server is '
           'registered as a server backing the endpoint.'))

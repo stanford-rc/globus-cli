@@ -9,7 +9,7 @@ from globus_cli.services.transfer import (
 
 @click.command(
     'my-shared-endpoint-list',
-    help='List all Shared Endpoints on an Endpoint by the current user')
+    help='List all shared endpoints on an endpoint by the current user')
 @common_options
 @endpoint_id_arg
 def my_shared_endpoint_list(endpoint_id):

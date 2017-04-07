@@ -6,8 +6,8 @@ from globus_cli.parsing import common_options, task_id_arg
 from globus_cli.services.transfer import get_client
 
 
-@click.command('cancel', short_help='Cancel a Task',
-               help='Cancel a Task owned by the current user')
+@click.command('cancel', short_help='Cancel a task',
+               help='Cancel a task owned by the current user')
 @common_options
 @task_id_arg(required=False)
 @click.option('--all', '-a', is_flag=True,

@@ -7,7 +7,7 @@ from globus_cli.commands.endpoint.permission.update import update_command
 from globus_cli.commands.endpoint.permission.delete import delete_command
 
 
-@globus_group(name='permission', help=('Manage Endpoint Permissions '
+@globus_group(name='permission', help=('Manage endpoint permissions '
                                        '(Access Control Lists)'))
 def permission_command():
     pass

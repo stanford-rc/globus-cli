@@ -13,7 +13,7 @@ from globus_cli.commands.task.generate_submission_id import (
     generate_submission_id)
 
 
-@globus_group(name='task', help='Manage asynchronous Tasks')
+@globus_group(name='task', help='Manage asynchronous tasks')
 def task_command():
     pass
 

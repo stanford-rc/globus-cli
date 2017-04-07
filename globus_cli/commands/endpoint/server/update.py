@@ -8,7 +8,7 @@ from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
 from globus_cli.services.transfer import get_client, assemble_generic_doc
 
 
-@click.command('update', help='Update attributes of a Server on an Endpoint')
+@click.command('update', help='Update attributes of a server on an endpoint')
 @common_options
 @server_add_and_update_opts
 @endpoint_id_arg

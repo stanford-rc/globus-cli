@@ -6,7 +6,7 @@ from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
 from globus_cli.services.transfer import get_client
 
 
-@click.command('deactivate', help='Deactivate an Endpoint')
+@click.command('deactivate', help='Deactivate an endpoint')
 @common_options
 @endpoint_id_arg
 def endpoint_deactivate(endpoint_id):

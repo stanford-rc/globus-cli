@@ -8,15 +8,15 @@ from globus_cli.safeio import formatted_print, FORMAT_SILENT
 from globus_cli.services.transfer import get_client
 
 
-@click.command('wait', help='Wait for a Task to complete')
+@click.command('wait', help='Wait for a task to complete')
 @common_options
 @task_id_arg
 @click.option('--timeout', type=int, metavar='N',
-              help=('Wait N seconds. If the Task does not terminate by '
+              help=('Wait N seconds. If the task does not terminate by '
                     'then, or terminates with an unsuccessful status, '
                     'exit with status 1'))
 @click.option('--polling-interval', default=1, type=int, show_default=True,
-              help='Number of seconds between Task status checks.')
+              help='Number of seconds between task status checks.')
 @click.option('--heartbeat', '-H', is_flag=True,
               help=('Every polling interval, print "." to stdout to '
                     'indicate that task wait is till active'))

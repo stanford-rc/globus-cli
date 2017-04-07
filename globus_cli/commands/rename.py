@@ -6,7 +6,7 @@ from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
 from globus_cli.services.transfer import get_client, autoactivate
 
 
-@click.command('rename', help='Rename a file or directory on an Endpoint')
+@click.command('rename', help='Rename a file or directory on an endpoint')
 @common_options
 @click.argument('source', metavar='ENDPOINT_ID:SOURCE_PATH',
                 type=ENDPOINT_PLUS_REQPATH)

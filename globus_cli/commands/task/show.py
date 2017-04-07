@@ -54,7 +54,7 @@ def print_task_detail(client, task_id):
         (DELETE_FIELDS if res['type'] == 'DELETE' else TRANSFER_FIELDS)))
 
 
-@click.command('show', help='Show detailed information about a specific Task')
+@click.command('show', help='Show detailed information about a specific task')
 @common_options
 @task_id_arg
 @click.option('--successful-transfers', '-t', is_flag=True, default=False,

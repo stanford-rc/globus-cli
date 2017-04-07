@@ -16,7 +16,7 @@ def _shared_with_keyfunc(rule):
         return rule['principal_type']
 
 
-@click.command('show', help='Show a Permission on an Endpoint')
+@click.command('show', help='Show a permission on an endpoint')
 @common_options
 @endpoint_id_arg
 @click.argument('rule_id')

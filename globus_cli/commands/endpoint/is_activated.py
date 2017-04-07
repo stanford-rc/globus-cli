@@ -5,8 +5,8 @@ from globus_cli.services.transfer import get_client
 from globus_cli.safeio import formatted_print
 
 
-@click.command('is-activated', short_help='Check if an Endpoint is activated',
-               help=('Check if an Endpoint is activated or requires '
+@click.command('is-activated', short_help='Check if an endpoint is activated',
+               help=('Check if an endpoint is activated or requires '
                      'activation. If it requires activation, exits with '
                      'status 1, otherwise exits with status 0.'))
 @common_options
