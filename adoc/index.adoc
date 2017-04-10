@@ -52,7 +52,7 @@ Deactivate an endpoint
 link:endpoint_create[globus endpoint create]::
 Create a new endpoint
 
-link:endpoint_[globus endpoint update]::
+link:endpoint_update[globus endpoint update]::
 Update attributes of an endpoint
 
 link:endpoint_my_shared_endpoint_list[globus endpoint my-shared-endpoint-list]::
