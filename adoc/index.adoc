@@ -8,6 +8,9 @@ List all CLI commands
 link:version[globus version]::
 Show the version and exit
 
+link:update[globus update]::
+Update the Globus CLI to its latest version
+
 link:login[globus login]::
 Login to Globus to get credentials for the Globus CLI
 
