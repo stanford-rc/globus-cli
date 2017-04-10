@@ -2,155 +2,155 @@
 
 NOTE: This page refers to the current Globus CLI which is locally installed program. We also have a link:../hosted[reference for the hosted CLI], which is accessed via SSH but will eventually be deprecated.
 
-link:globus_list_commands[globus list-commands]::
+link:list_commands[globus list-commands]::
 List all CLI commands
 
-link:globus_version[globus version]::
+link:version[globus version]::
 Show the version and exit
 
-link:globus_login[globus login]::
+link:login[globus login]::
 Login to Globus to get credentials for the Globus CLI
 
-link:globus_logout[globus logout]::
+link:logout[globus logout]::
 Logout of the Globus CLI
 
-link:globus_whoami[globus whoami]::
+link:whoami[globus whoami]::
 Show the currently logged-in identity.
 
-link:globus_rename[globus rename]::
+link:rename[globus rename]::
 Rename a file or directory on an endpoint
 
-link:globus_transfer[globus transfer]::
+link:transfer[globus transfer]::
 Submit a transfer task
 
-link:globus_mkdir[globus mkdir]::
+link:mkdir[globus mkdir]::
 Make a directory on an endpoint
 
-link:globus_get_identities[globus get-identities]::
+link:get_identities[globus get-identities]::
 Lookup Globus Auth identities
 
-link:globus_delete[globus delete]::
+link:delete[globus delete]::
 Submit a delete task
 
-link:globus_ls[globus ls]::
+link:ls[globus ls]::
 List endpoint directory contents
 
 == globus endpoint commands
 
-link:globus_endpoint_search[globus endpoint search]::
+link:endpoint_search[globus endpoint search]::
 Search for Globus endpoints
 
-link:globus_endpoint_activate[globus endpoint activate]::
+link:endpoint_activate[globus endpoint activate]::
 Activate an endpoint
 
-link:globus_endpoint_show[globus endpoint show]::
+link:endpoint_show[globus endpoint show]::
 Display a detailed endpoint definition
 
-link:globus_endpoint_deactivate[globus endpoint deactivate]::
+link:endpoint_deactivate[globus endpoint deactivate]::
 Deactivate an endpoint
 
-link:globus_endpoint_create[globus endpoint create]::
+link:endpoint_create[globus endpoint create]::
 Create a new endpoint
 
-link:globus_endpoint_[globus endpoint update]::
+link:endpoint_[globus endpoint update]::
 Update attributes of an endpoint
 
-link:globus_endpoint_my_shared_endpoint_list[globus endpoint my-shared-endpoint-list]::
+link:endpoint_my_shared_endpoint_list[globus endpoint my-shared-endpoint-list]::
 List all shared endpoints on an endpoint owned by the current user
 
-link:globus_endpoint_is_activated[globus endpoint is-activated]::
+link:endpoint_is_activated[globus endpoint is-activated]::
 Check if an endpoint is activated
 
-link:globus_endpoint_delete[globus endpoint delete]::
+link:endpoint_delete[globus endpoint delete]::
 Delete a given endpoint
 
 == globus endpoint permission commands
 
-link:globus_endpoint_permission_create[globus endpoint permission create]::
+link:endpoint_permission_create[globus endpoint permission create]::
 Create an access control rule
 
-link:globus_endpoint_permission_delete[globus endpoint permission delete]::
+link:endpoint_permission_delete[globus endpoint permission delete]::
 Delete an access control rule
 
-link:globus_endpoint_permission_list[globus endpoint permission list]::
+link:endpoint_permission_list[globus endpoint permission list]::
 List of permissions on an endpoint
 
-link:globus_endpoint_permission_update[globus endpoint permission update]::
+link:endpoint_permission_update[globus endpoint permission update]::
 Update an access control rule
 
-link:globus_endpoint_permission_show[globus endpoint permission show]::
+link:endpoint_permission_show[globus endpoint permission show]::
 Show a permission on an endpoint
 
 == globus endpoint server commands
 
-link:globus_endpoint_server_add[globus endpoint server add]::
+link:endpoint_server_add[globus endpoint server add]::
 Add a server to an endpoint
 
-link:globus_endpoint_server_delete[globus endpoint server delete]::
+link:endpoint_server_delete[globus endpoint server delete]::
 Delete a server belonging to an endpoint
 
-link:globus_endpoint_server_list[globus endpoint server list]::
+link:endpoint_server_list[globus endpoint server list]::
 List all servers belonging to an endpoint
 
-link:globus_endpoint_server_update[globus endpoint server update]::
+link:endpoint_server_update[globus endpoint server update]::
 Update attributes of a server on an endpoint
 
-link:globus_endpoint_server_show[globus endpoint server show]::
+link:endpoint_server_show[globus endpoint server show]::
 Show a server belonging to an endpoint
 
 == globus endpoint role commands
 
-link:globus_endpoint_role_create[globus endpoint role create]::
+link:endpoint_role_create[globus endpoint role create]::
 Create a role on an endpoint
 
-link:globus_endpoint_role_delete[globus endpoint role delete]::
+link:endpoint_role_delete[globus endpoint role delete]::
 Remove a role from an endpoint
 
-link:globus_endpoint_role_list[globus endpoint role list]::
+link:endpoint_role_list[globus endpoint role list]::
 List of assigned roles on an endpoint
 
-link:globus_endpoint_role_show[globus endpoint role show]::
+link:endpoint_role_show[globus endpoint role show]::
 Show full info for a role on an endpoint
 
 == globus bookmark commands
 
-link:globus_bookmark_rename[globus bookmark rename]::
+link:bookmark_rename[globus bookmark rename]::
 Change a bookmark's name
 
-link:globus_bookmark_create[globus bookmark create]::
+link:bookmark_create[globus bookmark create]::
 Create a bookmark for the current user
 
-link:globus_bookmark_show[globus bookmark show]::
+link:bookmark_show[globus bookmark show]::
 Given a bookmark name or ID resolves bookmark to an 'ENDPOINT_ID:PATH'
 
-link:globus_bookmark_list[globus bookmark list]::
+link:bookmark_list[globus bookmark list]::
 List bookmarks for the current user
 
-link:globus_bookmark_delete[globus bookmark delete]::
+link:bookmark_delete[globus bookmark delete]::
 Delete a bookmark
 
 == globus task commands
 
-link:globus_task_event_list[globus task event-list]::
+link:task_event_list[globus task event-list]::
 List events for a given task
 
-link:globus_task[globus task show]::
+link:task[globus task show]::
 Show detailed information about a specific task
 
-link:globus_task_list[globus task list]::
+link:task_list[globus task list]::
 List tasks for the current user
 
-link:globus_task_update[globus task update]::
+link:task_update[globus task update]::
 Update a task
 
-link:globus_task_generate_submission_id[globus task generate-submission-id]::
+link:task_generate_submission_id[globus task generate-submission-id]::
 Get a submission ID
 
-link:globus_task_pause_info[globus task pause-info]::
+link:task_pause_info[globus task pause-info]::
 Show why an in-progress task is currently paused
 
-link:globus_task_cancel[globus task cancel]::
+link:task_cancel[globus task cancel]::
 Cancel a task
 
-link:globus_task_wait[globus task wait]::
+link:task_wait[globus task wait]::
 Wait for a task to complete
