@@ -69,7 +69,7 @@ class BasicTests(CliTestCase):
             "globus get-identities " +
             get_user_data()["clitester1a"]["username"],
             assert_exit_code=1)
-        self.assertIn("A GLobus API Error Occurred", output)
+        self.assertIn("A Globus Error Occurred", output)
         self.assertIn("401", output)
 
     def test_auth_call(self):
