@@ -19,7 +19,7 @@ A few quick rules if you don't want to read this full document:
   - All of your code *must* pass `flake8`. We won't consider merging code which
       doesn't pass `flake8`
   - Check if there's a matching
-      [issue](https://github.com/globus/globus-sdk-python/issues)
+      https://github.com/globus/globus-sdk-python/issues[issue]
       before opening a new issue or pull request
 
 Developer Setup
@@ -39,10 +39,10 @@ directly out of the repo (that's what `python setup.py develop` does).
 You can write and test commands interactively in this setup.
 
 Reporting Bugs
-==============
+--------------
 
 We welcome any and all bugs on the
-[GitHub Issue Tracker](https://github.com/globus/globus-cli/issues).
+https://github.com/globus/globus-cli/issues[GitHub Issue Tracker].
 
 However, the best bug reports are ones which follow the following rules and
 answer the following questions:
@@ -63,7 +63,7 @@ answer the following questions:
 
 
 Requesting Features & Improvements
-==================================
+----------------------------------
 
 When requesting new features, there are a few things we ask you to do in order
 to help us prioritize.
@@ -80,10 +80,10 @@ to help us prioritize.
       an example of what you'd like to see.
 
 Submitting Pull Requests
-========================
+------------------------
 
 The most important thing about a pull request is that it meets the standards
-defined in this document's [Style Guide](#style-guide).
+defined in this document's <<style-guide,Style Guide>>.
 
 Beyond that, we have a few recommendations:
 
@@ -96,10 +96,10 @@ Beyond that, we have a few recommendations:
       history if there are many fixup commits.
 
 Additionally, make sure you follow our rules for
-[Commit Messages](#commit-messages)
+<<commit-messages,Commit Messages>>
 
 Commit Messages
-===============
+---------------
 
 A few basic ground rules for what ideal commits should look like.
 
@@ -109,7 +109,7 @@ A few basic ground rules for what ideal commits should look like.
   - Present tense and imperative mood
 
 Style Guide
-===========
+-----------
 
 Some rules and tips for the python and documentation in this project.
 
