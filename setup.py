@@ -29,10 +29,10 @@ setup(
     long_description=open("README.rst").read(),
     author="Stephen Rosen",
     author_email="sirosen@globus.org",
-    url="https://github.com/globusonline/globus-cli",
+    url="https://github.com/globus/globus-cli",
     keywords=["globus", "cli", "command line"],
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: POSIX",
