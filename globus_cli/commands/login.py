@@ -87,7 +87,7 @@ def check_logged_in():
     # check that tokens are valid
     native_client = internal_auth_client()
     for tok in (transfer_rt, auth_rt):
-        res = native_client.validate_token(tok)
+        res = native_client.oauth2_validate_token(tok)
         if not res['active']:
             return False
 
