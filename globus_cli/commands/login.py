@@ -121,6 +121,12 @@ def do_local_server_login_flow():
     Starts a local http server, opens a browser to have the user login,
     and gets the code redirected to the server (no copy and pasting required)
     """
+    safeprint(
+        "You are running 'globus login', which should automatically open "
+        "a browser window for you to login.\n"
+        "If this fails or you experience difficulty, try "
+        "'globus login --no-local-server'"
+        "\n---")
     # start local server and create matching redirect_uri
     with start_local_server(listen=('127.0.0.1', 0)) as server:
         _, port = server.socket.getsockname()
