@@ -73,6 +73,17 @@ def authentication_hook(exception):
     exit_with_mapped_status(exception.http_status)
 
 
+def invalidrefresh_hook(exception):
+    write_error_info(
+        "Invalid Refresh Token",
+        [PrintableErrorField("HTTP status", exception.http_status),
+         PrintableErrorField("code", exception.code),
+         PrintableErrorField("message", exception.message, multiline=True)],
+        message=("Globus CLI Error: Your credentials are no longer "
+                 "valid. Please log in again with 'globus login'."))
+    exit_with_mapped_status(exception.http_status)
+
+
 def globus_generic_hook(exception):
     write_error_info(
         'Globus Error',
@@ -123,6 +134,9 @@ def custom_except_hook(exc_info):
         elif isinstance(exception, exc.AuthAPIError):
             if exception.code == "UNAUTHORIZED":
                 authentication_hook(exception)
+            # invalid_grant occurs when the users refresh tokens are not valid
+            elif exception.message == "invalid_grant":
+                invalidrefresh_hook(exception)
             else:
                 authapi_hook(exception)
 
