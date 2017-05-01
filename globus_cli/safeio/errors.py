@@ -35,8 +35,7 @@ class PrintableErrorField(object):
                 name, spacer, spacer.join(self.value.split('\n')))
 
 
-def write_error_info(error_name, fields):
-    message = None
+def write_error_info(error_name, fields, message=None):
     if outformat_is_json():
         # dictify joined tuple lists and dump to json string
         message = json.dumps(
@@ -44,8 +43,10 @@ def write_error_info(error_name, fields):
                 [('error_name', error_name)] +
                 [(f.name, f.value) for f in fields]),
             indent=2)
-    else:
-        message = 'A {0} Occurred.\n{1}'.format(
+
+    if not message:
+        message = 'A{0} {1} Occurred.\n{2}'.format(
+            "n" if error_name[0] in "aeiouAEIOU" else "",
             error_name, '\n'.join(str(f) for f in fields))
         message = '{0} {1}'.format(PrintableErrorField.TEXT_PREFIX, message)
 

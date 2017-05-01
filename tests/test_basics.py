@@ -63,14 +63,13 @@ class BasicTests(CliTestCase):
 
     def test_auth_call_no_auth(self):
         """
-        Runs get-identities without auth, confirms 401
+        Runs get-identities without auth, confirms No Authentication CLI error.
         """
         output = self.run_line_no_auth(
             "globus get-identities " +
             get_user_data()["clitester1a"]["username"],
             assert_exit_code=1)
-        self.assertIn("A Globus Error Occurred", output)
-        self.assertIn("401", output)
+        self.assertIn("No Authentication provided.", output)
 
     def test_auth_call(self):
         """
@@ -84,12 +83,11 @@ class BasicTests(CliTestCase):
 
     def test_transfer_call_no_auth(self):
         """
-        Runs ls without auth, confirms 400
+        Runs ls without auth, confirms No Authentication CLI error.
         """
         output = self.run_line_no_auth("globus ls " + str(GO_EP1_ID),
                                        assert_exit_code=1)
-        self.assertIn("A Transfer API Error Occurred", output)
-        self.assertIn("400", output)
+        self.assertIn("No Authentication provided.", output)
 
     def test_transfer_call(self):
         """
