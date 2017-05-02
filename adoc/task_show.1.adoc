@@ -35,23 +35,36 @@ All of the following which apply will be shown:
 - 'Task ID'
 - 'Type'
 - 'Status'
+- 'Is Paused'
 - 'Label'
 - 'Files'
 - 'Directories'
 - 'Source Endpoint'
+- 'Source Endpoint ID'
 - 'Destination Endpoint'
+- 'Destination Endpoint ID'
 - 'Endpoint'
+- 'Endpoint ID'
 - 'Completion Time'
 - 'Deadline'
 - 'Details'
 - 'Request Time'
+- 'Bytes Transferred'
+- 'Bytes Per Second'
+- 'Faults'
+- 'Total Subtasks'
+- 'Subtasks Succeeded'
+- 'Subtasks Pending'
+- 'Subtasks Retrying'
+- 'Subtasks Failed'
+- 'Subtasks Canceled'
+- 'Subtasks Expired'
 
 If *--successful-transfers* is given, the following fields are used:
 
-- 'Source'
-- 'Destination'
+- 'Source Path'
+- 'Destination Path'
 
-which refer to the source and destination paths.
 
 == EXAMPLES
 
