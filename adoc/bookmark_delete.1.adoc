@@ -6,12 +6,12 @@ globus bookmark delete - Delete a Bookmark
 
 == SYNOPSIS
 
-*globus bookmark delete* ['OPTIONS'] 'BOOKMARK_ID'
+*globus bookmark delete* ['OPTIONS'] 'BOOKMARK_ID_OR_NAME'
 
 
 == DESCRIPTION
 
-The *globus bookmark delete* command deletes one bookmark, given its ID.
+The *globus bookmark delete* command deletes one bookmark, given its ID or name.
 
 == OPTIONS
 
@@ -24,10 +24,10 @@ the success or failure of the operation.
 
 == EXAMPLES
 
-Delete a bookmark:
+Delete a bookmark by name:
 
 ----
-$ globus bookmark delete BOOKMARK_ID
+$ globus bookmark delete "Bookmark Name"
 ----
 
 

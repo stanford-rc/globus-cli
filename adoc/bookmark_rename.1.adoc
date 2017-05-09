@@ -6,12 +6,12 @@ globus bookmark rename - Rename an existing bookmark
 
 == SYNOPSIS
 
-*globus bookmark rename* ['OPTIONS'] 'BOOKMARK_ID' 'NEW_BOOKMARK_NAME'
+*globus bookmark rename* ['OPTIONS'] 'BOOKMARK_ID_OR_NAME' 'NEW_BOOKMARK_NAME'
 
 
 == DESCRIPTION
 
-The *globus bookmark rename* command renames bookmark, given its ID.
+The *globus bookmark rename* command renames bookmark, given its ID or name.
 
 == OPTIONS
 
@@ -24,10 +24,10 @@ success message.
 
 == EXAMPLES
 
-Rename a bookmark:
+Rename a bookmark named "oldname" to "newname":
 
 ----
-$ globus bookmark delete BOOKMARK_ID newname
+$ globus bookmark delete oldname newname
 ----
 
 
