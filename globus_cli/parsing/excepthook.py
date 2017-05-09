@@ -44,12 +44,43 @@ def transferapi_hook(exception):
     exit_with_mapped_status(exception.http_status)
 
 
+def authapi_hook(exception):
+    write_error_info(
+        'Auth API Error',
+        [PrintableErrorField('HTTP status', exception.http_status),
+         PrintableErrorField('code', exception.code),
+         PrintableErrorField('message', exception.message, multiline=True)])
+    exit_with_mapped_status(exception.http_status)
+
+
 def globusapi_hook(exception):
     write_error_info(
         'GLobus API Error',
         [PrintableErrorField('HTTP status', exception.http_status),
          PrintableErrorField('code', exception.code),
          PrintableErrorField('message', exception.message, multiline=True)])
+    exit_with_mapped_status(exception.http_status)
+
+
+def authentication_hook(exception):
+    write_error_info(
+        "No Authentication Error",
+        [PrintableErrorField("HTTP status", exception.http_status),
+         PrintableErrorField("code", exception.code),
+         PrintableErrorField("message", exception.message, multiline=True)],
+        message=("Globus CLI Error: No Authentication provided. Make sure "
+                 "you have logged in with 'globus login'."))
+    exit_with_mapped_status(exception.http_status)
+
+
+def invalidrefresh_hook(exception):
+    write_error_info(
+        "Invalid Refresh Token",
+        [PrintableErrorField("HTTP status", exception.http_status),
+         PrintableErrorField("code", exception.code),
+         PrintableErrorField("message", exception.message, multiline=True)],
+        message=("Globus CLI Error: Your credentials are no longer "
+                 "valid. Please log in again with 'globus login'."))
     exit_with_mapped_status(exception.http_status)
 
 
@@ -94,9 +125,22 @@ def custom_except_hook(exc_info):
 
         # handle the Globus-raised errors with our special hooks
         # these will present the output (on stderr) as JSON
-        elif exception_type is exc.TransferAPIError:
-            transferapi_hook(exception)
-        elif exception_type is exc.GlobusAPIError:
+        elif isinstance(exception, exc.TransferAPIError):
+            if exception.code == "ClientError.AuthenticationFailed":
+                authentication_hook(exception)
+            else:
+                transferapi_hook(exception)
+
+        elif isinstance(exception, exc.AuthAPIError):
+            if exception.code == "UNAUTHORIZED":
+                authentication_hook(exception)
+            # invalid_grant occurs when the users refresh tokens are not valid
+            elif exception.message == "invalid_grant":
+                invalidrefresh_hook(exception)
+            else:
+                authapi_hook(exception)
+
+        elif isinstance(exception, exc.GlobusAPIError):
             globusapi_hook(exception)
 
         # specific checks fell through -- now check if it's any kind of
