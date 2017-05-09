@@ -9,11 +9,20 @@ from globus_cli.services.transfer import get_client, iterable_response_to_dict
 COMMON_FIELDS = [
     ('Label', 'label'),
     ('Task ID', 'task_id'),
+    ('Is Paused', 'is_paused'),
     ('Type', 'type'),
     ('Directories', 'directories'),
     ('Files', 'files'),
     ('Status', 'status'),
     ('Request Time', 'request_time'),
+    ('Faults', 'faults'),
+    ('Total Subtasks', 'subtasks_total'),
+    ('Subtasks Succeeded', 'subtasks_succeeded'),
+    ('Subtasks Pending', 'subtasks_pending'),
+    ('Subtasks Retrying', 'subtasks_retrying'),
+    ('Subtasks Failed', 'subtasks_failed'),
+    ('Subtasks Canceled', 'subtasks_canceled'),
+    ('Subtasks Expired', 'subtasks_expired'),
 ]
 
 ACTIVE_FIELDS = [
@@ -27,16 +36,21 @@ COMPLETED_FIELDS = [
 
 DELETE_FIELDS = [
     ('Endpoint', 'source_endpoint_display_name'),
+    ('Endpoint ID', 'source_endpoint_id'),
 ]
 
 TRANSFER_FIELDS = [
     ('Source Endpoint', 'source_endpoint_display_name'),
+    ('Source Endpoint ID', 'source_endpoint_id'),
     ('Destination Endpoint', 'destination_endpoint_display_name'),
+    ('Destination Endpoint ID', 'destination_endpoint_id'),
+    ('Bytes Transferred', 'bytes_transferred'),
+    ('Bytes Per Second', 'effective_bytes_per_second'),
 ]
 
 SUCCESSFULL_TRANSFER_FIELDS = [
-    ('Source', 'source_path'),
-    ('Destination', 'destination_path')
+    ('Source Path', 'source_path'),
+    ('Destination Path', 'destination_path')
 ]
 
 
