@@ -16,6 +16,8 @@ help:
 
 $(VIRTUALENV):
 	virtualenv $(VIRTUALENV)
+	$(VIRTUALENV)/bin/pip install --upgrade pip
+	$(VIRTUALENV)/bin/pip install --upgrade setuptools
 
 
 localdev: $(VIRTUALENV)
@@ -41,6 +43,15 @@ $(VIRTUALENV)/bin/flake8 $(VIRTUALENV)/bin/nose2: test-requirements.txt $(VIRTUA
 test: $(VIRTUALENV)/bin/flake8 $(VIRTUALENV)/bin/nose2 localdev
 	$(VIRTUALENV)/bin/flake8
 	$(VIRTUALENV)/bin/nose2 --verbose
+
+
+travis:
+	pip install --upgrade pip
+	pip install --upgrade "setuptools>=29,<30"
+	pip install -r test-requirements.txt
+	python setup.py develop
+	flake8
+	nose2 --verbose
 
 
 clean:
