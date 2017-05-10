@@ -137,7 +137,7 @@ Delete a bookmark
 link:task_event_list[globus task event-list]::
 List events for a given task
 
-link:task[globus task show]::
+link:task_show[globus task show]::
 Show detailed information about a specific task
 
 link:task_list[globus task list]::
