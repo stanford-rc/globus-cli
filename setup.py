@@ -20,6 +20,10 @@ setup(
         'six>=1.10.0,<2.0.0'
     ],
 
+    extras_require={
+        'delegate-proxy': ['M2Crypto==0.26.0']
+    },
+
     entry_points={
         'console_scripts': ['globus = globus_cli:main']
     },

@@ -49,6 +49,7 @@ travis:
 	pip install --upgrade pip
 	pip install --upgrade "setuptools>=29,<30"
 	pip install -r test-requirements.txt
+	pip install M2Crypto==0.26.0
 	python setup.py develop
 	flake8
 	nose2 --verbose
