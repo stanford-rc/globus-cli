@@ -88,13 +88,18 @@ delegate_proxy_long_help = """
               help=("Use delegate proxy activation, takes an X.509 "
                     "certificate in pem format as an argument. Mutually "
                     "exclusive with --web and --myproxy."))
+@click.option("--proxy-lifetime", type=int, default=12, show_default=True,
+              cls=(click.Option if m2crypto_imported else HiddenOption),
+              help=("Set a lifetime in hours for the proxy generated with "
+                    "--delegate-proxy."))
 @click.option("--no-autoactivate", is_flag=True, default=False,
               help=("Don't attempt to autoactivate endpoint before using "
                     "another activation method."))
 @click.option("--force", is_flag=True, default=False,
               help="Force activation even if endpoint is already activated.")
 def endpoint_activate(endpoint_id, myproxy, myproxy_username, myproxy_password,
-                      web, no_browser, delegate_proxy, no_autoactivate, force):
+                      web, no_browser, delegate_proxy, proxy_lifetime,
+                      no_autoactivate, force):
     """
     Executor for `globus endpoint activate`
     """
@@ -192,7 +197,7 @@ def endpoint_activate(endpoint_id, myproxy, myproxy_username, myproxy_password,
         requirements_data = client.endpoint_get_activation_requirements(
             endpoint_id).data
         filled_requirements_data = fill_delegate_proxy_activation_requirements(
-            requirements_data, delegate_proxy)
+            requirements_data, delegate_proxy, lifetime_hours=proxy_lifetime)
         res = client.endpoint_activate(endpoint_id, filled_requirements_data)
 
     # output

@@ -14,7 +14,8 @@ _end_private_key = "-----END RSA PRIVATE KEY-----"
 REQUIRED_KEY_USAGE = ["Digital Signature"]
 
 
-def fill_delegate_proxy_activation_requirements(requirements_data, cred_file):
+def fill_delegate_proxy_activation_requirements(requirements_data, cred_file,
+                                                lifetime_hours=12):
     """
     Given the activation requirements for an endpoint and a filename for
     X.509 credentials, extracts the public key from the activation
@@ -40,7 +41,8 @@ def fill_delegate_proxy_activation_requirements(requirements_data, cred_file):
         issuer_cred = f.read()
 
     # create proxy from the public key and the user credentials
-    proxy = create_proxy(issuer_cred, public_key)
+    proxy = create_proxy(
+        issuer_cred, public_key, lifetime_hours)
 
     # return the activation requirements document with the proxy_chain filled
     for data in requirements_data["DATA"]:
@@ -53,7 +55,7 @@ def fill_delegate_proxy_activation_requirements(requirements_data, cred_file):
             "does not support Delegate Proxy activation."))
 
 
-def create_proxy(issuer_cred, public_key, lifetime_hours=12):
+def create_proxy(issuer_cred, public_key, lifetime_hours):
     old_proxy = False
 
     # Standard order is cert, private key, then the chain.
