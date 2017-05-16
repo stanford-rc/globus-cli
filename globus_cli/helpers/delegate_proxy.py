@@ -22,6 +22,7 @@ def fill_delegate_proxy_activation_requirements(requirements_data, cred_file,
     requirements, uses the key and the credentials to make a proxy credential,
     and returns the requirements data with the proxy chain filled in.
     """
+
     # cannot proceed without M2Crypto
     if not m2crypto_imported:
         raise ImportError("Unable to import M2Crypto")

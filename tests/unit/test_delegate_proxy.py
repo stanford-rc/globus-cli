@@ -23,11 +23,9 @@ class DelegateProxyTests(CliTestCase):
         output = self.run_line("globus endpoint activate --help")
         self.assertNotIn("--delegate-proxy", output)
 
-        # --force and --no-autoactivate are used to prevent the endpoint being
-        # seen as not needing activation
         output = self.run_line((
-            "globus endpoint activate {} --delegate-proxy cert.pem "
-            "--no-autoactivate --force".format(GO_EP1_ID)), assert_exit_code=1)
+            "globus endpoint activate {} --delegate-proxy cert.pem"
+            .format(GO_EP1_ID)), assert_exit_code=1)
         self.assertIn("Missing M2Crypto dependency", output)
 
     @unittest.skipIf(not m2crypto_imported, "M2Crypto not imported")

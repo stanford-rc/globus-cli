@@ -88,10 +88,10 @@ delegate_proxy_long_help = """
               help=("Use delegate proxy activation, takes an X.509 "
                     "certificate in pem format as an argument. Mutually "
                     "exclusive with --web and --myproxy."))
-@click.option("--proxy-lifetime", type=int, default=12, show_default=True,
+@click.option("--proxy-lifetime", type=int, default=None,
               cls=(click.Option if m2crypto_imported else HiddenOption),
               help=("Set a lifetime in hours for the proxy generated with "
-                    "--delegate-proxy."))
+                    "--delegate-proxy. [default: 12]"))
 @click.option("--no-autoactivate", is_flag=True, default=False,
               help=("Don't attempt to autoactivate endpoint before using "
                     "another activation method."))
@@ -119,6 +119,11 @@ def endpoint_activate(endpoint_id, myproxy, myproxy_username, myproxy_password,
         raise click.UsageError("--myproxy-password requires --myproxy.")
     if no_browser and not web:
         raise click.UsageError("--no-browser requires --web.")
+    if proxy_lifetime and not delegate_proxy:
+        raise click.UsageError("--proxy-lifetime requires --delegate-proxy.")
+    if delegate_proxy and not m2crypto_imported:
+            raise click.ClickException(
+                "Missing M2Crypto dependency required for --delegate-proxy, ")
 
     # check if endpoint is already activated unless --force
     if not force:
@@ -189,15 +194,12 @@ def endpoint_activate(endpoint_id, myproxy, myproxy_username, myproxy_password,
 
     # delegate proxy activation
     elif delegate_proxy:
-        if not m2crypto_imported:
-            raise click.ClickException(
-                "Missing M2Crypto dependency required for --delegate-proxy, "
-                "")
 
         requirements_data = client.endpoint_get_activation_requirements(
             endpoint_id).data
         filled_requirements_data = fill_delegate_proxy_activation_requirements(
-            requirements_data, delegate_proxy, lifetime_hours=proxy_lifetime)
+            requirements_data, delegate_proxy,
+            lifetime_hours=proxy_lifetime or 12)
         res = client.endpoint_activate(endpoint_id, filled_requirements_data)
 
     # output
