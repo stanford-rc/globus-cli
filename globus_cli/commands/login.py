@@ -84,7 +84,13 @@ def check_logged_in():
             whoami_email is None or whoami_name is None):
         return False
 
-    # TODO: check that the tokens are valid
+    # check that tokens are valid
+    native_client = internal_auth_client()
+    for tok in (transfer_rt, auth_rt):
+        res = native_client.oauth2_validate_token(tok)
+        if not res['active']:
+            return False
+
     return True
 
 
