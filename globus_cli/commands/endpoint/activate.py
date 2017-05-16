@@ -20,7 +20,7 @@ from globus_cli.helpers import (
 delegate_proxy_long_help = """
     \b
     To use Delegate Proxy activation use the --delegate-proxy option with a
-    file containing an 5.X09 certificate as an argument (e.g. an X.509
+    file containing an X.509 certificate as an argument (e.g. an X.509
     gotten from the myproxy-logon command). This certificate must
     be a valid credential or proxy credential for the user from an identity
     provider accepted by the endpoint being activated, and the endpoint must be
@@ -35,7 +35,7 @@ delegate_proxy_long_help = """
                short_help="Activate an endpoint",
                help="""
     Activate an endpoint using Autoactivation, Myproxy,{} or Web activation.
-    Note that --web {}and --myproxy activation are mutually exclusive options.
+    Note that --web{} and --myproxy activation are mutually exclusive options.
 
     \b
     Autoactivation will always be attempted unless the --no-autoactivate
@@ -62,8 +62,8 @@ delegate_proxy_long_help = """
     prompted to hide your inputs and keep your password out of your
     command history, but you may pass your password with the hidden
     --myproxy-password or -P options.
-    {}""".format("Delegate Proxy," if m2crypto_imported else "",
-                 "--delegate-proxy" if m2crypto_imported else "",
+    {}""".format(" Delegate Proxy," if m2crypto_imported else "",
+                 " --delegate-proxy" if m2crypto_imported else "",
                  delegate_proxy_long_help if m2crypto_imported else ""))
 @common_options
 @endpoint_id_arg
@@ -83,7 +83,7 @@ delegate_proxy_long_help = """
               help=("Give a username to use with --myproxy. "
                     "Overrides any default myproxy username set in config."))
 @click.option("--myproxy-password", "-P", cls=HiddenOption)
-@click.option("--delegate-proxy", metavar="X.509 PEM FILE",
+@click.option("--delegate-proxy", metavar="X.509_PEM_FILE",
               cls=(click.Option if m2crypto_imported else HiddenOption),
               help=("Use delegate proxy activation, takes an X.509 "
                     "certificate in pem format as an argument. Mutually "

@@ -51,7 +51,7 @@ https://gitlab.com/m2crypto/m2crypto/blob/master/INSTALL.rst[M2Crypto's Install 
 for details
 
 To use Delegate Proxy activation use the --delegate-proxy option with a
-file containing an 5.X09 certificate as an argument (e.g. an X.509
+file containing an X.509 certificate as an argument (e.g. an X.509
 gotten from the myproxy-logon command). This certificate must
 be a valid credential or proxy credential for the user from an identity
 provider accepted by the endpoint being activated, and the endpoint must be
