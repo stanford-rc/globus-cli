@@ -21,12 +21,18 @@ def task_event_list(task_id, limit, filter_errors, filter_non_errors):
     """
     client = get_client()
 
-    # set filter based on filter flags, if both set do nothing
-    filter_string = None
-    if filter_errors and not filter_non_errors:
+    # cannot filter by both errors and non errors
+    if filter_errors and filter_non_errors:
+        raise click.UsageError("Cannot filter by both errors and non errors")
+
+    elif filter_errors:
         filter_string = "is_error:1"
-    if filter_non_errors and not filter_errors:
-        filter_string = "is_error:1"
+
+    elif filter_non_errors:
+        filter_string = "is_error:0"
+
+    else:
+        filter_string = ""
 
     event_iterator = client.task_event_list(
         task_id, num_results=limit, filter=filter_string)
