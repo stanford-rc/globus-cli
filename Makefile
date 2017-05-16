@@ -1,6 +1,6 @@
 VIRTUALENV=.venv
 
-.PHONY: build upload localdev test clean help
+.PHONY: build upload localdev test clean help travis
 
 help:
 	@echo "These are our make targets and what they do."
@@ -49,7 +49,9 @@ travis:
 	pip install --upgrade pip
 	pip install --upgrade "setuptools>=29,<30"
 	pip install -r test-requirements.txt
-	pip install M2Crypto==0.26.0
+ifeq (, $(findstring pypy, $(TRAVIS_PYTHON_VERSION)))
+	pip install "M2Crypto==0.26.0"
+endif
 	python setup.py develop
 	flake8
 	nose2 --verbose
