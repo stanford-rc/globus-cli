@@ -1,5 +1,38 @@
 = CLI Changelog
 
+
+== 1.1.0
+
+Features:
+
+* Add Delegate Proxy Activation to 'globus endpoint activate'
+(requires M2Crypto for options to be displayed)
+(https://github.com/globus/globus-cli/pull/306[306])
+* Allow 'globus bookmark rename' and 'globus bookmark delete'
+to accept either a bookmark name or id.
+(https://github.com/globus/globus-cli/pull/292[292])
+
+Enhancements:
+
+* Validate tokens upon login.
+(https://github.com/globus/globus-cli/pull/286[286])
+* Raise more helpful error messages on missing / invalid tokens.
+(https://github.com/globus/globus-cli/pull/299[299])
+* Display additional helptext with 'globus login'.
+(https://github.com/globus/globus-cli/pull/289[289])
+* Display additional fields with 'globus task show'.
+(https://github.com/globus/globus-cli/pull/301[301])
+* Make conflicting filters mutually exclusive in 'globus task event-list 
+(https://github.com/globus/globus-cli/pull/294[294])
+
+Bugfixes:
+
+* Fix broken links in the docs.
+(https://github.com/globus/globus-cli/pull/305[305])
+* Update Six dependency to >=1.10.0 to meet SDK requirements.
+(https://github.com/globus/globus-cli/pull/285[285])
+
+
 == 1.0.0.0
 
 * Initial release.

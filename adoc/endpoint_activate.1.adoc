@@ -91,7 +91,7 @@ Give a password to use with --myproxy, skipping the password prompt.
 NOTE: the --delegate-proxy and --proxy-lifetime options will only appear if
 M2Crypto was successfully imported, see above note for details.
 
-*--delegate-proxy* X.509 PEM FILE::
+*--delegate-proxy* X.509_PEM_FILE::
 
 Use delegate proxy activation using the credential in the given file.
 Credential must be an X.509 in pem format. Mutually exclusive with
