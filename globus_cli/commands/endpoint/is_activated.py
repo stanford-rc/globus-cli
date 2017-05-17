@@ -1,7 +1,8 @@
 import click
 
 from globus_cli.parsing import common_options, endpoint_id_arg
-from globus_cli.services.transfer import get_client
+from globus_cli.services.transfer import (
+    get_client, activation_requirements_help_text)
 from globus_cli.safeio import formatted_print
 
 
@@ -29,14 +30,11 @@ def endpoint_is_activated(endpoint_id, until, absolute_time):
     def fail(deadline=None):
         exp_string = ''
         if deadline is not None:
-            exp_string = ' or will expire before {}'.format(deadline)
+            exp_string = ' or will expire within {} seconds'.format(deadline)
 
-        formatted_print(
-            res, simple_text=(
-                '{0} is not activated{1}\n'
-                'To activate, please go to the following page:\n\n'
-                '  https://www.globus.org/app/endpoints/{0}/activate\n'
-                ).format(endpoint_id, exp_string))
+        message = ("The endpoint is not activated{}.\n\n".format(exp_string) +
+                   activation_requirements_help_text(res, endpoint_id))
+        formatted_print(res, simple_text=message)
         click.get_current_context().exit(1)
 
     def success(msg, *format_params):
@@ -48,7 +46,7 @@ def endpoint_is_activated(endpoint_id, until, absolute_time):
     if res['expires_in'] == -1:
         success('{} does not require activation')
 
-    # if --until was not passed
+    # autoactivation is not supported and --until was not passed
     if until is None:
         # and we are active right now (0s in the future)...
         if res.active_until(0):
@@ -58,6 +56,6 @@ def endpoint_is_activated(endpoint_id, until, absolute_time):
 
     # autoactivation is not supported and --until was passed
     if res.active_until(until, relative_time=not absolute_time):
-        success('{} will be active until {}', until)
+        success('{} will be active for at least {} seconds', until)
     else:
         fail(deadline=until)
