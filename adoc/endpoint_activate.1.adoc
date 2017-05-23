@@ -45,10 +45,12 @@ history, but you may pass your password with the --myproxy-password
 or -P options.
 
 NOTE: Delegate Proxy activation requires the optional dependency of
-M2Crypto. This dependency is optional as it frequently requires additional
-non-python packages to be installed on your machine. Consult 
-https://gitlab.com/m2crypto/m2crypto/blob/master/INSTALL.rst[M2Crypto's Install Page]
-for details.
+cryptography which requires additional non-python binaries to be installed on
+your machine. Consult
+https://cryptography.io/en/latest/installation/[cryptography's Install Page]
+for details. Once those dependencies are met you can use
+'pip install globus_cli[delegate-proxy]' to include cryptography in the
+install of the Globus CLI.
 
 To use Delegate Proxy activation use the --delegate-proxy option with a
 file containing an X.509 certificate as an argument (e.g. an X.509
@@ -89,7 +91,7 @@ password in plain-text in your command history.
 Give a password to use with --myproxy, skipping the password prompt.
 
 NOTE: the --delegate-proxy and --proxy-lifetime options will only appear if
-M2Crypto was successfully imported, see above note for details.
+cryptography was successfully imported, see above note for details.
 
 *--delegate-proxy* X.509 PEM FILE::
 
