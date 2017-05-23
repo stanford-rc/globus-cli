@@ -1,17 +1,15 @@
 import struct
 import os
-import time
+import datetime
+import re
+import six
 try:
-    from M2Crypto import X509, RSA, EVP, ASN1, BIO
-    m2crypto_imported = True
+    from cryptography import x509
+    from cryptography.hazmat.primitives import serialization, hashes
+    from cryptography.hazmat.backends import default_backend
+    cryptography_imported = True
 except ImportError:
-    m2crypto_imported = False
-
-_begin_private_key = "-----BEGIN RSA PRIVATE KEY-----"
-_end_private_key = "-----END RSA PRIVATE KEY-----"
-# The issuer is required to have this bit set if keyUsage is present;
-# see RFC 3820 section 3.1.
-REQUIRED_KEY_USAGE = ["Digital Signature"]
+    cryptography_imported = False
 
 
 def fill_delegate_proxy_activation_requirements(requirements_data, cred_file,
@@ -22,10 +20,9 @@ def fill_delegate_proxy_activation_requirements(requirements_data, cred_file,
     requirements, uses the key and the credentials to make a proxy credential,
     and returns the requirements data with the proxy chain filled in.
     """
-
-    # cannot proceed without M2Crypto
-    if not m2crypto_imported:
-        raise ImportError("Unable to import M2Crypto")
+    # cannot proceed without cryptography
+    if not cryptography_imported:
+        raise ImportError("Unable to import cryptography")
 
     # get the public key from the activation requirements
     for data in requirements_data["DATA"]:
@@ -41,8 +38,8 @@ def fill_delegate_proxy_activation_requirements(requirements_data, cred_file,
     with open(cred_file) as f:
         issuer_cred = f.read()
 
-    # create proxy from the public key and the user credentials
-    proxy = create_proxy(
+    # create the proxy credentials
+    proxy = create_proxy_credentials(
         issuer_cred, public_key, lifetime_hours)
 
     # return the activation requirements document with the proxy_chain filled
@@ -56,111 +53,169 @@ def fill_delegate_proxy_activation_requirements(requirements_data, cred_file,
             "does not support Delegate Proxy activation."))
 
 
-def create_proxy(issuer_cred, public_key, lifetime_hours):
-    old_proxy = False
+def create_proxy_credentials(issuer_cred, public_key, lifetime_hours):
+    """
+    Given an issuer credentials PEM file in the form of a string, a public_key
+    string from an activation requirements document, and an int for the
+    proxy lifetime, returns credentials as a unicode string in PEM format
+    containing a new proxy certificate and an extended proxy chain.
+    """
+    # parse the issuer credential
+    loaded_cert, loaded_private_key, issuer_chain = parse_issuer_cred(
+        issuer_cred)
 
-    # Standard order is cert, private key, then the chain.
+    # load the public_key into a cryptography object
+    loaded_public_key = serialization.load_pem_public_key(
+            public_key.encode("ascii"), backend=default_backend())
+
+    # check that the issuer certificate is not an old proxy
+    # and is using the keyUsage section as required
+    confirm_not_old_proxy(loaded_cert)
+    validate_key_usage(loaded_cert)
+
+    # create the proxy cert cryptography object
+    new_cert = create_proxy_cert(loaded_cert, loaded_private_key,
+                                 loaded_public_key, lifetime_hours)
+
+    # extend the proxy chain as a unicode string
+    extended_chain = loaded_cert.public_bytes(
+        serialization.Encoding.PEM).decode("ascii") + six.u(issuer_chain)
+
+    # return in PEM format as a unicode string
+    return new_cert.public_bytes(serialization.Encoding.PEM).decode(
+        "ascii") + extended_chain
+
+
+def parse_issuer_cred(issuer_cred):
+    """
+    Given an X509 PEM file in the form of a string, parses it into sections
+    by the PEM delimiters of: -----BEGIN <label>----- and -----END <label>----
+    Confirms the sections can be decoded in the proxy credential order of:
+    issuer cert, issuer private key, proxy chain of 0 or more certs .
+    Returns the issuer cert and private key as loaded cryptography objects
+    and the proxy chain as a potentially empty string.
+    """
+    # get each section of the PEM file
+    sections = re.findall(
+        "-----BEGIN.*?-----.*?-----END.*?-----", issuer_cred, flags=re.DOTALL)
     try:
-        _begin_idx = issuer_cred.index(_begin_private_key)
-        _end_idx = issuer_cred.index(_end_private_key) + len(_end_private_key)
-        issuer_key = issuer_cred[_begin_idx:_end_idx]
-        issuer_cert = issuer_cred[:_begin_idx]
-        issuer_chain = issuer_cert + issuer_cred[_end_idx:]
-    except:
-        raise ValueError("Unable to find private key in credentials, "
-                         "make sure the X.509 is in PEM format.")
+        issuer_cert = sections[0]
+        issuer_private_key = sections[1]
+        issuer_chain_certs = sections[2:]
+    except IndexError:
+        raise ValueError("Unable to parse PEM data in credentials, "
+                         "make sure the X.509 file is in PEM format and "
+                         "consists of the issuer cert, issuer private key, "
+                         "and proxy chain (if any) in that order.")
 
-    proxy = X509.X509()
-    proxy.set_version(2)
+    # then validate that each section of data can be decoded as expected
+    try:
+        loaded_cert = x509.load_pem_x509_certificate(
+            six.b(issuer_cert), default_backend())
+        loaded_private_key = serialization.load_pem_private_key(
+            six.b(issuer_private_key),
+            password=None, backend=default_backend())
+        for chain_cert in issuer_chain_certs:
+            x509.load_pem_x509_certificate(
+                six.b(chain_cert), default_backend())
+        issuer_chain = "".join(issuer_chain_certs)
+    except ValueError:
+        raise ValueError("Failed to decode PEM data in credentials. Make sure "
+                         "the X.509 file consists of the issuer cert, "
+                         "issuer private key, and proxy chain (if any) "
+                         "in that order.")
+
+    # return loaded cryptography objects and the issuer chain
+    return loaded_cert, loaded_private_key, issuer_chain
+
+
+def create_proxy_cert(loaded_cert, loaded_private_key,
+                      loaded_public_key, lifetime_hours):
+    """
+    Given cryptography objects for an issuing certificate, a public_key,
+    a private_key, and an int for lifetime in hours, creates a proxy
+    cert from the issuer and public key signed by the private key.
+    """
+    builder = x509.CertificateBuilder()
+
+    # create a serial number for the new proxy
     # Under RFC 3820 there are many ways to generate the serial number. However
     # making the number unpredictable has security benefits, e.g. it can make
     # this style of attack more difficult:
     # http://www.win.tue.nl/hashclash/rogue-ca
     serial = struct.unpack("<Q", os.urandom(8))[0]
-    proxy.set_serial_number(serial)
+    builder = builder.serial_number(serial)
 
-    now = int(time.time())
-    not_before = ASN1.ASN1_UTCTIME()
-    not_before.set_time(now)
-    proxy.set_not_before(not_before)
+    # set the new proxy as valid from now until lifetime_hours have passed
+    builder = builder.not_valid_before(datetime.datetime.today())
+    builder = builder.not_valid_after(
+        datetime.datetime.today() + datetime.timedelta(hours=lifetime_hours))
 
-    not_after = ASN1.ASN1_UTCTIME()
-    not_after.set_time(now + lifetime_hours * 3600)
-    proxy.set_not_after(not_after)
+    # set the public key of the new proxy to the given public key
+    builder = builder.public_key(loaded_public_key)
 
-    pkey = EVP.PKey()
-    tmp_bio = BIO.MemoryBuffer(str(public_key))
-    rsa = RSA.load_pub_key_bio(tmp_bio)
-    pkey.assign_rsa(rsa)
-    del rsa
-    del tmp_bio
-    proxy.set_pubkey(pkey)
+    # set the issuer of the new cert to the subject of the issuing cert
+    builder = builder.issuer_name(loaded_cert.subject)
 
+    # set the new proxy's subject
+    # append a CommonName to the new proxy's subject
+    # with the serial as the value of the CN
+    new_atribute = x509.NameAttribute(
+        x509.oid.NameOID.COMMON_NAME, six.u(str(serial)))
+    subject_attributes = list(loaded_cert.subject)
+    subject_attributes.append(new_atribute)
+    builder = builder.subject_name(x509.Name(subject_attributes))
+
+    # add proxyCertInfo extension to the new proxy (We opt not to add keyUsage)
+    # For RFC proxies the effective usage is defined as the intersection
+    # of the usage of each cert in the chain. See section 4.2 of RFC 3820.
+
+    # the constants 'oid' and 'value' are gotten from
+    # examining output from a call to the open ssl function:
+    # X509V3_EXT_conf(NULL, ctx, name, value)
+    # ctx set by X509V3_set_nconf(&ctx, NCONF_new(NULL))
+    # name = "proxyCertInfo"
+    # value = "critical,language:Inherit all"
+    oid = x509.ObjectIdentifier("1.3.6.1.5.5.7.1.14")
+    value = b"0\x0c0\n\x06\x08+\x06\x01\x05\x05\x07\x15\x01"
+    extension = x509.extensions.UnrecognizedExtension(oid, value)
+    builder = builder.add_extension(extension, critical=True)
+
+    # sign the new proxy with the issuer's private key
+    new_certificate = builder.sign(
+        private_key=loaded_private_key, algorithm=hashes.SHA256(),
+        backend=default_backend())
+
+    # return the new proxy as a cryptography object
+    return new_certificate
+
+
+def confirm_not_old_proxy(loaded_cert):
+    """
+    Given a cryptography object for the issuer cert, checks if the cert is
+    an "old proxy" and raise an error if so.
+    """
+    # Examine the last CommonName to see if it looks like an old proxy.
+    last_cn = loaded_cert.subject.get_attributes_for_oid(
+        x509.oid.NameOID.COMMON_NAME)[-1]
+    # if the last CN is 'proxy' or 'limited proxy' we are in an old proxy
+    if last_cn.value in ("proxy", "limited proxy"):
+        raise ValueError("Proxy certificate is in an outdated format "
+                         "that is no longer supported")
+
+
+def validate_key_usage(loaded_cert):
+    """
+    Given a cryptography object for the issuer cert, checks that if
+    the keyUsage extension is being used that the digital signature
+    bit has been asserted. (As specified in RFC 3820 section 3.1.)
+    """
     try:
-        issuer = X509.load_cert_string(issuer_cert)
-    except Exception as e:
-        raise ValueError(("Error parsing credentials, make sure the X.509 is "
-                          "in PEM format: {}".format(e)))
-
-    # Examine the last CN to see if it looks like and old proxy.
-    cn_entries = issuer.get_subject().get_entries_by_nid(
-                                        X509.X509_Name.nid["CN"])
-    if cn_entries:
-        last_cn = cn_entries[-1].get_data()
-        old_proxy = (str(last_cn) in ("proxy", "limited proxy"))
-
-    # If the issuer has keyUsage extension, make sure it contains all
-    # the values we require.
-    try:
-        keyUsageExt = issuer.get_ext("keyUsage")
-        if keyUsageExt:
-            values = keyUsageExt.get_value().split(", ")
-            for required in REQUIRED_KEY_USAGE:
-                if required not in values:
-                    raise ValueError(
-                      "issuer contains keyUsage without required usage '%s'"
-                      % required)
-    except LookupError:
-        keyUsageExt = None
-
-    # hack to get a copy of the X509 name that we can append to.
-    issuer_copy = X509.load_cert_string(issuer_cert)
-    proxy_subject = issuer_copy.get_subject()
-    if old_proxy:
-        proxy_subject.add_entry_by_txt(field="CN", type=ASN1.MBSTRING_ASC,
-                                       entry="proxy",
-                                       len=-1, loc=-1, set=0)
-    else:
-        proxy_subject.add_entry_by_txt(field="CN", type=ASN1.MBSTRING_ASC,
-                                       entry=str(serial),
-                                       len=-1, loc=-1, set=0)
-    proxy.set_subject(proxy_subject)
-    proxy.set_issuer(issuer.get_subject())
-
-    # create a full proxy (legacy/old or rfc, draft is not supported)
-    if old_proxy:
-        # For old proxies, there is no spec that defines the interpretation,
-        # so the keyUsage extension is more important.
-        # TODO: copy extended key usage also?
-        if keyUsageExt:
-            # Copy from the issuer if it had a keyUsage extension.
-            ku_ext = X509.new_extension("keyUsage", keyUsageExt.get_value(), 1)
-        else:
-            # Otherwise default to this set of usages.
-            ku_ext = X509.new_extension(
-                "keyUsage",
-                "Digital Signature, Key Encipherment, Data Encipherment", 1)
-        proxy.add_ext(ku_ext)
-    else:
-        # For RFC proxies the effictive usage is defined as the intersection
-        # of the usage of each cert in the chain. See section 4.2 of RFC 3820.
-        # We opt not to add keyUsage.
-        pci_ext = X509.new_extension("proxyCertInfo",
-                                     "critical,language:Inherit all", 1)
-        proxy.add_ext(pci_ext)
-
-    issuer_rsa = RSA.load_key_string(issuer_key)
-    sign_pkey = EVP.PKey()
-    sign_pkey.assign_rsa(issuer_rsa)
-    proxy.sign(pkey=sign_pkey, md="sha1")
-    return proxy.as_pem() + issuer_chain
+        key_usage = loaded_cert.extensions.get_extension_for_oid(
+            x509.oid.ExtensionOID.KEY_USAGE)
+        if not key_usage.value.digital_signature:
+            raise ValueError(
+                "Certificate is using the keyUsage extension, but has "
+                "not asserted the Digital Signature bit.")
+    except x509.ExtensionNotFound:  # keyUsage extension not used
+        return

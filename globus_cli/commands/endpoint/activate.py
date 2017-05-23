@@ -1,13 +1,13 @@
 import click
 import webbrowser
 
-# only have --delegate-proxy appear if M2Crypto is available
+# only have --delegate-proxy appear if cryptography is available
 try:
-    import M2Crypto
+    import cryptography
     # slightly hacky way of preventing flake8 from complaining
-    m2crypto_imported = bool(M2Crypto)
+    cryptography_imported = bool(cryptography)
 except ImportError:
-    m2crypto_imported = False
+    cryptography_imported = False
 
 
 from globus_cli.parsing import common_options, endpoint_id_arg, HiddenOption
@@ -62,15 +62,15 @@ delegate_proxy_long_help = """
     prompted to hide your inputs and keep your password out of your
     command history, but you may pass your password with the hidden
     --myproxy-password or -P options.
-    {}""".format(" Delegate Proxy," if m2crypto_imported else "",
-                 " --delegate-proxy" if m2crypto_imported else "",
-                 delegate_proxy_long_help if m2crypto_imported else ""))
+    {}""".format(" Delegate Proxy," if cryptography_imported else "",
+                 " --delegate-proxy" if cryptography_imported else "",
+                 delegate_proxy_long_help if cryptography_imported else ""))
 @common_options
 @endpoint_id_arg
 @click.option("--web", is_flag=True, default=False,
               help=("Use web activation. Mutually exclusive with --myproxy"
                     "{}.".format(" and --delegate-proxy"
-                                 if m2crypto_imported else "")))
+                                 if cryptography_imported else "")))
 @click.option("--no-browser", is_flag=True, default=False,
               help=("If using --web, Give a url to manually follow instead of "
                     "opening your default web browser. Implied if the CLI "
@@ -78,18 +78,18 @@ delegate_proxy_long_help = """
 @click.option("--myproxy", is_flag=True, default=False,
               help=("Use myproxy activation. Mutually exclusive with --web"
                     "{}.".format(" and --delegate-proxy"
-                                 if m2crypto_imported else "")))
+                                 if cryptography_imported else "")))
 @click.option("--myproxy-username", "-U",
               help=("Give a username to use with --myproxy. "
                     "Overrides any default myproxy username set in config."))
 @click.option("--myproxy-password", "-P", cls=HiddenOption)
 @click.option("--delegate-proxy", metavar="X.509_PEM_FILE",
-              cls=(click.Option if m2crypto_imported else HiddenOption),
+              cls=(click.Option if cryptography_imported else HiddenOption),
               help=("Use delegate proxy activation, takes an X.509 "
                     "certificate in pem format as an argument. Mutually "
                     "exclusive with --web and --myproxy."))
 @click.option("--proxy-lifetime", type=int, default=None,
-              cls=(click.Option if m2crypto_imported else HiddenOption),
+              cls=(click.Option if cryptography_imported else HiddenOption),
               help=("Set a lifetime in hours for the proxy generated with "
                     "--delegate-proxy. [default: 12]"))
 @click.option("--no-autoactivate", is_flag=True, default=False,
@@ -121,9 +121,9 @@ def endpoint_activate(endpoint_id, myproxy, myproxy_username, myproxy_password,
         raise click.UsageError("--no-browser requires --web.")
     if proxy_lifetime and not delegate_proxy:
         raise click.UsageError("--proxy-lifetime requires --delegate-proxy.")
-    if delegate_proxy and not m2crypto_imported:
-            raise click.ClickException(
-                "Missing M2Crypto dependency required for --delegate-proxy, ")
+    if delegate_proxy and not cryptography_imported:
+            raise click.ClickException("Missing cryptography dependency "
+                                       "required for --delegate-proxy, ")
 
     # check if endpoint is already activated unless --force
     if not force:
