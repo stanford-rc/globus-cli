@@ -152,5 +152,5 @@ def custom_except_hook(exc_info):
         # or NotImplementedError bubbled all the way up here: just print it
         # out, basically
         else:
-            safeprint('{}: {}'.format(exception_type.__name__, exception))
+            safeprint(u'{}: {}'.format(exception_type.__name__, exception))
             sys.exit(1)

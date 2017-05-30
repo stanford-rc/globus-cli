@@ -69,8 +69,8 @@ def colon_formatted_print(data, named_fields):
     maxlen = max(len(n) for n, f in named_fields) + 1
     for name, field in named_fields:
         field_keyfunc = _key_to_keyfunc(field)
-        safeprint('{} {}'.format((name + ':').ljust(maxlen),
-                                 field_keyfunc(data)))
+        safeprint(u'{} {}'.format((name + u':').ljust(maxlen),
+                                  field_keyfunc(data)))
 
 
 def print_table(iterable, headers_and_keys, print_headers=True):
@@ -106,7 +106,7 @@ def print_table(iterable, headers_and_keys, print_headers=True):
     widths = [max(w, len(h)) for w, h in zip(widths, headers)]
 
     # create a format string based on column widths
-    format_str = six.u(' | '.join('{:' + str(w) + '}' for w in widths))
+    format_str = u' | '.join(u'{:' + str(w) + u'}' for w in widths)
 
     def none_to_null(val):
         if val is None:
