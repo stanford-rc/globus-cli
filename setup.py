@@ -21,7 +21,7 @@ setup(
     ],
 
     extras_require={
-        'delegate-proxy': ['M2Crypto==0.26.0']
+        'delegate-proxy': ['cryptography>=1.8.1,<2.0.0']
     },
 
     entry_points={

@@ -50,7 +50,7 @@ travis:
 	pip install --upgrade "setuptools>=29,<30"
 	pip install -r test-requirements.txt
 ifeq (, $(findstring pypy, $(TRAVIS_PYTHON_VERSION)))
-	pip install "M2Crypto==0.26.0"
+	pip install "cryptography>=1.8.1,<2.0.0"
 endif
 	python setup.py develop
 	flake8
