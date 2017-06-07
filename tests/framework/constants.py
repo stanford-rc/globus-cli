@@ -5,11 +5,11 @@ GO_EP2_ID = "ddb59af0-6d04-11e5-ba46-22000b92c6ec"
 # tokens #
 # ------ #
 CLITESTER1A_TRANSFER_RT = (
-    "AQEAAAAAAASZW75F06PMlmWcsINaQOKnbY72CBk0Ig"
-    "FSgL3tO6szYUEBJOq8xTDdKtHUKD4o4Pdm9x012Owt")
+    "AQEAAAAAAASZW1zL_o4peWhnfsH2tQW-4HLaeLwkb6"
+    "3cUoFsnsmlY_rodQXe8T56-z7ETCP3AVkIup48_Py-")
 CLITESTER1A_AUTH_RT = (
-    "AQEAAAAAAASZXC-lkxvvazq0ZZMiOMOiWHmgmUXrhH"
-    "sS57LzjtA1fNjQYZgS7Mk0mRPRQ4nnpNVdR3D3ts51")
+    "AQEAAAAAAASZXCkLcngJiAy9-FcFnDC_TIe47gr27K"
+    "zGwXqTnFC5vAesv4LNaWA7MkJqp92t2jQcG-WBwp3B")
 # ---------- #
 # end tokens #
 # ---------- #
