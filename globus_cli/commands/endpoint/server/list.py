@@ -19,7 +19,7 @@ def server_list(endpoint_id):
     endpoint = client.get_endpoint(endpoint_id)
 
     if endpoint['host_endpoint_id']:  # not GCS -- this is a share endpoint
-        raise click.UsageError(dedent("""\
+        raise click.UsageError(dedent(u"""\
             {id} ({0}) is a share and does not have servers.
 
             To see details of the share, use

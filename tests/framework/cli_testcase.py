@@ -1,4 +1,5 @@
 import unittest
+import six
 import shlex
 from click.testing import CliRunner
 from datetime import datetime, timedelta
@@ -109,14 +110,23 @@ class CliTestCase(unittest.TestCase):
         Asserts that the exit_code is equal to the given value
         """
         # split line into args and confirm line starts with "globus"
-        args = shlex.split(line)
+        # python2 shlex can't handle non ascii unicode
+        if six.PY2 and isinstance(line, six.text_type):
+            args = [a for a in shlex.split(line.encode("utf-8"))]
+        else:
+            args = shlex.split(line)
         self.assertEqual(args[0], "globus")
+
         # run the line. globus_cli.main is the "globus" part of the line
-        result = self._runner.invoke(main, args[1:], input=batch_input)
-        # confirm expected exit_code and exception
+        # if we are expecting success (0), don't catch any exceptions.
+        result = self._runner.invoke(main, args[1:], input=batch_input,
+                                     catch_exceptions=bool(assert_exit_code))
+        # confirm expected exit_code
         if result.exit_code != assert_exit_code:
+            if isinstance(line, six.binary_type):
+                line = line.decode("utf-8")
             raise(Exception(
-                ("CliTest run_line exit_code assertion failed!\n"
+                (u"CliTest run_line exit_code assertion failed!\n"
                  "Line: {}\nexited with {} when expecting {}\n"
                  "Output: {}".format(line, result.exit_code,
                                      assert_exit_code, result.output))))

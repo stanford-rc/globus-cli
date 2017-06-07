@@ -27,7 +27,7 @@ Logout of the Globus CLI with
   globus logout
 """)
 
-_LOGIN_EPILOG = ("""\
+_LOGIN_EPILOG = (u"""\
 
 You have successfully logged in to the Globus CLI as {}
 """) + _SHARED_EPILOG

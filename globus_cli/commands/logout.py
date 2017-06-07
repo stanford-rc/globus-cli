@@ -46,8 +46,8 @@ def logout_command():
     if not username:
         safeprint(("Your username is not set. You may not be logged in. "
                    "Attempting logout anyway...\n"))
-    safeprint('Logging out of Globus{}\n'.format(' as ' + username
-                                                 if username else ''))
+    safeprint(u'Logging out of Globus{}\n'.format(u' as ' + username
+                                                  if username else ''))
 
     # build the NativeApp client object
     native_client = internal_auth_client()
