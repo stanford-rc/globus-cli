@@ -4,11 +4,11 @@ import time
 import click
 
 try:
-    import M2Crypto
+    import cryptography
     # slightly hacky way of preventing flake8 from complaining
-    m2crypto_imported = bool(M2Crypto)
+    cryptography_imported = bool(cryptography)
 except ImportError:
-    m2crypto_imported = False
+    cryptography_imported = False
 
 from globus_sdk import TransferClient, RefreshTokenAuthorizer
 from globus_sdk.exc import NetworkError
@@ -158,12 +158,12 @@ def activation_requirements_help_text(res, ep_id):
         ("For delegate proxy activation use:\n"
          "'globus endpoint activate --delegate-proxy "
          "X.509_PEM_FILE {}'\n".format(ep_id)
-         if "delegate_proxy" in methods and m2crypto_imported else ""),
+         if "delegate_proxy" in methods and cryptography_imported else ""),
 
         ("Delegate proxy activation requires an additional dependency on "
-         "M2Crypto. See the docs for details:\n"
+         "cryptography. See the docs for details:\n"
          "https://docs.globus.org/cli/reference/endpoint_activate/\n"
-         if "delegate_proxy" in methods and not m2crypto_imported else ""),
+         if "delegate_proxy" in methods and not cryptography_imported else ""),
     ]
 
     return "".join(lines)
