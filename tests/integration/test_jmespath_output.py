@@ -16,6 +16,8 @@ class JMESPathTests(CliTestCase):
         Runs some simple fetch operations and confirms that `--jmespath '@'`
         doesn't change the output (but also that it overrides --format TEXT)
         """
+        self.maxDiff = None
+
         output = self.run_line(
             "globus endpoint show {} -Fjson".format(GO_EP1_ID))
         jmespathoutput = self.run_line(
