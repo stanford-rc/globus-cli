@@ -20,7 +20,17 @@ class JMESPathTests(CliTestCase):
             "globus endpoint show {} -Fjson".format(GO_EP1_ID))
         jmespathoutput = self.run_line(
             "globus endpoint show {} -Ftext --jmespath '@'".format(GO_EP1_ID))
-        self.assertEquals(output, jmespathoutput)
+
+        # Drop fields that can be affected by concurrent test runs
+        output_json_dict = json.loads(output)
+        output_jmespath_dict = json.loads(jmespathoutput)
+        for obj in (output_json_dict, output_jmespath_dict):
+            obj.pop('in_use')
+            obj.pop('expire_time')
+        output_fixed = json.dumps(output_json_dict)
+        jmespathoutput_fixed = json.dumps(output_jmespath_dict)
+
+        self.assertEquals(output_fixed, jmespathoutput_fixed)
 
     def test_jmespath_extract_from_list(self):
         """
