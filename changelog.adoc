@@ -1,6 +1,23 @@
 = CLI Changelog
 
 
+== 1.1.1
+
+Enhancements:
+
+* Use the `cryptography` package instead of `M2Crypto` for the
+`delegate-proxy` feature.
+** Note: If you are using the `delegate-proxy` feature and
+previously installed the CLI along with `M2Crypto`, you
+will need to activate the CLI's virtualenv and install
+the `cryptography` dependency:
+```
+source $HOME/.globus-cli-virtualenv/bin/activate
+pip install globus-cli[delegate-proxy] --upgrade
+deactivate
+```
+
+
 == 1.1.0
 
 Features:
@@ -22,7 +39,7 @@ Enhancements:
 (https://github.com/globus/globus-cli/pull/289[289])
 * Display additional fields with 'globus task show'.
 (https://github.com/globus/globus-cli/pull/301[301])
-* Make conflicting filters mutually exclusive in 'globus task event-list 
+* Make conflicting filters mutually exclusive in 'globus task event-list'
 (https://github.com/globus/globus-cli/pull/294[294])
 
 Bugfixes:
