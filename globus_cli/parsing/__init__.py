@@ -18,6 +18,8 @@ from globus_cli.parsing.shared_options import (
 
 from globus_cli.parsing.process_stdin import shlex_process_stdin
 
+from globus_cli.parsing.one_use_option import one_use_option
+
 
 __all__ = [
     'globus_group',
@@ -26,6 +28,8 @@ __all__ = [
     'CaseInsensitiveChoice',
     'ENDPOINT_PLUS_OPTPATH', 'ENDPOINT_PLUS_REQPATH',
     'TaskPath',
+
+    'one_use_option',
 
     'HiddenOption',
     'ISOTimeType',
