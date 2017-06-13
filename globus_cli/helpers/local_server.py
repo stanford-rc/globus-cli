@@ -27,6 +27,8 @@ try:
 except ImportError:
     from urllib.parse import urlparse, parse_qsl
 
+from globus_cli.safeio import safeprint
+
 
 class LocalServerError(Exception):
     pass
@@ -139,17 +141,15 @@ class RedirectHTTPServer(HTTPServer, object):
         self._auth_code_queue.put_nowait(code)
 
     def wait_for_code(self):
-        # use a non-blocking get() on the queue so that keyboard interrupts
-        # during the wait will be respected
-        # use a 1 second polling interval, though the exact value doesn't
-        # matter
+        # workaround for handling control-c interrupt.
         # relevant Python issue discussing this behavior:
         # https://bugs.python.org/issue1360
-        while True:
-            try:
-                return self._auth_code_queue.get(timeout=1)
-            except Queue.Empty:
-                pass
+        try:
+            return self._auth_code_queue.get(block=True, timeout=3600)
+        except Queue.Empty:
+            safeprint(
+                'Login timed out. Please try again.', write_to_stderr=True)
+            sys.exit(1)
 
 
 @contextmanager
