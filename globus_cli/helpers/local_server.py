@@ -139,7 +139,17 @@ class RedirectHTTPServer(HTTPServer, object):
         self._auth_code_queue.put_nowait(code)
 
     def wait_for_code(self):
-        return self._auth_code_queue.get(block=True)
+        # use a non-blocking get() on the queue so that keyboard interrupts
+        # during the wait will be respected
+        # use a 1 second polling interval, though the exact value doesn't
+        # matter
+        # relevant Python issue discussing this behavior:
+        # https://bugs.python.org/issue1360
+        while True:
+            try:
+                return self._auth_code_queue.get(timeout=1)
+            except Queue.Empty:
+                pass
 
 
 @contextmanager
