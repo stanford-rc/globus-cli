@@ -12,7 +12,7 @@ link:update[globus update]::
 Update the Globus CLI to its latest version
 
 link:login[globus login]::
-Login to Globus to get credentials for the Globus CLI
+Log into Globus to get credentials for the Globus CLI
 
 link:logout[globus logout]::
 Logout of the Globus CLI

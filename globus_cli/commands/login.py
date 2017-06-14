@@ -41,7 +41,7 @@ You may force a new login with
 
 
 @click.command('login',
-               short_help=('Login to Globus to get credentials for '
+               short_help=('Log into Globus to get credentials for '
                            'the Globus CLI'),
                help=('Get credentials for the Globus CLI. '
                      'Necessary before any Globus CLI commands which require '
@@ -109,7 +109,7 @@ def do_link_login_flow():
         refresh_tokens=True, prefill_named_grant=label)
 
     # prompt
-    linkprompt = 'Please login to Globus here'
+    linkprompt = 'Please log into Globus here'
     safeprint('{0}:\n{1}\n{2}\n{1}\n'
               .format(linkprompt, '-' * len(linkprompt),
                       native_client.oauth2_get_authorize_url()))
