@@ -2,7 +2,7 @@
 
 == NAME
 
-globus login - Login to Globus to get credentials for the Globus CLI
+globus login - Log into Globus to get credentials for the Globus CLI
 
 == SYNOPSIS
 
