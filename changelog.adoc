@@ -1,6 +1,17 @@
 = CLI Changelog
 
 
+== 1.1.2
+
+Enhancements:
+
+* Improved autoactivation error messages. (https://github.com/globus/globus-cli/pull/296[296])
+
+Bugfixes:
+
+* Handle "control-c" interrupts while doing the browser based login flow. (https://github.com/globus/globus-cli/pull/320[320])
+
+
 == 1.1.1
 
 Enhancements:
