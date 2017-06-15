@@ -13,7 +13,8 @@ from globus_cli.services.transfer import get_client, assemble_generic_doc
 @click.command('create', help=('Create an access control rule, allowing new '
                                'permissions'))
 @common_options
-@security_principal_opts(allow_anonymous=True, allow_all_authenticated=True)
+@security_principal_opts(
+    allow_anonymous=True, allow_all_authenticated=True, allow_provision=True)
 @click.option('--permissions', required=True,
               type=CaseInsensitiveChoice(('r', 'rw')),
               help='Permissions to add. Read-Only or Read/Write')
@@ -34,6 +35,13 @@ def create_command(principal, permissions, endpoint_plus_path):
 
     if principal_type == 'identity':
         principal_val = maybe_lookup_identity_id(principal_val)
+        if not principal_val:
+            raise click.UsageError(
+                'Identity does not exist. '
+                'Use --provision-identity to auto-provision an identity.')
+    elif principal_type == 'provision-identity':
+        principal_val = maybe_lookup_identity_id(principal_val, provision=True)
+        principal_type = 'identity'
 
     rule_data = assemble_generic_doc(
         'access', permissions=permissions, principal=principal_val,

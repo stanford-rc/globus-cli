@@ -13,7 +13,7 @@ from globus_cli.services.transfer import get_client, assemble_generic_doc
 @click.command('create', help='Create a role on an endpoint')
 @common_options
 @endpoint_id_arg
-@security_principal_opts
+@security_principal_opts(allow_provision=True)
 @click.option('--role', required=True,
               type=CaseInsensitiveChoice(
                   ('administrator', 'access_manager', 'activity_manager',
@@ -29,6 +29,13 @@ def role_create(role, principal, endpoint_id):
 
     if principal_type == 'identity':
         principal_val = maybe_lookup_identity_id(principal_val)
+        if not principal_val:
+            raise click.UsageError(
+                'Identity does not exist. '
+                'Use --provision-identity to auto-provision an identity.')
+    elif principal_type == 'provision-identity':
+        principal_val = maybe_lookup_identity_id(principal_val, provision=True)
+        principal_type = 'identity'
 
     role_doc = assemble_generic_doc(
         'role', principal_type=principal_type, principal=principal_val,

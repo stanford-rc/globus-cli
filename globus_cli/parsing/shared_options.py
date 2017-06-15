@@ -385,22 +385,33 @@ def security_principal_opts(*args, **kwargs):
         def decorator(*args, **kwargs):
             identity = kwargs.pop('identity', None)
             group = kwargs.pop('group', None)
+            provision_identity = kwargs.pop('provision_identity', None)
+
+            has_identity = (identity or provision_identity)
+
+            if identity and provision_identity:
+                raise click.UsageError(
+                    'Only one of --identity or --provision-identity '
+                    'allowed')
             if kwargs.get('principal') is not None:
-                if identity or group:
+                if has_identity or group:
                     raise click.UsageError(
                         'You may only pass one security principal')
             else:
-                if identity and group:
+                if has_identity and group:
                     raise click.UsageError(
                         ('You have passed both an identity and a group. '
                          'Please only pass one principal type'))
-                elif not identity and not group:
+                elif not has_identity and not group:
                     raise click.UsageError(
                         ('You must provide at least one principal '
                          '(identity, group, etc.)'))
 
                 if identity:
                     kwargs['principal'] = ('identity', identity)
+                elif provision_identity:
+                    kwargs['principal'] = (
+                        'provision-identity', provision_identity)
                 else:
                     kwargs['principal'] = ('group', group)
 
@@ -408,7 +419,8 @@ def security_principal_opts(*args, **kwargs):
         return decorator
 
     def inner_decorator(
-            f, allow_anonymous=False, allow_all_authenticated=False):
+            f, allow_anonymous=False, allow_all_authenticated=False,
+            allow_provision=False):
 
         # order matters here -- the preprocessor must run after option
         # application, so it has to be applied first
@@ -440,6 +452,12 @@ def security_principal_opts(*args, **kwargs):
                 flag_value=('all_authenticated_users', ""),
                 help=('Allow anyone access, as long as they login'
                       '(treated as a security principal)'))(f)
+
+        if allow_provision:
+            f = click.option(
+                '--provision-identity', metavar='IDENTITY_USERNAME',
+                help='Identity username to use as a security principal. '
+                     'Identity will be provisioned if it does not exist.')(f)
 
         return f
 
