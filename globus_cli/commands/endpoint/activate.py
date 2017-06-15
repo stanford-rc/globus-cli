@@ -13,9 +13,11 @@ except ImportError:
 from globus_cli.parsing import common_options, endpoint_id_arg, HiddenOption
 from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
 from globus_cli.config import lookup_option, MYPROXY_USERNAME_OPTNAME
-from globus_cli.services.transfer import get_client
+from globus_cli.services.transfer import (
+    get_client, activation_requirements_help_text)
 from globus_cli.helpers import (
     is_remote_session, fill_delegate_proxy_activation_requirements)
+
 
 delegate_proxy_long_help = """
     \b
@@ -148,8 +150,9 @@ def endpoint_activate(endpoint_id, myproxy, myproxy_username, myproxy_password,
 
         # override potentially confusing autoactivation failure response
         else:
-            res = {"message": ("Auto-activation failed, please "
-                               "use another activation method")}
+            message = ("The endpoint could not be auto-activated.\n\n" +
+                       activation_requirements_help_text(res, endpoint_id))
+            res = {"message": message}
 
     # myproxy activation
     if myproxy:
