@@ -11,8 +11,8 @@ from globus_cli.services.transfer import get_client
 def principal_str(role):
     principal = role['principal']
     if role['principal_type'] == 'identity':
-        principal = lookup_identity_name(principal)
-    return principal
+        username = lookup_identity_name(principal)
+    return username or principal
 
 
 @click.command('list', help='List of assigned roles on an endpoint')
