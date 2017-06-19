@@ -42,21 +42,29 @@ def get_auth_client():
     return client
 
 
-def _lookup_identity_field(id_name=None, id_id=None, field='id'):
+def _lookup_identity_field(id_name=None, id_id=None, field='id',
+                           provision=False):
     assert (id_name or id_id) and not (id_name and id_id)
     client = get_auth_client()
 
+    kw = dict(provision=provision)
     if id_name:
-        kw = {'usernames': id_name}
+        kw.update({'usernames': id_name})
     else:
-        kw = {'ids': id_id}
+        kw.update({'ids': id_id})
 
-    return client.get_identities(**kw)['identities'][0][field]
+    try:
+        return client.get_identities(**kw)['identities'][0][field]
+    except (IndexError, KeyError):
+        # IndexError: identity does not exist and wasn't provisioned
+        # KeyError: `field` does not exist for the requested identity
+        return None
 
 
-def maybe_lookup_identity_id(identity_name):
+def maybe_lookup_identity_id(identity_name, provision=False):
     if is_valid_identity_name(identity_name):
-        return _lookup_identity_field(id_name=identity_name)
+        return _lookup_identity_field(
+            id_name=identity_name, provision=provision)
     else:
         return identity_name
 

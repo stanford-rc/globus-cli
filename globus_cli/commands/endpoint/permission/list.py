@@ -20,13 +20,17 @@ def list_command(endpoint_id):
     def principal_str(rule):
         principal = rule['principal']
         if rule['principal_type'] == 'identity':
-            return lookup_identity_name(principal)
+            username = lookup_identity_name(principal)
+
+            return username or principal
         elif rule['principal_type'] == 'group':
             return (u'https://www.globus.org/app/groups/{}'
                     ).format(principal)
         else:
             principal = rule['principal_type']
+
         return principal
+
     formatted_print(
         rules, fields=[('Rule ID', 'id'), ('Permissions', 'permissions'),
                        ('Shared With', principal_str), ('Path', 'path')])
