@@ -4,8 +4,6 @@ import logging
 
 from globus_sdk import GlobusAPIError, NetworkError
 
-from globus_cli.services.transfer import get_client
-
 from tests.framework.constants import GO_EP1_ID
 from tests.framework.cli_testcase import CliTestCase
 
@@ -45,7 +43,6 @@ class BookmarkTests(CliTestCase):
     def setUp(self):
         super(BookmarkTests, self).setUp()
 
-        self.tc = get_client()
         self.created_bookmark_names = set()
 
         # use try-catch to ensure that cleanup this runs even if setUp crashes
