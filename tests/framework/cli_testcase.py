@@ -58,6 +58,10 @@ def default_test_config(*args, **kwargs):
     """
     user_data = get_user_data()["clitester1a"]
 
+    # create a ConfgObj from a dict of testing constants. a ConfigObj created
+    # this way will not be tied to a config file on disk, meaning that
+    # ConfigObj.filename = None and ConfigObj.write() returns a string without
+    # writing anything to disk.
     return ConfigObj({"cli": {
         AUTH_RT_OPTNAME: CLITESTER1A_AUTH_RT,
         AUTH_AT_OPTNAME: "",
