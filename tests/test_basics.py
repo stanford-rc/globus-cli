@@ -56,19 +56,20 @@ class BasicTests(CliTestCase):
 
     def test_whoami_no_auth(self):
         """
-        Runs whoami without auth to confirm no_auth successfully setup
+        Runs whoami with config set to be empty, confirms no login seen.
         """
-        output = self.run_line_no_auth("globus whoami", assert_exit_code=1)
+        output = self.run_line("globus whoami", config={}, assert_exit_code=1)
         self.assertIn("No login information available", output)
 
     def test_auth_call_no_auth(self):
         """
-        Runs get-identities without auth, confirms No Authentication CLI error.
+        Runs get-identities with config set to be empty,
+        confirms No Authentication CLI error.
         """
-        output = self.run_line_no_auth(
+        output = self.run_line(
             "globus get-identities " +
             get_user_data()["clitester1a"]["username"],
-            assert_exit_code=1)
+            config={}, assert_exit_code=1)
         self.assertIn("No Authentication provided.", output)
 
     def test_auth_call(self):
@@ -83,10 +84,11 @@ class BasicTests(CliTestCase):
 
     def test_transfer_call_no_auth(self):
         """
-        Runs ls without auth, confirms No Authentication CLI error.
+        Runs ls with config set to be empty,
+        confirms No Authentication CLI error.
         """
-        output = self.run_line_no_auth("globus ls " + str(GO_EP1_ID),
-                                       assert_exit_code=1)
+        output = self.run_line("globus ls " + str(GO_EP1_ID),
+                               config={}, assert_exit_code=1)
         self.assertIn("No Authentication provided.", output)
 
     def test_transfer_call(self):

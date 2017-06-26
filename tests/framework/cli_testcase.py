@@ -1,8 +1,13 @@
 import unittest
+try:
+    from mock import patch
+except ImportError:
+    from unittest.mock import patch
 import six
 import shlex
 from click.testing import CliRunner
 from datetime import datetime, timedelta
+from configobj import ConfigObj
 
 import globus_sdk
 
@@ -11,7 +16,7 @@ from globus_cli.config import (
     AUTH_RT_OPTNAME, AUTH_AT_OPTNAME, AUTH_AT_EXPIRES_OPTNAME,
     TRANSFER_RT_OPTNAME, TRANSFER_AT_OPTNAME, TRANSFER_AT_EXPIRES_OPTNAME,
     WHOAMI_ID_OPTNAME, WHOAMI_USERNAME_OPTNAME, WHOAMI_NAME_OPTNAME,
-    WHOAMI_EMAIL_OPTNAME, get_config_obj)
+    WHOAMI_EMAIL_OPTNAME)
 from globus_cli.services.transfer import get_client
 from globus_cli.services.auth import get_auth_client
 
@@ -46,12 +51,18 @@ def clean_sharing():
         tc.submit_delete(ddata)
 
 
-def write_test_config(conf):
+def default_test_config(*args, **kwargs):
     """
-    Writes known constants and refresh tokens into config for testing
+    Returns a ConfigObj with the clitester's refresh tokens and whoami info
+    as if the clitester was logged in and a call to get_config_obj was made.
     """
     user_data = get_user_data()["clitester1a"]
-    testing_constants = {
+
+    # create a ConfgObj from a dict of testing constants. a ConfigObj created
+    # this way will not be tied to a config file on disk, meaning that
+    # ConfigObj.filename = None and ConfigObj.write() returns a string without
+    # writing anything to disk.
+    return ConfigObj({"cli": {
         AUTH_RT_OPTNAME: CLITESTER1A_AUTH_RT,
         AUTH_AT_OPTNAME: "",
         AUTH_AT_EXPIRES_OPTNAME: 0,
@@ -62,9 +73,8 @@ def write_test_config(conf):
         WHOAMI_USERNAME_OPTNAME: user_data["username"],
         WHOAMI_NAME_OPTNAME: user_data["name"],
         WHOAMI_EMAIL_OPTNAME: user_data["email"]
-    }
-    conf["cli"] = testing_constants
-    conf.write()
+        }
+    })
 
 
 class CliTestCase(unittest.TestCase):
@@ -78,37 +88,39 @@ class CliTestCase(unittest.TestCase):
         self._runner = CliRunner()
 
     @classmethod
+    @patch("globus_cli.config.get_config_obj", new=default_test_config)
     def setUpClass(self):
         """
-        Stores any existing config data in the cli environment of .globus.cfg
-        Then replaces that data with known values for testing
-        Creates a transfer client and an auth client for any direct SDK calls
+        Gets a TransferClient and AuthClient for direct sdk calls
         Cleans any old sharing data created by previous test runs
         """
-        self.conf = get_config_obj()
-        try:
-            self.stored_config = self.conf["cli"]
-        except KeyError:
-            self.stored_config = {}
-        write_test_config(self.conf)
         self.tc = get_client()
         self.ac = get_auth_client()
-
         clean_sharing()
 
-    @classmethod
-    def tearDownClass(self):
+    @patch("globus_cli.config.get_config_obj")
+    def run_line(self, line, mock_config, config=None,
+                 assert_exit_code=0, batch_input=None):
         """
-        Restores original values of the cli environment of .globus.cfg
-        """
-        self.conf["cli"] = self.stored_config
-        self.conf.write()
+        Uses the CliRunner to run the given command line.
 
-    def run_line(self, line, assert_exit_code=0, batch_input=None):
+        Any calls to get_config_obj during the test are patched to
+        return a ConfigObj with given config dict. If no config dict is given,
+        defaults to default_test_config_obj defined above.
+
+        Asserts that the exit_code is equal to the given assert_exit_code,
+        and if that exit_code is 0 prevents click from catching exceptions
+        for easier debugging.
+
+        Any given batch_input is passed as input to stdin.
         """
-        Uses the CliRunner to run the given command line,
-        Asserts that the exit_code is equal to the given value
-        """
+        # mock out calls to get_config_obj to return given config
+        # if none given default to default test config values
+        if config is None:
+            mock_config.return_value = default_test_config()
+        else:
+            mock_config.return_value = ConfigObj(config)
+
         # split line into args and confirm line starts with "globus"
         # python2 shlex can't handle non ascii unicode
         if six.PY2 and isinstance(line, six.text_type):
@@ -132,18 +144,3 @@ class CliTestCase(unittest.TestCase):
                                      assert_exit_code, result.output))))
         # return the output for further testing
         return result.output
-
-    def run_line_no_auth(self, line, assert_exit_code=0, batch_input=None):
-        """
-        Wrapper around run_line that wipes the cli environment of .globus.cfg
-        Before running, then restores test values after run is complete.
-        """
-        # wipe cli environment
-        self.conf["cli"] = {}
-        self.conf.write()
-        # run the line in blank environment
-        ret = self.run_line(line, assert_exit_code=assert_exit_code,
-                            batch_input=batch_input)
-        # reset the test environment and return the result
-        write_test_config(self.conf)
-        return ret
