@@ -1,74 +1,11 @@
 import click
+import re
 
 from globus_cli.parsing import common_options, ENDPOINT_PLUS_OPTPATH
 from globus_cli.safeio import formatted_print
-from globus_cli.helpers import is_verbose
-from globus_cli.services.transfer import get_client, autoactivate
-
-
-class DummyLSIterable(dict):
-    """
-    Simple subclass of dict that has same iteration behavior as an
-    IterableTransferResponse item. Important for returning a
-    (GlobusResponse|DummyLSIterable) from a (maybe) recursive listing.
-    Also has the `.data` property which is itself, which is all that's
-    required for `formatted_print` to consume it
-    """
-    def __iter__(self):
-        return iter(self['DATA'])
-
-    @property
-    def data(self):
-        return self
-
-
-def _get_ls_res(client, path, endpoint_id, recursive, depth, show_hidden):
-    """
-    Do recursive or non-recursive listing, and either return the GlobusResponse
-    that we got back, or an artificial DummyLSIterable, formatted to look like
-    a Transfer API response.
-
-    Note about paths: because the "path" key always has a trailing slash, and
-    item names never have leading slashes, we can just string concat.
-    """
-    ls_kwargs = {
-        'show_hidden': int(show_hidden)
-    }
-    if path is not None:
-        ls_kwargs.update({'path': path})
-
-    # non-recursive ls is simple -- just make the call and return the result
-    if not recursive:
-        return client.operation_ls(endpoint_id, **ls_kwargs)
-
-    # the rest of this is the recursive case
-
-    # start with an empty result set, will be returned in the base case of
-    # depth < 0
-    result_doc = DummyLSIterable(DATA=[])
-
-    if depth >= 0:
-        # do an `ls` call against current path, use it to seed the result_doc
-        res = client.operation_ls(endpoint_id, **ls_kwargs)
-        result_doc['DATA'] = [item for item in res]
-        # set path in order to get trailing slash, if necessary
-        result_doc['path'] = res['path']
-        path = res['path']
-
-        # walk over dir entries
-        for item in [i for i in res if i['type'] == 'dir']:
-            # do a recursive ls on each dir
-            nested_res = _get_ls_res(
-                client, path + item['name'], endpoint_id, True, depth - 1,
-                show_hidden)
-
-            # walk the recursive ls results from this dir
-            for nested_item in nested_res:
-                # fix the name, then inject it into the current document
-                nested_item['name'] = item['name'] + '/' + nested_item['name']
-                result_doc['DATA'].append(nested_item)
-
-    return result_doc
+from globus_cli.helpers import is_verbose, outformat_is_json
+from globus_cli.services.transfer import (
+    get_client, autoactivate, iterable_response_to_dict)
 
 
 @click.command('ls', help='List the contents of a directory on an endpoint',
@@ -101,19 +38,52 @@ def ls_command(endpoint_plus_path, recursive_depth_limit,
     client = get_client()
     autoactivate(client, endpoint_id, if_expires_in=60)
 
-    # get the `ls` result
-    # note that `path` can be None
-    res = _get_ls_res(client, path, endpoint_id, recursive,
-                      recursive_depth_limit, all)
+    # create the query paramaters to send to operation_ls
+    ls_params = {"show_hidden": int(all)}
+    if path:
+        ls_params["path"] = path
 
-    def cleaned_item_name(item):
-        return item['name'] + ('/' if item['type'] == 'dir' else '')
+    # get the `ls` result
+    if recursive:
+        res = client.recursive_operation_ls(
+            endpoint_id, depth=recursive_depth_limit, **ls_params)
+    else:
+        res = client.operation_ls(endpoint_id, **ls_params)
+
+    def formated_item_name(item):
+        # determine if the formated item name should end in / or not
+        final_slash = ("/" if item["type"] == "dir" else "")
+
+        # ignore any trailing slashes for easier logic
+        if path and path[-1] == "/":
+            formatted_path = path[:-1]
+        else:
+            formatted_path = path
+
+        # if the item has a path field, it is recursive, and we want
+        # to display the relative path from the start of the ls.
+        if item.get("path"):
+
+            # if the ls command has a starting path,
+            # give everything relative to that path
+            if formatted_path:
+                relative_path = re.match(u".*{}/(.*{})".format(
+                    formatted_path, item["name"]), item["path"]).group(1)
+            # otherwise give everything after the first /~/ or /
+            else:
+                relative_path = re.match(u"(/~)*/(.*{})".format(
+                    item["name"]), item["path"]).group(2)
+
+            return relative_path + final_slash
+        else:
+            return item["name"] + final_slash
 
     # and then print it, per formatting rules
     formatted_print(
         res, fields=[('Permissions', 'permissions'), ('User', 'user'),
                      ('Group', 'group'), ('Size', 'size'),
                      ('Last Modified', 'last_modified'), ('File Type', 'type'),
-                     ('Filename', cleaned_item_name)],
-        simple_text=(None if long or is_verbose() else
-                     "\n".join(cleaned_item_name(x) for x in res)))
+                     ('Filename', formated_item_name)],
+        simple_text=(None if long or is_verbose() or outformat_is_json() else
+                     "\n".join(formated_item_name(x) for x in res)),
+        json_converter=iterable_response_to_dict)
