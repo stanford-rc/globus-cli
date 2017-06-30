@@ -60,19 +60,20 @@ def ls_command(endpoint_plus_path, recursive_depth_limit,
         else:
             formatted_path = path
 
-        # if the item has a path field, it is recursive, and we want
-        # to display the relative path from the start of the ls.
-        if item.get("path"):
+        # if we are doing a recursive ls we want to display the relative path
+        # from the start of the ls.
+        if recursive:
 
             # if the ls command has a starting path,
             # give everything relative to that path
             if formatted_path:
                 relative_path = re.match(u".*{}/(.*{})".format(
-                    formatted_path, item["name"]), item["path"]).group(1)
+                    re.escape(formatted_path), re.escape(item["name"])),
+                    item["path"]).group(1)
             # otherwise give everything after the first /~/ or /
             else:
                 relative_path = re.match(u"(/~)*/(.*{})".format(
-                    item["name"]), item["path"]).group(2)
+                    re.escape(item["name"])), item["path"]).group(2)
 
             return relative_path + final_slash
         else:
