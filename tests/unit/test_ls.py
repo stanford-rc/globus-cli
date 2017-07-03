@@ -40,4 +40,4 @@ class LsTests(CliTestCase):
         """
         output = self.run_line("globus ls -r -F json {}:/".format(GO_EP1_ID))
         self.assertIn('"DATA":', output)
-        self.assertIn('"path": "/share/godata/file1.txt"', output)
+        self.assertIn('"name": "share/godata/file1.txt"', output)

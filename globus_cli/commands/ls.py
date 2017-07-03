@@ -1,5 +1,4 @@
 import click
-import re
 
 from globus_cli.parsing import common_options, ENDPOINT_PLUS_OPTPATH
 from globus_cli.safeio import formatted_print
@@ -50,41 +49,15 @@ def ls_command(endpoint_plus_path, recursive_depth_limit,
     else:
         res = client.operation_ls(endpoint_id, **ls_params)
 
-    def formated_item_name(item):
-        # determine if the formated item name should end in / or not
-        final_slash = ("/" if item["type"] == "dir" else "")
-
-        # ignore any trailing slashes for easier logic
-        if path and path[-1] == "/":
-            formatted_path = path[:-1]
-        else:
-            formatted_path = path
-
-        # if we are doing a recursive ls we want to display the relative path
-        # from the start of the ls.
-        if recursive:
-
-            # if the ls command has a starting path,
-            # give everything relative to that path
-            if formatted_path:
-                relative_path = re.match(u".*{}/(.*{})".format(
-                    re.escape(formatted_path), re.escape(item["name"])),
-                    item["path"]).group(1)
-            # otherwise give everything after the first /~/ or /
-            else:
-                relative_path = re.match(u"(/~)*/(.*{})".format(
-                    re.escape(item["name"])), item["path"]).group(2)
-
-            return relative_path + final_slash
-        else:
-            return item["name"] + final_slash
+    def cleaned_item_name(item):
+        return item['name'] + ('/' if item['type'] == 'dir' else '')
 
     # and then print it, per formatting rules
     formatted_print(
         res, fields=[('Permissions', 'permissions'), ('User', 'user'),
                      ('Group', 'group'), ('Size', 'size'),
                      ('Last Modified', 'last_modified'), ('File Type', 'type'),
-                     ('Filename', formated_item_name)],
+                     ('Filename', cleaned_item_name)],
         simple_text=(None if long or is_verbose() or outformat_is_json() else
-                     "\n".join(formated_item_name(x) for x in res)),
+                     "\n".join(cleaned_item_name(x) for x in res)),
         json_converter=iterable_response_to_dict)

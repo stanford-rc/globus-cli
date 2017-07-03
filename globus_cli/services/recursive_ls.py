@@ -52,10 +52,10 @@ class RecursiveLsResponse(PaginatedResource):
         self.filtering = True
         self.ls_count = 0
 
-        # queue of (path, depth) tuples.
+        # queue of (absolute_path, relative_path, depth) tuples.
         self.queue = deque()
         # initialized with the start path (if any) and a depth of 0
-        self.queue.append((self.ls_params.get("path"), 0))
+        self.queue.append((self.ls_params.get("path"), "", 0))
 
         # call the iterable_func method to convert it to a generator expression
         self.generator = self.iterable_func()
@@ -93,11 +93,11 @@ class RecursiveLsResponse(PaginatedResource):
                 time.sleep(SLEEP_LEN)
 
             # get path and current depth from the queue
-            path, depth = self.queue.pop()
+            abs_path, rel_path, depth = self.queue.pop()
 
-            # set the target path to the popped path if it exists
-            if path:
-                self.ls_params["path"] = path
+            # set the target path to the popped absolute path if it exists
+            if abs_path:
+                self.ls_params["path"] = abs_path
 
             # if filter_after_first is False, stop filtering after the first
             # ls call has been made
@@ -114,16 +114,20 @@ class RecursiveLsResponse(PaginatedResource):
             res = self.client.operation_ls(self.endpoint_id, **self.ls_params)
             res_data = res["DATA"]
 
-            # for each item in the response data include the item's path with
-            # the response data since top level fields are no longer visible,
-            # and yield the item
-            for item in res_data:
-                item["path"] = res["path"] + item["name"]
-                yield GlobusResponse(item)
-
             # if we aren't at the depth limit, add dir entries to the queue.
+            # including the dir's name in the absolute and relative paths
+            # and increase the depth by one.
             # data is reversed to maintain any "orderby" ordering
             if depth < self.max_depth:
-                self.queue.extend([(i["path"], depth + 1)
-                                   for i in reversed(res_data)
-                                   if i["type"] == "dir"])
+                self.queue.extend(
+                    [(res["path"] + item["name"],
+                      (rel_path + "/" if rel_path else "") + item["name"],
+                      depth + 1)
+                     for item in reversed(res_data) if item["type"] == "dir"])
+
+            # for each item in the response data update the item's name with
+            # the relative path popped from the queue, and yield the item
+            for item in res_data:
+                item["name"] = (
+                    rel_path + "/" if rel_path else "") + item["name"]
+                yield GlobusResponse(item)
