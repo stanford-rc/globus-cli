@@ -38,6 +38,7 @@ class LsTests(CliTestCase):
         """
         Confirms -F json works with the RecursiveLsResponse
         """
-        output = self.run_line("globus ls -r -F json {}:/".format(GO_EP1_ID))
+        output = self.run_line(
+            "globus ls -r -F json {}:/share".format(GO_EP1_ID))
         self.assertIn('"DATA":', output)
-        self.assertIn('"name": "share/godata/file1.txt"', output)
+        self.assertIn('"name": "godata/file1.txt"', output)
