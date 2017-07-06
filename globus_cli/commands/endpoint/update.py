@@ -33,6 +33,6 @@ def endpoint_update(**kwargs):
         endpoint_type, get_res["subscription_id"], kwargs)
 
     # make the update
-    ep_doc = assemble_generic_doc('endpoint', **kwargs)
+    ep_doc = assemble_generic_doc('endpoint', include_nones=True, **kwargs)
     res = client.update_endpoint(endpoint_id, ep_doc)
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key='message')

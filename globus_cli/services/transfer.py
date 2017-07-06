@@ -138,12 +138,12 @@ def iterable_response_to_dict(iterator):
     return output_dict
 
 
-def assemble_generic_doc(datatype, **kwargs):
+def assemble_generic_doc(datatype, include_nones=False, **kwargs):
     doc = {'DATA_TYPE': datatype}
     for key, val in kwargs.items():
         if isinstance(val, uuid.UUID):
             val = str(val)
-        if val is not None:
+        if include_nones or val is not None:
             doc[key] = val
     return doc
 

@@ -1,8 +1,7 @@
 import click
 
 from globus_cli.parsing.command_state import (
-    format_option, debug_option, map_http_status_option,
-    verbose_option, HiddenOption)
+    format_option, debug_option, map_http_status_option, verbose_option)
 from globus_cli.parsing.version_option import version_option
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
 from globus_cli.parsing.detect_and_decorate import detect_and_decorate
@@ -174,10 +173,16 @@ def endpoint_create_and_update_params(*args, **kwargs):
 
         # Managed Endpoint options
         f = click.option(
+            "--managed/--no-managed", is_flag=True, default=None,
+            help=("(Un)set the endpoint as a managed endpoint. Requires the "
+                  "user to be a subscription manager. If the user has "
+                  "multiple subscription IDs, --subscription-id must be used "
+                  "instead of --managed to specify one."))(f)
+        f = click.option(
             "--subscription-id", type=click.UUID, default=None,
-            cls=HiddenOption,
             help=("Set the endpoint as a managed endpoint with the given "
-                  "subscription ID"))(f)
+                  "subscription ID. Mutually exclusive with "
+                  "--managed/--no-managed."))(f)
         f = click.option(
             "--network-use", default=None,
             type=click.Choice(["normal", "minimal", "aggressive", "custom"]),
@@ -229,7 +234,7 @@ def validate_endpoint_create_and_update_params(endpoint_type, managed, params):
 
     # if the endpoint was not previously managed, and is not being passed
     # a subscription id, it cannot use managed endpoint only fields
-    if (not managed) and (not params["subscription_id"]):
+    if (not managed) and not (params["subscription_id"] or params["managed"]):
         for option in ["network_use", "max_concurrency",
                        "preferred_concurrency", "max_parallelism",
                        "preferred_parallelism"]:
@@ -237,6 +242,26 @@ def validate_endpoint_create_and_update_params(endpoint_type, managed, params):
                 raise click.UsageError(
                     ("Option --{} can only be used with managed "
                      "endpoints".format(option.replace("_", "-"))))
+
+    # remove any options set to None so include_nones can be set to
+    # true for endpoint update (allows nulling out fields)
+    for key, val in list(params.items()):
+        if val is None:
+            del params[key]
+
+    # make sure --(no-)managed and --subscription-id are mutually exclusive
+    # if --managed given pass DEFAULT as the subscription_id
+    # if --no-managed given, pass None
+    managed_flag = params.get("managed")
+    if managed_flag is not None:
+        params.pop("managed")
+        if params.get("subscription_id"):
+            raise click.UsageError("Cannot specify --subscription-id and use "
+                                   "the --managed/--no-managed option.")
+        if managed_flag:
+            params["subscription_id"] = "DEFAULT"
+        else:
+            params["subscription_id"] = None
 
 
 def task_id_arg(*args, **kwargs):
