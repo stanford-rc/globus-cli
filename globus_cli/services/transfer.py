@@ -18,6 +18,7 @@ from globus_cli import version
 from globus_cli.safeio import safeprint
 from globus_cli.config import (
     get_transfer_tokens, internal_auth_client, set_transfer_access_token)
+from globus_cli.parsing import EXPLICIT_NULL
 from globus_cli.services.recursive_ls import RecursiveLsResponse
 
 
@@ -138,12 +139,15 @@ def iterable_response_to_dict(iterator):
     return output_dict
 
 
-def assemble_generic_doc(datatype, include_nones=False, **kwargs):
+def assemble_generic_doc(datatype, **kwargs):
     doc = {'DATA_TYPE': datatype}
     for key, val in kwargs.items():
         if isinstance(val, uuid.UUID):
             val = str(val)
-        if include_nones or val is not None:
+
+        if val == EXPLICIT_NULL:
+            doc[key] = None
+        elif val is not None:
             doc[key] = val
     return doc
 

@@ -7,6 +7,7 @@ from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
 from globus_cli.parsing.detect_and_decorate import detect_and_decorate
 from globus_cli.parsing.location import LocationType
 from globus_cli.parsing.iso_time import ISOTimeType
+from globus_cli.parsing.explicit_null import EXPLICIT_NULL
 
 
 def common_options(*args, **kwargs):
@@ -243,12 +244,6 @@ def validate_endpoint_create_and_update_params(endpoint_type, managed, params):
                     ("Option --{} can only be used with managed "
                      "endpoints".format(option.replace("_", "-"))))
 
-    # remove any options set to None so include_nones can be set to
-    # true for endpoint update (allows nulling out fields)
-    for key, val in list(params.items()):
-        if val is None:
-            del params[key]
-
     # make sure --(no-)managed and --subscription-id are mutually exclusive
     # if --managed given pass DEFAULT as the subscription_id
     # if --no-managed given, pass None
@@ -261,7 +256,7 @@ def validate_endpoint_create_and_update_params(endpoint_type, managed, params):
         if managed_flag:
             params["subscription_id"] = "DEFAULT"
         else:
-            params["subscription_id"] = None
+            params["subscription_id"] = EXPLICIT_NULL
 
 
 def task_id_arg(*args, **kwargs):
