@@ -71,12 +71,13 @@ separated floats. Overrides automatic location approximation.
 (Un)set this endpoint as a managed endpoint. If setting, the user must be
 a subscription manager, and the user's default subscription ID will be used.
 If the user has more than one subscription ID, --subscription-id must be used
-instead to specify one of them. Mutually exclusive with --subscription-id.
+instead to specify one of them. --no-managed is mutually exclusive with
+--subscription-id.
 
 *--subscription-id* 'SUBSCRIPTION_ID'::
 
 Set the endpoint as managed with the given subscription ID. Mutually
-exclusive with --managed/--no-managed.
+exclusive with --no-managed.
 
 *--network-use* '[ normal | minimal | aggressive | custom ]'::
 

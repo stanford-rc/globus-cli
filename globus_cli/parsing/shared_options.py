@@ -250,12 +250,13 @@ def validate_endpoint_create_and_update_params(endpoint_type, managed, params):
     managed_flag = params.get("managed")
     if managed_flag is not None:
         params.pop("managed")
-        if params.get("subscription_id"):
-            raise click.UsageError("Cannot specify --subscription-id and use "
-                                   "the --managed/--no-managed option.")
         if managed_flag:
-            params["subscription_id"] = "DEFAULT"
+            params["subscription_id"] = (params.get("subscription_id") or
+                                         "DEFAULT")
         else:
+            if params.get("subscription_id"):
+                raise click.UsageError("Cannot specify --subscription-id and "
+                                       "use the --no-managed option.")
             params["subscription_id"] = EXPLICIT_NULL
 
 
