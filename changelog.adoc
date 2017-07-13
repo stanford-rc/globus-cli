@@ -1,6 +1,14 @@
 = CLI Changelog
 
 
+== 1.2.0
+
+Enhancements:
+
+* Allow enabling or disabling the "managed" state of an endpoint via the `--managed`, `--no-managed`, and
+`--subscription-id` options to the `globus endpoint update` command.
+
+
 == 1.1.2
 
 Enhancements:
