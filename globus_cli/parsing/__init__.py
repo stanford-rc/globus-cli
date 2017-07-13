@@ -9,6 +9,8 @@ from globus_cli.parsing.endpoint_plus_path import (
 from globus_cli.parsing.hidden_option import HiddenOption
 from globus_cli.parsing.iso_time import ISOTimeType
 
+from globus_cli.parsing.explicit_null import EXPLICIT_NULL
+
 from globus_cli.parsing.shared_options import (
     common_options, endpoint_id_arg, task_id_arg, task_submission_options,
     endpoint_create_and_update_params,
@@ -33,6 +35,8 @@ __all__ = [
 
     'HiddenOption',
     'ISOTimeType',
+
+    'EXPLICIT_NULL',
 
     'common_options',
     # Transfer options
