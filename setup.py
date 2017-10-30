@@ -10,7 +10,7 @@ version = version_ns['__version__']
 setup(
     name="globus-cli",
     version=version,
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests', 'tests.*']),
     install_requires=[
         'globus-sdk==1.1.1',
         'click>=6.6,<7.0',
