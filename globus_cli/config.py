@@ -84,7 +84,7 @@ def get_config_obj(system=False):
     else:
         path = os.path.expanduser("~/.globus.cfg")
 
-    return ConfigObj(path)
+    return ConfigObj(path, encoding='utf-8')
 
 
 def lookup_option(option, section='cli', environment=None):
