@@ -140,7 +140,8 @@ class EndpointCreateTests(CliTestCase):
         # options with the same option value and expected value
         same_value_dict = [
             {"opt": "--myproxy-dn", "key": "myproxy_dn", "val": "/dn"},
-            {"opt": "--myproxy-server", "key": "myproxy_server", "val": "srv"},
+            {"opt": "--myproxy-server", "key": "myproxy_server",
+             "val": "srv.example.com"},
         ]
         # options that have differing option values and expected values
         diff_value_dict = [
@@ -174,7 +175,8 @@ class EndpointCreateTests(CliTestCase):
         Confirms invalid options are caught at the CLI level rather than API
         """
         options = ["--public", "--private", "--myproxy-dn /dn",
-                   "--myproxy-server mpsrv", "--oauth-server oasrv",
+                   "--myproxy-server mpsrv.example.com",
+                   "--oauth-server oasrv.example.com",
                    "--location 1,1"]
         for opt in options:
             for ep_type in ["--shared {}:/~/".format(GO_EP1_ID),
