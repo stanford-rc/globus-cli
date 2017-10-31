@@ -53,8 +53,9 @@ class BookmarkTests(CliTestCase):
                  'path': '/home/',
                  'name': self.bm1name})
             self.bm1id = res['id']
-        finally:
+        except (GlobusAPIError, NetworkError):
             self._clean()
+            raise
 
     def tearDown(self):
         self._clean()
