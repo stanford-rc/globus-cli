@@ -2,10 +2,10 @@ from distutils.version import LooseVersion
 
 # single source of truth for package version,
 # see https://packaging.python.org/en/latest/single_source_version/
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 
 # app name to send as part of SDK requests
-app_name = 'Globus CLI v{}'.format(__version__)
+app_name = "Globus CLI v{}".format(__version__)
 
 
 # pull down version data from PyPi
@@ -23,8 +23,8 @@ def get_versions():
     import requests
     try:
         version_data = requests.get(
-            'https://pypi.python.org/pypi/globus-cli/json').json()
-        latest = max(LooseVersion(v) for v in version_data['releases'])
+            "https://pypi.python.org/pypi/globus-cli/json").json()
+        latest = max(LooseVersion(v) for v in version_data["releases"])
         return latest, LooseVersion(__version__)
     # if the fetch from pypi fails
     except requests.RequestException:
