@@ -244,6 +244,33 @@ def validate_endpoint_create_and_update_params(endpoint_type, managed, params):
                     ("Option --{} can only be used with managed "
                      "endpoints".format(option.replace("_", "-"))))
 
+    # because the Transfer service doesn't do network use level updates in a
+    # patchy way, *both* endpoint `POST`s *and* `PUT`s must either use
+    # - `network_use='custom'` with *every* other parameter specified, or
+    # - a preset/absent `network_use` with *no* other parameter specified (in
+    #   this case, Transfer will accept but ignore the others parameters if
+    #   given, leading to user confusion if we don't do this validation check)
+    custom_network_use_params = ('max_concurrency', 'preferred_concurrency',
+                                 'max_parallelism', 'preferred_parallelism')
+    if params['network_use'] == 'custom':
+        for option in custom_network_use_params:
+            if params[option] is None:
+                raise click.UsageError(
+                    "When using --network-use=custom, you must specify all "
+                    "{} parameters: {}".
+                    format(len(custom_network_use_params),
+                           ", ".join("--" + option.replace("_", "-")
+                                     for option in custom_network_use_params))
+                )
+    else:
+        for option in custom_network_use_params:
+            if params[option] is not None:
+                raise click.UsageError(
+                    "The {} options require you use --network-use=custom.".
+                    format("/".join("--" + option.replace("_", "-")
+                                    for option in custom_network_use_params))
+                )
+
     # make sure --(no-)managed and --subscription-id are mutually exclusive
     # if --managed given pass DEFAULT as the subscription_id
     # if --no-managed given, pass None
