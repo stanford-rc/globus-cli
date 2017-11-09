@@ -188,23 +188,28 @@ def endpoint_create_and_update_params(*args, **kwargs):
             "--network-use", default=None,
             type=click.Choice(["normal", "minimal", "aggressive", "custom"]),
             help=("Set the endpoint's network use level. If using custom, "
-                  "the endpoint's max and preferred concurrency must be set "
+                  "the endpoint's max and preferred concurrency and "
+                  "parallelism must be set "
                   "(Managed endpoints only) (Globus Connect Server only)"))(f)
         f = click.option(
             "--max-concurrency", type=int, default=None,
-            help=("Set the endpoint's max concurrency "
+            help=("Set the endpoint's max concurrency; "
+                  "requires --network-use=custom "
                   "(Managed endpoints only) (Globus Connect Server only)"))(f)
         f = click.option(
             "--preferred-concurrency", type=int, default=None,
-            help=("Set the endpoint's preferred concurrency "
+            help=("Set the endpoint's preferred concurrency; "
+                  "requires --network-use=custom "
                   "(Managed endpoints only) (Globus Connect Server only)"))(f)
         f = click.option(
             "--max-parallelism", type=int, default=None,
-            help=("Set the endpoint's max parallelism "
+            help=("Set the endpoint's max parallelism; "
+                  "requires --network-use=custom "
                   "(Managed endpoints only) (Globus Connect Server only)"))(f)
         f = click.option(
             "--preferred-parallelism", type=int, default=None,
-            help=("Set the endpoint's preferred parallelism "
+            help=("Set the endpoint's preferred parallelism; "
+                  "requires --network-use=custom "
                   "(Managed endpoints only) (Globus Connect Server only)"))(f)
 
         return f
