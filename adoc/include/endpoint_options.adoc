@@ -82,25 +82,25 @@ exclusive with --no-managed.
 *--network-use* '[ normal | minimal | aggressive | custom ]'::
 
 Set this endpoint's network use level. If using custom, this endpoint's max
-and preferred concurrency must be set. (Managed endpoints only) 
+and preferred concurrency and parallelism must be set. (Managed endpoints only) 
 (Globus Connect Server endpoints only)
 
 *--max-concurrency* 'INT'::
 
-Set this endpoint's max concurrency
+Set this endpoint's max concurrency; requires --network-use=custom
 (Managed endpoints only) (Globus Connect Server endpoints only)
 
 *--preferred-concurrency* 'INT'::
 
-Set this endpoint's preferred concurrency
+Set this endpoint's preferred concurrency; requires --network-use=custom
 (Managed endpoints only) (Globus Connect Server endpoints only)
 
 *--max-parallelism* 'INT'::
 
-Set this endpoint's max parallelism
+Set this endpoint's max parallelism; requires --network-use=custom
 (Managed endpoints only) (Globus Connect Server endpoints only)
 
 *--preferred-parallelism* 'INT'::
 
-Set this endpoint's preferred parallelism
+Set this endpoint's preferred parallelism; requires --network-use=custom
 (Managed endpoints only) (Globus Connect Server endpoints only)
