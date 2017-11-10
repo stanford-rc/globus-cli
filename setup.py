@@ -1,5 +1,14 @@
 import os
+import sys
 from setuptools import setup, find_packages
+
+
+if sys.version_info < (2, 7):
+    raise NotImplementedError("""\n
+##############################################################
+# globus-cli does not support python versions older than 2.7 #
+##############################################################""")
+
 
 # single source of truth for package version
 version_ns = {}
