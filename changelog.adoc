@@ -1,5 +1,17 @@
 = CLI Changelog
 
+== 1.2.2
+
+Enhancements:
+
+* Better errors when installation onto python2.6 is attempted (https://github.com/globus/globus-cli/pull/362[362])
+* Improve validation of Endpoint `--network-use` (https://github.com/globus/globus-cli/pull/361[361])
+
+Bugfixes:
+
+* Generate delegate proxy certs using UTC, not local time (https://github.com/globus/globus-cli/pull/360[360])
+
+
 == 1.2.1
 
 Bugfixes:
