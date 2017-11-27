@@ -5,7 +5,4 @@ _globus() {
         eval "$(env COMMANDLINE="${words[1,$CURRENT]}" globus --shell-complete ZSH)"
     fi
 }
-if [[ "$(basename "${(%):-%x}")" != "_globus" ]]; then
-    autoload -U compinit && compinit
-    compdef _globus globus
-fi
+compdef _globus globus
