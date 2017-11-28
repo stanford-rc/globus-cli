@@ -7,7 +7,7 @@ from globus_cli.helpers import is_verbose
 from globus_cli.config import (
     WHOAMI_ID_OPTNAME, WHOAMI_USERNAME_OPTNAME,
     WHOAMI_EMAIL_OPTNAME, WHOAMI_NAME_OPTNAME,
-    GLOBUS_ENV, lookup_option)
+    lookup_option)
 
 
 @click.command('whoami',
