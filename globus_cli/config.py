@@ -75,10 +75,11 @@ if GLOBUS_ENV:
     WHOAMI_NAME_OPTNAME = '{0}_whoami_identity_display_name'.format(GLOBUS_ENV)
 
     CLIENT_ID = {
-        'sandbox':  '33b6a241-bce4-4359-9c6d-09f88b3c9eef',
-        'test':     '0ebfd058-452f-40c3-babf-5a6b16a7b337',
-        'staging':  '3029c3cb-c8d9-4f2b-979c-c53330aa7327',
-        'preview':  'b2867dbb-0846-4579-8486-dc70763d700b',
+        'sandbox':      '33b6a241-bce4-4359-9c6d-09f88b3c9eef',
+        'integration':  'e0c31fd1-663b-44e1-840f-f4304bb9ee7a',
+        'test':         '0ebfd058-452f-40c3-babf-5a6b16a7b337',
+        'staging':      '3029c3cb-c8d9-4f2b-979c-c53330aa7327',
+        'preview':      'b2867dbb-0846-4579-8486-dc70763d700b',
     }.get(GLOBUS_ENV, CLIENT_ID)
 
 
