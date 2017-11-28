@@ -40,9 +40,6 @@ __all__ = [
 # CLI Native App definition
 # accessed via `internal_auth_client()` -- not exported
 CLIENT_ID = '95fdeba8-fac2-42bd-a357-e068d82ff78e'
-# an extra option (not exported) for using the CLI against other Globus
-# Environments (like the future beta environment)
-ENV_CLIENT_ID_OPTNAME = 'cli_client_id'
 
 # constants for global use
 OUTPUT_FORMAT_OPTNAME = 'output_format'
@@ -76,6 +73,13 @@ if GLOBUS_ENV:
     WHOAMI_USERNAME_OPTNAME = '{0}_whoami_identity_username'.format(GLOBUS_ENV)
     WHOAMI_EMAIL_OPTNAME = '{0}_whoami_identity_email'.format(GLOBUS_ENV)
     WHOAMI_NAME_OPTNAME = '{0}_whoami_identity_display_name'.format(GLOBUS_ENV)
+
+    CLIENT_ID = {
+        'sandbox':  '33b6a241-bce4-4359-9c6d-09f88b3c9eef',
+        'test':     '0ebfd058-452f-40c3-babf-5a6b16a7b337',
+        'staging':  '3029c3cb-c8d9-4f2b-979c-c53330aa7327',
+        'preview':  'b2867dbb-0846-4579-8486-dc70763d700b',
+    }.get(GLOBUS_ENV, CLIENT_ID)
 
 
 def get_config_obj(system=False):
@@ -179,12 +183,7 @@ def set_transfer_access_token(token, expires_at):
 
 
 def internal_auth_client():
-    # check to see if an alternate client ID has been specified by the
-    # environment
-    client_id = lookup_option(ENV_CLIENT_ID_OPTNAME,
-                              environment=GLOBUS_ENV) or CLIENT_ID
-
-    return globus_sdk.NativeAppAuthClient(client_id, app_name=version.app_name)
+    return globus_sdk.NativeAppAuthClient(CLIENT_ID, app_name=version.app_name)
 
 
 def setup_logging(level="DEBUG"):
