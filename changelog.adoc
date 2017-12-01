@@ -1,5 +1,11 @@
 = CLI Changelog
 
+== 1.2.3
+
+Enhancements:
+
+* Add support for `GLOBUS_SDK_ENVIRONMENT="preview"`
+
 == 1.2.2
 
 Enhancements:
