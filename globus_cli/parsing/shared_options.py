@@ -325,9 +325,12 @@ def task_submission_options(f):
             "presence of network failures."))(f)
     f = click.option(
         "--label", default=None, help="Set a label for this task.")(f)
-    f = f = click.option(
+    f = click.option(
         "--deadline", default=None, type=ISOTimeType(),
         help="Set a deadline for this to be canceled if not completed by.")(f)
+    f = click.option('--skip-activation-check', is_flag=True, help=(
+            "Submit the task even if the endpoint(s) "
+            "aren't currently activated."))(f)
 
     return f
 

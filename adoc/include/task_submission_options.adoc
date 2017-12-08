@@ -22,3 +22,10 @@ a task with the same submission id in case of unreliable networks.
 Note that this is not the same id as the task's id once it is submitted.
 If not specified the Globus CLI will still generate a submission id and safely
 resubmit tasks on network errors.
+
+*--skip-activation-check*::
+
+Submit the task even if one or more of the target endpoints are not currently
+activated. Once all target endpoints have been activated the task will begin
+normally. If this option is given, auto-activation will not be attempted
+on the target endpoints.
