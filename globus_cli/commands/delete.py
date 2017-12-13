@@ -28,7 +28,8 @@ from globus_cli.services.transfer import get_client, autoactivate
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_OPTPATH.metavar,
                 type=ENDPOINT_PLUS_OPTPATH)
 def delete_command(batch, ignore_missing, recursive, endpoint_plus_path,
-                   label, submission_id, dry_run, deadline):
+                   label, submission_id, dry_run, deadline,
+                   skip_activation_check):
     """
     Executor for `globus delete`
     """
@@ -38,14 +39,18 @@ def delete_command(batch, ignore_missing, recursive, endpoint_plus_path,
             'delete requires either a PATH OR --batch')
 
     client = get_client()
-    autoactivate(client, endpoint_id, if_expires_in=60)
+
+    # attempt to activate unless --skip-activation-check is given
+    if not skip_activation_check:
+        autoactivate(client, endpoint_id, if_expires_in=60)
 
     delete_data = DeleteData(client, endpoint_id,
                              label=label,
                              recursive=recursive,
                              ignore_missing=ignore_missing,
                              submission_id=submission_id,
-                             deadline=deadline)
+                             deadline=deadline,
+                             skip_activation_check=skip_activation_check)
 
     if batch:
         # although this sophisticated structure (like that in transfer)
