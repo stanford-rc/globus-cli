@@ -1,4 +1,5 @@
 import click
+import json
 
 from globus_cli.parsing import common_options, task_id_arg
 from globus_cli.safeio import formatted_print
@@ -37,7 +38,21 @@ def task_event_list(task_id, limit, filter_errors, filter_non_errors):
     event_iterator = client.task_event_list(
         task_id, num_results=limit, filter=filter_string)
 
+    def squashed_json_details(x):
+        is_json = False
+        try:
+            loaded = json.loads(x['details'])
+            is_json = True
+        except ValueError:
+            loaded = x['details']
+
+        if is_json:
+            return json.dumps(loaded, separators=(',', ':'))
+        else:
+            return loaded.replace('\n', '\\n')
+
     formatted_print(event_iterator,
                     fields=(('Time', 'time'), ('Code', 'code'),
-                            ('Is Error', 'is_error'), ('Details', 'details')),
+                            ('Is Error', 'is_error'),
+                            ('Details', squashed_json_details)),
                     json_converter=iterable_response_to_dict)
