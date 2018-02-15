@@ -1,5 +1,17 @@
 = CLI Changelog
 
+== 1.3.0
+
+Enhancements:
+
+* Add `--skip-activation-check` option for submitting tasks regardless of the activation status of an endpoint (https://github.com/globus/globus-cli/pull/367[367])
+* Improve `task event-details` output formatting (https://github.com/globus/globus-cli/pull/373[373])
+
+Other:
+
+* Update Globus SDK to v1.5.0
+
+
 == 1.2.3
 
 Enhancements:
