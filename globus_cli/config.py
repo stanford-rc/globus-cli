@@ -83,13 +83,13 @@ if GLOBUS_ENV:
     }.get(GLOBUS_ENV, CLIENT_ID)
 
 
-def get_config_obj(system=False):
+def get_config_obj(system=False, file_error=False):
     if system:
         path = '/etc/globus.cfg'
     else:
         path = os.path.expanduser("~/.globus.cfg")
 
-    return ConfigObj(path, encoding='utf-8')
+    return ConfigObj(path, encoding='utf-8', file_error=file_error)
 
 
 def lookup_option(option, section='cli', environment=None):
