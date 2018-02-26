@@ -6,7 +6,9 @@ from globus_sdk import DeleteData
 from globus_cli.parsing import (
     common_options, task_submission_options, TaskPath, ENDPOINT_PLUS_OPTPATH,
     shlex_process_stdin)
-from globus_cli.safeio import formatted_print, FORMAT_TEXT_RECORD
+from globus_cli.safeio import (
+    safeprint, formatted_print, FORMAT_TEXT_RECORD,
+    err_is_terminal, term_is_interactive)
 
 from globus_cli.services.transfer import get_client, autoactivate
 
@@ -20,6 +22,9 @@ from globus_cli.services.transfer import get_client, autoactivate
     '--recursive', '-r', is_flag=True, help='Recursively delete dirs')
 @click.option('--ignore-missing', '-f', is_flag=True,
               help="Don't throw errors if the file or dir is absent")
+@click.option('--star-silent', '--unsafe', 'star_silent', is_flag=True,
+              help=("Don't prompt when the trailing character is a \"*\". "
+                    "Implicit in --batch"))
 @click.option('--batch', is_flag=True,
               help=('Accept a batch of paths on stdin (i.e. run in '
                     'batchmode). Uses ENDPOINT_ID as passed on the '
@@ -27,8 +32,8 @@ from globus_cli.services.transfer import get_client, autoactivate
                     'a prefix to all paths given'))
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_OPTPATH.metavar,
                 type=ENDPOINT_PLUS_OPTPATH)
-def delete_command(batch, ignore_missing, recursive, endpoint_plus_path,
-                   label, submission_id, dry_run, deadline,
+def delete_command(batch, ignore_missing, star_silent, recursive,
+                   endpoint_plus_path, label, submission_id, dry_run, deadline,
                    skip_activation_check):
     """
     Executor for `globus delete`
@@ -68,6 +73,17 @@ def delete_command(batch, ignore_missing, recursive, endpoint_plus_path,
         shlex_process_stdin(
             process_batch_line, 'Enter paths to delete, line by line.')
     else:
+        if not star_silent and path.endswith('*'):
+            # not intuitive, but `click.confirm(abort=True)` prints to stdout
+            # unnecessarily, which we don't really want...
+            # only do this check if stderr is a pty
+            if (err_is_terminal() and
+                term_is_interactive() and
+                not click.confirm(
+                    'Are you sure you want to delete all files matching "{}"?'
+                    .format(path), err=True)):
+                safeprint('Aborted.', write_to_stderr=True)
+                click.get_current_context().exit(1)
         delete_data.add_item(path)
 
     if dry_run:
