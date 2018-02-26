@@ -13,28 +13,29 @@ class PrintableErrorField(object):
     TEXT_PREFIX = 'Globus CLI Error:'
 
     def __init__(self, name, value, multiline=False):
-        self.name = safe_stringify(name)
-        self.value = safe_stringify(value)
         self.multiline = multiline
-        self._format_value()
+        self.name = safe_stringify(name)
+        self.raw_value = safe_stringify(value)
+        self.value = self._format_value(self.raw_value)
 
     @property
     def _text_prefix_len(self):
         return len(self.TEXT_PREFIX)
 
-    def _format_value(self):
+    def _format_value(self, val):
         """
-        formats self.value to be good for textmode printing
-        self.value must be unicode before this is called, and will remain so
+        formats a value to be good for textmode printing
+        val must be unicode
         """
         name = self.name + ':'
-        if not self.multiline or '\n' not in self.value:
-            self.value = u'{0} {1}'.format(name.ljust(self._text_prefix_len),
-                                           self.value)
+        if not self.multiline or '\n' not in val:
+            val = u'{0} {1}'.format(name.ljust(self._text_prefix_len), val)
         else:
             spacer = '\n' + ' '*(self._text_prefix_len + 1)
-            self.value = u'{0}{1}{2}'.format(
-                name, spacer, spacer.join(self.value.split('\n')))
+            val = u'{0}{1}{2}'.format(
+                name, spacer, spacer.join(val.split('\n')))
+
+        return val
 
 
 def write_error_info(error_name, fields, message=None):
@@ -44,7 +45,7 @@ def write_error_info(error_name, fields, message=None):
         message = json.dumps(
             dict(
                 [('error_name', error_name)] +
-                [(f.name, f.value) for f in fields]),
+                [(f.name, f.raw_value) for f in fields]),
             indent=2)
     if not message:
         message = u'A{0} {1} Occurred.\n{2}'.format(
