@@ -1,5 +1,6 @@
 from globus_cli.parsing import globus_group
 
+from globus_cli.commands.config.filename import filename_command
 from globus_cli.commands.config.init import init_command
 from globus_cli.commands.config.remove import remove_command
 from globus_cli.commands.config.set import set_command
@@ -33,6 +34,7 @@ def config_command():
     pass
 
 
+config_command.add_command(filename_command)
 config_command.add_command(init_command)
 config_command.add_command(remove_command)
 config_command.add_command(set_command)
