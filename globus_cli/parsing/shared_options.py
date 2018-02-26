@@ -175,12 +175,14 @@ def endpoint_create_and_update_params(*args, **kwargs):
         # Managed Endpoint options
         f = click.option(
             "--managed", "managed", is_flag=True, flag_value=True,
+            default=None,
             help=("Set the endpoint as a managed endpoint. Requires the "
                   "user to be a subscription manager. If the user has "
                   "multiple subscription IDs, --subscription-id must be used "
                   "instead"))(f)
         f = click.option(
             "--no-managed", "managed", is_flag=True, flag_value=False,
+            default=None,
             help=("Unset the endpoint as a managed endpoint. "
                   "Does not require the user to be a subscription manager. "
                   "Mutually exclusive with --subscription-id"))(f)
