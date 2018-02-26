@@ -18,7 +18,7 @@ The *globus delete* command submits an asynchronous task that deletes files
 and/or directories on the target endpoint.
 
 *globus delete* has two modes. Single target, which deletes one
-file or one directory, and batch, which takes in several lines to delete 
+file or one directory, and batch, which takes in several lines to delete
 multiple files or directories. See "Batch Input" below for more information.
 
 Symbolic links are never followed - only unlinked (deleted).
@@ -29,12 +29,12 @@ include::include/cli_autoactivate.adoc[]
 
 == Batch Input
 
-If you give a SOURCE_PATH without the --batch flag, you will submit a 
+If you give a SOURCE_PATH without the --batch flag, you will submit a
 single-file or single-directory delete task. This has
 behavior similar to `cp` and `cp -r`, across endpoints.
 
 Using `--batch`, *globus delete* can submit a task which deletes
-multiple files or directories. Lines are taken from stdin, respecting quotes, 
+multiple files or directories. Lines are taken from stdin, respecting quotes,
 and every line is treated as a path to a file or directory to delete.
 
 Lines are of the form
@@ -69,6 +69,13 @@ if using batch input.
 
 Ignore nonexistent files and directories. The task will succeed even if given
 paths do not exist.
+
+*--star-silent, --unsafe*::
+
+Don't prompt when the trailing character is a "\*". Implicit in *--batch*.
++
+By default, 'globus delete $ep_id:~/foo*' will prompt before deleting if used
+in an interactive context.
 
 include::include/task_submission_options.adoc[]
 
