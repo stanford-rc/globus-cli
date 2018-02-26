@@ -16,7 +16,7 @@ The *globus transfer* command submits an asynchronous task that copies files
 and/or directories between endpoints.
 
 *globus transfer* has two modes. Single target, which transfers one
-file or one directory, and batch, which takes in several lines to transfer 
+file or one directory, and batch, which takes in several lines to transfer
 multiple files or directories. See "Batch Input" below for more information.
 
 *globus transfer* will always place the dest files in a
@@ -24,11 +24,11 @@ consistent, deterministic location.  The contents of a source directory will
 be placed inside the dest directory.  A source file will be copied to
 the dest file path, which must not be an existing  directory.  All
 intermediate / parent directories on the dest will be automatically
-created if they don't exist. 
+created if they don't exist.
 
 If the files or directories given as input are symbolic links, they are
 followed.  However, no other symbolic links are followed and no symbolic links
-are ever created on the dest.  
+are ever created on the dest.
 
 
 include::include/cli_autoactivate.adoc[]
@@ -59,9 +59,13 @@ these paths will be used as prefixes to their respective paths on stdin.
 
 *--batch*::
 
-Starts batch mode input for transfers, which takes lines in the form 
+Starts batch mode input for transfers, which takes lines in the form
 [--recursive] SOURCE_PATH DEST_PATH from stdin to transfer multiple
 files and/or directories. See "Batch Input" above for more information.
+
+Mutually exclusive with *--recursive*.
+i.e. This is invalid: 'globus transfer --recursive --batch ...'.
+Use of *--recursive* inside of batch input is distinct, and allowed.
 
 *-r, --recursive*::
 
@@ -70,10 +74,15 @@ of all files and directories inside of the source directory to the destination
 directory. Note that for batch input, each directory must be marked as
 recursive individually unlike 'globus delete'.
 
+Mutually exclusive with *--batch*.
+If you want to recursively transfer directories in *--batch* input, see
+"Batch Input" above.
+
 *-s, --sync-level [exists|size|mtime|checksum]*::
 
 Set the level at which the transfer task will decide to replace a file at the
-destination with a file at the source with the same name. If not set, 
+destination with a file at the source with the same name. If not set, files
+at the destination will be replaced by default.
 +
 *exists* will only copy files that do not exist at the destination
 +
@@ -93,8 +102,8 @@ will not have their modification times preserved.
 
 *--verify-checksum / --no-verify-checksum*::
 
-After transfer, verify that the source and destination file checksums match. 
-If they don’t, re-transfer the entire file and keep trying until it succeeds. 
+After transfer, verify that the source and destination file checksums match.
+If they don’t, re-transfer the entire file and keep trying until it succeeds.
 Defaults to True.
 
 *--encrypt*::
@@ -132,16 +141,39 @@ $ dest_ep=ddb59af0-6d04-11e5-ba46-22000b92c6ec
 $ globus transfer $source_ep:/share/godata/ $dest_ep:~/mynewdir/ --recursive
 ----
 
-Use the batch input method to transfer multiple files and or dirs:
+Use the batch input method to transfer multiple files and directories:
 
 ----
 $ source_ep=ddb59aef-6d04-11e5-ba46-22000b92c6ec
 $ dest_ep=ddb59af0-6d04-11e5-ba46-22000b92c6ec
 $ globus transfer $source_ep $dest_ep --batch
+# lines starting with '#' are comments
+# and blank lines (for spacing) are allowed
+
+# files in the batch
 /share/godata/file1.txt ~/myfile1.txt
 /share/godata/file2.txt ~/myfile2.txt
 /share/godata/file3.txt ~/myfile3.txt
+# these are recursive transfers in the batch
+# you can use -r, --recursive, and put the option before or after
 /share/godata ~/mygodatadir -r
+--recursive godata mygodatadir2
+<EOF>
+----
+
+Use the batch input method to transfer multiple files and directories, with a
+prefix on the source and destination endpoints (this is identical to the case
+above, but much more concise):
+
+----
+$ source_ep=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ dest_ep=ddb59af0-6d04-11e5-ba46-22000b92c6ec
+$ globus transfer $source_ep:/share/ $dest_ep:~/ --batch
+godata/file1.txt myfile1.txt
+godata/file2.txt myfile2.txt
+godata/file3.txt myfile3.txt
+godata mygodatadir -r
+--recursive godata mygodatadir2
 <EOF>
 ----
 
