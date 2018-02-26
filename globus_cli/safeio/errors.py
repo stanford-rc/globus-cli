@@ -14,7 +14,8 @@ class PrintableErrorField(object):
 
     def __init__(self, name, value, multiline=False):
         self.name = safe_stringify(name)
-        self.value = safe_stringify(value)
+        self.raw_value = safe_stringify(value)
+        self.value = self.raw_value
         self.multiline = multiline
         self._format_value()
 
@@ -44,7 +45,7 @@ def write_error_info(error_name, fields, message=None):
         message = json.dumps(
             dict(
                 [('error_name', error_name)] +
-                [(f.name, f.value) for f in fields]),
+                [(f.name, f.raw_value) for f in fields]),
             indent=2)
     if not message:
         message = u'A{0} {1} Occurred.\n{2}'.format(
