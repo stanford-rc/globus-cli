@@ -18,9 +18,15 @@ from globus_cli.services.transfer import get_client, assemble_generic_doc
 @click.option('--permissions', required=True,
               type=CaseInsensitiveChoice(('r', 'rw')),
               help='Permissions to add. Read-Only or Read/Write')
+@click.option('--notify-email', metavar='EMAIL_ADDRESS',
+              help=('An email address to notify that '
+                    'the permission has been added'))
+@click.option('--notify-message', metavar='MESSAGE',
+              help='A custom message to add to email notifications')
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_REQPATH.metavar,
                 type=ENDPOINT_PLUS_REQPATH)
-def create_command(principal, permissions, endpoint_plus_path):
+def create_command(principal, permissions, endpoint_plus_path,
+                   notify_email, notify_message):
     """
     Executor for `globus endpoint permission create`
     """
@@ -43,9 +49,13 @@ def create_command(principal, permissions, endpoint_plus_path):
         principal_val = maybe_lookup_identity_id(principal_val, provision=True)
         principal_type = 'identity'
 
+    if not notify_email:
+        notify_message = None
+
     rule_data = assemble_generic_doc(
         'access', permissions=permissions, principal=principal_val,
-        principal_type=principal_type, path=path)
+        principal_type=principal_type, path=path,
+        notify_email=notify_email, notify_message=notify_message)
 
     res = client.add_endpoint_acl_rule(endpoint_id, rule_data)
     formatted_print(res, text_format=FORMAT_TEXT_RECORD,

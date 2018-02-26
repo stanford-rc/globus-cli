@@ -12,7 +12,7 @@ globus endpoint permission create - Create an access control rule
 
 == DESCRIPTION
 
-The *globus endpoint permission create* creates a new access control on the 
+The *globus endpoint permission create* creates a new access control on the
 the target endpoint granting users new permissions on the given path.
 
 The target endpoint must be a shared endpoint or an s3 endpoint, as only these
@@ -36,13 +36,22 @@ Give this permission to anyone who has logged in.
 
 Give this permission to anyone even if they aren't logged in.
 
-*--group* 'GROUP_ID'::                
+*--group* 'GROUP_ID'::
 
 Give this permission to anyone in the given group.
 
 *--identity* 'IDENTITY_ID_OR_NAME'::
 
 Give this permission to a specific identity in Globus Auth.
+
+*--notify-email* 'EMAIL_ADDRESS'::
+
+An email address to notify that the permission has been added.
+
+*--notify-message* 'TEXT'::
+
+A custom message to add to email notifications.
+
 
 include::include/common_options.adoc[]
 
