@@ -26,6 +26,10 @@ Manage Consents Page:
 
 _LOGOUT_EPILOG = """\
 You are now successfully logged out of the Globus CLI.
+You may also want to logout of any browser session you have with Globus:
+
+  https://auth.globus.org/v2/web/logout
+
 Before attempting any further CLI commands, you will have to login again using
 
   globus login
