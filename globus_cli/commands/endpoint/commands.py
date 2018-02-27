@@ -14,6 +14,7 @@ from globus_cli.commands.endpoint.is_activated import endpoint_is_activated
 from globus_cli.commands.endpoint.deactivate import endpoint_deactivate
 from globus_cli.commands.endpoint.my_shared_endpoint_list import (
     my_shared_endpoint_list)
+from globus_cli.commands.endpoint.local_id import local_id
 
 
 @globus_group(name='endpoint', help='Manage Globus endpoint definitions')
@@ -38,3 +39,4 @@ endpoint_command.add_command(endpoint_is_activated)
 endpoint_command.add_command(endpoint_deactivate)
 
 endpoint_command.add_command(my_shared_endpoint_list)
+endpoint_command.add_command(local_id)
