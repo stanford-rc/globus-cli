@@ -1,10 +1,10 @@
 import click
 
 from globus_sdk import TransferData
-
 from globus_cli.parsing import (
     CaseInsensitiveChoice, common_options, task_submission_options,
-    TaskPath, ENDPOINT_PLUS_OPTPATH, shlex_process_stdin)
+    TaskPath, ENDPOINT_PLUS_OPTPATH, shlex_process_stdin,
+    HiddenOption)
 from globus_cli.safeio import formatted_print, FORMAT_TEXT_RECORD
 
 from globus_cli.services.transfer import get_client, autoactivate
@@ -92,10 +92,14 @@ from globus_cli.services.transfer import get_client, autoactivate
                 type=ENDPOINT_PLUS_OPTPATH)
 @click.argument('destination', metavar='DEST_ENDPOINT_ID[:DEST_PATH]',
                 type=ENDPOINT_PLUS_OPTPATH)
+@click.option('--perf-cc', type=int, cls=HiddenOption)
+@click.option('--perf-p', type=int, cls=HiddenOption)
+@click.option('--perf-pp', type=int, cls=HiddenOption)
+@click.option('--perf-udt', is_flag=True, default=None, cls=HiddenOption)
 def transfer_command(batch, sync_level, recursive, destination, source, label,
                      preserve_mtime, verify_checksum, encrypt, submission_id,
-                     dry_run, delete, deadline, skip_activation_check,
-                     notify):
+                     dry_run, delete, deadline, skip_activation_check, notify,
+                     perf_cc, perf_p, perf_pp, perf_udt):
     """
     Executor for `globus transfer`
     """
@@ -113,6 +117,22 @@ def transfer_command(batch, sync_level, recursive, destination, source, label,
             ('transfer requires either SOURCE_PATH and DEST_PATH or '
              '--batch'))
 
+    # because python can't handle multiple **kwargs expansions in a single
+    # call, we need to get a little bit clever
+    # both the performance options (of which there are a few), and the
+    # notification options (also there are a few) have elements which should be
+    # omitted in some cases
+    # notify comes to us clean, perf opts need more care
+    # put them together into a dict before passing to TransferData
+    kwargs = {}
+    perf_opts = dict(
+        (k, v) for (k, v) in
+        dict(perf_cc=perf_cc, perf_p=perf_p,
+             perf_pp=perf_pp, perf_udt=perf_udt).items()
+        if v is not None)
+    kwargs.update(perf_opts)
+    kwargs.update(notify)
+
     client = get_client()
     transfer_data = TransferData(
         client, source_endpoint, dest_endpoint,
@@ -120,7 +140,7 @@ def transfer_command(batch, sync_level, recursive, destination, source, label,
         preserve_timestamp=preserve_mtime, encrypt_data=encrypt,
         submission_id=submission_id, delete_destination_extra=delete,
         deadline=deadline, skip_activation_check=skip_activation_check,
-        **notify)
+        **kwargs)
 
     if batch:
         @click.command()
