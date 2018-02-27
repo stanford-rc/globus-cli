@@ -29,3 +29,11 @@ Submit the task even if one or more of the target endpoints are not currently
 activated. Once all target endpoints have been activated the task will begin
 normally. If this option is given, auto-activation will not be attempted
 on the target endpoints.
+
+
+*--notify*::
+
+Comma separated list of task events which notify by email.
+'on' and 'off' may be used to enable or disable notifications for all
+event types. Otherwise, use 'succeeded', 'failed', or 'inactive'.
+e.g. '--notify failed,inactive' to skip notifications on successful tasks.
