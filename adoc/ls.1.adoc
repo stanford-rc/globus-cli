@@ -43,6 +43,23 @@ rate limits.
 Set the depth limit when using the --recursive option. Defaults to 3 if not
 given.
 
+*--filter* 'FILTER_PATTERN'::
+
+Filter results to filenames matching the given pattern.
++
+Filter patterns must start with `=`, `~`, `!`, or `!~`
+If none of these are given, `=` will be used
++
+`=` does exact matching
++
+`~` does regex matching, supporting globs (*)
++
+`!` does inverse `=` matching
++
+`!~` does inverse `~` matching
++
+See the examples section for various forms of usage.
+
 include::include/common_options.adoc[]
 
 
@@ -52,14 +69,37 @@ List files and dirs in your default directory on an endpoint.
 
 ----
 $ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
-$ ls $ep_id
+$ globus ls $ep_id
 ----
 
 List files and dirs on a specific path on an endpoint.
 
 ----
 $ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
-$ ls $ep_id:/share/godata/
+$ globus ls $ep_id:/share/godata/
+----
+
+List files and dirs on a specific path on an endpoint, filtering in various
+ways.
+
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ globus ls $ep_id:/share/godata/ --filter '~*.txt'  # all txt files
+$ globus ls $ep_id:/share/godata/ --filter '!~file1.*'  # not starting in "file1."
+$ globus ls $ep_id:/share/godata/ --filter '~*ile3.tx*'  # anything with "ile3.tx"
+$ globus ls $ep_id:/share/godata/ --filter '=file2.txt'  # only "file2.txt"
+$ globus ls $ep_id:/share/godata/ --filter 'file2.txt'  # same as '=file2.txt'
+$ globus ls $ep_id:/share/godata/ --filter '!=file2.txt'  # anything but "file2.txt"
+----
+
+Compare a grep with a `globus ls --filter`. These two are the same, but the
+filter will be faster because it doesn't require that filenames which are
+filtered out are returned to the CLI:
+
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ globus ls $ep_id:/share/godata/ | egrep '*.txt'  # done with grep, okay
+$ globus ls $ep_id:/share/godata/ --filter '~*.txt'  # done with --filter, better
 ----
 
 
