@@ -94,7 +94,8 @@ from globus_cli.services.transfer import get_client, autoactivate
                 type=ENDPOINT_PLUS_OPTPATH)
 def transfer_command(batch, sync_level, recursive, destination, source, label,
                      preserve_mtime, verify_checksum, encrypt, submission_id,
-                     dry_run, delete, deadline, skip_activation_check):
+                     dry_run, delete, deadline, skip_activation_check,
+                     notify):
     """
     Executor for `globus transfer`
     """
@@ -118,7 +119,8 @@ def transfer_command(batch, sync_level, recursive, destination, source, label,
         label=label, sync_level=sync_level, verify_checksum=verify_checksum,
         preserve_timestamp=preserve_mtime, encrypt_data=encrypt,
         submission_id=submission_id, delete_destination_extra=delete,
-        deadline=deadline, skip_activation_check=skip_activation_check)
+        deadline=deadline, skip_activation_check=skip_activation_check,
+        **notify)
 
     if batch:
         @click.command()
