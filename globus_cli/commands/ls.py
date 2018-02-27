@@ -64,14 +64,22 @@ def ls_command(endpoint_plus_path, recursive_depth_limit,
     if path:
         ls_params["path"] = path
     if filter_val:
-        # these chars have special meaning in the LS API's filter clause
-        if ':' in filter_val or '/' in filter_val:
-            raise click.UsageError('--filter cannot contain ":" or "/"')
+        # this char has special meaning in the LS API's filter clause
+        # can't be part of the pattern (but we don't support globbing across
+        # dir structures anyway)
+        if '/' in filter_val:
+            raise click.UsageError('--filter cannot contain "/"')
         # format into a simple filter clause which operates on filenames
         ls_params['filter'] = 'name:{}'.format(filter_val)
 
     # get the `ls` result
     if recursive:
+        # NOTE:
+        # --recursive and --filter have an interplay that some users may find
+        # surprising
+        # if we're asked to change or "improve" the behavior in the future, we
+        # could do so with "type:dir" or "type:file" filters added in, and
+        # potentially work out some viable behavior based on what people want
         res = client.recursive_operation_ls(
             endpoint_id, depth=recursive_depth_limit, **ls_params)
     else:

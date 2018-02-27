@@ -47,7 +47,7 @@ given.
 
 Filter results to filenames matching the given pattern.
 +
-Filter patterns must start with `=`, `~`, `!`, or `!~`
+Filter patterns must start with `=`, `~`, `!`, or `!~` +
 If none of these are given, `=` will be used
 +
 `=` does exact matching
@@ -98,7 +98,7 @@ filtered out are returned to the CLI:
 
 ----
 $ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
-$ globus ls $ep_id:/share/godata/ | egrep '*.txt'  # done with grep, okay
+$ globus ls $ep_id:/share/godata/ | egrep '.*\.txt$'  # done with grep, okay
 $ globus ls $ep_id:/share/godata/ --filter '~*.txt'  # done with --filter, better
 ----
 
