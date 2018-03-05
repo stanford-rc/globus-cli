@@ -143,14 +143,20 @@ def get_all_choices(completed_args, cur, quoted):
 
 
 def do_bash_complete():
-    comp_words, quoted = safe_split_line(os.environ['COMP_WORDS'])
-    cur_index = int(os.environ['COMP_CWORD'])
-    try:
-        cur = comp_words[cur_index]
-        completed_args = comp_words[1:-1]
-    except IndexError:
+    comp_line = os.environ.get('COMP_LINE', '')
+    comp_words, quoted = safe_split_line(comp_line)
+    cur_index = int(os.environ.get('COMP_POINT', len(comp_line)))
+
+    # now, figure out the current word in the line by "parsing"
+    # the chunk of it up to cur_index
+    partial_comp_words, _ = safe_split_line(comp_line[:cur_index])
+    cur = partial_comp_words[-1]
+
+    if comp_line[-1].isspace():
         cur = None
         completed_args = comp_words[1:]
+    else:
+        completed_args = comp_words[1:-1]
 
     choices = [name for (name, helpstr) in
                get_all_choices(completed_args, cur, quoted)]
