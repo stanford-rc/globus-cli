@@ -6,7 +6,7 @@ from globus_cli.safeio import safeprint
 from globus_cli.parsing.hidden_option import HiddenOption
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
 
-SUPPORTED_SHELLS = ['BASH', 'ZSH']
+SUPPORTED_SHELLS = ('BASH', 'ZSH')
 
 
 def safe_split_line(inputline):
@@ -113,7 +113,8 @@ def get_all_choices(completed_args, cur, quoted):
         # comparisons / matching later on
         if isinstance(matching_choice_opt.type, CaseInsensitiveChoice):
             match_func = match_nocase
-        choices = matching_choice_opt.type.choices
+        choices = [(x, matching_choice_opt.help) for x in
+                   matching_choice_opt.type.choices]
     # if cur looks like an option, just look for options
     # but skip if it's quoted text
     elif cur and cur.startswith('-') and not quoted:
@@ -126,16 +127,17 @@ def get_all_choices(completed_args, cur, quoted):
                 # the cur appears to be a short opt already
                 if opt.startswith('--') or (
                         len(cur) > 1 and cur[1] != '-'):
-                    choices.append(opt)
+                    choices.append((opt, param.help))
     # and if it's a multicommand we see, get the list of subcommands
     elif isinstance(ctx.command, click.MultiCommand) and not quoted:
-        choices = ctx.command.list_commands(ctx)
+        choices = [(cmdname, ctx.command.get_command(ctx, cmdname).short_help)
+                   for cmdname in ctx.command.list_commands(ctx)]
     else:
         pass
 
     # now, do final filtering
     if cur:
-        choices = [n for n in choices if match_func(n, cur)]
+        choices = [(n, h) for (n, h) in choices if match_func(n, cur)]
 
     return choices
 
@@ -150,7 +152,8 @@ def do_bash_complete():
         cur = None
         completed_args = comp_words[1:]
 
-    choices = get_all_choices(completed_args, cur, quoted)
+    choices = [name for (name, helpstr) in
+               get_all_choices(completed_args, cur, quoted)]
 
     safeprint('\t'.join(choices), newline=False)
     click.get_current_context().exit(0)
@@ -168,7 +171,24 @@ def do_zsh_complete():
         cur = None
         completed_args = comp_words
 
+    def clean_help(helpstr):
+        """
+        Replace ' with '"'"'
+
+        Because we'll put these single quote chars in '...'
+        quotation, we need to do
+        '   -- end single quotes
+        "'" -- single quote string (will concatenate in ZSH)
+        '   -- start single quotes again
+
+        This is hard to read, but one of the less insane ways to write this in
+        python is with a tripe-quoted string.
+        """
+        return helpstr.replace("'", """'"'"'""")
+
     choices = get_all_choices(completed_args, cur, quoted)
+    choices = ['{}\\:"{}"'.format(name, clean_help(helpstr))
+               for (name, helpstr) in choices]
 
     safeprint("_arguments '*: :(({}))'".format('\n'.join(choices)),
               newline=False)
