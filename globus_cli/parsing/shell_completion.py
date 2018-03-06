@@ -77,6 +77,13 @@ def get_completion_context(args):
 
 
 def get_all_choices(completed_args, cur, quoted):
+    """
+    This is the main completion function.
+    Inputs:
+    - completed_args: a list of already-completed arguments
+    - cur: the current "word in progress" or None
+    - quoted: is cur part of a quoted string?
+    """
     ctx = get_completion_context(completed_args)
     if not ctx:
         return []
@@ -122,12 +129,13 @@ def get_all_choices(completed_args, cur, quoted):
             # skip hidden options
             if isinstance(param, HiddenOption):
                 continue
-            for opt in param.opts:
-                # only add long-opts, never short opts to completion, unless
-                # the cur appears to be a short opt already
-                if opt.startswith('--') or (
-                        len(cur) > 1 and cur[1] != '-'):
-                    choices.append((opt, param.help))
+            for optset in (param.opts, param.secondary_opts):
+                for opt in optset:
+                    # only add long-opts, never short opts to completion,
+                    # unless the cur appears to be a short opt already
+                    if opt.startswith('--') or (
+                            len(cur) > 1 and cur[1] != '-'):
+                        choices.append((opt, param.help))
     # and if it's a multicommand we see, get the list of subcommands
     elif isinstance(ctx.command, click.MultiCommand) and not quoted:
         choices = [(cmdname, ctx.command.get_command(ctx, cmdname).short_help)
