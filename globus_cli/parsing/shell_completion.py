@@ -187,8 +187,12 @@ def do_zsh_complete():
         completed_args = comp_words
 
     def clean_help(helpstr):
-        """
-        Replace ' with '"'"'
+        r"""
+        Replace
+            " with \"
+            ' with '"'"'
+            ` with \`
+            $ with \$
 
         Because we'll put these single quote chars in '...'
         quotation, we need to do
@@ -196,7 +200,11 @@ def do_zsh_complete():
         "'" -- single quote string (will concatenate in ZSH)
         '   -- start single quotes again
         """
-        return helpstr.replace("'", "'\"'\"'")
+        return (helpstr
+                .replace('"', '\\"')
+                .replace("'", "'\"'\"'")
+                .replace("`", "\\`")
+                .replace("$", "\\$"))
 
     choices = get_all_choices(completed_args, cur, quoted)
     choices = ['{}\\:"{}"'.format(name, clean_help(helpstr))
