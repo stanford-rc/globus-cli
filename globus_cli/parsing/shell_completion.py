@@ -1,5 +1,6 @@
 import os
 import shlex
+import textwrap
 import click
 
 from globus_cli.safeio import safeprint
@@ -194,11 +195,8 @@ def do_zsh_complete():
         '   -- end single quotes
         "'" -- single quote string (will concatenate in ZSH)
         '   -- start single quotes again
-
-        This is hard to read, but one of the less insane ways to write this in
-        python is with a tripe-quoted string.
         """
-        return helpstr.replace("'", """'"'"'""")
+        return helpstr.replace("'", "'\"'\"'")
 
     choices = get_all_choices(completed_args, cur, quoted)
     choices = ['{}\\:"{}"'.format(name, clean_help(helpstr))
@@ -206,6 +204,51 @@ def do_zsh_complete():
 
     safeprint("_arguments '*: :(({}))'".format('\n'.join(choices)),
               newline=False)
+
+
+def print_completer_option(f):
+    bash_shell_completer = textwrap.dedent("""\
+    _globus_completion () {
+      local IFS=$'\\t'
+      if type globus > /dev/null; then
+        COMPREPLY=( $( env COMP_LINE="$COMP_LINE" COMP_POINT="$COMP_POINT" \\
+                       globus --shell-complete BASH ) )
+      else
+        COMPREPLY=( )
+      fi
+      return 0
+    }
+    complete -F _globus_completion -o default globus;
+    """)
+    zsh_shell_completer = textwrap.dedent("""\
+    #compdef globus
+    _globus () {
+        if type globus > /dev/null; then
+          eval "$(env COMMANDLINE="${words[1,$CURRENT]}" \\
+                  globus --shell-complete ZSH)"
+        fi
+    }
+    compdef _globus globus
+    """)
+
+    def callback(ctx, param, value):
+        if not value or ctx.resilient_parsing:
+            return
+        if value == "BASH":
+            safeprint(bash_shell_completer)
+        elif value == "ZSH":
+            safeprint(zsh_shell_completer)
+        else:
+            raise ValueError('Unsupported shell completion')
+        click.get_current_context().exit(0)
+
+    f = click.option("--completer", "--bash-completer",
+                     cls=HiddenOption, is_eager=True, expose_value=False,
+                     flag_value="BASH", callback=callback)(f)
+    f = click.option("--zsh-completer",
+                     cls=HiddenOption, is_eager=True, expose_value=False,
+                     flag_value="ZSH", callback=callback)(f)
+    return f
 
 
 def shell_complete_option(f):
