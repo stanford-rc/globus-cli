@@ -1,8 +1,2 @@
-#compdef globus
-_globus() {
-    if type globus > /dev/null;
-    then
-        eval "$(env COMMANDLINE="${words[1,$CURRENT]}" globus --shell-complete ZSH)"
-    fi
-}
-compdef _globus globus
+# temporary shim -- remove me after release of shell completion
+eval "$(globus --zsh-completer)"
