@@ -3,6 +3,8 @@ import random
 import time
 import click
 
+from textwrap import dedent
+
 try:
     import cryptography
     # slightly hacky way of preventing flake8 from complaining
@@ -237,6 +239,38 @@ def autoactivate(client, endpoint_id, if_expires_in=None):
 
     else:
         return res
+
+
+def get_endpoint_w_server_list(endpoint_id):
+    """
+    A helper for handling endpoint server list lookups correctly accounting
+    for various endpoint types.
+
+    - Raises click.UsageError when used on Shares
+    - Returns (<get_endpoint_response>, "S3") for S3 endpoints
+    - Returns (<get_endpoint_response>, <server_list_response>) for all other
+      Endpoints
+    """
+    client = get_client()
+
+    endpoint = client.get_endpoint(endpoint_id)
+
+    if endpoint['host_endpoint_id']:  # not GCS -- this is a share endpoint
+        raise click.UsageError(dedent(u"""\
+            {id} ({0}) is a share and does not have servers.
+
+            To see details of the share, use
+                globus endpoint show {id}
+
+            To list the servers on the share's host endpoint, use
+                globus endpoint server list {host_endpoint_id}
+        """).format(display_name_or_cname(endpoint), **endpoint.data))
+
+    if endpoint['s3_url']:  # not GCS -- legacy S3 endpoint type
+        return (endpoint, 'S3')
+
+    else:
+        return (endpoint, client.endpoint_server_list(endpoint_id))
 
 
 ENDPOINT_LIST_FIELDS = (('ID', 'id'), ('Owner', 'owner_string'),
