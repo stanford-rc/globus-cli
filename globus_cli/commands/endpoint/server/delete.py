@@ -69,9 +69,21 @@ def server_delete(endpoint_id, server):
 
     mode = _detect_mode(server)
 
-    if mode != 'id':
-        endpoint, server_list = get_endpoint_w_server_list(endpoint_id)
+    # list (even if not necessary) in order to make errors more consistent when
+    # mode='id'
+    endpoint, server_list = get_endpoint_w_server_list(endpoint_id)
 
+    if server_list == 'S3':
+        raise click.UsageError('You cannot delete servers from S3 endpoints.')
+
+    # we don't *have to* raise an error in the GCP case, since the API would
+    # deny it too, but doing so makes our errors a little bit more consistent
+    # with deletes against S3 endpoints and shares
+    if endpoint['is_globus_connect']:
+        raise click.UsageError(
+            'You cannot delete servers from Globus Connect Personal endpoints')
+
+    if mode != 'id':
         matches = _spec_to_matches(server_list, server, mode)
         if not matches:
             raise click.UsageError('No server was found matching "{}"'
@@ -80,7 +92,7 @@ def server_delete(endpoint_id, server):
             raise click.UsageError(dedent("""\
                 Multiple servers matched "{}":
                     {}
-            """).format(server, [x['id'] for x in server_list]))
+            """).format(server, [x['id'] for x in matches]))
         else:
             server = matches[0]['id']
 

@@ -27,15 +27,27 @@ class EndpointServerTests(CliTestCase):
         self.gcs_id = res['id']
 
     def _mk_gcp(self):
-        output = self.run_line("globus endpoint create endpointservertest_gcs "
+        output = self.run_line("globus endpoint create endpointservertest_gcp "
                                "--personal -F json")
         res = json.loads(output)
         self.gcp_id = res['id']
 
-    def _add_server(self, epid, use_json=False):
-        return self.run_line(
-            "globus endpoint server add {} --hostname foo.com{}"
-            .format(epid, '' if not use_json else ' -Fjson'))
+    def _add_server(self, epid, hostname='foo.com', use_json=False, port=None,
+                    return_id=False):
+        extra_opts = ''
+        if use_json or return_id:
+            extra_opts += ' -Fjson'
+        if port:
+            extra_opts += ' --port {}'.format(port)
+
+        output = self.run_line(
+            "globus endpoint server add {} --hostname {}{}"
+            .format(epid, hostname, extra_opts))
+
+        if not return_id:
+            return output
+        else:
+            return json.loads(output)['id']
 
     def test_gcs_server_add(self):
         self._mk_gcs()
@@ -61,7 +73,6 @@ class EndpointServerTests(CliTestCase):
     def _create_and_delete_server(self, mode):
         assert mode in ('id', 'hostname', 'hostname_port', 'uri')
 
-        self._mk_gcs()
         add_server_out = json.loads(
             self._add_server(self.gcs_id, use_json=True))
 
@@ -86,13 +97,44 @@ class EndpointServerTests(CliTestCase):
         self.assertNotIn('gsiftp://foo.com:2811', output)
 
     def test_server_delete_by_id(self):
+        self._mk_gcs()
         self._create_and_delete_server('id')
 
     def test_server_delete_by_hostname(self):
+        self._mk_gcs()
         self._create_and_delete_server('hostname')
 
     def test_server_delete_by_hostname_port(self):
+        self._mk_gcs()
         self._create_and_delete_server('hostname_port')
 
     def test_server_delete_by_uri(self):
+        self._mk_gcs()
         self._create_and_delete_server('uri')
+
+    def test_server_delete_by_hostname_many_matches(self):
+        self._mk_gcs()
+        matches = [
+            self._add_server(self.gcs_id, return_id=True),
+            self._add_server(self.gcs_id, port='2812', return_id=True),
+            self._add_server(self.gcs_id, port='2813', return_id=True)
+        ]
+        nonmatch = self._add_server(self.gcs_id, hostname='foo.net',
+                                    return_id=True)
+
+        output = self.run_line(
+            "globus endpoint server delete {} foo.com".format(self.gcs_id),
+            assert_exit_code=2)
+        self.assertIn('Multiple servers matched', output)
+        self.assertNotIn(str(nonmatch), output)
+        for mid in matches:
+            self.assertIn(str(mid), output)
+
+    def test_server_delete_on_gcp(self):
+        self._mk_gcp()
+        output = self.run_line(
+            "globus endpoint server delete {} foo.com".format(self.gcp_id),
+            assert_exit_code=2)
+        self.assertIn(
+            'You cannot delete servers from Globus Connect Personal endpoints',
+            output)
