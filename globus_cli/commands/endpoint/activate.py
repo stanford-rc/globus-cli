@@ -1,14 +1,6 @@
 import click
 import webbrowser
 
-# only have --delegate-proxy appear if cryptography is available
-try:
-    import cryptography
-    # slightly hacky way of preventing flake8 from complaining
-    cryptography_imported = bool(cryptography)
-except ImportError:
-    cryptography_imported = False
-
 
 from globus_cli.parsing import common_options, endpoint_id_arg, HiddenOption
 from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
@@ -19,25 +11,13 @@ from globus_cli.helpers import (
     is_remote_session, fill_delegate_proxy_activation_requirements)
 
 
-delegate_proxy_long_help = """
-    \b
-    To use Delegate Proxy activation use the --delegate-proxy option with a
-    file containing an X.509 certificate as an argument (e.g. an X.509
-    gotten from the myproxy-logon command). This certificate must
-    be a valid credential or proxy credential for the user from an identity
-    provider accepted by the endpoint being activated, and the endpoint must be
-    configured with a gridmap that will match the globus user using this
-    command with the local user the certificate was made to. Note if the X.509
-    is valid, but the endpoint does not recognize the identity provider or the
-    user the error will not be detected until the user attempts to perform an
-    operation on the endpoint."""
-
-
 @click.command("activate",
                short_help="Activate an endpoint",
                help="""
-    Activate an endpoint using Autoactivation, Myproxy,{} or Web activation.
-    Note that --web{} and --myproxy activation are mutually exclusive options.
+    Activate an endpoint using Autoactivation, Myproxy, Delegate Proxy,
+    or Web activation.
+    Note that --web, --delegate-proxy, and --myproxy activation are mutually
+    exclusive options.
 
     \b
     Autoactivation will always be attempted unless the --no-autoactivate
@@ -64,34 +44,39 @@ delegate_proxy_long_help = """
     prompted to hide your inputs and keep your password out of your
     command history, but you may pass your password with the hidden
     --myproxy-password or -P options.
-    {}""".format(" Delegate Proxy," if cryptography_imported else "",
-                 " --delegate-proxy" if cryptography_imported else "",
-                 delegate_proxy_long_help if cryptography_imported else ""))
+
+    \b
+    To use Delegate Proxy activation use the --delegate-proxy option with a
+    file containing an X.509 certificate as an argument (e.g. an X.509
+    gotten from the myproxy-logon command). This certificate must
+    be a valid credential or proxy credential for the user from an identity
+    provider accepted by the endpoint being activated, and the endpoint must be
+    configured with a gridmap that will match the globus user using this
+    command with the local user the certificate was made to. Note if the X.509
+    is valid, but the endpoint does not recognize the identity provider or the
+    user the error will not be detected until the user attempts to perform an
+    operation on the endpoint.""")
 @common_options
 @endpoint_id_arg
 @click.option("--web", is_flag=True, default=False,
-              help=("Use web activation. Mutually exclusive with --myproxy"
-                    "{}.".format(" and --delegate-proxy"
-                                 if cryptography_imported else "")))
+              help=("Use web activation. Mutually exclusive with --myproxy "
+                    "and --delegate-proxy."))
 @click.option("--no-browser", is_flag=True, default=False,
               help=("If using --web, Give a url to manually follow instead of "
                     "opening your default web browser. Implied if the CLI "
                     "detects this is a remote session."))
 @click.option("--myproxy", is_flag=True, default=False,
-              help=("Use myproxy activation. Mutually exclusive with --web"
-                    "{}.".format(" and --delegate-proxy"
-                                 if cryptography_imported else "")))
+              help=("Use myproxy activation. Mutually exclusive with --web "
+                    "and --delegate-proxy."))
 @click.option("--myproxy-username", "-U",
               help=("Give a username to use with --myproxy. "
                     "Overrides any default myproxy username set in config."))
 @click.option("--myproxy-password", "-P", cls=HiddenOption)
 @click.option("--delegate-proxy", metavar="X.509_PEM_FILE",
-              cls=(click.Option if cryptography_imported else HiddenOption),
               help=("Use delegate proxy activation, takes an X.509 "
                     "certificate in pem format as an argument. Mutually "
                     "exclusive with --web and --myproxy."))
 @click.option("--proxy-lifetime", type=int, default=None,
-              cls=(click.Option if cryptography_imported else HiddenOption),
               help=("Set a lifetime in hours for the proxy generated with "
                     "--delegate-proxy. [default: 12]"))
 @click.option("--no-autoactivate", is_flag=True, default=False,
@@ -123,9 +108,6 @@ def endpoint_activate(endpoint_id, myproxy, myproxy_username, myproxy_password,
         raise click.UsageError("--no-browser requires --web.")
     if proxy_lifetime and not delegate_proxy:
         raise click.UsageError("--proxy-lifetime requires --delegate-proxy.")
-    if delegate_proxy and not cryptography_imported:
-            raise click.ClickException("Missing cryptography dependency "
-                                       "required for --delegate-proxy, ")
 
     # check if endpoint is already activated unless --force
     if not force:
@@ -197,7 +179,6 @@ def endpoint_activate(endpoint_id, myproxy, myproxy_username, myproxy_password,
 
     # delegate proxy activation
     elif delegate_proxy:
-
         requirements_data = client.endpoint_get_activation_requirements(
             endpoint_id).data
         filled_requirements_data = fill_delegate_proxy_activation_requirements(
