@@ -85,6 +85,11 @@ delegate_proxy_long_help = """
               help=("Give a username to use with --myproxy. "
                     "Overrides any default myproxy username set in config."))
 @click.option("--myproxy-password", "-P", cls=HiddenOption)
+@click.option("--myproxy-lifetime", type=int,
+              help=("The lifetime for the credential to request from the "
+                    "server under --myproxy activation, in hours. "
+                    "The myproxy server may be configured with a maximum "
+                    "lifetime which it will use if this value is too high"))
 @click.option("--delegate-proxy", metavar="X.509_PEM_FILE",
               cls=(click.Option if cryptography_imported else HiddenOption),
               help=("Use delegate proxy activation, takes an X.509 "
@@ -99,7 +104,9 @@ delegate_proxy_long_help = """
                     "another activation method."))
 @click.option("--force", is_flag=True, default=False,
               help="Force activation even if endpoint is already activated.")
-def endpoint_activate(endpoint_id, myproxy, myproxy_username, myproxy_password,
+def endpoint_activate(endpoint_id,
+                      myproxy, myproxy_username, myproxy_password,
+                      myproxy_lifetime,
                       web, no_browser, delegate_proxy, proxy_lifetime,
                       no_autoactivate, force):
     """
@@ -119,6 +126,11 @@ def endpoint_activate(endpoint_id, myproxy, myproxy_username, myproxy_password,
         raise click.UsageError("--myproxy-username requires --myproxy.")
     if myproxy_password and not myproxy:
         raise click.UsageError("--myproxy-password requires --myproxy.")
+    # NOTE: "0" is a legitimate, though weird, value
+    # In the case where someone is setting this value programatically,
+    # respecting it behaves more consistently/predictably
+    if myproxy_lifetime is not None and not myproxy:
+        raise click.UsageError("--myproxy-lifetime requires --myproxy.")
     if no_browser and not web:
         raise click.UsageError("--no-browser requires --web.")
     if proxy_lifetime and not delegate_proxy:
@@ -174,12 +186,22 @@ def endpoint_activate(endpoint_id, myproxy, myproxy_username, myproxy_password,
             raise click.ClickException(no_server_msg)
 
         for data in requirements_data["DATA"]:
+            # skip non-myproxy values
+            # although the API does not practice this today, in theory other
+            # activation types may have fields with the same names...
+            if data["type"] != "myproxy":
+                continue
+
             if data["name"] == "passphrase":
                 data["value"] = myproxy_password
             if data["name"] == "username":
                 data["value"] = myproxy_username or default_myproxy_username
             if data["name"] == "hostname" and data["value"] is None:
                 raise click.ClickException(no_server_msg)
+            # NOTE: remember that "0" is a possible value
+            if (data["name"] == "lifetime_in_hours" and
+                    myproxy_lifetime is not None):
+                data["value"] = str(myproxy_lifetime)
 
         res = client.endpoint_activate(endpoint_id, requirements_data)
 
