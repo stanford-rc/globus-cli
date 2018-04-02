@@ -18,6 +18,25 @@ def _call_pip(*args):
     subprocess.check_call(all_args)
 
 
+def _check_pip_installed():
+    """
+    Invoke `pip --version` and make sure it doesn't error.
+    Use check_output to capture stdout and stderr
+
+    Invokes pip by the same manner that we plan to in _call_pip()
+
+    Don't bother trying to reuse _call_pip to do this... Finnicky and not worth
+    the effort.
+    """
+    try:
+        subprocess.check_output(
+            [sys.executable, '-m', 'pip', '--version'],
+            stderr=subprocess.STDOUT)
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+
 @click.command('update', help='Update the Globus CLI to its latest version')
 @common_options(no_format_option=True, no_map_http_status_option=True)
 @click.option('--yes', is_flag=True,
@@ -53,10 +72,7 @@ def update_command(yes, development, development_version):
     #   of the CLI which can't import its installing `pip`. If we depend on
     #   pip, anyone doing this is forced to get two copies of pip, which seems
     #   kind of nasty (even if "they're asking for it")
-    try:
-        import pip
-        assert pip
-    except ImportError:
+    if not _check_pip_installed():
         safeprint("`globus update` requires pip. "
                   "Please install pip and try again")
         click.get_current_context().exit(1)
