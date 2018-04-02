@@ -5,13 +5,6 @@ import click
 
 from textwrap import dedent
 
-try:
-    import cryptography
-    # slightly hacky way of preventing flake8 from complaining
-    cryptography_imported = bool(cryptography)
-except ImportError:
-    cryptography_imported = False
-
 from globus_sdk import TransferClient, RefreshTokenAuthorizer
 from globus_sdk.exc import NetworkError
 from globus_sdk.base import safe_stringify
@@ -205,12 +198,12 @@ def activation_requirements_help_text(res, ep_id):
         ("For delegate proxy activation use:\n"
          "'globus endpoint activate --delegate-proxy "
          "X.509_PEM_FILE {}'\n".format(ep_id)
-         if "delegate_proxy" in methods and cryptography_imported else ""),
+         if "delegate_proxy" in methods else ""),
 
         ("Delegate proxy activation requires an additional dependency on "
          "cryptography. See the docs for details:\n"
          "https://docs.globus.org/cli/reference/endpoint_activate/\n"
-         if "delegate_proxy" in methods and not cryptography_imported else ""),
+         if "delegate_proxy" in methods else ""),
     ]
 
     return "".join(lines)

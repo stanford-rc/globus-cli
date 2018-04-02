@@ -3,13 +3,10 @@ import os
 import datetime
 import re
 import six
-try:
-    from cryptography import x509
-    from cryptography.hazmat.primitives import serialization, hashes
-    from cryptography.hazmat.backends import default_backend
-    cryptography_imported = True
-except ImportError:
-    cryptography_imported = False
+
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.backends import default_backend
 
 
 def fill_delegate_proxy_activation_requirements(requirements_data, cred_file,
@@ -20,10 +17,6 @@ def fill_delegate_proxy_activation_requirements(requirements_data, cred_file,
     requirements, uses the key and the credentials to make a proxy credential,
     and returns the requirements data with the proxy chain filled in.
     """
-    # cannot proceed without cryptography
-    if not cryptography_imported:
-        raise ImportError("Unable to import cryptography")
-
     # get the public key from the activation requirements
     for data in requirements_data["DATA"]:
         if data["type"] == "delegate_proxy" and data["name"] == "public_key":

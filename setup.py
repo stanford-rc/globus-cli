@@ -26,11 +26,20 @@ setup(
         'jmespath==0.9.2',
         'configobj>=5.0.6,<6.0.0',
         'requests>=2.0.0,<3.0.0',
-        'six>=1.10.0,<2.0.0'
+        'six>=1.10.0,<2.0.0',
+        # cryptography has unusual versioning and compatibility rules:
+        # https://cryptography.io/en/latest/api-stability/
+        # we trust the two next major versions, per the Deprecation policy
+        #
+        # as new versions of cryptography are released, we may need to update
+        # this requirement
+        'cryptography>=1.8.1,<2.5.0'
     ],
 
     extras_require={
-        'delegate-proxy': ['cryptography>=1.8.1,<2.0.0']
+        # deprecated, but do not remove -- doing so would break installs which
+        # are already using this extra
+        'delegate-proxy': []
     },
 
     entry_points={

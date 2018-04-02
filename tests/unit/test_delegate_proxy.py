@@ -1,52 +1,9 @@
-import unittest
-try:
-    import cryptography
-    # slightly hacky way of preventing flake8 from complaining
-    cryptography_imported = bool(cryptography)
-except ImportError:
-    cryptography_imported = False
-
 from globus_cli.helpers import fill_delegate_proxy_activation_requirements
 from tests.framework.cli_testcase import CliTestCase
-from tests.framework.constants import GO_EP1_ID, PUBLIC_KEY
+from tests.framework.constants import PUBLIC_KEY
 
 
 class DelegateProxyTests(CliTestCase):
-
-    @unittest.skipIf(cryptography_imported, "cryptography was imported")
-    def test_cryptography_not_imported(self):
-        """
-        Confirms --delegate-proxy doesn't appear in activate help text
-        if cryptography is not available. Confirms error if option is attempted
-        to be used anyways.
-        """
-        output = self.run_line("globus endpoint activate --help")
-        self.assertNotIn("--delegate-proxy", output)
-
-        output = self.run_line((
-            "globus endpoint activate {} --delegate-proxy cert.pem"
-            .format(GO_EP1_ID)), assert_exit_code=1)
-        self.assertIn("Missing cryptography dependency", output)
-
-    @unittest.skipIf(not cryptography_imported, "cryptography not imported")
-    def test_cryptography_imported(self):
-        """
-        Confirms --delegate-proxy does appear in activate help text if
-        cryptography was successfully imported.
-        Confirms the tutorial endpoints cannot use delegate_proxy activation.
-        """
-        output = self.run_line("globus endpoint activate --help")
-        self.assertIn("--delegate-proxy", output)
-
-        # --force and --no-autoactivate are used to prevent the endpoint being
-        # seen as not needing activation
-        output = self.run_line((
-            "globus endpoint activate {} --delegate-proxy cert.pem "
-            "--no-autoactivate --force".format(GO_EP1_ID)), assert_exit_code=1)
-        self.assertIn(
-            "this endpoint does not support Delegate Proxy activation", output)
-
-    @unittest.skipIf(not cryptography_imported, "cryptography not imported")
     def test_fill_delegate_proxy_activation_requirements(self):
         """
         Uses the public key from constants to form a fake activation
@@ -77,7 +34,6 @@ class DelegateProxyTests(CliTestCase):
         self.assertIn("-----END CERTIFICATE-----",
                       filled_requirements["DATA"][1]["value"])
 
-    @unittest.skipIf(not cryptography_imported, "cryptography not imported")
     def test_bad_x509(self):
         """
         Uses the public key from constants to form a fake activation
