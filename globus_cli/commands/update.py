@@ -1,9 +1,21 @@
+import sys
+import subprocess
 import atexit
 import click
 
 from globus_cli.safeio import safeprint
 from globus_cli.version import get_versions
 from globus_cli.parsing import common_options, HiddenOption
+
+
+def _call_pip(*args):
+    """
+    Invoke pip *safely* and in the *supported* way:
+    https://pip.pypa.io/en/latest/user_guide/#using-pip-from-your-program
+    """
+    all_args = [sys.executable, '-m', 'pip'] + list(args)
+    print('> {}'.format(' '.join(all_args)))
+    subprocess.check_call(all_args)
 
 
 @click.command('update', help='Update the Globus CLI to its latest version')
@@ -43,6 +55,7 @@ def update_command(yes, development, development_version):
     #   kind of nasty (even if "they're asking for it")
     try:
         import pip
+        assert pip
     except ImportError:
         safeprint("`globus update` requires pip. "
                   "Please install pip and try again")
@@ -111,4 +124,4 @@ def update_command(yes, development, development_version):
     # atexit method. Anything outside of atexit methods remains safe!
     @atexit.register
     def do_upgrade():
-        pip.main(['install', '--upgrade', target_version])
+        _call_pip('install', '--upgrade', target_version)
