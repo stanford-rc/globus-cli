@@ -1,11 +1,18 @@
 import sys
 import subprocess
 import atexit
+import site
 import click
 
 from globus_cli.safeio import safeprint
 from globus_cli.version import get_versions
 from globus_cli.parsing import common_options, HiddenOption
+
+
+# check if the source for this is inside of the USER_BASE
+# if so, a `pip install --user` was used
+# https://docs.python.org/2/library/site.html#site.USER_BASE
+IS_USER_INSTALL = __file__.startswith(site.USER_BASE)
 
 
 def _call_pip(*args):
@@ -140,4 +147,7 @@ def update_command(yes, development, development_version):
     # atexit method. Anything outside of atexit methods remains safe!
     @atexit.register
     def do_upgrade():
-        _call_pip('install', '--upgrade', target_version)
+        install_args = ['install', '--upgrade', target_version]
+        if IS_USER_INSTALL:
+            install_args.insert(1, '--user')
+        _call_pip(*install_args)
