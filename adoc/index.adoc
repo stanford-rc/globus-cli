@@ -24,7 +24,7 @@ link:rename[globus rename]::
 Rename a file or directory on an endpoint
 
 link:transfer[globus transfer]::
-Submit a transfer task
+Submit a transfer task (asynchronous)
 
 link:mkdir[globus mkdir]::
 Make a directory on an endpoint
@@ -33,7 +33,10 @@ link:get_identities[globus get-identities]::
 Lookup Globus Auth identities
 
 link:delete[globus delete]::
-Submit a delete task
+Submit a delete task (asynchronous)
+
+link:rm[globus rm]::
+Delete a single path; wait for it to complete
 
 link:ls[globus ls]::
 List endpoint directory contents

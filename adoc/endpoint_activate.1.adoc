@@ -15,7 +15,7 @@ globus endpoint activate - Activate an endpoint for use
 *globus endpoint activate* activates an endpoint for use by assigning a short
 term security credential to that endpoint.
 
-The Globus CLI can activate using Automatic activation, Myproxy activation, 
+The Globus CLI can activate using Automatic activation, Myproxy activation,
 Delegate Proxy activation, or Web activation. Note that --myproxy --web and
 --delegate-proxy are mutually exclusive options as only one activation
 method other than autoactivation can be attempted at a time.
@@ -44,18 +44,6 @@ prompted to hide your inputs and keep your password out of your command
 history, but you may pass your password with the --myproxy-password
 or -P options.
 
-NOTE: Delegate Proxy activation requires optional dependencies. You can use
-'pip install globus_cli[delegate-proxy]' to include them on install, but
-these packages require additional non-python binaries on your machine
-before they can be installed via pip. +
-For Globus CLI version 1.1.0 M2Crypto is needed. Consult
-https://gitlab.com/m2crypto/m2crypto/blob/master/INSTALL.rst[M2Crypto's Install Page]
-for installation requirements. +
-Globus CLI version 1.1.1 switched to cryptography to be python 3 compatible
-and more portable. Consult
-https://cryptography.io/en/latest/installation/[cryptography's Install Page]
-for installation requirements.
-
 To use Delegate Proxy activation use the --delegate-proxy option with a
 file containing an X.509 certificate as an argument (e.g. an X.509
 gotten from the myproxy-logon command). This certificate must
@@ -69,7 +57,7 @@ on the endpoint.
 
 == OPTIONS
 
-*--web*::                 
+*--web*::
 
 Use web activation. Mutually exclusive with --myproxy.
 
@@ -82,21 +70,23 @@ web browser. Implied if on a remote session.
 
 Use myproxy activation. Mutually exclusive with --web and --delegate-proxy.
 
+*--myproxy-lifetime* INTEGER::
+
+The lifetime for the credential to request from the server under --myproxy
+activation, in hours. The myproxy server may be configured with a maximum
+lifetime which it will use if this value is too high
+
 *-U, --myproxy-username* TEXT::
 
-Give a username to use with --myproxy skipping the username prompt. 
+Give a username to use with --myproxy skipping the username prompt.
 Overrides any default myproxy username set in config.
 
 *-P, --myproxy-password* TEXT::
 
-WARNING: It is not recommended to use this option as it will leave your 
+WARNING: It is not recommended to use this option as it will leave your
 password in plain-text in your command history.
 +
 Give a password to use with --myproxy, skipping the password prompt.
-
-NOTE: the --delegate-proxy and --proxy-lifetime options will only appear if
-their optional dependencies are available, see the above note on Delegate Proxy
-activation for details.
 
 *--delegate-proxy* X.509_PEM_FILE::
 

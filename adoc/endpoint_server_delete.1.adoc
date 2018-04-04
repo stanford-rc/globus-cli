@@ -7,12 +7,16 @@ globus endpoint server delete - Delete a server belonging to an endpoint
 
 == SYNOPSIS
 
-*globus endpoint server delete* ['OPTIONS'] 'ENDPOINT_ID' 'SERVER_ID'
+*globus endpoint server delete* ['OPTIONS'] 'ENDPOINT_ID' 'SERVER'
 
 
 == DESCRIPTION
 
 The *globus endpoint server delete* command removes a server from an endpoint.
+
+'SERVER' may be a server 'ID', 'HOSTNAME', 'HOSTNAME:PORT', or
+'URI' ('SCHEME://HOSTNAME:PORT')
+
 
 To get the IDs of servers to remove use 'globus endpoint server list'
 
