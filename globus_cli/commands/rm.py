@@ -14,10 +14,11 @@ from globus_cli.services.transfer import (
     get_client, autoactivate, task_wait_with_io)
 
 
-@click.command("rm", short_help="Delete a single file or directory",
-               help=("Submit a Delete Task to delete a single file or "
-                     "directory, and then block and wait for it to "
-                     "complete."))
+@click.command(
+    "rm", short_help="Delete a single path; wait for it to complete",
+    help=("Submit a Delete Task to delete a single path, "
+          "and then block and wait for it to complete. "
+          "Output is similar to 'globus task wait'"))
 @common_options
 @task_submission_options
 @delete_and_rm_options(supports_batch=False, default_enable_globs=True)

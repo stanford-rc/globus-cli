@@ -13,7 +13,7 @@ from globus_cli.safeio import (
 from globus_cli.services.transfer import get_client, autoactivate
 
 
-@click.command('delete', short_help='Submit a delete task',
+@click.command('delete', short_help='Submit a delete task (asynchronous)',
                help=('Delete a file or directory from one endpoint as an '
                      'asynchronous task.'))
 @common_options

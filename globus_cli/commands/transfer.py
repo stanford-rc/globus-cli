@@ -10,7 +10,7 @@ from globus_cli.safeio import formatted_print, FORMAT_TEXT_RECORD
 from globus_cli.services.transfer import get_client, autoactivate
 
 
-@click.command('transfer', short_help='Submit a transfer task',
+@click.command('transfer', short_help='Submit a transfer task (asynchronous)',
                help=("""\
     Copy a file or directory from one endpoint to another as an asynchronous
     task.
