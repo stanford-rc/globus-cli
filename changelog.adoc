@@ -1,5 +1,14 @@
 = CLI Changelog
 
+== 1.5.0
+
+Enhancements:
+
+* Support endpoint server deletion by hostname or URL (https://github.com/globus/globus-cli/pull/389[389])
+* Support `--myproxy-lifetime` for endpoint activation (https://github.com/globus/globus-cli/pull/393[393])
+* The `globus update` command now handles `pip install --user` installations of the CLI (https://github.com/globus/globus-cli/pull/392[392])
+* Add `globus rm` command (https://github.com/globus/globus-cli/pull/399[399])
+
 == 1.4.0
 
 Enhancements:
