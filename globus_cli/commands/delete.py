@@ -5,7 +5,7 @@ from globus_sdk import DeleteData
 
 from globus_cli.parsing import (
     common_options, task_submission_options, TaskPath, ENDPOINT_PLUS_OPTPATH,
-    shlex_process_stdin)
+    shlex_process_stdin, delete_and_rm_options)
 from globus_cli.safeio import (
     safeprint, formatted_print, FORMAT_TEXT_RECORD,
     err_is_terminal, term_is_interactive)
@@ -13,26 +13,15 @@ from globus_cli.safeio import (
 from globus_cli.services.transfer import get_client, autoactivate
 
 
-@click.command('delete', short_help='Submit a delete task',
+@click.command('delete', short_help='Submit a delete task (asynchronous)',
                help=('Delete a file or directory from one endpoint as an '
                      'asynchronous task.'))
 @common_options
 @task_submission_options
-@click.option(
-    '--recursive', '-r', is_flag=True, help='Recursively delete dirs')
-@click.option('--ignore-missing', '-f', is_flag=True,
-              help="Don't throw errors if the file or dir is absent")
-@click.option('--star-silent', '--unsafe', 'star_silent', is_flag=True,
-              help=("Don't prompt when the trailing character is a \"*\". "
-                    "Implicit in --batch"))
-@click.option('--batch', is_flag=True,
-              help=('Accept a batch of paths on stdin (i.e. run in '
-                    'batchmode). Uses ENDPOINT_ID as passed on the '
-                    'commandline. Any commandline PATH given will be used as '
-                    'a prefix to all paths given'))
+@delete_and_rm_options
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_OPTPATH.metavar,
                 type=ENDPOINT_PLUS_OPTPATH)
-def delete_command(batch, ignore_missing, star_silent, recursive,
+def delete_command(batch, ignore_missing, star_silent, recursive, enable_globs,
                    endpoint_plus_path, label, submission_id, dry_run, deadline,
                    skip_activation_check, notify):
     """
@@ -56,6 +45,7 @@ def delete_command(batch, ignore_missing, star_silent, recursive,
                              submission_id=submission_id,
                              deadline=deadline,
                              skip_activation_check=skip_activation_check,
+                             interpret_globs=enable_globs,
                              **notify)
 
     if batch:
@@ -74,7 +64,7 @@ def delete_command(batch, ignore_missing, star_silent, recursive,
         shlex_process_stdin(
             process_batch_line, 'Enter paths to delete, line by line.')
     else:
-        if not star_silent and path.endswith('*'):
+        if not star_silent and enable_globs and path.endswith('*'):
             # not intuitive, but `click.confirm(abort=True)` prints to stdout
             # unnecessarily, which we don't really want...
             # only do this check if stderr is a pty

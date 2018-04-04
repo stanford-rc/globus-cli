@@ -4,6 +4,7 @@ from globus_cli.parsing.command_state import (
     format_option, debug_option, map_http_status_option, verbose_option)
 from globus_cli.parsing.version_option import version_option
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
+from globus_cli.parsing.hidden_option import HiddenOption
 from globus_cli.parsing.detect_and_decorate import detect_and_decorate
 from globus_cli.parsing.location import LocationType
 from globus_cli.parsing.iso_time import ISOTimeType
@@ -403,6 +404,67 @@ def task_submission_options(f):
             "Submit the task even if the endpoint(s) "
             "aren't currently activated."))(f)
 
+    return f
+
+
+def delete_and_rm_options(*args, **kwargs):
+    """
+    Options which apply both to `globus delete` and `globus rm`
+    """
+    def inner_decorator(f, supports_batch=True, default_enable_globs=False):
+        f = click.option(
+            '--recursive', '-r', is_flag=True,
+            help='Recursively delete dirs')(f)
+        f = click.option(
+            '--ignore-missing', '-f', is_flag=True,
+            help="Don't throw errors if the file or dir is absent")(f)
+        f = click.option(
+            '--star-silent', '--unsafe', 'star_silent', is_flag=True,
+            help=("Don't prompt when the trailing character is a \"*\"." +
+                  (" Implicit in --batch" if supports_batch else "")))(f)
+        f = click.option(
+            '--enable-globs/--no-enable-globs', is_flag=True,
+            default=default_enable_globs, show_default=True,
+            help=("Enable expansion of *, ?, and [ ] characters in the last "
+                  "component of file paths, unless they are escaped with "
+                  "a preceeding backslash, \\"))(f)
+        if supports_batch:
+            f = click.option(
+                '--batch', is_flag=True,
+                help=('Accept a batch of paths on stdin (i.e. run in '
+                      'batchmode). Uses ENDPOINT_ID as passed on the '
+                      'commandline. Any commandline PATH given will be used '
+                      'as a prefix to all paths given'))(f)
+        return f
+
+    return detect_and_decorate(inner_decorator, args, kwargs)
+
+
+def synchronous_task_wait_options(f):
+    def polling_interval_callback(ctx, param, value):
+        if not value:
+            return None
+
+        if value < 1:
+            raise click.UsageError(
+                '--polling-interval={0} was less than minimum of {1}'
+                .format(value, 1))
+
+        return value
+
+    f = click.option('--timeout', type=int, metavar='N',
+                     help=('Wait N seconds. If the Task does not terminate by '
+                           'then, or terminates with an unsuccessful status, '
+                           'exit with status 1'))(f)
+    f = click.option(
+        '--polling-interval', default=1, type=int, show_default=True,
+        callback=polling_interval_callback,
+        help='Number of seconds between Task status checks.')(f)
+    f = click.option(
+        '--heartbeat', '-H', is_flag=True,
+        help=('Every polling interval, print "." to stdout to '
+              'indicate that task wait is till active'))(f)
+    f = click.option('--meow', is_flag=True, cls=HiddenOption)(f)
     return f
 
 

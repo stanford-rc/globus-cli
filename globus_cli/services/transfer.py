@@ -1,6 +1,7 @@
 import uuid
 import random
 import time
+import sys
 import click
 
 from textwrap import dedent
@@ -10,7 +11,7 @@ from globus_sdk.exc import NetworkError
 from globus_sdk.base import safe_stringify
 
 from globus_cli import version
-from globus_cli.safeio import safeprint
+from globus_cli.safeio import safeprint, formatted_print, FORMAT_SILENT
 from globus_cli.config import (
     get_transfer_tokens, internal_auth_client, set_transfer_access_token)
 from globus_cli.parsing import EXPLICIT_NULL
@@ -264,6 +265,85 @@ def get_endpoint_w_server_list(endpoint_id):
 
     else:
         return (endpoint, client.endpoint_server_list(endpoint_id))
+
+
+def task_wait_with_io(meow, heartbeat, polling_interval, timeout, task_id,
+                      client=None):
+    """
+    Options are the core "task wait" options, including the `--meow` easter
+    egg.
+
+    This does the core "task wait" loop, including all of the IO.
+    It *does exit* on behalf of the caller. (We can enhance with a
+    `noabort=True` param or somesuch in the future if necessary.)
+    """
+    client = client or get_client()
+
+    def timed_out(waited_time):
+        if timeout is None:
+            return False
+        else:
+            return waited_time >= timeout
+
+    def check_completed():
+        completed = client.task_wait(task_id, timeout=polling_interval,
+                                     polling_interval=polling_interval)
+        if completed:
+            if heartbeat:
+                safeprint('', write_to_stderr=True)
+            # meowing tasks wake up!
+            if meow:
+                safeprint("""\
+                  _..
+  /}_{\           /.-'
+ ( a a )-.___...-'/
+ ==._.==         ;
+      \ i _..._ /,
+      {_;/   {_//""", write_to_stderr=True)
+
+            # TODO: possibly update TransferClient.task_wait so that we don't
+            # need to do an extra fetch to get the task status after completion
+            res = client.get_task(task_id)
+            formatted_print(res, text_format=FORMAT_SILENT)
+
+            status = res['status']
+            if status == 'SUCCEEDED':
+                click.get_current_context().exit(0)
+            else:
+                click.get_current_context().exit(1)
+
+        return completed
+
+    # Tasks start out sleepy
+    if meow:
+        safeprint("""\
+   |\      _,,,---,,_
+   /,`.-'`'    -.  ;-;;,_
+  |,4-  ) )-,_..;\ (  `'-'
+ '---''(_/--'  `-'\_)""", write_to_stderr=True)
+
+    waited_time = 0
+    while (not timed_out(waited_time) and
+           not check_completed()):
+        if heartbeat:
+            safeprint('.', write_to_stderr=True, newline=False)
+            sys.stderr.flush()
+
+        waited_time += polling_interval
+
+    # add a trailing newline to heartbeats if we fail
+    if heartbeat:
+        safeprint('', write_to_stderr=True)
+
+    if timed_out(waited_time):
+        safeprint('Task has yet to complete after {} seconds'.format(timeout),
+                  write_to_stderr=True)
+
+    # output json if requested, but nothing for text mode
+    res = client.get_task(task_id)
+    formatted_print(res, text_format=FORMAT_SILENT)
+
+    click.get_current_context().exit(1)
 
 
 ENDPOINT_LIST_FIELDS = (('ID', 'id'), ('Owner', 'owner_string'),
