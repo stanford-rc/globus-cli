@@ -411,7 +411,7 @@ def delete_and_rm_options(*args, **kwargs):
     """
     Options which apply both to `globus delete` and `globus rm`
     """
-    def inner_decorator(f, supports_batch=True):
+    def inner_decorator(f, supports_batch=True, default_enable_globs=False):
         f = click.option(
             '--recursive', '-r', is_flag=True,
             help='Recursively delete dirs')(f)
@@ -422,6 +422,12 @@ def delete_and_rm_options(*args, **kwargs):
             '--star-silent', '--unsafe', 'star_silent', is_flag=True,
             help=("Don't prompt when the trailing character is a \"*\"." +
                   (" Implicit in --batch" if supports_batch else "")))(f)
+        f = click.option(
+            '--enable-globs/--no-enable-globs', is_flag=True,
+            default=default_enable_globs, show_default=True,
+            help=("Enable expansion of *, ?, and [ ] characters in the last "
+                  "component of file paths, unless they are escaped with "
+                  "a preceeding backslash, \\"))(f)
         if supports_batch:
             f = click.option(
                 '--batch', is_flag=True,

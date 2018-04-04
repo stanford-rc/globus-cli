@@ -335,6 +335,10 @@ def task_wait_with_io(meow, heartbeat, polling_interval, timeout, task_id,
     if heartbeat:
         safeprint('', write_to_stderr=True)
 
+    if timed_out(waited_time):
+        safeprint('Task has yet to complete after {} seconds'.format(timeout),
+                  write_to_stderr=True)
+
     # output json if requested, but nothing for text mode
     res = client.get_task(task_id)
     formatted_print(res, text_format=FORMAT_SILENT)

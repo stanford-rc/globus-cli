@@ -5,6 +5,16 @@ from tests.framework.cli_testcase import CliTestCase
 from tests.framework.constants import GO_EP1_ID
 
 
+def _load_probably_json_substring(x):
+    """
+    Weak method of extracting JSON object from a string which includes JSON and
+    non-JSON data. Just gets the largest substring from { to }
+    Works well for these cases, where click.CliRunner gives us output
+    containing both stderr and stdout.
+    """
+    return json.loads(x[x.index('{'):x.rindex('}') + 1])
+
+
 class RMTests(CliTestCase):
 
     def test_recursive(self):
@@ -18,7 +28,7 @@ class RMTests(CliTestCase):
 
         output = self.run_line(
             "globus rm -r -F json {}:{}".format(GO_EP1_ID, path))
-        res = json.loads(output)
+        res = _load_probably_json_substring(output)
         self.assertEqual(res["status"], "SUCCEEDED")
 
     def test_no_file(self):
@@ -36,7 +46,7 @@ class RMTests(CliTestCase):
         """
         path = "/~/nofilehere.txt"
         output = self.run_line("globus rm -f {}:{}".format(GO_EP1_ID, path))
-        self.assertEqual(output, "")
+        self.assertIn("Delete task submitted under ID ", output)
 
     def test_pattern_globbing(self):
         """
@@ -53,7 +63,7 @@ class RMTests(CliTestCase):
         glob = "rm_dir{}*".format(rand)
         output = self.run_line(
             "globus rm -r -F json {}:{}".format(GO_EP1_ID, glob))
-        res = json.loads(output)
+        res = _load_probably_json_substring(output)
         self.assertEqual(res["status"], "SUCCEEDED")
 
         # confirm no dirs with the prefix exist on the endpoint
@@ -77,7 +87,7 @@ class RMTests(CliTestCase):
         glob = "rm_dir{}-?".format(rand)
         output = self.run_line(
             "globus rm -r -F json {}:{}".format(GO_EP1_ID, glob))
-        res = json.loads(output)
+        res = _load_probably_json_substring(output)
         self.assertEqual(res["status"], "SUCCEEDED")
 
         # confirm no dirs with the prefix exist on the endpoint
@@ -101,7 +111,7 @@ class RMTests(CliTestCase):
         glob = "rm_dir{}-[012]".format(rand)
         output = self.run_line(
             "globus rm -r -F json {}:{}".format(GO_EP1_ID, glob))
-        res = json.loads(output)
+        res = _load_probably_json_substring(output)
         self.assertEqual(res["status"], "SUCCEEDED")
 
         # confirm no dirs with the prefix exist on the endpoint
@@ -121,4 +131,4 @@ class RMTests(CliTestCase):
             "globus rm -r --timeout {} {}:{}".format(timeout, GO_EP1_ID, path),
             assert_exit_code=1)
         self.assertIn(("Task has yet to complete "
-                       "after {} seconds.".format(timeout)), output)
+                       "after {} seconds".format(timeout)), output)

@@ -20,11 +20,11 @@ from globus_cli.services.transfer import (
                      "complete."))
 @common_options
 @task_submission_options
-@delete_and_rm_options(supports_batch=False)
+@delete_and_rm_options(supports_batch=False, default_enable_globs=True)
 @synchronous_task_wait_options
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_REQPATH.metavar,
                 type=ENDPOINT_PLUS_REQPATH)
-def rm_command(ignore_missing, star_silent, recursive,
+def rm_command(ignore_missing, star_silent, recursive, enable_globs,
                endpoint_plus_path, label, submission_id, dry_run, deadline,
                skip_activation_check, notify,
                meow, heartbeat, polling_interval, timeout):
@@ -46,9 +46,10 @@ def rm_command(ignore_missing, star_silent, recursive,
                              submission_id=submission_id,
                              deadline=deadline,
                              skip_activation_check=skip_activation_check,
+                             interpret_globs=enable_globs,
                              **notify)
 
-    if not star_silent and path.endswith('*'):
+    if not star_silent and enable_globs and path.endswith('*'):
         # not intuitive, but `click.confirm(abort=True)` prints to stdout
         # unnecessarily, which we don't really want...
         # only do this check if stderr is a pty

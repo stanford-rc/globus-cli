@@ -21,7 +21,7 @@ from globus_cli.services.transfer import get_client, autoactivate
 @delete_and_rm_options
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_OPTPATH.metavar,
                 type=ENDPOINT_PLUS_OPTPATH)
-def delete_command(batch, ignore_missing, star_silent, recursive,
+def delete_command(batch, ignore_missing, star_silent, recursive, enable_globs,
                    endpoint_plus_path, label, submission_id, dry_run, deadline,
                    skip_activation_check, notify):
     """
@@ -45,6 +45,7 @@ def delete_command(batch, ignore_missing, star_silent, recursive,
                              submission_id=submission_id,
                              deadline=deadline,
                              skip_activation_check=skip_activation_check,
+                             interpret_globs=enable_globs,
                              **notify)
 
     if batch:
@@ -63,7 +64,7 @@ def delete_command(batch, ignore_missing, star_silent, recursive,
         shlex_process_stdin(
             process_batch_line, 'Enter paths to delete, line by line.')
     else:
-        if not star_silent and path.endswith('*'):
+        if not star_silent and enable_globs and path.endswith('*'):
             # not intuitive, but `click.confirm(abort=True)` prints to stdout
             # unnecessarily, which we don't really want...
             # only do this check if stderr is a pty
