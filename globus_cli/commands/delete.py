@@ -5,7 +5,7 @@ from globus_sdk import DeleteData
 
 from globus_cli.parsing import (
     common_options, task_submission_options, TaskPath, ENDPOINT_PLUS_OPTPATH,
-    shlex_process_stdin)
+    shlex_process_stdin, delete_and_rm_options)
 from globus_cli.safeio import (
     safeprint, formatted_print, FORMAT_TEXT_RECORD,
     err_is_terminal, term_is_interactive)
@@ -18,18 +18,7 @@ from globus_cli.services.transfer import get_client, autoactivate
                      'asynchronous task.'))
 @common_options
 @task_submission_options
-@click.option(
-    '--recursive', '-r', is_flag=True, help='Recursively delete dirs')
-@click.option('--ignore-missing', '-f', is_flag=True,
-              help="Don't throw errors if the file or dir is absent")
-@click.option('--star-silent', '--unsafe', 'star_silent', is_flag=True,
-              help=("Don't prompt when the trailing character is a \"*\". "
-                    "Implicit in --batch"))
-@click.option('--batch', is_flag=True,
-              help=('Accept a batch of paths on stdin (i.e. run in '
-                    'batchmode). Uses ENDPOINT_ID as passed on the '
-                    'commandline. Any commandline PATH given will be used as '
-                    'a prefix to all paths given'))
+@delete_and_rm_options
 @click.argument('endpoint_plus_path', metavar=ENDPOINT_PLUS_OPTPATH.metavar,
                 type=ENDPOINT_PLUS_OPTPATH)
 def delete_command(batch, ignore_missing, star_silent, recursive,
