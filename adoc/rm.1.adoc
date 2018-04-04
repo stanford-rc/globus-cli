@@ -1,0 +1,80 @@
+= GLOBUS DELETE(1)
+
+== NAME
+
+globus rm - Delete a single path; wait for it to complete
+
+
+== SYNOPSIS
+
+*globus delete* ['OPTIONS'] -- ENDPOINT_ID:PATH
+
+
+== DESCRIPTION
+
+The *globus rm* command submits an asynchronous task that deletes files
+and/or directories on the target endpoint.
+
+It then blocks and waits for that task to complete.
+Output is similar to *globus task wait*, and it is safe to *globus task wait*
+on a *globus rm* which timed out.
+
+Symbolic links are never followed - only unlinked (deleted).
+
+
+include::include/cli_autoactivate.adoc[]
+
+
+== OPTIONS
+
+*-r, --recursive*::
+
+Delete any directories recursively.
+
+*-f, ignore-missing*::
+
+Ignore nonexistent files and directories. The task will succeed even if given
+paths do not exist.
+
+*--star-silent, --unsafe*::
+
+Don't prompt when the trailing character is a "\*".
++
+By default, 'globus rm $ep_id:~/foo*' will prompt before deleting if used
+in an interactive context.
+
+*--timeout* 'N'::
+
+Wait a maximum of 'N' seconds. If omitted, *globus rm* will wait
+indefinitely, until the task succeeds or fails.
+
+*--polling-interval* 'M'::
+
+Check task status (and potentially hearbeat) every 'M' seconds. Defaults to 1.
+
+*-H,--heartbeat*::
+
+Turn on heartbeats. When set, a '.' character will be printed to standard error
+every polling interval.
+
+include::include/task_submission_options.adoc[]
+
+include::include/common_options.adoc[]
+
+
+== EXAMPLES
+
+Delete a single file.
+----
+$ ep_id=ddb59af0-6d04-11e5-ba46-22000b92c6ec
+$ globus rm $ep_id:~/myfile.txt
+----
+
+Delete a directory recursively.
+
+----
+$ ep_id=ddb59af0-6d04-11e5-ba46-22000b92c6ec
+$ globus rm $ep_id:~/mydir --recursive
+----
+
+include::include/exit_status.adoc[]

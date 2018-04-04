@@ -2,7 +2,7 @@
 
 == NAME
 
-globus transfer - Submit a transfer task
+globus transfer - Submit a transfer task (asynchronous)
 
 == SYNOPSIS
 

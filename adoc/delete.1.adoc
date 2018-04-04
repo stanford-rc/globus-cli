@@ -2,7 +2,7 @@
 
 == NAME
 
-globus delete - Submit a delete task
+globus delete - Submit a delete task (asynchronous)
 
 
 == SYNOPSIS
