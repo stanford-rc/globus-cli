@@ -1,4 +1,4 @@
-= GLOBUS DELETE(1)
+= GLOBUS RM(1)
 
 == NAME
 
