@@ -6,7 +6,9 @@ import six
 from globus_sdk import GlobusResponse
 
 from globus_cli.safeio import safeprint
-from globus_cli.helpers import outformat_is_json, get_jmespath_expression
+from globus_cli.safeio.awscli_text import unix_formatted_print
+from globus_cli.helpers import (
+    outformat_is_json, outformat_is_unix, get_jmespath_expression)
 
 # make sure this is a tuple
 # if it's a list, pylint will freak out
@@ -51,20 +53,31 @@ def _key_to_keyfunc(k):
     return k
 
 
-def print_json_response(res):
+def _jmespath_preprocess(res):
     jmespath_expr = get_jmespath_expression()
 
-    def _print(data):
-        if jmespath_expr is not None:
-            data = jmespath_expr.search(data)
-        safeprint(json.dumps(data, indent=2))
-
     if isinstance(res, GlobusResponse):
-        _print(res.data)
-    elif isinstance(res, dict):
-        _print(res)
-    else:
-        safeprint(res)
+        res = res.data
+
+    if not isinstance(res, six.string_types):
+        if jmespath_expr is not None:
+            res = jmespath_expr.search(res)
+
+    return res
+
+
+def print_json_response(res):
+    res = _jmespath_preprocess(res)
+
+    if not isinstance(res, six.string_types):
+        res = json.dumps(res, indent=2, separators=(',', ': '))
+
+    safeprint(res)
+
+
+def print_unix_response(res):
+    res = _jmespath_preprocess(res)
+    unix_formatted_print(res)
 
 
 def colon_formatted_print(data, named_fields):
@@ -150,7 +163,7 @@ def formatted_print(response_data,
 
     ``json_converter`` is a callable that does preprocessing of JSON output. It
     must take ``response_data`` and produce another dict or dict-like object
-    (json output only)
+    (json/unix output only)
 
     ``fields`` is an iterable of (fieldname, keyfunc) tuples. When keyfunc is
     a string, it is implicitly converted to `lambda x: x[keyfunc]` (text output
@@ -169,6 +182,10 @@ def formatted_print(response_data,
 
     def _print_as_json():
         print_json_response(json_converter(response_data)
+                            if json_converter else response_data)
+
+    def _print_as_unix():
+        print_unix_response(json_converter(response_data)
                             if json_converter else response_data)
 
     def _print_as_text():
@@ -211,6 +228,8 @@ def formatted_print(response_data,
 
     if outformat_is_json():
         _print_as_json()
+    elif outformat_is_unix():
+        _print_as_unix()
     else:
         # silent does nothing
         if text_format == FORMAT_SILENT:
