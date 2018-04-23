@@ -1,5 +1,6 @@
 import click
 
+from globus_sdk import TransferAPIError
 from globus_cli.parsing import common_options
 from globus_cli.safeio import formatted_print
 
@@ -19,8 +20,14 @@ def bookmark_list():
 
     def get_ep_name(item):
         ep_id = item['endpoint_id']
-        ep_doc = client.get_endpoint(ep_id)
-        return display_name_or_cname(ep_doc)
+        try:
+            ep_doc = client.get_endpoint(ep_id)
+            return display_name_or_cname(ep_doc)
+        except TransferAPIError as err:
+            if err.code == "EndpointDeleted":
+                return "[DELETED ENDPOINT]"
+            else:
+                raise err
 
     formatted_print(
         bookmark_iterator,
