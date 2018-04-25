@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import json
 import six
+import click
 
 from globus_sdk import GlobusResponse
 
@@ -77,7 +78,22 @@ def print_json_response(res):
 
 def print_unix_response(res):
     res = _jmespath_preprocess(res)
-    unix_formatted_print(res)
+    try:
+        unix_formatted_print(res)
+    # Attr errors indicate that we got data which cannot be unix formatted
+    # likely a scalar + non-scalar in an array, though there may be other cases
+    # print good error and exit(2) (Count this as UsageError!)
+    except AttributeError:
+        safeprint(
+            'UNIX formatting of output failed.'
+            '\n  '
+            'This usually means that data has a structure which cannot be '
+            'handled by the UNIX formatter.'
+            '\n  '
+            'To avoid this error in the future, ensure that you query the '
+            'exact properties you want from output data with "--jmespath"',
+            write_to_stderr=True)
+        click.get_current_context().exit(2)
 
 
 def colon_formatted_print(data, named_fields):
