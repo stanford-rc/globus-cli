@@ -61,6 +61,14 @@ class BasicTests(CliTestCase):
         output = self.run_line("globus whoami", config={}, assert_exit_code=1)
         self.assertIn("No login information available", output)
 
+    def test_json_raw_string_output(self):
+        """
+        Get single-field jmespath output and make sure it's quoted
+        """
+        output = self.run_line("globus whoami --jmespath Username").strip()
+        self.assertEquals(
+            '"{}"'.format(get_user_data()["clitester1a"]["username"]), output)
+
     def test_auth_call_no_auth(self):
         """
         Runs get-identities with config set to be empty,
