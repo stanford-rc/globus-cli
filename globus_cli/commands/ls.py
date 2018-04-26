@@ -2,7 +2,7 @@ import click
 
 from globus_cli.parsing import common_options, ENDPOINT_PLUS_OPTPATH
 from globus_cli.safeio import formatted_print
-from globus_cli.helpers import is_verbose, outformat_is_json
+from globus_cli.helpers import is_verbose, outformat_is_text
 from globus_cli.services.transfer import (
     get_client, autoactivate, iterable_response_to_dict)
 
@@ -96,6 +96,6 @@ def ls_command(endpoint_plus_path, recursive_depth_limit,
                      ('Filename', cleaned_item_name)],
         simple_text=(
             None
-            if long_output or is_verbose() or outformat_is_json() else
+            if long_output or is_verbose() or not outformat_is_text() else
             "\n".join(cleaned_item_name(x) for x in res)),
         json_converter=iterable_response_to_dict)

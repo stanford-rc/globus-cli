@@ -11,6 +11,7 @@ from globus_cli.parsing.hidden_option import HiddenOption
 # could use a namedtuple, but that's overkill
 JSON_FORMAT = 'json'
 TEXT_FORMAT = 'text'
+UNIX_FORMAT = 'unix'
 
 
 class CommandState(object):
@@ -32,33 +33,39 @@ class CommandState(object):
     def outformat_is_json(self):
         return self.output_format == JSON_FORMAT
 
+    def outformat_is_unix(self):
+        return self.output_format == UNIX_FORMAT
+
     def is_verbose(self):
         return self.verbosity > 0
 
 
 def format_option(f):
     def callback(ctx, param, value):
+        if not value:
+            return
+
         state = ctx.ensure_object(CommandState)
-        # only set a new format if there is no stored jmespath expression
-        # otherwise, it must remain JSON
-        if state.jmespath_expr is None:
-            # need to do an OR check here because this is invoked with
-            # value=None everywhere that the `-F`/`--format` option is
-            # omitted (each level of the command tree)
-            state.output_format = (value or state.output_format).lower()
-        return state.output_format
+
+        # when a jmespath expr is set, ignore --format=text
+        if value == TEXT_FORMAT and state.jmespath_expr:
+            return
+
+        state.output_format = value.lower()
 
     def jmespath_callback(ctx, param, value):
         if value is None:
             return
+
         state = ctx.ensure_object(CommandState)
-        state.output_format = 'json'
         state.jmespath_expr = jmespath.compile(value)
-        return state.jmespath_expr
+
+        if state.output_format == TEXT_FORMAT:
+            state.output_format = JSON_FORMAT
 
     f = click.option(
         '-F', '--format',
-        type=CaseInsensitiveChoice([JSON_FORMAT, TEXT_FORMAT]),
+        type=CaseInsensitiveChoice([UNIX_FORMAT, JSON_FORMAT, TEXT_FORMAT]),
         help='Output format for stdout. Defaults to text',
         expose_value=False, callback=callback)(f)
     f = click.option(
