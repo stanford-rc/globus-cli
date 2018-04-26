@@ -69,10 +69,7 @@ def _jmespath_preprocess(res):
 
 def print_json_response(res):
     res = _jmespath_preprocess(res)
-
-    if not isinstance(res, six.string_types):
-        res = json.dumps(res, indent=2, separators=(',', ': '))
-
+    res = json.dumps(res, indent=2, separators=(',', ': '))
     safeprint(res)
 
 
