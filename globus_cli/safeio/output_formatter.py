@@ -69,7 +69,7 @@ def _jmespath_preprocess(res):
 
 def print_json_response(res):
     res = _jmespath_preprocess(res)
-    res = json.dumps(res, indent=2, separators=(',', ': '))
+    res = json.dumps(res, indent=2, separators=(',', ': '), sort_keys=True)
     safeprint(res)
 
 
