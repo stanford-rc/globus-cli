@@ -43,5 +43,14 @@ Create a bookmark named 'mybookmark':
 $ globus bookmark create 'ddb59aef-6d04-11e5-ba46-22000b92c6ec:/~/' mybookmark
 ----
 
+Take a specific field from the JSON output and format it into unix-friendly
+output by using '--jmespath' and '--format=UNIX':
+
+----
+$ globus bookmark create \
+    'ddb59aef-6d04-11e5-ba46-22000b92c6ec:/~/' mybookmark \
+     -F unix --jmespath 'id'
+----
+
 
 include::include/exit_status.adoc[]

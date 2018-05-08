@@ -27,7 +27,7 @@ success message.
 Rename a bookmark named "oldname" to "newname":
 
 ----
-$ globus bookmark delete oldname newname
+$ globus bookmark rename oldname newname
 ----
 
 

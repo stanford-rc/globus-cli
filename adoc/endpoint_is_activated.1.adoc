@@ -14,7 +14,7 @@ globus endpoint is-activated - Check if an endpoint is activated
 
 The *globus endpoint is-activated* command checks if an endpoint is already
 activated or requires activation to be used. If the endpoint is not activated
-a link will be given for web activation, or you can use 
+a link will be given for web activation, or you can use
 *globus endpoint activate* to activate the endpoint.
 
 == OPTIONS
@@ -27,6 +27,39 @@ include::include/common_options.adoc[]
 ----
 $ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
 $ globus endpoint is-activated $ep_id
+----
+
+Check *globus endpoint is-activated* as part of a script:
+
+----
+ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+globus endpoint is-activated $ep_id
+if [ $? -ne 0 ]; then
+    echo "$ep_id is not activated! This script cannot run!"
+    exit 1
+fi
+# ... more stuff using $ep_id below ...
+----
+
+Use `is-activated` to get and parse activation requirements, finding out the
+expiration time, but only for endpoints which are activated. Uses '--jmespath'
+to select fields, exit status to indicate that the endpoint is or is not
+activated, and '--format=UNIX' to get nice, unix-friendly output.
+
+----
+ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+output="$(globus endpoint is-activated "$ep_id" \
+    --jmespath expires_in --format unix)"
+if [ $? -eq 0 ]; then
+    if [ "$output" -eq "-1" ]; then
+        echo "$ep_id is activated forever. Activation never expires."
+    else
+        echo "$ep_id activation expires in $output seconds"
+    fi
+else
+    echo "$ep_id not activated"
+    exit 1
+fi
 ----
 
 

@@ -99,4 +99,14 @@ $ globus task list --limit 100 \
     --filter-not-label 'autolabel' --exact
 ----
 
+List active transfers in a tabular format suitable for consumption by unix
+tools:
+
+----
+$ globus task list --format unix \
+    --jmespath 'DATA[?status==`ACTIVE`].[task_id, source_endpoint_id, destination_endpoint_id, label]'
+----
+
+NOTE: 'destination_endpoint_id' will be 'None' in the case of Delete tasks.
+
 include::include/exit_status.adoc[]

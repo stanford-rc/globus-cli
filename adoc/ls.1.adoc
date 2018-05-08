@@ -65,19 +65,38 @@ include::include/common_options.adoc[]
 
 == EXAMPLES
 
-List files and dirs in your default directory on an endpoint.
+List files and dirs in your default directory on an endpoint
 
 ----
 $ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
 $ globus ls $ep_id
 ----
 
-List files and dirs on a specific path on an endpoint.
+List files and dirs on a specific path on an endpoint
 
 ----
 $ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
 $ globus ls $ep_id:/share/godata/
 ----
+
+Do a *globus ls* requesting JSON formatted output
+
+----
+$ globus ls $ep_id:/share/godata/ --format=JSON
+----
+
+Take specific fields from the JSON output and format them into unix-friendly
+columnar output using '--jmespath' to query and '--format UNIX' to format
+output:
+
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$  globus ls $ep_id:/share/godata/ \
+    --jmespath 'DATA[*].[type, permissions, name, last_modified]' \
+    --format UNIX
+----
+
+=== Filtering
 
 List files and dirs on a specific path on an endpoint, filtering in various
 ways.
@@ -92,7 +111,7 @@ $ globus ls $ep_id:/share/godata/ --filter 'file2.txt'  # same as '=file2.txt'
 $ globus ls $ep_id:/share/godata/ --filter '!=file2.txt'  # anything but "file2.txt"
 ----
 
-Compare a grep with a `globus ls --filter`. These two are the same, but the
+Compare a grep with a *globus ls --filter*. These two are the same, but the
 filter will be faster because it doesn't require that filenames which are
 filtered out are returned to the CLI:
 
