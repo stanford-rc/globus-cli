@@ -109,4 +109,24 @@ $ globus task list --format unix \
 
 NOTE: 'destination_endpoint_id' will be 'None' in the case of Delete tasks.
 
+Cancel all tasks with expired credentials:
+
+----
+# careful: do not quote this output, but instead rely on the shell's
+# word-splitting for this for-loop
+for id in $(globus task list --filter-status=INACTIVE \
+                             --format=UNIX \
+                             --jmespath='DATA[*].task_id'); do
+    globus task cancel $id
+done
+----
+
+Print out task statuses with links to their pages in the web UI:
+
+----
+globus task list --format=unix --jmespath='DATA[*].[task_id, status]' | \
+    awk '{printf "Task %s is currently %s\n", $1, $2;
+          printf "View at https://www.globus.org/app/activity/%s\n\n", $1}'
+----
+
 include::include/exit_status.adoc[]
