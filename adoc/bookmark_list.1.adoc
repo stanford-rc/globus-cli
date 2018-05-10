@@ -32,5 +32,12 @@ When textual output is requested, the following fields are displayed:
 $ globus bookmark list
 ----
 
+Format specific fields in the bookmark list into unix-friendly columnar
+output:
+
+----
+$ globus bookmark list --jmespath='DATA[*].[name, endpoint_id]' --format=unix
+----
+
 
 include::include/exit_status.adoc[]
