@@ -46,7 +46,7 @@ def write_error_info(error_name, fields, message=None):
             dict(
                 [('error_name', error_name)] +
                 [(f.name, f.raw_value) for f in fields]),
-            indent=2)
+            indent=2, separators=(',', ': '), sort_keys=True)
     if not message:
         message = u'A{0} {1} Occurred.\n{2}'.format(
             "n" if error_name[0] in "aeiouAEIOU" else "",

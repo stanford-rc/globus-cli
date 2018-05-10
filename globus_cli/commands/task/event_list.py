@@ -47,7 +47,7 @@ def task_event_list(task_id, limit, filter_errors, filter_non_errors):
             loaded = x['details']
 
         if is_json:
-            return json.dumps(loaded, separators=(',', ':'))
+            return json.dumps(loaded, separators=(',', ':'), sort_keys=True)
         else:
             return loaded.replace('\n', '\\n')
 
