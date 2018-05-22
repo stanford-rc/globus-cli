@@ -14,15 +14,12 @@ import globus_sdk
 from globus_cli import main
 from globus_cli.config import (
     AUTH_RT_OPTNAME, AUTH_AT_OPTNAME, AUTH_AT_EXPIRES_OPTNAME,
-    TRANSFER_RT_OPTNAME, TRANSFER_AT_OPTNAME, TRANSFER_AT_EXPIRES_OPTNAME,
-    WHOAMI_ID_OPTNAME, WHOAMI_USERNAME_OPTNAME, WHOAMI_NAME_OPTNAME,
-    WHOAMI_EMAIL_OPTNAME)
+    TRANSFER_RT_OPTNAME, TRANSFER_AT_OPTNAME, TRANSFER_AT_EXPIRES_OPTNAME)
 from globus_cli.services.transfer import get_client
 from globus_cli.services.auth import get_auth_client
 
 from tests.framework.constants import (CLITESTER1A_TRANSFER_RT,
                                        CLITESTER1A_AUTH_RT, GO_EP1_ID)
-from tests.framework.tools import get_user_data
 
 
 def clean_sharing():
@@ -53,11 +50,9 @@ def clean_sharing():
 
 def default_test_config(*args, **kwargs):
     """
-    Returns a ConfigObj with the clitester's refresh tokens and whoami info
-    as if the clitester was logged in and a call to get_config_obj was made.
+    Returns a ConfigObj with the clitester's refresh tokens as if the
+    clitester was logged in and a call to get_config_obj was made.
     """
-    user_data = get_user_data()["clitester1a"]
-
     # create a ConfgObj from a dict of testing constants. a ConfigObj created
     # this way will not be tied to a config file on disk, meaning that
     # ConfigObj.filename = None and ConfigObj.write() returns a string without
@@ -69,10 +64,6 @@ def default_test_config(*args, **kwargs):
         TRANSFER_RT_OPTNAME: CLITESTER1A_TRANSFER_RT,
         TRANSFER_AT_OPTNAME: "",
         TRANSFER_AT_EXPIRES_OPTNAME: 0,
-        WHOAMI_ID_OPTNAME: user_data["id"],
-        WHOAMI_USERNAME_OPTNAME: user_data["username"],
-        WHOAMI_NAME_OPTNAME: user_data["name"],
-        WHOAMI_EMAIL_OPTNAME: user_data["email"]
         }
     })
 
