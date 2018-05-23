@@ -14,7 +14,7 @@ def get_file_dir():
 def get_user_data():
     dirname = get_file_dir()
     ret = {}
-    for uname in ("clitester1a", "go"):
+    for uname in ("clitester1a", "clitester1alinked", "go"):
         with open(os.path.join(dirname,
                                uname + "@globusid.org.json")) as f:
             ret[uname] = json.load(f)

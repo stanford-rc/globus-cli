@@ -1,14 +1,14 @@
 import click
 import globus_sdk
+from globus_sdk.exc import AuthAPIError
 
 from globus_cli.safeio import safeprint
 from globus_cli.parsing import common_options
+from globus_cli.services.auth import get_auth_client
 from globus_cli.config import (
     AUTH_RT_OPTNAME, TRANSFER_RT_OPTNAME,
     AUTH_AT_OPTNAME, TRANSFER_AT_OPTNAME,
     AUTH_AT_EXPIRES_OPTNAME, TRANSFER_AT_EXPIRES_OPTNAME,
-    WHOAMI_ID_OPTNAME, WHOAMI_USERNAME_OPTNAME,
-    WHOAMI_EMAIL_OPTNAME, WHOAMI_NAME_OPTNAME,
     internal_auth_client, remove_option, lookup_option)
 
 
@@ -45,11 +45,14 @@ Before attempting any further CLI commands, you will have to login again using
 @click.confirmation_option(prompt='Are you sure you want to logout?',
                            help='Automatically say "yes" to all prompts')
 def logout_command():
-    # check for username -- if not set, probably not logged in
-    username = lookup_option(WHOAMI_USERNAME_OPTNAME)
-    if not username:
-        safeprint(("Your username is not set. You may not be logged in. "
+    # try to get the user's preferred username from userinfo
+    # if an API error is raised, they probably are not logged in
+    try:
+        username = get_auth_client().oauth2_userinfo()["preferred_username"]
+    except AuthAPIError:
+        safeprint(("Unable to lookup username. You may not be logged in. "
                    "Attempting logout anyway...\n"))
+        username = None
     safeprint(u'Logging out of Globus{}\n'.format(u' as ' + username
                                                   if username else ''))
 
@@ -85,11 +88,6 @@ def logout_command():
     for expires_opt in (TRANSFER_AT_EXPIRES_OPTNAME,
                         AUTH_AT_EXPIRES_OPTNAME):
         remove_option(expires_opt)
-
-    # remove whoami data
-    for whoami_opt in (WHOAMI_ID_OPTNAME, WHOAMI_USERNAME_OPTNAME,
-                       WHOAMI_EMAIL_OPTNAME, WHOAMI_NAME_OPTNAME):
-        remove_option(whoami_opt)
 
     # if print_rescind_help is true, we printed warnings above
     # so, jam out an extra newline as a separator

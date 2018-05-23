@@ -1,6 +1,5 @@
 import platform
 import webbrowser
-
 import click
 
 from globus_sdk import AuthClient, AccessTokenAuthorizer
@@ -13,8 +12,6 @@ from globus_cli.config import (
     AUTH_RT_OPTNAME, TRANSFER_RT_OPTNAME,
     AUTH_AT_OPTNAME, TRANSFER_AT_OPTNAME,
     AUTH_AT_EXPIRES_OPTNAME, TRANSFER_AT_EXPIRES_OPTNAME,
-    WHOAMI_ID_OPTNAME, WHOAMI_USERNAME_OPTNAME,
-    WHOAMI_EMAIL_OPTNAME, WHOAMI_NAME_OPTNAME,
     internal_auth_client, write_option, lookup_option)
 
 
@@ -38,6 +35,10 @@ You are already logged in!
 You may force a new login with
   globus login --force
 """) + _SHARED_EPILOG
+
+SCOPES = ("openid profile email "
+          "urn:globus:auth:scope:auth.globus.org:view_identity_set "
+          "urn:globus:auth:scope:transfer.api.globus.org:all")
 
 
 @click.command('login',
@@ -67,21 +68,14 @@ def login_command(force, no_local_server):
 
 
 def check_logged_in():
-    # first, pull up all of the data from config and see what we can get
+    # first, try to get the refresh tokens from config
     # we can skip the access tokens and their expiration times as those are not
     # strictly necessary
     transfer_rt = lookup_option(TRANSFER_RT_OPTNAME)
     auth_rt = lookup_option(AUTH_RT_OPTNAME)
-    # whoami data -- consider required for now
-    whoami_id = lookup_option(WHOAMI_ID_OPTNAME)
-    whoami_username = lookup_option(WHOAMI_USERNAME_OPTNAME)
-    whoami_email = lookup_option(WHOAMI_EMAIL_OPTNAME)
-    whoami_name = lookup_option(WHOAMI_NAME_OPTNAME)
 
-    # if any of these values are null return False
-    if (transfer_rt is None or auth_rt is None or
-            whoami_id is None or whoami_username is None or
-            whoami_email is None or whoami_name is None):
+    # if either of the refresh tokens are null return False
+    if (transfer_rt is None or auth_rt is None):
         return False
 
     # check that tokens are valid
@@ -106,7 +100,8 @@ def do_link_login_flow():
     # hostname for the local system
     label = platform.node() or None
     native_client.oauth2_start_flow(
-        refresh_tokens=True, prefill_named_grant=label)
+        refresh_tokens=True, prefill_named_grant=label,
+        requested_scopes=SCOPES)
 
     # prompt
     linkprompt = 'Please log into Globus here'
@@ -144,7 +139,7 @@ def do_local_server_login_flow():
         native_client = internal_auth_client()
         native_client.oauth2_start_flow(
             refresh_tokens=True, prefill_named_grant=label,
-            redirect_uri=redirect_uri)
+            redirect_uri=redirect_uri, requested_scopes=SCOPES)
         url = native_client.oauth2_get_authorize_url()
 
         # open web-browser for user to log in, get auth code
@@ -189,13 +184,7 @@ def exchange_code_and_store_config(native_client, auth_code):
 
     # get the identity that the tokens were issued to
     auth_client = AuthClient(authorizer=AccessTokenAuthorizer(auth_at))
-    res = auth_client.get('/p/whoami')
-
-    # get the primary identity
-    # note: Auth's /p/whoami response does not mark an identity as
-    # "primary" but by way of its implementation, the first identity
-    # in the list is the primary.
-    identity = res['identities'][0]
+    res = auth_client.oauth2_userinfo()
 
     # revoke any existing tokens
     for token_opt in (TRANSFER_RT_OPTNAME, TRANSFER_AT_OPTNAME,
@@ -211,10 +200,5 @@ def exchange_code_and_store_config(native_client, auth_code):
     write_option(AUTH_RT_OPTNAME, auth_rt)
     write_option(AUTH_AT_OPTNAME, auth_at)
     write_option(AUTH_AT_EXPIRES_OPTNAME, auth_at_expires)
-    # write whoami data to config
-    write_option(WHOAMI_ID_OPTNAME, identity['id'])
-    write_option(WHOAMI_USERNAME_OPTNAME, identity['username'])
-    write_option(WHOAMI_EMAIL_OPTNAME, identity['email'])
-    write_option(WHOAMI_NAME_OPTNAME, identity['name'])
 
-    safeprint(_LOGIN_EPILOG.format(identity['username']))
+    safeprint(_LOGIN_EPILOG.format(res["preferred_username"]))
