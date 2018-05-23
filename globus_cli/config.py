@@ -77,7 +77,15 @@ def get_config_obj(system=False, file_error=False):
     else:
         path = os.path.expanduser("~/.globus.cfg")
 
-    return ConfigObj(path, encoding='utf-8', file_error=file_error)
+    conf = ConfigObj(path, encoding='utf-8', file_error=file_error)
+
+    # delete any old whomai values in the cli section
+    for key in conf.get("cli", {}):
+        if "whoami_identity_" in key:
+            del conf["cli"][key]
+            conf.write()
+
+    return conf
 
 
 def lookup_option(option, section='cli', environment=None):
