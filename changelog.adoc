@@ -1,5 +1,20 @@
 = CLI Changelog
 
+== 1.6.0
+
+Enhancements:
+
+* Add the `globus whoami --linked-identities` flag to get all of your linked identities
+(https://github.com/globus/globus-cli/pull/295[295])
+* Add the `--format UNIX` flag to produce output suitable for line-oriented
+processing with typical unix tools
+(https://github.com/globus/globus-cli/pull/404[404])
+* Documentation and minor internal improvements
+
+Bugfixes:
+* Fix `globus bookmark list` rendering of deleted endpoints
+(https://github.com/globus/globus-cli/pull/406[406])
+
 == 1.5.0
 
 Enhancements:
@@ -99,7 +114,7 @@ deactivate
 
 == 1.1.0
 
-Features:
+Enhancements:
 
 * Add Delegate Proxy Activation to 'globus endpoint activate'
 (requires M2Crypto for options to be displayed)
@@ -107,9 +122,6 @@ Features:
 * Allow 'globus bookmark rename' and 'globus bookmark delete'
 to accept either a bookmark name or id.
 (https://github.com/globus/globus-cli/pull/292[292])
-
-Enhancements:
-
 * Validate tokens upon login.
 (https://github.com/globus/globus-cli/pull/286[286])
 * Raise more helpful error messages on missing / invalid tokens.
