@@ -1,5 +1,11 @@
 = CLI Changelog
 
+== 1.6.1
+
+Enhancements:
+
+* Minor internal improvements
+
 == 1.6.0
 
 Enhancements:
