@@ -12,7 +12,11 @@ def principal_str(role):
     principal = role['principal']
     if role['principal_type'] == 'identity':
         username = lookup_identity_name(principal)
-    return username or principal
+        return username or principal
+    elif role['principal_type'] == 'group':
+        return (u'https://www.globus.org/app/groups/{}').format(principal)
+    else:
+        return principal
 
 
 @click.command('list', help='List of assigned roles on an endpoint')
