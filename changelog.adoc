@@ -1,5 +1,12 @@
 = CLI Changelog
 
+== 1.6.2
+
+Bugfixes:
+
+* Fix handling of Groups in `globus endpoint role list`
+(https://github.com/globus/globus-cli/pull/417[417])
+
 == 1.6.1
 
 Enhancements:
