@@ -25,6 +25,7 @@ processing with typical unix tools
 * Documentation and minor internal improvements
 
 Bugfixes:
+
 * Fix `globus bookmark list` rendering of deleted endpoints
 (https://github.com/globus/globus-cli/pull/406[406])
 
