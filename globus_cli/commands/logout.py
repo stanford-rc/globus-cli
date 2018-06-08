@@ -6,6 +6,7 @@ from globus_cli.safeio import safeprint
 from globus_cli.parsing import common_options
 from globus_cli.services.auth import get_auth_client
 from globus_cli.config import (
+    CLIENT_ID_OPTNAME, CLIENT_SECRET_OPTNAME,
     AUTH_RT_OPTNAME, TRANSFER_RT_OPTNAME,
     AUTH_AT_OPTNAME, TRANSFER_AT_OPTNAME,
     AUTH_AT_EXPIRES_OPTNAME, TRANSFER_AT_EXPIRES_OPTNAME,
@@ -56,8 +57,14 @@ def logout_command():
     safeprint(u'Logging out of Globus{}\n'.format(u' as ' + username
                                                   if username else ''))
 
-    # build the NativeApp client object
-    native_client = internal_auth_client()
+    # get the instance client, if the user has not yet logged in
+    # this will create a redundant client that will be deleted later
+    auth_client = internal_auth_client()
+
+    # close the current session
+    client_id = lookup_option(CLIENT_ID_OPTNAME)
+    # TDOD: uncomment when this api exists
+    # auth_client.post("/v2/api/clients/{}/close-session".format(client_id))
 
     # remove tokens from config and revoke them
     # also, track whether or not we should print the rescind help
@@ -73,7 +80,7 @@ def logout_command():
             continue
         # token was found, so try to revoke it
         try:
-            native_client.oauth2_revoke_token(token)
+            auth_client.oauth2_revoke_token(token)
         # if we network error, revocation failed -- print message and abort so
         # that we can revoke later when the network is working
         except globus_sdk.NetworkError:
@@ -84,10 +91,13 @@ def logout_command():
         # finally, we revoked, so it's safe to remove the token
         remove_option(token_opt)
 
-    # remove expiration times, just for cleanliness
-    for expires_opt in (TRANSFER_AT_EXPIRES_OPTNAME,
-                        AUTH_AT_EXPIRES_OPTNAME):
-        remove_option(expires_opt)
+    # delete the instance client
+    auth_client.delete("/v2/api/clients/{}".format(client_id))
+
+    # remove deleted client values and expiration times
+    for opt in (CLIENT_ID_OPTNAME, CLIENT_SECRET_OPTNAME,
+                TRANSFER_AT_EXPIRES_OPTNAME, AUTH_AT_EXPIRES_OPTNAME):
+        remove_option(opt)
 
     # if print_rescind_help is true, we printed warnings above
     # so, jam out an extra newline as a separator

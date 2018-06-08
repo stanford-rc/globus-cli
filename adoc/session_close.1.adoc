@@ -1,0 +1,35 @@
+= GLOBUS SESSION CLOSE(1)
+
+== NAME
+
+globus session close - Close the user's CLI auth session
+
+
+== SYNOPSIS
+
+*globus session close* ['OPTIONS']
+
+
+== DESCRIPTION
+
+The *globus session close* command closes the auth session tied
+to the CLI's access tokens.
+
+Note that closing the session will not prevent the tokens from working
+with resource servers that do not require in session identities or enforce
+authentication timeouts, to revoke the tokens entirely use *globus logout*
+
+
+== OPTIONS
+
+*--yes*::
+
+Automatically say yes to the
+"Are you sure you want to close your CLI auth session?" prompt.
+
+include::include/help_option.adoc[]
+
+include::include/verbose_option.adoc[]
+
+
+include::include/exit_status_no_http.adoc[]
