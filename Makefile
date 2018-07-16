@@ -47,7 +47,7 @@ test: $(VIRTUALENV)/bin/flake8 $(VIRTUALENV)/bin/nose2 localdev
 
 travis:
 	pip install --upgrade pip
-	pip install --upgrade "setuptools>=29,<30"
+	pip install --upgrade "setuptools>=29"
 	pip install -r test-requirements.txt
 ifeq (, $(findstring pypy, $(TRAVIS_PYTHON_VERSION)))
 	pip install "cryptography>=1.8.1,<2.0.0"
