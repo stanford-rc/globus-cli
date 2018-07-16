@@ -1,5 +1,12 @@
 = CLI Changelog
 
+== 1.6.3
+
+Enhancements:
+
+* Verbose output option for `version` command (https://github.com/globus/globus-cli/pull/420[420])
+* Lists of roles and permissions are now faster (https://github.com/globus/globus-cli/pull/424[424])
+
 == 1.6.2
 
 Bugfixes:
