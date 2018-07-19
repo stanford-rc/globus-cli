@@ -1,7 +1,6 @@
 from globus_cli.parsing import globus_group
 
 from globus_cli.commands.session.boost import session_boost
-from globus_cli.commands.session.close import session_close
 from globus_cli.commands.session.show import session_show
 
 
@@ -12,5 +11,4 @@ def session_command():
 
 # commands
 session_command.add_command(session_boost)
-session_command.add_command(session_close)
 session_command.add_command(session_show)

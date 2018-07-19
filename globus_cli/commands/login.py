@@ -48,7 +48,7 @@ def login_command(no_local_server, force):
 
     # use a link login if remote session or user requested
     if no_local_server or is_remote_session():
-        do_link_auth_flow()
+        do_link_auth_flow(force_new_client=force)
 
     # otherwise default to a local server login flow
     else:
@@ -58,7 +58,7 @@ def login_command(no_local_server, force):
             "If this fails or you experience difficulty, try "
             "'globus login --no-local-server'"
             "\n---")
-        do_local_server_auth_flow()
+        do_local_server_auth_flow(force_new_client=force)
 
     # confirm login with user's preferred username
     auth_client = get_auth_client()

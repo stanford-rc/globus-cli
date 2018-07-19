@@ -14,13 +14,13 @@ SCOPES = ("openid profile email "
           "urn:globus:auth:scope:transfer.api.globus.org:all")
 
 
-def do_link_auth_flow(session_params=None):
+def do_link_auth_flow(session_params=None, force_new_client=False):
     """
     Prompts the user with a link to authenticate with globus auth
     and authorize the CLI to act on their behalf.
     """
     # get the ConfidentialApp client object
-    auth_client = internal_auth_client()
+    auth_client = internal_auth_client(force_new=force_new_client)
 
     # start the Confidential App Grant flow, prefilling the
     # named grant label on the consent page if we can get a
@@ -48,7 +48,7 @@ def do_link_auth_flow(session_params=None):
     return True
 
 
-def do_local_server_auth_flow(session_params=None):
+def do_local_server_auth_flow(session_params=None, force_new_client=False):
     """
     Starts a local http server, opens a browser to have the user authenticate,
     and gets the code redirected to the server (no copy and pasting required)
@@ -61,7 +61,7 @@ def do_local_server_auth_flow(session_params=None):
         # get the ConfidentialApp client object and start a flow
         # if available, use the system-name to prefill the grant
         # label = platform.node() or None
-        auth_client = internal_auth_client()
+        auth_client = internal_auth_client(force_new=force_new_client)
         auth_client.oauth2_start_flow(
             refresh_tokens=True,  # prefill_named_grant=label,
             redirect_uri=redirect_uri, requested_scopes=SCOPES)

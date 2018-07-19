@@ -184,17 +184,18 @@ def set_transfer_access_token(token, expires_at):
     write_option(TRANSFER_AT_EXPIRES_OPTNAME, expires_at)
 
 
-def internal_auth_client():
+def internal_auth_client(force_new=False):
     """
-    Either looks up the values for this CLI's Instance Client in config
-    or if none exist registers a new Instance Client with GLobus Auth
+    Looks up the values for this CLI's Instance Client in config
+    or if none exists or force_new is passed
+    registers a new Instance Client with GLobus Auth
 
     Returns a ConfidentialAppAuthClient for the Instance Client
     """
     client_id = lookup_option(CLIENT_ID_OPTNAME)
     client_secret = lookup_option(CLIENT_SECRET_OPTNAME)
 
-    if not (client_id and client_secret):
+    if not (client_id and client_secret) or force_new:
 
         # register a new instance client with auth
         anonym_client = globus_sdk.AuthClient()
