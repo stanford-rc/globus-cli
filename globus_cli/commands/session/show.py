@@ -3,6 +3,7 @@ import time
 
 from globus_cli.parsing import common_options
 from globus_cli.safeio import formatted_print
+from globus_cli.services.auth import LazyIdentityMap
 from globus_cli.config import (
     internal_auth_client, lookup_option, AUTH_AT_OPTNAME)
 
@@ -20,28 +21,14 @@ def session_show():
     session_info = res.get("session_info", {})
     authentications = session_info.get("authentications") or {}
 
-    # make an auth call to get human readable usernames for the returned ids
-    if authentications:
-        identities = auth_client.get_identities(
-            ids=list(authentications))["identities"]
-    else:
-        identities = []
-
-    def _get_username(auth_id):
-        """
-        helper to lookup the username for the matching id
-        """
-        for identity in identities:
-            if identity["id"] == auth_id:
-                return identity["username"]
-        else:
-            return ""
+    # resolve ids to human readable usernames
+    resolved_ids = LazyIdentityMap(list(authentications))
 
     # put the nested dicts in a format table output can work with
     # while also converting vals into human readable formats
     list_data = [
         {"id": key,
-         "username": _get_username(key),
+         "username": resolved_ids.get(key),
          "auth_time": time.strftime(
             '%Y-%m-%d %H:%M %Z', time.localtime(vals["auth_time"]))
          }
