@@ -1,5 +1,6 @@
 import click
 
+from globus_sdk.exc import AuthAPIError
 from globus_cli.helpers import (
     is_remote_session, do_link_auth_flow, do_local_server_auth_flow)
 from globus_cli.safeio import safeprint
@@ -80,10 +81,17 @@ def check_logged_in():
     # get or create the instance client
     auth_client = internal_auth_client()
 
-    # check that tokens are valid
-    for tok in (transfer_rt, auth_rt):
-        res = auth_client.oauth2_validate_token(tok)
-        if not res['active']:
-            return False
+    # check that tokens and client are valid
+    try:
+        for tok in (transfer_rt, auth_rt):
+            res = auth_client.oauth2_validate_token(tok)
+            if not res['active']:
+                return False
+
+    # if the instance client is invalid, an AuthAPIError will be raised
+    # we then force a new client to be created before continuing
+    except AuthAPIError:
+        internal_auth_client(force_new_client=True)
+        return False
 
     return True
