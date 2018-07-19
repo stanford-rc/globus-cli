@@ -39,7 +39,8 @@ __all__ = [
 # primarily accessed via `internal_auth_client()`
 CLIENT_ID_OPTNAME = 'client_id'
 CLIENT_SECRET_OPTNAME = 'client_secret'
-TEMPLATE_ID = '95fdeba8-fac2-42bd-a357-e068d82ff78e'
+TEMPLATE_ID_OPTNAME = 'template_id'
+DEFAULT_TEMPLATE_ID = '95fdeba8-fac2-42bd-a357-e068d82ff78e'
 
 # constants for global use
 OUTPUT_FORMAT_OPTNAME = 'output_format'
@@ -67,13 +68,14 @@ if GLOBUS_ENV:
 
     CLIENT_ID_OPTNAME = '{0}_client_id'.format(GLOBUS_ENV)
     CLIENT_SECRET_OPTNAME = '{0}_client_secret'.format(GLOBUS_ENV)
-    TEMPLATE_ID = {
+    TEMPLATE_ID_OPTNAME = '{0}_template_id'.format(GLOBUS_ENV)
+    DEFAULT_TEMPLATE_ID = {
         'sandbox':      '33b6a241-bce4-4359-9c6d-09f88b3c9eef',
         'integration':  'e0c31fd1-663b-44e1-840f-f4304bb9ee7a',
         'test':         '0ebfd058-452f-40c3-babf-5a6b16a7b337',
         'staging':      '3029c3cb-c8d9-4f2b-979c-c53330aa7327',
         'preview':      'b2867dbb-0846-4579-8486-dc70763d700b',
-    }.get(GLOBUS_ENV, TEMPLATE_ID)
+    }.get(GLOBUS_ENV, DEFAULT_TEMPLATE_ID)
 
 
 def get_config_obj(system=False, file_error=False):
@@ -194,6 +196,7 @@ def internal_auth_client(force_new_client=False):
     """
     client_id = lookup_option(CLIENT_ID_OPTNAME)
     client_secret = lookup_option(CLIENT_SECRET_OPTNAME)
+    template_id = lookup_option(TEMPLATE_ID_OPTNAME) or DEFAULT_TEMPLATE_ID
 
     if not (client_id and client_secret) or force_new_client:
 
@@ -201,7 +204,7 @@ def internal_auth_client(force_new_client=False):
         anonym_client = globus_sdk.AuthClient()
         body = {
             "client": {
-                "template_id": TEMPLATE_ID,
+                "template_id": template_id,
                 "name": version.app_name
             }
         }
