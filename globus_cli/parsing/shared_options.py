@@ -141,11 +141,15 @@ def endpoint_create_and_update_params(*args, **kwargs):
         f = click.option(
             "--keywords",
             help=(update_help_prefix +
-                  "Comma seperated list of keywords to help searches"
+                  "Comma separated list of keywords to help searches "
                   "for the endpoint"))(f)
         f = click.option(
             "--default-directory",
             help=("Set the default directory"))(f)
+        f = click.option(
+            "--no-default-directory",
+            is_flag=True, flag_value=True, default=None,
+            help=("Unset any default directory on the endpoint"))(f)
         f = click.option(
             "--force-encryption/--no-force-encryption", default=None,
             help=("(Un)Force the endpoint to encrypt transfers"))(f)
@@ -290,6 +294,18 @@ def validate_endpoint_create_and_update_params(endpoint_type, managed, params):
                 raise click.UsageError("Cannot specify --subscription-id and "
                                        "use the --no-managed option.")
             params["subscription_id"] = EXPLICIT_NULL
+
+    # make sure --no-default-directory are mutually exclusive
+    # if --no-managed given, pass an EXPLICIT_NULL as the default directory
+    if params.get("no_default_directory"):
+
+        if params.get("default_directory"):
+            raise click.UsageError(
+                "--no-default-directory and --default-directory are mutually "
+                "exclusive.")
+        else:
+            params["default_directory"] = EXPLICIT_NULL
+            params.pop("no_default_directory")
 
 
 def task_id_arg(*args, **kwargs):
