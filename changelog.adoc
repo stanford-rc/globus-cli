@@ -1,5 +1,13 @@
 = CLI Changelog
 
+== 1.7.0
+
+Enhancements:
+
+* Add the `--no-default-directory` flag to `globus endpoint create` and
+`globus endpoint update` which unsets the default directory setting
+(https://github.com/globus/globus-cli/pull/428[428])
+
 == 1.6.3
 
 Enhancements:
