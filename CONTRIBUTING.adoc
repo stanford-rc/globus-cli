@@ -141,13 +141,14 @@ If you are a CLI maintainer, you need to be able to do a release.
 Setup:
 
   - Make sure you have a pypi account
-  - Setup your credentials for twine (the pypi upload tool) https://github.com/pypa/twine[twine docs for detail]
-  - Make sure you have a gpg key setup for use with git
+  - Setup your credentials for twine (the pypi upload tool)
+      https://github.com/pypa/twine[twine docs for detail]
+  - Make sure you have a gpg key setup for use with git.
+      https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work[git-scm.com guide for detail]
 
 Do it:
 
-  - `rm -r dist/` to make sure there are no old or weird source dists lying around
-  - `make upload` to build new source dists in `dist/` and upload via twine
-  - `git tag -s $VERSION` and write `v${VERSION}` in the tag. e.g. `v1.7.0`
+  - `make release` to build source dists, upload via twine, and tag the release
+  - push the newly created version tag to GitHub
   - Ensure that `docs.globus.org` gets updated with new docs/changelog
       Procedure is set in that repo.
