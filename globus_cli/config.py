@@ -21,6 +21,7 @@ __all__ = [
 
     'GLOBUS_ENV',
 
+    'internal_native_client',
     'internal_auth_client',
 
     'get_output_format',
@@ -186,29 +187,38 @@ def set_transfer_access_token(token, expires_at):
     write_option(TRANSFER_AT_EXPIRES_OPTNAME, expires_at)
 
 
-def internal_auth_client(force_new_client=False):
+def internal_native_client():
+    template_id = lookup_option(TEMPLATE_ID_OPTNAME) or DEFAULT_TEMPLATE_ID
+    return globus_sdk.NativeAppAuthClient(template_id)
+
+
+def internal_auth_client(requires_instance=False, force_new_client=False):
     """
     Looks up the values for this CLI's Instance Client in config
-    or if none exists or force_new_client is passed
+
+    If none exists and requires_instance is True or force_new_client is True,
     registers a new Instance Client with GLobus Auth
 
-    Returns a ConfidentialAppAuthClient for the Instance Client
+    If none exists and requires_instance is false, defaults to a Native Client
+    for backwards compatibility
+
+    Returns either a NativeAppAuthClient or a ConfidentialAppAuthClient
     """
     client_id = lookup_option(CLIENT_ID_OPTNAME)
     client_secret = lookup_option(CLIENT_SECRET_OPTNAME)
     template_id = lookup_option(TEMPLATE_ID_OPTNAME) or DEFAULT_TEMPLATE_ID
+    template_client = internal_native_client()
+    existing = client_id and client_secret
 
-    if not (client_id and client_secret) or force_new_client:
-
+    if force_new_client or (requires_instance and not existing):
         # register a new instance client with auth
-        anonym_client = globus_sdk.AuthClient()
         body = {
             "client": {
                 "template_id": template_id,
                 "name": version.app_name
             }
         }
-        res = anonym_client.post("/v2/api/clients", json_body=body)
+        res = template_client.post("/v2/api/clients", json_body=body)
 
         # get values and write to config
         credential_data = res["included"]["client_credential"]
@@ -217,8 +227,15 @@ def internal_auth_client(force_new_client=False):
         write_option(CLIENT_ID_OPTNAME, client_id)
         write_option(CLIENT_SECRET_OPTNAME, client_secret)
 
-    return globus_sdk.ConfidentialAppAuthClient(client_id, client_secret,
-                                                app_name=version.app_name)
+        return globus_sdk.ConfidentialAppAuthClient(
+            client_id, client_secret, app_name=version.app_name)
+
+    elif existing:
+        return globus_sdk.ConfidentialAppAuthClient(
+            client_id, client_secret, app_name=version.app_name)
+
+    else:
+        return template_client
 
 
 def setup_logging(level="DEBUG"):

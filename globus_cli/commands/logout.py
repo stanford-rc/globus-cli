@@ -10,7 +10,7 @@ from globus_cli.config import (
     AUTH_RT_OPTNAME, TRANSFER_RT_OPTNAME,
     AUTH_AT_OPTNAME, TRANSFER_AT_OPTNAME,
     AUTH_AT_EXPIRES_OPTNAME, TRANSFER_AT_EXPIRES_OPTNAME,
-    internal_auth_client, remove_option, lookup_option)
+    internal_auth_client, internal_native_client, remove_option, lookup_option)
 
 
 _RESCIND_HELP = """\
@@ -57,14 +57,9 @@ def logout_command():
     safeprint(u'Logging out of Globus{}\n'.format(u' as ' + username
                                                   if username else ''))
 
-    # get the instance client, if the user has not yet logged in
-    # this will create a redundant client that will be deleted later
-    auth_client = internal_auth_client()
-
-    # close the current session
-    client_id = lookup_option(CLIENT_ID_OPTNAME)
-    # TDOD: uncomment when this api exists
-    # auth_client.post("/v2/api/clients/{}/close-session".format(client_id))
+    # we use a Native Client to prevent an invalid instance client
+    # from preventing token revocation
+    native_client = internal_native_client()
 
     # remove tokens from config and revoke them
     # also, track whether or not we should print the rescind help
@@ -80,7 +75,7 @@ def logout_command():
             continue
         # token was found, so try to revoke it
         try:
-            auth_client.oauth2_revoke_token(token)
+            native_client.oauth2_revoke_token(token)
         # if we network error, revocation failed -- print message and abort so
         # that we can revoke later when the network is working
         except globus_sdk.NetworkError:
@@ -91,8 +86,18 @@ def logout_command():
         # finally, we revoked, so it's safe to remove the token
         remove_option(token_opt)
 
-    # delete the instance client
-    auth_client.delete("/v2/api/clients/{}".format(client_id))
+    # delete the instance client if one exists
+    client_id = lookup_option(CLIENT_ID_OPTNAME)
+
+    if client_id:
+        instance_client = internal_auth_client()
+        try:
+            instance_client.delete("/v2/api/clients/{}".format(client_id))
+
+        # if the client secret has been invalidated or the client has
+        # already been removed, we continue on
+        except AuthAPIError:
+            pass
 
     # remove deleted client values and expiration times
     for opt in (CLIENT_ID_OPTNAME, CLIENT_SECRET_OPTNAME,

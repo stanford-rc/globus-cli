@@ -1,6 +1,7 @@
 import click
 import time
 
+import globus_sdk
 from globus_cli.parsing import common_options
 from globus_cli.safeio import formatted_print
 from globus_cli.services.auth import LazyIdentityMap
@@ -16,10 +17,18 @@ def session_show():
     # introspect the auth access token to get session info
     auth_client = internal_auth_client()
     access_token = lookup_option(AUTH_AT_OPTNAME)
-    res = auth_client.oauth2_token_introspect(
-        access_token, include="session_info")
-    session_info = res.get("session_info", {})
-    authentications = session_info.get("authentications") or {}
+
+    # only instance clients can introspect tokens
+    if isinstance(auth_client, globus_sdk.ConfidentialAppAuthClient):
+        res = auth_client.oauth2_token_introspect(
+            access_token, include="session_info")
+        session_info = res.get("session_info", {})
+        authentications = session_info.get("authentications") or {}
+
+    # empty session if still using Native App Client
+    else:
+        session_info = {}
+        authentications = {}
 
     # resolve ids to human readable usernames
     resolved_ids = LazyIdentityMap(list(authentications))

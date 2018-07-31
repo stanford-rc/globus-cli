@@ -49,7 +49,7 @@ def login_command(no_local_server, force):
 
     # use a link login if remote session or user requested
     if no_local_server or is_remote_session():
-        do_link_auth_flow(force_new_client=force)
+        do_link_auth_flow(force_new_client=True)
 
     # otherwise default to a local server login flow
     else:
@@ -59,7 +59,7 @@ def login_command(no_local_server, force):
             "If this fails or you experience difficulty, try "
             "'globus login --no-local-server'"
             "\n---")
-        do_local_server_auth_flow(force_new_client=force)
+        do_local_server_auth_flow(force_new_client=True)
 
     # confirm login with user's preferred username
     auth_client = get_auth_client()
@@ -79,7 +79,7 @@ def check_logged_in():
         return False
 
     # get or create the instance client
-    auth_client = internal_auth_client()
+    auth_client = internal_auth_client(requires_instance=True)
 
     # check that tokens and client are valid
     try:
@@ -91,7 +91,6 @@ def check_logged_in():
     # if the instance client is invalid, an AuthAPIError will be raised
     # we then force a new client to be created before continuing
     except AuthAPIError:
-        internal_auth_client(force_new_client=True)
         return False
 
     return True
