@@ -36,17 +36,17 @@ def exit_with_mapped_status(http_status):
 
 def session_hook(exception):
     """
-    Expects an error with an authorization_paramaters field
+    Expects an exception with an authorization_paramaters field in its raw_json
     """
     safeprint("The resource you are trying to access requires you to "
               "re-authenticate with specific identities.")
 
-    message = exception["authorization_paramaters"].get("session_message")
+    params = exception.raw_json["authorization_parameters"]
+    message = params.get("session_message")
     if message:
         safeprint("message: {}".format(message))
 
-    identities = exception["authorization_paramaters"].get(
-        "session_required_identities")
+    identities = params.get("session_required_identities")
     if identities:
         id_str = " ".join(identities)
         safeprint("Please run\n\n"
@@ -144,6 +144,7 @@ def custom_except_hook(exc_info):
 
     # we're not in debug mode, do custom handling
     else:
+
         # if it's a click exception, re-raise as original -- Click's main
         # execution context will handle pretty-printing
         if isinstance(exception, click.ClickException):
@@ -151,8 +152,8 @@ def custom_except_hook(exc_info):
 
         # catch any session errors to give helpful instructions
         # on how to use globus session boost
-        elif (isinstance(exception, exc.GlobusAPIError) and
-                "authorization_parameters" in exception):
+        elif (isinstance(exception, exc.GlobusAPIError) and exception.raw_json
+                and "authorization_parameters" in exception.raw_json):
             session_hook(exception)
 
         # handle the Globus-raised errors with our special hooks
