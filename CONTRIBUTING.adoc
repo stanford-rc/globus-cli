@@ -131,3 +131,24 @@ Some rules and tips for the python and documentation in this project.
   - Use named parameters, not positional arguments
   - Use the verbs `create`, `show`, `update`, and `remove` for underlying API
       CRUD operations
+
+
+Releasing a Version
+-------------------
+
+If you are a CLI maintainer, you need to be able to do a release.
+
+Setup:
+
+  - Make sure you have a pypi account
+  - Setup your credentials for twine (the pypi upload tool)
+      https://github.com/pypa/twine[twine docs for detail]
+  - Make sure you have a gpg key setup for use with git.
+      https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work[git-scm.com guide for detail]
+
+Do it:
+
+  - `make release` to build source dists, upload via twine, and tag the release
+  - push the newly created version tag to GitHub
+  - Ensure that `docs.globus.org` gets updated with new docs/changelog
+      Procedure is set in that repo.
