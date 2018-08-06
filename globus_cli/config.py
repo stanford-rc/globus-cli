@@ -210,6 +210,19 @@ def internal_auth_client(requires_instance=False, force_new_client=False):
     template_client = internal_native_client()
     existing = client_id and client_secret
 
+    # if we are forcing a new client, delete any existing client
+    if force_new_client and existing:
+        existing_client = globus_sdk.ConfidentialAppAuthClient(
+            client_id, client_secret)
+        try:
+            existing_client.delete("/v2/api/clients/{}".format(client_id))
+
+        # if the client secret has been invalidated or the client has
+        # already been removed, we continue on
+        except globus_sdk.exc.AuthAPIError:
+            pass
+
+    # if we require a new client to be made
     if force_new_client or (requires_instance and not existing):
         # register a new instance client with auth
         body = {
@@ -230,10 +243,13 @@ def internal_auth_client(requires_instance=False, force_new_client=False):
         return globus_sdk.ConfidentialAppAuthClient(
             client_id, client_secret, app_name=version.app_name)
 
+    # if we already have a client, just return it
     elif existing:
         return globus_sdk.ConfidentialAppAuthClient(
             client_id, client_secret, app_name=version.app_name)
 
+    # fall-back to a native client to not break old logins
+    # TOOD: eventually remove this behavior
     else:
         return template_client
 
