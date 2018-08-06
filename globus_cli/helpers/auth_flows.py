@@ -14,7 +14,7 @@ SCOPES = ("openid profile email "
           "urn:globus:auth:scope:transfer.api.globus.org:all")
 
 
-def do_link_auth_flow(session_params=None, force_new_client=False):
+def do_link_auth_flow(session_params={}, force_new_client=False):
     """
     Prompts the user with a link to authenticate with globus auth
     and authorize the CLI to act on their behalf.
@@ -23,22 +23,19 @@ def do_link_auth_flow(session_params=None, force_new_client=False):
     auth_client = internal_auth_client(
         requires_instance=True, force_new_client=force_new_client)
 
-    # start the Confidential App Grant flow, prefilling the
-    # named grant label on the consent page if we can get a
-    # hostname for the local system
-    # label = platform.node() or None
+    # start the Confidential App Grant flow
     auth_client.oauth2_start_flow(
         redirect_uri=auth_client.base_url + 'v2/web/auth-code',
-        refresh_tokens=True,
-        # prefill_named_grant=label,
-        requested_scopes=SCOPES)
+        refresh_tokens=True, requested_scopes=SCOPES)
 
     # prompt
+    additional_params = {"prompt": "login"}
+    additional_params.update(session_params)
     linkprompt = 'Please authenticate with Globus here'
     safeprint('{0}:\n{1}\n{2}\n{1}\n'
               .format(linkprompt, '-' * len(linkprompt),
                       auth_client.oauth2_get_authorize_url(
-                        additional_params=session_params)))
+                        additional_params=additional_params)))
 
     # come back with auth code
     auth_code = click.prompt(
@@ -49,7 +46,7 @@ def do_link_auth_flow(session_params=None, force_new_client=False):
     return True
 
 
-def do_local_server_auth_flow(session_params=None, force_new_client=False):
+def do_local_server_auth_flow(session_params={}, force_new_client=False):
     """
     Starts a local http server, opens a browser to have the user authenticate,
     and gets the code redirected to the server (no copy and pasting required)
@@ -60,15 +57,15 @@ def do_local_server_auth_flow(session_params=None, force_new_client=False):
         redirect_uri = 'http://localhost:{}'.format(port)
 
         # get the ConfidentialApp client object and start a flow
-        # if available, use the system-name to prefill the grant
-        # label = platform.node() or None
         auth_client = internal_auth_client(
             requires_instance=True, force_new_client=force_new_client)
         auth_client.oauth2_start_flow(
-            refresh_tokens=True,  # prefill_named_grant=label,
-            redirect_uri=redirect_uri, requested_scopes=SCOPES)
+            refresh_tokens=True, redirect_uri=redirect_uri,
+            requested_scopes=SCOPES)
+        additional_params = {"prompt": "login"}
+        additional_params.update(session_params)
         url = auth_client.oauth2_get_authorize_url(
-            additional_params=session_params)
+            additional_params=additional_params)
 
         # open web-browser for user to log in, get auth code
         webbrowser.open(url, new=1)

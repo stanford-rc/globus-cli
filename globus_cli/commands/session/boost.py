@@ -65,8 +65,7 @@ def session_boost(identities, no_local_server, all):
     # create session params once we have all identity ids
     session_params = {
         "session_required_identities": ",".join(identity_ids),
-        "session_message": "Authenticate to boost your CLI session.",
-        "prompt": "login"
+        "session_message": "Authenticate to boost your CLI session."
     }
 
     # use a link login if remote session or user requested
