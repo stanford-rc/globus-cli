@@ -3,7 +3,7 @@ import time
 
 import globus_sdk
 from globus_cli.parsing import common_options
-from globus_cli.safeio import formatted_print
+from globus_cli.safeio import formatted_print, print_command_hint
 from globus_cli.services.auth import LazyIdentityMap
 from globus_cli.config import (
     internal_auth_client, lookup_option, AUTH_AT_OPTNAME)
@@ -42,6 +42,10 @@ def session_show():
             '%Y-%m-%d %H:%M %Z', time.localtime(vals["auth_time"]))
          }
         for key, vals in authentications.items()]
+
+    print_command_hint(
+        "For information on your primary identity or full identity set see\n"
+        "  globus whoami\n")
 
     formatted_print(list_data, json_converter=lambda x: session_info,
                     fields=[("Username", "username"),

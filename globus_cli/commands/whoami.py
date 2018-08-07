@@ -2,18 +2,19 @@ import click
 
 from globus_sdk.exc import AuthAPIError
 
-from globus_cli.safeio import safeprint, formatted_print, FORMAT_TEXT_RECORD
+from globus_cli.safeio import (
+    safeprint, print_command_hint, formatted_print, FORMAT_TEXT_RECORD)
 from globus_cli.parsing import common_options
 from globus_cli.helpers import is_verbose
 from globus_cli.services.auth import get_auth_client
 
 
 @click.command('whoami',
-               help=('Show the currently logged-in identity.'))
+               help=('Show the currently logged-in primary identity.'))
 @common_options(no_map_http_status_option=True)
 @click.option("--linked-identities", is_flag=True,
               help=("Also show identities linked to the currently logged-in "
-                    "identity."))
+                    "primary identity."))
 def whoami_command(linked_identities):
     """
     Executor for `globus whoami`
@@ -28,6 +29,10 @@ def whoami_command(linked_identities):
         safeprint('Unable to get user information. Please try '
                   'logging in again.', write_to_stderr=True)
         click.get_current_context().exit(1)
+
+    print_command_hint(
+        "For information on which identities are in session see\n"
+        "  globus session show\n")
 
     # --linked-identities either displays all usernames or a table if verbose
     if linked_identities:

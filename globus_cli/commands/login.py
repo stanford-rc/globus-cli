@@ -7,12 +7,14 @@ from globus_cli.safeio import safeprint
 from globus_cli.parsing import common_options, no_local_server_option
 from globus_cli.config import (
     AUTH_RT_OPTNAME, TRANSFER_RT_OPTNAME, internal_auth_client, lookup_option)
-from globus_cli.services.auth import get_auth_client
 
 _SHARED_EPILOG = ("""\
 
-You can always check your current identity with
+You can check your primary identity with
   globus whoami
+
+For information on which of your identities are in session use
+  globus session show
 
 Logout of the Globus CLI with
   globus logout
@@ -20,7 +22,7 @@ Logout of the Globus CLI with
 
 _LOGIN_EPILOG = (u"""\
 
-You have successfully logged in to the Globus CLI as {}
+You have successfully logged in to the Globus CLI!
 """) + _SHARED_EPILOG
 
 _LOGGED_IN_RESPONSE = ("""\
@@ -61,10 +63,8 @@ def login_command(no_local_server, force):
             "\n---")
         do_local_server_auth_flow(force_new_client=True)
 
-    # confirm login with user's preferred username
-    auth_client = get_auth_client()
-    res = auth_client.oauth2_userinfo()
-    safeprint(_LOGIN_EPILOG.format(res["preferred_username"]))
+    # print epilog
+    safeprint(_LOGIN_EPILOG)
 
 
 def check_logged_in():
