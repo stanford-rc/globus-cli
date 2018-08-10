@@ -1,13 +1,5 @@
 = Command Line Interface (CLI) Reference
 
-[NOTE]
-====
-This page refers to the current Globus CLI which is locally installed program.
-We also have a link:../legacy[reference for the hosted CLI], which is accessed
-via SSH but is deprecated.
-Support for the Hosted CLI will end August 1st, 2018.
-====
-
 link:list_commands[globus list-commands]::
 List all CLI commands
 
