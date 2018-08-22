@@ -13,12 +13,15 @@ import globus_sdk
 
 from globus_cli import main
 from globus_cli.config import (
+    CLIENT_ID_OPTNAME, CLIENT_SECRET_OPTNAME,
     AUTH_RT_OPTNAME, AUTH_AT_OPTNAME, AUTH_AT_EXPIRES_OPTNAME,
     TRANSFER_RT_OPTNAME, TRANSFER_AT_OPTNAME, TRANSFER_AT_EXPIRES_OPTNAME)
 from globus_cli.services.transfer import get_client
 from globus_cli.services.auth import get_auth_client
 
-from tests.framework.constants import (CLITESTER1A_TRANSFER_RT,
+from tests.framework.constants import (CLITESTER1A_CLIENT_ID,
+                                       CLITESTER1A_CLIENT_SECRET,
+                                       CLITESTER1A_TRANSFER_RT,
                                        CLITESTER1A_AUTH_RT, GO_EP1_ID)
 
 
@@ -58,6 +61,8 @@ def default_test_config(*args, **kwargs):
     # ConfigObj.filename = None and ConfigObj.write() returns a string without
     # writing anything to disk.
     return ConfigObj({"cli": {
+        CLIENT_ID_OPTNAME: CLITESTER1A_CLIENT_ID,
+        CLIENT_SECRET_OPTNAME: CLITESTER1A_CLIENT_SECRET,
         AUTH_RT_OPTNAME: CLITESTER1A_AUTH_RT,
         AUTH_AT_OPTNAME: "",
         AUTH_AT_EXPIRES_OPTNAME: 0,
