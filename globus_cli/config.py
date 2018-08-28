@@ -4,8 +4,6 @@ from configobj import ConfigObj
 
 import globus_sdk
 
-from globus_cli import version
-
 __all__ = [
     # option name constants
     'OUTPUT_FORMAT_OPTNAME',
@@ -228,7 +226,7 @@ def internal_auth_client(requires_instance=False, force_new_client=False):
         body = {
             "client": {
                 "template_id": template_id,
-                "name": version.app_name
+                "name": "Globus CLI"
             }
         }
         res = template_client.post("/v2/api/clients", json_body=body)
@@ -241,12 +239,12 @@ def internal_auth_client(requires_instance=False, force_new_client=False):
         write_option(CLIENT_SECRET_OPTNAME, client_secret)
 
         return globus_sdk.ConfidentialAppAuthClient(
-            client_id, client_secret, app_name=version.app_name)
+            client_id, client_secret, app_name="Globus CLI")
 
     # if we already have a client, just return it
     elif existing:
         return globus_sdk.ConfidentialAppAuthClient(
-            client_id, client_secret, app_name=version.app_name)
+            client_id, client_secret, app_name="Globus CLI")
 
     # fall-back to a native client to not break old logins
     # TOOD: eventually remove this behavior
