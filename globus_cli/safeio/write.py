@@ -1,7 +1,8 @@
 import errno
 import click
 
-from globus_cli.safeio.check_pty import term_is_interactive, err_is_terminal
+from globus_cli.safeio.check_pty import (
+    term_is_interactive, err_is_terminal, out_is_terminal)
 
 
 def safeprint(message, write_to_stderr=False, newline=True):
@@ -24,5 +25,5 @@ def print_command_hint(message):
     Wrapper around safeprint that checks terminal state
     before printing a given command hint message
     """
-    if term_is_interactive() and err_is_terminal():
+    if term_is_interactive() and err_is_terminal() and out_is_terminal():
         safeprint(message, write_to_stderr=True)
