@@ -14,14 +14,19 @@ from globus_cli.config import (
                help="List all identities in your current CLI auth session.")
 @common_options()
 def session_show():
-    # introspect the auth access token to get session info
+    # get a token to introspect, refreshing if neccecary
     auth_client = internal_auth_client()
+    try:
+        auth_client.authorizer._check_expiration_time()
+    except AttributeError:  # if we have no RefreshTokenAuthorizor
+        pass
     access_token = lookup_option(AUTH_AT_OPTNAME)
 
     # only instance clients can introspect tokens
     if isinstance(auth_client, globus_sdk.ConfidentialAppAuthClient):
         res = auth_client.oauth2_token_introspect(
             access_token, include="session_info")
+
         session_info = res.get("session_info", {})
         authentications = session_info.get("authentications") or {}
 
