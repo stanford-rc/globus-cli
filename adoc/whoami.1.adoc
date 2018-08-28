@@ -30,6 +30,9 @@ include::include/verbose_option.adoc[]
 
 == OUTPUT
 
+Note: this output is not affected by sessions in any way. For information
+on which of your identities are in session use *globus session show*
+
 If no options are given the default output is just the preferred
 username of the logged in identity.
 

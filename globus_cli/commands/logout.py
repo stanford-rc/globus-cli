@@ -6,10 +6,11 @@ from globus_cli.safeio import safeprint
 from globus_cli.parsing import common_options
 from globus_cli.services.auth import get_auth_client
 from globus_cli.config import (
+    CLIENT_ID_OPTNAME, CLIENT_SECRET_OPTNAME,
     AUTH_RT_OPTNAME, TRANSFER_RT_OPTNAME,
     AUTH_AT_OPTNAME, TRANSFER_AT_OPTNAME,
     AUTH_AT_EXPIRES_OPTNAME, TRANSFER_AT_EXPIRES_OPTNAME,
-    internal_auth_client, remove_option, lookup_option)
+    internal_auth_client, internal_native_client, remove_option, lookup_option)
 
 
 _RESCIND_HELP = """\
@@ -56,8 +57,9 @@ def logout_command():
     safeprint(u'Logging out of Globus{}\n'.format(u' as ' + username
                                                   if username else ''))
 
-    # build the NativeApp client object
-    native_client = internal_auth_client()
+    # we use a Native Client to prevent an invalid instance client
+    # from preventing token revocation
+    native_client = internal_native_client()
 
     # remove tokens from config and revoke them
     # also, track whether or not we should print the rescind help
@@ -84,10 +86,23 @@ def logout_command():
         # finally, we revoked, so it's safe to remove the token
         remove_option(token_opt)
 
-    # remove expiration times, just for cleanliness
-    for expires_opt in (TRANSFER_AT_EXPIRES_OPTNAME,
-                        AUTH_AT_EXPIRES_OPTNAME):
-        remove_option(expires_opt)
+    # delete the instance client if one exists
+    client_id = lookup_option(CLIENT_ID_OPTNAME)
+
+    if client_id:
+        instance_client = internal_auth_client()
+        try:
+            instance_client.delete("/v2/api/clients/{}".format(client_id))
+
+        # if the client secret has been invalidated or the client has
+        # already been removed, we continue on
+        except AuthAPIError:
+            pass
+
+    # remove deleted client values and expiration times
+    for opt in (CLIENT_ID_OPTNAME, CLIENT_SECRET_OPTNAME,
+                TRANSFER_AT_EXPIRES_OPTNAME, AUTH_AT_EXPIRES_OPTNAME):
+        remove_option(opt)
 
     # if print_rescind_help is true, we printed warnings above
     # so, jam out an extra newline as a separator

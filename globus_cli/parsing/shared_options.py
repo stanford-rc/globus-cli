@@ -659,3 +659,15 @@ def security_principal_opts(*args, **kwargs):
         return f
 
     return detect_and_decorate(inner_decorator, args, kwargs)
+
+
+def no_local_server_option(f):
+    """
+    Option for commands that start auth flows and might need to disable
+    the default local server behavior
+    """
+    return click.option(
+        "--no-local-server", is_flag=True,
+        help=("Manual authorization by copying and pasting an auth code. "
+              "This option is implied if the CLI detects you are using a "
+              "remote connection."))(f)

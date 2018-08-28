@@ -1,4 +1,4 @@
-from globus_cli.safeio.write import safeprint
+from globus_cli.safeio.write import safeprint, print_command_hint
 from globus_cli.safeio.errors import PrintableErrorField, write_error_info
 from globus_cli.safeio.output_formatter import (
     formatted_print,
@@ -10,6 +10,7 @@ from globus_cli.safeio.check_pty import (
 
 __all__ = [
     'safeprint',
+    'print_command_hint',
 
     'PrintableErrorField',
     'write_error_info',

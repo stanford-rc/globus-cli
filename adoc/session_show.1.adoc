@@ -1,0 +1,46 @@
+= GLOBUS SESSION SHOW(1)
+
+== NAME
+
+globus session show - List all identities in the user's CLI auth session
+
+
+== SYNOPSIS
+
+*globus session show* ['OPTIONS']
+
+
+== DESCRIPTION
+
+The *globus session show* command lists all identities that are in the
+session tied to the CLI's access tokens along with the time the
+user authenticated with that identity.
+
+
+== OPTIONS
+
+include::include/common_options.adoc[]
+
+
+== OUTPUT
+
+Note: this output will not show your primary identity if it is not in session.
+For information on your identity set use *globus whoami*.
+
+When textual output is requested, the output will be a table with
+the following fields:
+
+- 'Username'
+- 'ID'
+- 'Auth Time'
+
+When JSON output is requested the output will also have the session id
+if needed.
+
+
+== EXAMPLES
+
+Display the current session with JSON output
+----
+$ globus session show --format json
+----
