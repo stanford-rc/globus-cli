@@ -1,5 +1,11 @@
 = CLI Changelog
 
+== 1.8.0
+
+Enhancements:
+
+* Add support for using high assurance collections (https://github.com/globus/globus-cli/pull/434[434])
+
 == 1.7.0
 
 Enhancements:
