@@ -27,7 +27,7 @@ def role_list(endpoint_id):
             username = resolved_ids.get(principal)
             return username or principal
         elif role['principal_type'] == 'group':
-            return (u'https://www.globus.org/app/groups/{}').format(principal)
+            return (u'https://app.globus.org/groups/{}').format(principal)
         else:
             return principal
 

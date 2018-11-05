@@ -126,7 +126,7 @@ Print out task statuses with links to their pages in the web UI:
 ----
 globus task list --format=unix --jmespath='DATA[*].[task_id, status]' | \
     awk '{printf "Task %s is currently %s\n", $1, $2;
-          printf "View at https://www.globus.org/app/activity/%s\n\n", $1}'
+          printf "View at https://app.globus.org/activity/%s\n\n", $1}'
 ----
 
 include::include/exit_status.adoc[]

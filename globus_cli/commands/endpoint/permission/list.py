@@ -28,7 +28,7 @@ def list_command(endpoint_id):
             username = resolved_ids.get(principal)
             return username or principal
         elif rule['principal_type'] == 'group':
-            return (u'https://www.globus.org/app/groups/{}'
+            return (u'https://app.globus.org/groups/{}'
                     ).format(principal)
         else:
             principal = rule['principal_type']
