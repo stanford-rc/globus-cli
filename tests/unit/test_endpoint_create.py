@@ -77,14 +77,14 @@ class EndpointCreateTests(CliTestCase):
         output = self.run_line(
             "globus endpoint create gcp_text --personal")
         self.assertIn("Setup Key:", output)
-        ep_id = re.search("Endpoint ID:\s*(\S*)", output).group(1)
+        ep_id = re.search(r"Endpoint ID:\s*(\S*)", output).group(1)
         self.asset_cleanup.append(ep_id)
 
         # GCS
         output = self.run_line(
             "globus endpoint create gcs_text --server")
         self.assertNotIn("Setup Key:", output)
-        ep_id = re.search("Endpoint ID:\s*(\S*)", output).group(1)
+        ep_id = re.search(r"Endpoint ID:\s*(\S*)", output).group(1)
         self.asset_cleanup.append(ep_id)
 
     def test_general_options(self):
