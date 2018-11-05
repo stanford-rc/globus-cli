@@ -293,7 +293,7 @@ def task_wait_with_io(meow, heartbeat, polling_interval, timeout, task_id,
                 safeprint('', write_to_stderr=True)
             # meowing tasks wake up!
             if meow:
-                safeprint("""\
+                safeprint(r"""
                   _..
   /}_{\           /.-'
  ( a a )-.___...-'/

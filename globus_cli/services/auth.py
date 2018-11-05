@@ -6,7 +6,7 @@ from globus_cli.config import (get_auth_tokens, internal_auth_client,
                                set_auth_access_token)
 
 # what qualifies as a valid Identity Name?
-_IDENTITY_NAME_REGEX = '^[a-zA-Z0-9]+.*@[a-zA-z0-9-]+\..*[a-zA-Z]+$'
+_IDENTITY_NAME_REGEX = r'^[a-zA-Z0-9]+.*@[a-zA-z0-9-]+\..*[a-zA-Z]+$'
 
 
 def _update_access_tokens(token_response):
