@@ -316,7 +316,7 @@ def task_wait_with_io(meow, heartbeat, polling_interval, timeout, task_id,
 
     # Tasks start out sleepy
     if meow:
-        safeprint("""\
+        safeprint(r"""
    |\      _,,,---,,_
    /,`.-'`'    -.  ;-;;,_
   |,4-  ) )-,_..;\ (  `'-'
