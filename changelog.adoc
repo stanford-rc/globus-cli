@@ -1,5 +1,15 @@
 = CLI Changelog
 
+== 1.9.0
+
+Enhancements:
+
+* GCP connection/paused status via the endpoint resource
+(https://github.com/globus/globus-cli/pull/440[440])
+* Update WebApp links
+(https://github.com/globus/globus-cli/pull/438[438])
+* Minor internal improvements
+
 == 1.8.0
 
 Enhancements:
