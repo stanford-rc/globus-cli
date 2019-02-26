@@ -1,5 +1,9 @@
 = CLI Changelog
 
+== 1.9.1
+
+* Minor internal improvements
+
 == 1.9.0
 
 Enhancements:
