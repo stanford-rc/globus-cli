@@ -1,7 +1,7 @@
 import os
 import sys
-from setuptools import setup, find_packages
 
+from setuptools import find_packages, setup
 
 if sys.version_info < (2, 7):
     raise NotImplementedError("""\n
@@ -21,7 +21,7 @@ setup(
     version=version,
     packages=find_packages(exclude=['tests', 'tests.*']),
     install_requires=[
-        'globus-sdk==1.6.1',
+        'globus-sdk==1.7.1',
         'click>=6.6,<7.0',
         'jmespath==0.9.2',
         'configobj>=5.0.6,<6.0.0',
@@ -33,7 +33,7 @@ setup(
         #
         # as new versions of cryptography are released, we may need to update
         # this requirement
-        'cryptography>=1.8.1,<2.5.0'
+        'cryptography>=1.8.1,<2.6.0'
     ],
 
     extras_require={
