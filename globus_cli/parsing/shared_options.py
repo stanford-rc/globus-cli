@@ -468,6 +468,17 @@ def synchronous_task_wait_options(f):
 
         return value
 
+    def exit_code_callback(ctx, param, value):
+        if not value:
+            return None
+
+        exit_stat_set = [0, 1] + list(range(50, 100))
+        if value not in exit_stat_set:
+            raise click.UsageError(
+                "--timeout-exit-code must have a value in 0,1,50-99")
+
+        return value
+
     f = click.option('--timeout', type=int, metavar='N',
                      help=('Wait N seconds. If the Task does not terminate by '
                            'then, or terminates with an unsuccessful status, '
@@ -480,6 +491,11 @@ def synchronous_task_wait_options(f):
         '--heartbeat', '-H', is_flag=True,
         help=('Every polling interval, print "." to stdout to '
               'indicate that task wait is till active'))(f)
+    f = click.option(
+        "--timeout-exit-code", type=int, default=1, show_default=True,
+        callback=exit_code_callback,
+        help=("If the task times out, exit with this status code. Must have "
+              "a value in 0,1,50-99"))(f)
     f = click.option('--meow', is_flag=True, cls=HiddenOption)(f)
     return f
 

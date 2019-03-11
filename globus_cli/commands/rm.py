@@ -28,7 +28,7 @@ from globus_cli.services.transfer import (
 def rm_command(ignore_missing, star_silent, recursive, enable_globs,
                endpoint_plus_path, label, submission_id, dry_run, deadline,
                skip_activation_check, notify,
-               meow, heartbeat, polling_interval, timeout):
+               meow, heartbeat, polling_interval, timeout, timeout_exit_code):
     """
     Executor for `globus rm`
     """
@@ -78,4 +78,4 @@ def rm_command(ignore_missing, star_silent, recursive, enable_globs,
 
     # do a `task wait` equivalent, including printing and correct exit status
     task_wait_with_io(meow, heartbeat, polling_interval, timeout, task_id,
-                      client=client)
+                      timeout_exit_code, client=client)
