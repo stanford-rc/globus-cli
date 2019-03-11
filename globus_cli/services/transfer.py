@@ -268,7 +268,7 @@ def get_endpoint_w_server_list(endpoint_id):
 
 
 def task_wait_with_io(meow, heartbeat, polling_interval, timeout, task_id,
-                      client=None):
+                      timeout_exit_code,  client=None):
     """
     Options are the core "task wait" options, including the `--meow` easter
     egg.
@@ -335,15 +335,17 @@ def task_wait_with_io(meow, heartbeat, polling_interval, timeout, task_id,
     if heartbeat:
         safeprint('', write_to_stderr=True)
 
+    exit_code = 1
     if timed_out(waited_time):
         safeprint('Task has yet to complete after {} seconds'.format(timeout),
                   write_to_stderr=True)
+        exit_code = timeout_exit_code
 
     # output json if requested, but nothing for text mode
     res = client.get_task(task_id)
     formatted_print(res, text_format=FORMAT_SILENT)
 
-    click.get_current_context().exit(1)
+    click.get_current_context().exit(exit_code)
 
 
 ENDPOINT_LIST_FIELDS = (('ID', 'id'), ('Owner', 'owner_string'),

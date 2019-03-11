@@ -132,3 +132,19 @@ class RMTests(CliTestCase):
             assert_exit_code=1)
         self.assertIn(("Task has yet to complete "
                        "after {} seconds".format(timeout)), output)
+
+    def test_timeout_explicit_status(self):
+        """
+        Attempts to remove a path we are not allowed to remove,
+        confirms rm times out and exits STATUS after given timeout, where
+        STATUS is set via the --timeout-exit-code opt
+        """
+        timeout = 1
+        status = 50
+        path = "/share/godata/file1.txt"
+        output = self.run_line(
+            "globus rm -r --timeout {} --timeout-exit-code {} {}:{}"
+            .format(timeout, status, GO_EP1_ID, path),
+            assert_exit_code=status)
+        self.assertIn(("Task has yet to complete "
+                       "after {} seconds".format(timeout)), output)
