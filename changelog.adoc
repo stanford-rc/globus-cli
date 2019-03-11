@@ -1,5 +1,12 @@
 = CLI Changelog
 
+== 1.10.0
+
+Enhancements:
+
+* Add `--timeout-exit-code` option to override the default exit
+code (1) for commands that wait on tasks. For example, `globus task wait <task_id> --timeout 60 --timeout-exit-code 0`.
+
 == 1.9.1
 
 * Minor internal improvements
