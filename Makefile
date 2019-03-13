@@ -1,3 +1,4 @@
+PYTHON_VERSION=python3
 VIRTUALENV=.venv
 CLI_VERSION=$(shell grep '^__version__' globus_cli/version.py | cut -d '"' -f2)
 
@@ -9,7 +10,7 @@ help:
 	@echo ""
 	@echo "  help:      Show this helptext"
 	@echo "  showvars:  Show makefile variables"
-	@echo "  localdev:  Setup local development env with a 'setup.py develop'"
+	@echo "  localdev:  Setup local development env with a 'pip install -e'"
 	@echo "  build:     Create the source distributions for release"
 	@echo "  test:      Run the full suite of tests"
 	@echo "  release:   [build], but also upload to pypi using twine and create a signed git tag"
@@ -21,13 +22,11 @@ showvars:
 
 
 $(VIRTUALENV):
-	virtualenv $(VIRTUALENV)
-	$(VIRTUALENV)/bin/pip install --upgrade pip
-	$(VIRTUALENV)/bin/pip install --upgrade setuptools
-
+	virtualenv --python=$(PYTHON_VERSION) $(VIRTUALENV)
+	$(VIRTUALENV)/bin/pip install -U pip setuptools
+	$(VIRTUALENV)/bin/pip install -e '.[development]'
 
 localdev: $(VIRTUALENV)
-	$(VIRTUALENV)/bin/python setup.py develop
 
 
 build: $(VIRTUALENV)
@@ -52,16 +51,10 @@ test: $(VIRTUALENV)/bin/flake8 $(VIRTUALENV)/bin/nose2 localdev
 	$(VIRTUALENV)/bin/nose2 --verbose
 
 
-travis:
-	pip install --upgrade pip
-	pip install --upgrade "setuptools>=29"
-	pip install -r test-requirements.txt
-ifeq (, $(findstring pypy, $(TRAVIS_PYTHON_VERSION)))
-	pip install "cryptography>=1.8.1,<2.0.0"
-endif
-	python setup.py develop
-	flake8
-	nose2 --verbose
+# run outside of tox because specifying a tox environment for py3.6+ is awkward
+autoformat: $(VIRTUALENV)
+	$(VIRTUALENV)/bin/isort --recursive tests/ globus_cli/ setup.py
+	if [ -f "$(VIRTUALENV)/bin/black" ]; then $(VIRTUALENV)/bin/black  tests/ globus_cli/ setup.py; fi
 
 
 clean:

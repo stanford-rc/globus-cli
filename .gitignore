@@ -16,3 +16,5 @@
 /.venv27/
 /.venv3/
 /venv3/
+
+/.tox
