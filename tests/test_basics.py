@@ -30,8 +30,7 @@ class BasicTests(CliTestCase):
         confirms both the command and the option are parsed
         """
         output = self.run_line("globus list-commands --help")
-        self.assertIn("List all Globus CLI Commands with short help output.",
-                      output)
+        self.assertIn("List all Globus CLI Commands with short help output.", output)
 
     def test_command_missing_args(self):
         """
@@ -66,8 +65,7 @@ class BasicTests(CliTestCase):
         Get single-field jmespath output and make sure it's quoted
         """
         output = self.run_line("globus whoami --jmespath name").strip()
-        self.assertEquals(
-            '"{}"'.format(get_user_data()["clitester1a"]["name"]), output)
+        self.assertEquals('"{}"'.format(get_user_data()["clitester1a"]["name"]), output)
 
     def test_auth_call_no_auth(self):
         """
@@ -75,9 +73,10 @@ class BasicTests(CliTestCase):
         confirms No Authentication CLI error.
         """
         output = self.run_line(
-            "globus get-identities " +
-            get_user_data()["clitester1a"]["username"],
-            config={}, assert_exit_code=1)
+            "globus get-identities " + get_user_data()["clitester1a"]["username"],
+            config={},
+            assert_exit_code=1,
+        )
         self.assertIn("No Authentication provided.", output)
 
     def test_auth_call(self):
@@ -86,8 +85,8 @@ class BasicTests(CliTestCase):
         test auth refresh token is live and configured correctly
         """
         output = self.run_line(
-            "globus get-identities " +
-            get_user_data()["clitester1a"]["username"])
+            "globus get-identities " + get_user_data()["clitester1a"]["username"]
+        )
         self.assertIn(get_user_data()["clitester1a"]["id"], output)
 
     def test_transfer_call_no_auth(self):
@@ -95,8 +94,9 @@ class BasicTests(CliTestCase):
         Runs ls with config set to be empty,
         confirms No Authentication CLI error.
         """
-        output = self.run_line("globus ls " + str(GO_EP1_ID),
-                               config={}, assert_exit_code=1)
+        output = self.run_line(
+            "globus ls " + str(GO_EP1_ID), config={}, assert_exit_code=1
+        )
         self.assertIn("No Authentication provided.", output)
 
     def test_transfer_call(self):
@@ -112,9 +112,13 @@ class BasicTests(CliTestCase):
         Dry-runs a transfer in batchmode, confirms batchmode inputs received
         """
         batch_input = "abc /def\n/xyz p/q/r\n"
-        output = self.run_line("globus transfer -F json --batch --dry-run " +
-                               str(GO_EP1_ID) + " " + str(GO_EP2_ID),
-                               batch_input=batch_input)
+        output = self.run_line(
+            "globus transfer -F json --batch --dry-run "
+            + str(GO_EP1_ID)
+            + " "
+            + str(GO_EP2_ID),
+            batch_input=batch_input,
+        )
         self.assertIn('"source_path": "abc"', output)
         self.assertIn('"destination_path": "/def"', output)
         self.assertIn('"source_path": "/xyz"', output)
@@ -125,9 +129,9 @@ class BasicTests(CliTestCase):
         Dry-runs a delete in batchmode
         """
         batch_input = "abc/def\n/xyz\n"
-        output = self.run_line("globus delete --batch --dry-run " +
-                               str(GO_EP1_ID), batch_input=batch_input)
-        self.assertEqual("\n".join(("Path   ",
-                                    "-------",
-                                    "abc/def",
-                                    "/xyz   \n")), output)
+        output = self.run_line(
+            "globus delete --batch --dry-run " + str(GO_EP1_ID), batch_input=batch_input
+        )
+        self.assertEqual(
+            "\n".join(("Path   ", "-------", "abc/def", "/xyz   \n")), output
+        )

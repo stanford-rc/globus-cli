@@ -30,15 +30,15 @@ class LsTests(CliTestCase):
         Confirms setting depth to 1 on a --recursive ls of EP1:/
         finds godata but not file1.txt
         """
-        output = self.run_line(("globus ls -r --recursive-depth-limit 1 {}:/"
-                                .format(GO_EP1_ID)))
+        output = self.run_line(
+            ("globus ls -r --recursive-depth-limit 1 {}:/".format(GO_EP1_ID))
+        )
         self.assertNotIn("file1.txt", output)
 
     def test_recursive_json(self):
         """
         Confirms -F json works with the RecursiveLsResponse
         """
-        output = self.run_line(
-            "globus ls -r -F json {}:/share".format(GO_EP1_ID))
+        output = self.run_line("globus ls -r -F json {}:/share".format(GO_EP1_ID))
         self.assertIn('"DATA":', output)
         self.assertIn('"name": "godata/file1.txt"', output)

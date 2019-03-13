@@ -1,9 +1,9 @@
 from textwrap import dedent
+
 import click
 
 from globus_cli.parsing import common_options, endpoint_id_arg
-from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
-
+from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import get_client, get_endpoint_w_server_list
 
 
@@ -14,53 +14,53 @@ def _spec_to_matches(server_list, server_spec, mode):
     A list of matching server docs.
     Should usually be 0 or 1 matches. Multiple matches are possible though.
     """
-    assert mode in ('uri', 'hostname', 'hostname_port')
+    assert mode in ("uri", "hostname", "hostname_port")
 
     def match(server_doc):
-        if mode == 'hostname':
-            return server_spec == server_doc['hostname']
-        elif mode == 'hostname_port':
-            return (server_spec == '{}:{}'.format(
-                        server_doc['hostname'],
-                        server_doc['port']))
-        elif mode == 'uri':
-            return (server_spec == '{}://{}:{}'.format(
-                        server_doc['scheme'],
-                        server_doc['hostname'],
-                        server_doc['port']))
+        if mode == "hostname":
+            return server_spec == server_doc["hostname"]
+        elif mode == "hostname_port":
+            return server_spec == "{}:{}".format(
+                server_doc["hostname"], server_doc["port"]
+            )
+        elif mode == "uri":
+            return server_spec == "{}://{}:{}".format(
+                server_doc["scheme"], server_doc["hostname"], server_doc["port"]
+            )
         else:
-            raise NotImplementedError(
-                'Unreachable error! Something is very wrong.')
+            raise NotImplementedError("Unreachable error! Something is very wrong.")
 
-    return [server_doc for server_doc in server_list
-            if match(server_doc)]
+    return [server_doc for server_doc in server_list if match(server_doc)]
 
 
 def _detect_mode(server):
     try:
         int(server)
-        return 'id'
+        return "id"
     except ValueError:
         pass
 
-    if '://' in server:
-        return 'uri'
+    if "://" in server:
+        return "uri"
 
-    if ':' in server:
-        return 'hostname_port'
+    if ":" in server:
+        return "hostname_port"
 
-    return 'hostname'
+    return "hostname"
 
 
-@click.command('delete', help="""\
+@click.command(
+    "delete",
+    help="""\
     Delete a server belonging to an endpoint
 
     SERVER may be a server ID, HOSTNAME, HOSTNAME:PORT, or URI
     ( SCHEME://HOSTNAME:PORT )
-    """)
+    """,
+)
 @common_options
 @endpoint_id_arg
-@click.argument('server')
+@click.argument("server")
 def server_delete(endpoint_id, server):
     """
     Executor for `globus endpoint server show`
@@ -73,30 +73,33 @@ def server_delete(endpoint_id, server):
     # mode='id'
     endpoint, server_list = get_endpoint_w_server_list(endpoint_id)
 
-    if server_list == 'S3':
-        raise click.UsageError('You cannot delete servers from S3 endpoints.')
+    if server_list == "S3":
+        raise click.UsageError("You cannot delete servers from S3 endpoints.")
 
     # we don't *have to* raise an error in the GCP case, since the API would
     # deny it too, but doing so makes our errors a little bit more consistent
     # with deletes against S3 endpoints and shares
-    if endpoint['is_globus_connect']:
+    if endpoint["is_globus_connect"]:
         raise click.UsageError(
-            'You cannot delete servers from Globus Connect Personal endpoints')
+            "You cannot delete servers from Globus Connect Personal endpoints"
+        )
 
-    if mode != 'id':
+    if mode != "id":
         matches = _spec_to_matches(server_list, server, mode)
         if not matches:
-            raise click.UsageError('No server was found matching "{}"'
-                                   .format(server))
+            raise click.UsageError('No server was found matching "{}"'.format(server))
         elif len(matches) > 1:
-            raise click.UsageError(dedent("""\
+            raise click.UsageError(
+                dedent(
+                    """\
                 Multiple servers matched "{}":
                     {}
-            """).format(server, [x['id'] for x in matches]))
+            """
+                ).format(server, [x["id"] for x in matches])
+            )
         else:
-            server = matches[0]['id']
+            server = matches[0]["id"]
 
     response = client.delete_endpoint_server(endpoint_id, server)
 
-    formatted_print(response, text_format=FORMAT_TEXT_RAW,
-                    response_key='message')
+    formatted_print(response, text_format=FORMAT_TEXT_RAW, response_key="message")

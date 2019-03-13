@@ -1,13 +1,10 @@
-import os
 import json
+import os
 
 
 def get_file_dir():
     return os.path.normpath(
-        os.path.join(
-            os.path.dirname(__file__),
-            "../framework/files"
-        )
+        os.path.join(os.path.dirname(__file__), "../framework/files")
     )
 
 
@@ -15,7 +12,6 @@ def get_user_data():
     dirname = get_file_dir()
     ret = {}
     for uname in ("clitester1a", "clitester1alinked", "go"):
-        with open(os.path.join(dirname,
-                               uname + "@globusid.org.json")) as f:
+        with open(os.path.join(dirname, uname + "@globusid.org.json")) as f:
             ret[uname] = json.load(f)
     return ret

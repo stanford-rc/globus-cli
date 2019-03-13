@@ -23,8 +23,8 @@ class RecursiveLsResponse(PaginatedResource):
     for BFS of the filesystem.
     Rate limits calls to prevent getting back connection errors.
     """
-    def __init__(self, client, endpoint_id,
-                 max_depth, filter_after_first, ls_params):
+
+    def __init__(self, client, endpoint_id, max_depth, filter_after_first, ls_params):
         """
         **Parameters**
           ``client``
@@ -41,8 +41,11 @@ class RecursiveLsResponse(PaginatedResource):
             Query params sent to operation_ls, see operation_ls for more
             details.
         """
-        logger.info("Creating RecursiveLsResponse on path {} of endpoint {}"
-                    .format(ls_params.get("path"), endpoint_id))
+        logger.info(
+            "Creating RecursiveLsResponse on path {} of endpoint {}".format(
+                ls_params.get("path"), endpoint_id
+            )
+        )
 
         self.client = client
         self.endpoint_id = endpoint_id
@@ -82,14 +85,22 @@ class RecursiveLsResponse(PaginatedResource):
         """
         # BFS is not done until the queue is empty
         while self.queue:
-            logger.debug(("recursive_operation_ls BFS queue not empty, "
-                          "getting next path now."))
+            logger.debug(
+                (
+                    "recursive_operation_ls BFS queue not empty, "
+                    "getting next path now."
+                )
+            )
 
             # rate limit based on number of ls calls we have made
             self.ls_count += 1
             if self.ls_count % SLEEP_FREQUENCY == 0:
-                logger.debug(("recursive_operation_ls sleeping {} seconds to "
-                              "rate limit itself.".format(SLEEP_LEN)))
+                logger.debug(
+                    (
+                        "recursive_operation_ls sleeping {} seconds to "
+                        "rate limit itself.".format(SLEEP_LEN)
+                    )
+                )
                 time.sleep(SLEEP_LEN)
 
             # get path and current depth from the queue
@@ -120,14 +131,19 @@ class RecursiveLsResponse(PaginatedResource):
             # data is reversed to maintain any "orderby" ordering
             if depth < self.max_depth:
                 self.queue.extend(
-                    [(res["path"] + item["name"],
-                      (rel_path + "/" if rel_path else "") + item["name"],
-                      depth + 1)
-                     for item in reversed(res_data) if item["type"] == "dir"])
+                    [
+                        (
+                            res["path"] + item["name"],
+                            (rel_path + "/" if rel_path else "") + item["name"],
+                            depth + 1,
+                        )
+                        for item in reversed(res_data)
+                        if item["type"] == "dir"
+                    ]
+                )
 
             # for each item in the response data update the item's name with
             # the relative path popped from the queue, and yield the item
             for item in res_data:
-                item["name"] = (
-                    rel_path + "/" if rel_path else "") + item["name"]
+                item["name"] = (rel_path + "/" if rel_path else "") + item["name"]
                 yield GlobusResponse(item)

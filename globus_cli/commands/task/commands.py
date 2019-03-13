@@ -1,19 +1,15 @@
-from globus_cli.parsing import globus_group
-
+from globus_cli.commands.task.cancel import cancel_task
+from globus_cli.commands.task.event_list import task_event_list
+from globus_cli.commands.task.generate_submission_id import generate_submission_id
 from globus_cli.commands.task.list import task_list
+from globus_cli.commands.task.pause_info import task_pause_info
 from globus_cli.commands.task.show import show_task
 from globus_cli.commands.task.update import update_task
-from globus_cli.commands.task.cancel import cancel_task
-
-from globus_cli.commands.task.event_list import task_event_list
-from globus_cli.commands.task.pause_info import task_pause_info
 from globus_cli.commands.task.wait import task_wait
-
-from globus_cli.commands.task.generate_submission_id import (
-    generate_submission_id)
+from globus_cli.parsing import globus_group
 
 
-@globus_group(name='task', help='Manage asynchronous tasks')
+@globus_group(name="task", help="Manage asynchronous tasks")
 def task_command():
     pass
 

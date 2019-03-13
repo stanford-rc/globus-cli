@@ -1,5 +1,5 @@
-import sys
 import shlex
+import sys
 
 from globus_cli.safeio import safeprint
 
@@ -16,10 +16,13 @@ def shlex_process_stdin(process_command, helptext):
     # if input is interactive, print help to stderr
     if sys.stdin.isatty():
         safeprint(
-            ('{}\n'.format(helptext) +
-             'Lines are split with shlex in POSIX mode: '
-             'https://docs.python.org/library/shlex.html#parsing-rules\n'
-             'Terminate input with Ctrl+D or <EOF>\n'), write_to_stderr=True)
+            (
+                "{}\n".format(helptext) + "Lines are split with shlex in POSIX mode: "
+                "https://docs.python.org/library/shlex.html#parsing-rules\n"
+                "Terminate input with Ctrl+D or <EOF>\n"
+            ),
+            write_to_stderr=True,
+        )
 
     # use readlines() rather than implicit file read line looping to force
     # python to properly capture EOF (otherwise, EOF acts as a flush and

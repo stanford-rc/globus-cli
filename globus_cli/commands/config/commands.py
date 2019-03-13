@@ -1,14 +1,16 @@
-from globus_cli.parsing import globus_group
-
 from globus_cli.commands.config.filename import filename_command
 from globus_cli.commands.config.init import init_command
 from globus_cli.commands.config.remove import remove_command
 from globus_cli.commands.config.set import set_command
 from globus_cli.commands.config.show import show_command
+from globus_cli.parsing import globus_group
 
 
-@globus_group('config', short_help=(
-    'Manage your Globus config file. (Advanced Users)'), help=("""\
+@globus_group(
+    "config",
+    short_help=("Manage your Globus config file. (Advanced Users)"),
+    help=(
+        """\
     Manage your Globus config file.
 
     Be aware that these commands are for advanced users with a strong
@@ -29,7 +31,9 @@ from globus_cli.commands.config.show import show_command
     You can equally well use
         $ globus config show cli.output_format
     to show the same value more explicitly.
-    """))
+    """
+    ),
+)
 def config_command():
     pass
 

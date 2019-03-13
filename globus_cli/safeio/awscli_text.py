@@ -22,6 +22,7 @@ import sys
 # we're going to use the stock/standard one and it should have all of the
 # same/correct behaviors
 import six
+
 # END Globus changes
 
 
@@ -38,7 +39,7 @@ def _format_text(item, stream, identifier=None, scalar_keys=None):
         # If it's not a list or a dict, we just write the scalar
         # value out directly.
         stream.write(six.text_type(item))
-        stream.write('\n')
+        stream.write("\n")
 
 
 def _format_list(item, identifier, stream):
@@ -47,15 +48,15 @@ def _format_list(item, identifier, stream):
     if any(isinstance(el, dict) for el in item):
         all_keys = _all_scalar_keys(item)
         for element in item:
-            _format_text(element, stream=stream, identifier=identifier,
-                         scalar_keys=all_keys)
+            _format_text(
+                element, stream=stream, identifier=identifier, scalar_keys=all_keys
+            )
     elif any(isinstance(el, list) for el in item):
         scalar_elements, non_scalars = _partition_list(item)
         if scalar_elements:
             _format_scalar_list(scalar_elements, identifier, stream)
         for non_scalar in non_scalars:
-            _format_text(non_scalar, stream=stream,
-                         identifier=identifier)
+            _format_text(non_scalar, stream=stream, identifier=identifier)
     else:
         _format_scalar_list(item, identifier, stream)
 
@@ -74,12 +75,11 @@ def _partition_list(item):
 def _format_scalar_list(elements, identifier, stream):
     if identifier is not None:
         for item in elements:
-            stream.write('%s\t%s\n' % (identifier.upper(),
-                                       item))
+            stream.write("%s\t%s\n" % (identifier.upper(), item))
     else:
         # For a bare list, just print the contents.
-        stream.write('\t'.join([six.text_type(item) for item in elements]))
-        stream.write('\n')
+        stream.write("\t".join([six.text_type(item) for item in elements]))
+        stream.write("\n")
 
 
 def _format_dict(scalar_keys, item, identifier, stream):
@@ -87,11 +87,10 @@ def _format_dict(scalar_keys, item, identifier, stream):
     if scalars:
         if identifier is not None:
             scalars.insert(0, identifier.upper())
-        stream.write('\t'.join(scalars))
-        stream.write('\n')
+        stream.write("\t".join(scalars))
+        stream.write("\n")
     for new_identifier, non_scalar in non_scalars:
-        _format_text(item=non_scalar, stream=stream,
-                     identifier=new_identifier)
+        _format_text(item=non_scalar, stream=stream, identifier=new_identifier)
 
 
 def _all_scalar_keys(list_of_dicts):
@@ -122,7 +121,7 @@ def _partition_dict(item_dict, scalar_keys):
                 scalar.append(six.text_type(value))
     else:
         for key in scalar_keys:
-            scalar.append(six.text_type(item_dict.get(key, '')))
+            scalar.append(six.text_type(item_dict.get(key, "")))
         remaining_keys = sorted(set(item_dict.keys()) - set(scalar_keys))
         for remaining_key in remaining_keys:
             non_scalar.append((remaining_key, item_dict[remaining_key]))
@@ -141,6 +140,6 @@ def unix_formatted_print(data):
             raise
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unix_formatted_print(json.load(sys.stdin))
 # END Globus changes

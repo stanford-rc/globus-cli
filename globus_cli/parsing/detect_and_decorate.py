@@ -14,12 +14,14 @@ def detect_and_decorate(decorator, args, kwargs):
     # will probably confuse someone in the future when their arguments are
     # silently discarded
     elif len(args) != 0:
-        raise ValueError('this decorator cannot take positional args')
+        raise ValueError("this decorator cannot take positional args")
 
     # final case: got 0 or more kwargs, no positionals
     # do the function-which-returns-a-decorator dance to produce a
     # new decorator based on the arguments given
     else:
+
         def inner_decorator(f):
             return decorator(f, **kwargs)
+
         return inner_decorator

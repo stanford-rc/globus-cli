@@ -1,5 +1,6 @@
-import click
 import time
+
+import click
 
 
 class ISOTimeType(click.ParamType):
@@ -20,5 +21,8 @@ class ISOTimeType(click.ParamType):
                 return value
             except ValueError:
                 self.fail(
-                    ("Time {} is not in ISO format of 'YYYY-MM-DD' or "
-                     "'YYYY-MM-DD HH:MM:SS'".format(value)))
+                    (
+                        "Time {} is not in ISO format of 'YYYY-MM-DD' or "
+                        "'YYYY-MM-DD HH:MM:SS'".format(value)
+                    )
+                )

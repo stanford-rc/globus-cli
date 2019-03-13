@@ -1,23 +1,20 @@
-from globus_cli.parsing import globus_group
-
-from globus_cli.commands.endpoint.permission import permission_command
-from globus_cli.commands.endpoint.role import role_command
-from globus_cli.commands.endpoint.server import server_command
-
 from globus_cli.commands.endpoint.activate import endpoint_activate
-from globus_cli.commands.endpoint.search import endpoint_search
-from globus_cli.commands.endpoint.show import endpoint_show
 from globus_cli.commands.endpoint.create import endpoint_create
-from globus_cli.commands.endpoint.update import endpoint_update
+from globus_cli.commands.endpoint.deactivate import endpoint_deactivate
 from globus_cli.commands.endpoint.delete import endpoint_delete
 from globus_cli.commands.endpoint.is_activated import endpoint_is_activated
-from globus_cli.commands.endpoint.deactivate import endpoint_deactivate
-from globus_cli.commands.endpoint.my_shared_endpoint_list import (
-    my_shared_endpoint_list)
 from globus_cli.commands.endpoint.local_id import local_id
+from globus_cli.commands.endpoint.my_shared_endpoint_list import my_shared_endpoint_list
+from globus_cli.commands.endpoint.permission import permission_command
+from globus_cli.commands.endpoint.role import role_command
+from globus_cli.commands.endpoint.search import endpoint_search
+from globus_cli.commands.endpoint.server import server_command
+from globus_cli.commands.endpoint.show import endpoint_show
+from globus_cli.commands.endpoint.update import endpoint_update
+from globus_cli.parsing import globus_group
 
 
-@globus_group(name='endpoint', help='Manage Globus endpoint definitions')
+@globus_group(name="endpoint", help="Manage Globus endpoint definitions")
 def endpoint_command():
     pass
 

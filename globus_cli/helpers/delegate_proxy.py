@@ -1,16 +1,17 @@
-import struct
-import os
 import datetime
+import os
 import re
+import struct
+
 import six
-
 from cryptography import x509
-from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes, serialization
 
 
-def fill_delegate_proxy_activation_requirements(requirements_data, cred_file,
-                                                lifetime_hours=12):
+def fill_delegate_proxy_activation_requirements(
+    requirements_data, cred_file, lifetime_hours=12
+):
     """
     Given the activation requirements for an endpoint and a filename for
     X.509 credentials, extracts the public key from the activation
@@ -23,17 +24,19 @@ def fill_delegate_proxy_activation_requirements(requirements_data, cred_file,
             public_key = data["value"]
             break
     else:
-        raise ValueError((
-            "No public_key found in activation requirements, this endpoint "
-            "does not support Delegate Proxy activation."))
+        raise ValueError(
+            (
+                "No public_key found in activation requirements, this endpoint "
+                "does not support Delegate Proxy activation."
+            )
+        )
 
     # get user credentials from user credential file"
     with open(cred_file) as f:
         issuer_cred = f.read()
 
     # create the proxy credentials
-    proxy = create_proxy_credentials(
-        issuer_cred, public_key, lifetime_hours)
+    proxy = create_proxy_credentials(issuer_cred, public_key, lifetime_hours)
 
     # return the activation requirements document with the proxy_chain filled
     for data in requirements_data["DATA"]:
@@ -41,9 +44,12 @@ def fill_delegate_proxy_activation_requirements(requirements_data, cred_file,
             data["value"] = proxy
             return requirements_data
     else:
-        raise ValueError((
-            "No proxy_chain found in activation requirements, this endpoint "
-            "does not support Delegate Proxy activation."))
+        raise ValueError(
+            (
+                "No proxy_chain found in activation requirements, this endpoint "
+                "does not support Delegate Proxy activation."
+            )
+        )
 
 
 def create_proxy_credentials(issuer_cred, public_key, lifetime_hours):
@@ -54,12 +60,12 @@ def create_proxy_credentials(issuer_cred, public_key, lifetime_hours):
     containing a new proxy certificate and an extended proxy chain.
     """
     # parse the issuer credential
-    loaded_cert, loaded_private_key, issuer_chain = parse_issuer_cred(
-        issuer_cred)
+    loaded_cert, loaded_private_key, issuer_chain = parse_issuer_cred(issuer_cred)
 
     # load the public_key into a cryptography object
     loaded_public_key = serialization.load_pem_public_key(
-            public_key.encode("ascii"), backend=default_backend())
+        public_key.encode("ascii"), backend=default_backend()
+    )
 
     # check that the issuer certificate is not an old proxy
     # and is using the keyUsage section as required
@@ -67,16 +73,20 @@ def create_proxy_credentials(issuer_cred, public_key, lifetime_hours):
     validate_key_usage(loaded_cert)
 
     # create the proxy cert cryptography object
-    new_cert = create_proxy_cert(loaded_cert, loaded_private_key,
-                                 loaded_public_key, lifetime_hours)
+    new_cert = create_proxy_cert(
+        loaded_cert, loaded_private_key, loaded_public_key, lifetime_hours
+    )
 
     # extend the proxy chain as a unicode string
-    extended_chain = loaded_cert.public_bytes(
-        serialization.Encoding.PEM).decode("ascii") + six.u(issuer_chain)
+    extended_chain = loaded_cert.public_bytes(serialization.Encoding.PEM).decode(
+        "ascii"
+    ) + six.u(issuer_chain)
 
     # return in PEM format as a unicode string
-    return new_cert.public_bytes(serialization.Encoding.PEM).decode(
-        "ascii") + extended_chain
+    return (
+        new_cert.public_bytes(serialization.Encoding.PEM).decode("ascii")
+        + extended_chain
+    )
 
 
 def parse_issuer_cred(issuer_cred):
@@ -90,40 +100,46 @@ def parse_issuer_cred(issuer_cred):
     """
     # get each section of the PEM file
     sections = re.findall(
-        "-----BEGIN.*?-----.*?-----END.*?-----", issuer_cred, flags=re.DOTALL)
+        "-----BEGIN.*?-----.*?-----END.*?-----", issuer_cred, flags=re.DOTALL
+    )
     try:
         issuer_cert = sections[0]
         issuer_private_key = sections[1]
         issuer_chain_certs = sections[2:]
     except IndexError:
-        raise ValueError("Unable to parse PEM data in credentials, "
-                         "make sure the X.509 file is in PEM format and "
-                         "consists of the issuer cert, issuer private key, "
-                         "and proxy chain (if any) in that order.")
+        raise ValueError(
+            "Unable to parse PEM data in credentials, "
+            "make sure the X.509 file is in PEM format and "
+            "consists of the issuer cert, issuer private key, "
+            "and proxy chain (if any) in that order."
+        )
 
     # then validate that each section of data can be decoded as expected
     try:
         loaded_cert = x509.load_pem_x509_certificate(
-            six.b(issuer_cert), default_backend())
+            six.b(issuer_cert), default_backend()
+        )
         loaded_private_key = serialization.load_pem_private_key(
-            six.b(issuer_private_key),
-            password=None, backend=default_backend())
+            six.b(issuer_private_key), password=None, backend=default_backend()
+        )
         for chain_cert in issuer_chain_certs:
-            x509.load_pem_x509_certificate(
-                six.b(chain_cert), default_backend())
+            x509.load_pem_x509_certificate(six.b(chain_cert), default_backend())
         issuer_chain = "".join(issuer_chain_certs)
     except ValueError:
-        raise ValueError("Failed to decode PEM data in credentials. Make sure "
-                         "the X.509 file consists of the issuer cert, "
-                         "issuer private key, and proxy chain (if any) "
-                         "in that order.")
+        raise ValueError(
+            "Failed to decode PEM data in credentials. Make sure "
+            "the X.509 file consists of the issuer cert, "
+            "issuer private key, and proxy chain (if any) "
+            "in that order."
+        )
 
     # return loaded cryptography objects and the issuer chain
     return loaded_cert, loaded_private_key, issuer_chain
 
 
-def create_proxy_cert(loaded_cert, loaded_private_key,
-                      loaded_public_key, lifetime_hours):
+def create_proxy_cert(
+    loaded_cert, loaded_private_key, loaded_public_key, lifetime_hours
+):
     """
     Given cryptography objects for an issuing certificate, a public_key,
     a private_key, and an int for lifetime in hours, creates a proxy
@@ -142,7 +158,8 @@ def create_proxy_cert(loaded_cert, loaded_private_key,
     # set the new proxy as valid from now until lifetime_hours have passed
     builder = builder.not_valid_before(datetime.datetime.utcnow())
     builder = builder.not_valid_after(
-        datetime.datetime.utcnow() + datetime.timedelta(hours=lifetime_hours))
+        datetime.datetime.utcnow() + datetime.timedelta(hours=lifetime_hours)
+    )
 
     # set the public key of the new proxy to the given public key
     builder = builder.public_key(loaded_public_key)
@@ -153,8 +170,7 @@ def create_proxy_cert(loaded_cert, loaded_private_key,
     # set the new proxy's subject
     # append a CommonName to the new proxy's subject
     # with the serial as the value of the CN
-    new_atribute = x509.NameAttribute(
-        x509.oid.NameOID.COMMON_NAME, six.u(str(serial)))
+    new_atribute = x509.NameAttribute(x509.oid.NameOID.COMMON_NAME, six.u(str(serial)))
     subject_attributes = list(loaded_cert.subject)
     subject_attributes.append(new_atribute)
     builder = builder.subject_name(x509.Name(subject_attributes))
@@ -176,8 +192,10 @@ def create_proxy_cert(loaded_cert, loaded_private_key,
 
     # sign the new proxy with the issuer's private key
     new_certificate = builder.sign(
-        private_key=loaded_private_key, algorithm=hashes.SHA256(),
-        backend=default_backend())
+        private_key=loaded_private_key,
+        algorithm=hashes.SHA256(),
+        backend=default_backend(),
+    )
 
     # return the new proxy as a cryptography object
     return new_certificate
@@ -189,12 +207,14 @@ def confirm_not_old_proxy(loaded_cert):
     an "old proxy" and raise an error if so.
     """
     # Examine the last CommonName to see if it looks like an old proxy.
-    last_cn = loaded_cert.subject.get_attributes_for_oid(
-        x509.oid.NameOID.COMMON_NAME)[-1]
+    last_cn = loaded_cert.subject.get_attributes_for_oid(x509.oid.NameOID.COMMON_NAME)[
+        -1
+    ]
     # if the last CN is 'proxy' or 'limited proxy' we are in an old proxy
     if last_cn.value in ("proxy", "limited proxy"):
-        raise ValueError("Proxy certificate is in an outdated format "
-                         "that is no longer supported")
+        raise ValueError(
+            "Proxy certificate is in an outdated format " "that is no longer supported"
+        )
 
 
 def validate_key_usage(loaded_cert):
@@ -205,10 +225,12 @@ def validate_key_usage(loaded_cert):
     """
     try:
         key_usage = loaded_cert.extensions.get_extension_for_oid(
-            x509.oid.ExtensionOID.KEY_USAGE)
+            x509.oid.ExtensionOID.KEY_USAGE
+        )
         if not key_usage.value.digital_signature:
             raise ValueError(
                 "Certificate is using the keyUsage extension, but has "
-                "not asserted the Digital Signature bit.")
+                "not asserted the Digital Signature bit."
+            )
     except x509.ExtensionNotFound:  # keyUsage extension not used
         return

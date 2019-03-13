@@ -18,8 +18,7 @@ class OneUseOption(click.Option):
         # was gotten, take it out of the tuple and return it
         if self.multiple:
             if len(converted_val) > 1:
-                raise click.BadParameter(
-                    "Option used multiple times.", ctx=ctx)
+                raise click.BadParameter("Option used multiple times.", ctx=ctx)
             if len(converted_val):
                 return converted_val[0]
             else:
@@ -29,13 +28,16 @@ class OneUseOption(click.Option):
         # count is no more than one, and type cast back to a bool
         elif self.count:
             if converted_val > 1:
-                raise click.BadParameter(
-                    "Option used multiple times.", ctx=ctx)
+                raise click.BadParameter("Option used multiple times.", ctx=ctx)
             return bool(converted_val)
 
         else:
-            raise ValueError(("Internal error, OneUseOption expected either "
-                              "multiple or count, but got neither."))
+            raise ValueError(
+                (
+                    "Internal error, OneUseOption expected either "
+                    "multiple or count, but got neither."
+                )
+            )
 
 
 def one_use_option(*args, **kwargs):
@@ -45,13 +47,16 @@ def one_use_option(*args, **kwargs):
     """
     # cannot force a multiple or count option to be single use
     if "multiple" in kwargs or "count" in kwargs:
-        raise ValueError("Internal error, one_use_option cannot be  used "
-                         "with multiple or count.")
+        raise ValueError(
+            "Internal error, one_use_option cannot be  used " "with multiple or count."
+        )
 
     # cannot force a non Option Paramater (argument) to be a OneUseOption
     if kwargs.get("cls"):
-        raise TypeError("Internal error, one_use_option cannot overwrite "
-                        "cls {}.".format(kwargs.get("cls")))
+        raise TypeError(
+            "Internal error, one_use_option cannot overwrite "
+            "cls {}.".format(kwargs.get("cls"))
+        )
 
     # use our OneUseOption class instead of a normal Option
     kwargs["cls"] = OneUseOption
@@ -70,4 +75,5 @@ def one_use_option(*args, **kwargs):
     # decorate with the click.option decorator, but with our custom kwargs
     def decorator(f):
         return click.option(*args, **kwargs)(f)
+
     return decorator

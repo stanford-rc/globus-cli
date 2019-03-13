@@ -21,9 +21,11 @@ def get_versions():
     # `requests` isn't required -- otherwise, setuptools will fail to run
     # because requests isn't installed yet.
     import requests
+
     try:
         version_data = requests.get(
-            "https://pypi.python.org/pypi/globus-cli/json").json()
+            "https://pypi.python.org/pypi/globus-cli/json"
+        ).json()
         latest = max(LooseVersion(v) for v in version_data["releases"])
         return latest, LooseVersion(__version__)
     # if the fetch from pypi fails

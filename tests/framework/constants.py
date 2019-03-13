@@ -6,10 +6,12 @@ GO_EP2_ID = "ddb59af0-6d04-11e5-ba46-22000b92c6ec"
 # ------ #
 CLITESTER1A_TRANSFER_RT = (
     "AgWp6kl76nQ9aM6yyv4yVjnnXPKkP1b6M0V6WbqaYl8Y01"
-    "W3MaFmU2BmG3kMK7yxgGbbYpkNv2OqmdObD80k464EMnxa7")
+    "W3MaFmU2BmG3kMK7yxgGbbYpkNv2OqmdObD80k464EMnxa7"
+)
 CLITESTER1A_AUTH_RT = (
     "AgGgYEqoBjqqG38pdGyw8v942egz9gYGnojep19pxmqvl8"
-    "nzEDFyUQoY0MN0gydYGJ95zrK8BMbErEpWgNYxGeWxPvMGJ")
+    "nzEDFyUQoY0MN0gydYGJ95zrK8BMbErEpWgNYxGeWxPvMGJ"
+)
 CLITESTER1A_CLIENT_ID = "839a51eb-1bc1-4d10-b36d-b6c0c8589a3f"
 CLITESTER1A_CLIENT_SECRET = "p/BwUIrvTJN9Tlx3OGHc/iMzui9ohtkPyQnZZauOV20="
 # ---------- #

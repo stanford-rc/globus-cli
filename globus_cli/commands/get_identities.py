@@ -1,13 +1,11 @@
 import base64
 import uuid
-import click
 
+import click
 from globus_sdk import GlobusResponse
 
-from globus_cli.safeio import safeprint, formatted_print, FORMAT_TEXT_TABLE
 from globus_cli.parsing import common_options
-from globus_cli.helpers import is_verbose
-
+from globus_cli.safeio import FORMAT_TEXT_TABLE, formatted_print, is_verbose, safeprint
 from globus_cli.services.auth import get_auth_client
 
 
@@ -22,11 +20,11 @@ def _try_b32_decode(v):
     If it does not appear to be formatted correctly, return None.
     """
     # should start with "u_"
-    if not v.startswith('u_'):
+    if not v.startswith("u_"):
         return None
     # usernames have @ , we want to allow `u_foo@example.com`
     # b32 names never have @
-    if '@' in v:
+    if "@" in v:
         return None
     # trim "u_"
     v = v[2:]
@@ -45,10 +43,13 @@ def _try_b32_decode(v):
         return None
 
 
-@click.command("get-identities", short_help="Lookup Globus Auth Identities",
-               help="Lookup Globus Auth Identities given one or more uuids "
-               "and/or usernames. Either resolves each uuid to a username and "
-               "vice versa, or use --verbose for tabular output.")
+@click.command(
+    "get-identities",
+    short_help="Lookup Globus Auth Identities",
+    help="Lookup Globus Auth Identities given one or more uuids "
+    "and/or usernames. Either resolves each uuid to a username and "
+    "vice versa, or use --verbose for tabular output.",
+)
 @common_options
 @click.argument("values", required=True, nargs=-1)
 def get_identities_command(values):
@@ -83,6 +84,7 @@ def get_identities_command(values):
         """
         Non-verbose text output is customized
         """
+
         def resolve_identity(value):
             """
             helper to deal with variable inputs and uncertain response order
@@ -102,12 +104,16 @@ def get_identities_command(values):
             safeprint(resolve_identity(val))
 
     formatted_print(
-        res, response_key='identities',
-        fields=[('ID', 'id'), ('Username', 'username'),
-                ('Full Name', 'name'), ('Organization', 'organization'),
-                ('Email Address', 'email')],
+        res,
+        response_key="identities",
+        fields=[
+            ("ID", "id"),
+            ("Username", "username"),
+            ("Full Name", "name"),
+            ("Organization", "organization"),
+            ("Email Address", "email"),
+        ],
         # verbose output is a table. Order not guaranteed, may contain
         # duplicates
-        text_format=(FORMAT_TEXT_TABLE
-                     if is_verbose() else
-                     _custom_text_format))
+        text_format=(FORMAT_TEXT_TABLE if is_verbose() else _custom_text_format),
+    )

@@ -1,38 +1,40 @@
 from __future__ import unicode_literals
 
 import json
-import six
-import click
 
+import click
+import six
 from globus_sdk import GlobusResponse
 
-from globus_cli.safeio import safeprint
 from globus_cli.safeio.awscli_text import unix_formatted_print
-from globus_cli.helpers import (
-    outformat_is_json, outformat_is_unix, get_jmespath_expression)
+from globus_cli.safeio.get_option_vals import (
+    get_jmespath_expression,
+    outformat_is_json,
+    outformat_is_unix,
+)
+from globus_cli.safeio.write import safeprint
 
 # make sure this is a tuple
 # if it's a list, pylint will freak out
 __all__ = (
-    'formatted_print',
-
-    'FORMAT_SILENT',
-    'FORMAT_JSON',
-    'FORMAT_TEXT_TABLE',
-    'FORMAT_TEXT_RECORD',
-    'FORMAT_TEXT_RAW'
+    "formatted_print",
+    "FORMAT_SILENT",
+    "FORMAT_JSON",
+    "FORMAT_TEXT_TABLE",
+    "FORMAT_TEXT_RECORD",
+    "FORMAT_TEXT_RAW"
     # NOTE: we don't export FORMAT_TEXT_CUSTOM as actually passing it is
     # incorrect usage -- it's used internally, but similarly to the other
     # format constants
 )
 
 
-FORMAT_SILENT = 'silent'
-FORMAT_JSON = 'json'
-FORMAT_TEXT_TABLE = 'text_table'
-FORMAT_TEXT_RECORD = 'text_record'
-FORMAT_TEXT_RAW = 'text_raw'
-FORMAT_TEXT_CUSTOM = 'text_custom'
+FORMAT_SILENT = "silent"
+FORMAT_JSON = "json"
+FORMAT_TEXT_TABLE = "text_table"
+FORMAT_TEXT_RECORD = "text_record"
+FORMAT_TEXT_RAW = "text_raw"
+FORMAT_TEXT_CUSTOM = "text_custom"
 
 
 def _key_to_keyfunc(k):
@@ -46,8 +48,10 @@ def _key_to_keyfunc(k):
     # if the key is a string, then the "keyfunc" is just a basic lookup
     # operation -- return that
     if isinstance(k, six.string_types):
+
         def lookup(x):
             return x[k]
+
         return lookup
     # otherwise, the key must be a function which is executed on the item
     # to produce a value -- return it verbatim
@@ -69,7 +73,7 @@ def _jmespath_preprocess(res):
 
 def print_json_response(res):
     res = _jmespath_preprocess(res)
-    res = json.dumps(res, indent=2, separators=(',', ': '), sort_keys=True)
+    res = json.dumps(res, indent=2, separators=(",", ": "), sort_keys=True)
     safeprint(res)
 
 
@@ -82,14 +86,15 @@ def print_unix_response(res):
     # print good error and exit(2) (Count this as UsageError!)
     except AttributeError:
         safeprint(
-            'UNIX formatting of output failed.'
-            '\n  '
-            'This usually means that data has a structure which cannot be '
-            'handled by the UNIX formatter.'
-            '\n  '
-            'To avoid this error in the future, ensure that you query the '
+            "UNIX formatting of output failed."
+            "\n  "
+            "This usually means that data has a structure which cannot be "
+            "handled by the UNIX formatter."
+            "\n  "
+            "To avoid this error in the future, ensure that you query the "
             'exact properties you want from output data with "--jmespath"',
-            write_to_stderr=True)
+            write_to_stderr=True,
+        )
         click.get_current_context().exit(2)
 
 
@@ -97,8 +102,7 @@ def colon_formatted_print(data, named_fields):
     maxlen = max(len(n) for n, f in named_fields) + 1
     for name, field in named_fields:
         field_keyfunc = _key_to_keyfunc(field)
-        safeprint(u'{} {}'.format((name + u':').ljust(maxlen),
-                                  field_keyfunc(data)))
+        safeprint("{} {}".format((name + ":").ljust(maxlen), field_keyfunc(data)))
 
 
 def print_table(iterable, headers_and_keys, print_headers=True):
@@ -123,6 +127,7 @@ def print_table(iterable, headers_and_keys, print_headers=True):
                 return len(x)
             except TypeError:
                 return len(str(x))
+
         lengths = [_safelen(kf(i)) for i in iterable]
         if not lengths:
             return 0
@@ -134,30 +139,32 @@ def print_table(iterable, headers_and_keys, print_headers=True):
     widths = [max(w, len(h)) for w, h in zip(widths, headers)]
 
     # create a format string based on column widths
-    format_str = u' | '.join(u'{:' + str(w) + u'}' for w in widths)
+    format_str = " | ".join("{:" + str(w) + "}" for w in widths)
 
     def none_to_null(val):
         if val is None:
-            return 'NULL'
+            return "NULL"
         return val
 
     # print headers
     if print_headers:
         safeprint(format_str.format(*[h for h in headers]))
-        safeprint(format_str.format(*['-'*w for w in widths]))
+        safeprint(format_str.format(*["-" * w for w in widths]))
     # print the rows of data
     for i in iterable:
         safeprint(format_str.format(*[none_to_null(kf(i)) for kf in keyfuncs]))
 
 
-def formatted_print(response_data,
-
-                    simple_text=None, text_preamble=None, text_epilog=None,
-                    text_format=FORMAT_TEXT_TABLE,
-
-                    json_converter=None,
-
-                    fields=None, response_key=None):
+def formatted_print(
+    response_data,
+    simple_text=None,
+    text_preamble=None,
+    text_epilog=None,
+    text_format=FORMAT_TEXT_TABLE,
+    json_converter=None,
+    fields=None,
+    response_key=None,
+):
     """
     A generic output formatter. Consumes the following pieces of data:
 
@@ -187,19 +194,23 @@ def formatted_print(response_data,
     gets a string. Necessary for certain formats like text table (text output
     only)
     """
+
     def _assert_fields():
         if fields is None:
             raise ValueError(
-                'Internal Error! Output format requires fields; none given. '
-                'You can workaround this error by using `--format JSON`')
+                "Internal Error! Output format requires fields; none given. "
+                "You can workaround this error by using `--format JSON`"
+            )
 
     def _print_as_json():
-        print_json_response(json_converter(response_data)
-                            if json_converter else response_data)
+        print_json_response(
+            json_converter(response_data) if json_converter else response_data
+        )
 
     def _print_as_unix():
-        print_unix_response(json_converter(response_data)
-                            if json_converter else response_data)
+        print_unix_response(
+            json_converter(response_data) if json_converter else response_data
+        )
 
     def _print_as_text():
         # if we're given simple text, print that and exit
@@ -212,9 +223,7 @@ def formatted_print(response_data,
             safeprint(text_preamble)
 
         # if there's a response key, key into it
-        data = (response_data
-                if response_key is None else
-                response_data[response_key])
+        data = response_data if response_key is None else response_data[response_key]
 
         #  do the various kinds of printing
         if text_format == FORMAT_TEXT_TABLE:

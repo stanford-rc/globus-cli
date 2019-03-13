@@ -1,20 +1,22 @@
-import uuid
 import random
-import time
 import sys
-import click
-
+import time
+import uuid
 from textwrap import dedent
 
-from globus_sdk import TransferClient, RefreshTokenAuthorizer
-from globus_sdk.exc import NetworkError
+import click
+from globus_sdk import RefreshTokenAuthorizer, TransferClient
 from globus_sdk.base import safe_stringify
+from globus_sdk.exc import NetworkError
 
 from globus_cli import version
-from globus_cli.safeio import safeprint, formatted_print, FORMAT_SILENT
 from globus_cli.config import (
-    get_transfer_tokens, internal_auth_client, set_transfer_access_token)
+    get_transfer_tokens,
+    internal_auth_client,
+    set_transfer_access_token,
+)
 from globus_cli.parsing import EXPLICIT_NULL
+from globus_cli.safeio import FORMAT_SILENT, formatted_print, safeprint
 from globus_cli.services.recursive_ls import RecursiveLsResponse
 
 
@@ -32,7 +34,7 @@ class RetryingTransferClient(TransferClient):
         Retries the given function self.tries times on NetworkErros
         """
         backoff = random.random() / 100  # 5ms on average
-        for t in range(self.tries-1):
+        for _ in range(self.tries - 1):
             try:
                 return f(*args, **kwargs)
             except NetworkError:
@@ -42,25 +44,26 @@ class RetryingTransferClient(TransferClient):
 
     # get and put should always be safe to retry
     def get(self, *args, **kwargs):
-        return self.retry(
-            super(RetryingTransferClient, self).get, *args, **kwargs)
+        return self.retry(super(RetryingTransferClient, self).get, *args, **kwargs)
 
     def put(self, *args, **kwargs):
-        return self.retry(
-            super(RetryingTransferClient, self).put, *args, **kwargs)
+        return self.retry(super(RetryingTransferClient, self).put, *args, **kwargs)
 
     # task submission is safe, as the data contains a unique submission-id
     def submit_transfer(self, *args, **kwargs):
-        return self.retry(super(
-            RetryingTransferClient, self).submit_transfer, *args, **kwargs)
+        return self.retry(
+            super(RetryingTransferClient, self).submit_transfer, *args, **kwargs
+        )
 
     def submit_delete(self, *args, **kwargs):
-        return self.retry(super(
-            RetryingTransferClient, self).submit_delete, *args, **kwargs)
+        return self.retry(
+            super(RetryingTransferClient, self).submit_delete, *args, **kwargs
+        )
 
     # TDOD: Remove this function when endpoints natively support recursive ls
-    def recursive_operation_ls(self, endpoint_id,
-                               depth=3, filter_after_first=True, **params):
+    def recursive_operation_ls(
+        self, endpoint_id, depth=3, filter_after_first=True, **params
+    ):
         """
         Makes recursive calls to ``GET /operation/endpoint/<endpoint_id>/ls``
         Does not preserve access to top level operation_ls fields, but
@@ -92,16 +95,17 @@ class RetryingTransferClient(TransferClient):
         "path" field is added.
         """
         endpoint_id = safe_stringify(endpoint_id)
-        self.logger.info("TransferClient.recursive_operation_ls({}, {}, {})"
-                         .format(endpoint_id, depth, params))
-        return RecursiveLsResponse(self, endpoint_id,
-                                   depth, filter_after_first, params)
+        self.logger.info(
+            "TransferClient.recursive_operation_ls({}, {}, {})".format(
+                endpoint_id, depth, params
+            )
+        )
+        return RecursiveLsResponse(self, endpoint_id, depth, filter_after_first, params)
 
 
 def _update_access_tokens(token_response):
-    tokens = token_response.by_resource_server['transfer.api.globus.org']
-    set_transfer_access_token(tokens['access_token'],
-                              tokens['expires_at_seconds'])
+    tokens = token_response.by_resource_server["transfer.api.globus.org"]
+    set_transfer_access_token(tokens["access_token"], tokens["expires_at_seconds"])
 
 
 def get_client():
@@ -109,34 +113,38 @@ def get_client():
     authorizer = None
 
     # if there's a refresh token, use it to build the authorizer
-    if tokens['refresh_token'] is not None:
+    if tokens["refresh_token"] is not None:
         authorizer = RefreshTokenAuthorizer(
-            tokens['refresh_token'], internal_auth_client(),
-            tokens['access_token'], tokens['access_token_expires'],
-            on_refresh=_update_access_tokens)
+            tokens["refresh_token"],
+            internal_auth_client(),
+            tokens["access_token"],
+            tokens["access_token_expires"],
+            on_refresh=_update_access_tokens,
+        )
 
     return RetryingTransferClient(
-        tries=10, authorizer=authorizer, app_name=version.app_name)
+        tries=10, authorizer=authorizer, app_name=version.app_name
+    )
 
 
 def display_name_or_cname(ep_doc):
-    return ep_doc['display_name'] or ep_doc['canonical_name']
+    return ep_doc["display_name"] or ep_doc["canonical_name"]
 
 
 def iterable_response_to_dict(iterator):
-    output_dict = {'DATA': []}
+    output_dict = {"DATA": []}
     for item in iterator:
         dat = item
         try:
             dat = item.data
         except AttributeError:
             pass
-        output_dict['DATA'].append(dat)
+        output_dict["DATA"].append(dat)
     return output_dict
 
 
 def assemble_generic_doc(datatype, **kwargs):
-    doc = {'DATA_TYPE': datatype}
+    doc = {"DATA_TYPE": datatype}
     for key, val in kwargs.items():
         if isinstance(val, uuid.UUID):
             val = str(val)
@@ -161,8 +169,11 @@ def supported_activation_methods(res):
 
     for req in res["DATA"]:
         # myproxy
-        if (req["type"] == "myproxy" and req["name"] == "hostname" and
-                req["value"] != "myproxy.globusonline.org"):
+        if (
+            req["type"] == "myproxy"
+            and req["name"] == "hostname"
+            and req["value"] != "myproxy.globusonline.org"
+        ):
             supported.append("myproxy")
 
         # delegate_proxy
@@ -183,28 +194,38 @@ def activation_requirements_help_text(res, ep_id):
         "This endpoint supports the following activation methods: ",
         ", ".join(methods).replace("_", " "),
         "\n",
-
-        ("For web activation use:\n"
-         "'globus endpoint activate --web {}'\n".format(ep_id)
-         if "web" in methods else ""),
-
-        ("For myproxy activation use:\n"
-         "'globus endpoint activate --myproxy {}'\n".format(ep_id)
-         if "myproxy" in methods else ""),
-
-        ("For oauth activation use web activation:\n"
-         "'globus endpoint activate --web {}'\n".format(ep_id)
-         if "oauth" in methods else ""),
-
-        ("For delegate proxy activation use:\n"
-         "'globus endpoint activate --delegate-proxy "
-         "X.509_PEM_FILE {}'\n".format(ep_id)
-         if "delegate_proxy" in methods else ""),
-
-        ("Delegate proxy activation requires an additional dependency on "
-         "cryptography. See the docs for details:\n"
-         "https://docs.globus.org/cli/reference/endpoint_activate/\n"
-         if "delegate_proxy" in methods else ""),
+        (
+            "For web activation use:\n"
+            "'globus endpoint activate --web {}'\n".format(ep_id)
+            if "web" in methods
+            else ""
+        ),
+        (
+            "For myproxy activation use:\n"
+            "'globus endpoint activate --myproxy {}'\n".format(ep_id)
+            if "myproxy" in methods
+            else ""
+        ),
+        (
+            "For oauth activation use web activation:\n"
+            "'globus endpoint activate --web {}'\n".format(ep_id)
+            if "oauth" in methods
+            else ""
+        ),
+        (
+            "For delegate proxy activation use:\n"
+            "'globus endpoint activate --delegate-proxy "
+            "X.509_PEM_FILE {}'\n".format(ep_id)
+            if "delegate_proxy" in methods
+            else ""
+        ),
+        (
+            "Delegate proxy activation requires an additional dependency on "
+            "cryptography. See the docs for details:\n"
+            "https://docs.globus.org/cli/reference/endpoint_activate/\n"
+            if "delegate_proxy" in methods
+            else ""
+        ),
     ]
 
     return "".join(lines)
@@ -219,14 +240,16 @@ def autoactivate(client, endpoint_id, if_expires_in=None):
     """
     kwargs = {}
     if if_expires_in is not None:
-        kwargs['if_expires_in'] = if_expires_in
+        kwargs["if_expires_in"] = if_expires_in
 
     res = client.endpoint_autoactivate(endpoint_id, **kwargs)
     if res["code"] == "AutoActivationFailed":
 
-        message = ("The endpoint could not be auto-activated and must be "
-                   "activated before it can be used.\n\n" +
-                   activation_requirements_help_text(res, endpoint_id))
+        message = (
+            "The endpoint could not be auto-activated and must be "
+            "activated before it can be used.\n\n"
+            + activation_requirements_help_text(res, endpoint_id)
+        )
 
         safeprint(message, write_to_stderr=True)
         click.get_current_context().exit(1)
@@ -249,8 +272,10 @@ def get_endpoint_w_server_list(endpoint_id):
 
     endpoint = client.get_endpoint(endpoint_id)
 
-    if endpoint['host_endpoint_id']:  # not GCS -- this is a share endpoint
-        raise click.UsageError(dedent(u"""\
+    if endpoint["host_endpoint_id"]:  # not GCS -- this is a share endpoint
+        raise click.UsageError(
+            dedent(
+                u"""\
             {id} ({0}) is a share and does not have servers.
 
             To see details of the share, use
@@ -258,17 +283,20 @@ def get_endpoint_w_server_list(endpoint_id):
 
             To list the servers on the share's host endpoint, use
                 globus endpoint server list {host_endpoint_id}
-        """).format(display_name_or_cname(endpoint), **endpoint.data))
+        """
+            ).format(display_name_or_cname(endpoint), **endpoint.data)
+        )
 
-    if endpoint['s3_url']:  # not GCS -- legacy S3 endpoint type
-        return (endpoint, 'S3')
+    if endpoint["s3_url"]:  # not GCS -- legacy S3 endpoint type
+        return (endpoint, "S3")
 
     else:
         return (endpoint, client.endpoint_server_list(endpoint_id))
 
 
-def task_wait_with_io(meow, heartbeat, polling_interval, timeout, task_id,
-                      timeout_exit_code,  client=None):
+def task_wait_with_io(
+    meow, heartbeat, polling_interval, timeout, task_id, timeout_exit_code, client=None
+):
     """
     Options are the core "task wait" options, including the `--meow` easter
     egg.
@@ -286,28 +314,32 @@ def task_wait_with_io(meow, heartbeat, polling_interval, timeout, task_id,
             return waited_time >= timeout
 
     def check_completed():
-        completed = client.task_wait(task_id, timeout=polling_interval,
-                                     polling_interval=polling_interval)
+        completed = client.task_wait(
+            task_id, timeout=polling_interval, polling_interval=polling_interval
+        )
         if completed:
             if heartbeat:
-                safeprint('', write_to_stderr=True)
+                safeprint("", write_to_stderr=True)
             # meowing tasks wake up!
             if meow:
-                safeprint(r"""
+                safeprint(
+                    r"""
                   _..
   /}_{\           /.-'
  ( a a )-.___...-'/
  ==._.==         ;
       \ i _..._ /,
-      {_;/   {_//""", write_to_stderr=True)
+      {_;/   {_//""",
+                    write_to_stderr=True,
+                )
 
             # TODO: possibly update TransferClient.task_wait so that we don't
             # need to do an extra fetch to get the task status after completion
             res = client.get_task(task_id)
             formatted_print(res, text_format=FORMAT_SILENT)
 
-            status = res['status']
-            if status == 'SUCCEEDED':
+            status = res["status"]
+            if status == "SUCCEEDED":
                 click.get_current_context().exit(0)
             else:
                 click.get_current_context().exit(1)
@@ -316,29 +348,33 @@ def task_wait_with_io(meow, heartbeat, polling_interval, timeout, task_id,
 
     # Tasks start out sleepy
     if meow:
-        safeprint(r"""
+        safeprint(
+            r"""
    |\      _,,,---,,_
    /,`.-'`'    -.  ;-;;,_
   |,4-  ) )-,_..;\ (  `'-'
- '---''(_/--'  `-'\_)""", write_to_stderr=True)
+ '---''(_/--'  `-'\_)""",
+            write_to_stderr=True,
+        )
 
     waited_time = 0
-    while (not timed_out(waited_time) and
-           not check_completed()):
+    while not timed_out(waited_time) and not check_completed():
         if heartbeat:
-            safeprint('.', write_to_stderr=True, newline=False)
+            safeprint(".", write_to_stderr=True, newline=False)
             sys.stderr.flush()
 
         waited_time += polling_interval
 
     # add a trailing newline to heartbeats if we fail
     if heartbeat:
-        safeprint('', write_to_stderr=True)
+        safeprint("", write_to_stderr=True)
 
     exit_code = 1
     if timed_out(waited_time):
-        safeprint('Task has yet to complete after {} seconds'.format(timeout),
-                  write_to_stderr=True)
+        safeprint(
+            "Task has yet to complete after {} seconds".format(timeout),
+            write_to_stderr=True,
+        )
         exit_code = timeout_exit_code
 
     # output json if requested, but nothing for text mode
@@ -348,5 +384,8 @@ def task_wait_with_io(meow, heartbeat, polling_interval, timeout, task_id,
     click.get_current_context().exit(exit_code)
 
 
-ENDPOINT_LIST_FIELDS = (('ID', 'id'), ('Owner', 'owner_string'),
-                        ('Display Name', display_name_or_cname))
+ENDPOINT_LIST_FIELDS = (
+    ("ID", "id"),
+    ("Owner", "owner_string"),
+    ("Display Name", display_name_or_cname),
+)

@@ -1,7 +1,6 @@
-from globus_cli.parsing import globus_group
-
 from globus_cli.commands.session.boost import session_boost
 from globus_cli.commands.session.show import session_show
+from globus_cli.parsing import globus_group
 
 
 @globus_group(name="session", help="Manage your CLI auth session")

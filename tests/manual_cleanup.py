@@ -9,7 +9,7 @@ except ImportError:
 
 def cleanup_bookmarks(tc):
     for bm in tc.bookmark_list():
-        tc.delete_bookmark(bm['id'])
+        tc.delete_bookmark(bm["id"])
 
 
 @patch("globus_cli.config.get_config_obj", new=default_test_config)
@@ -18,5 +18,5 @@ def main():
     cleanup_bookmarks(tc)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

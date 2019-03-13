@@ -8,8 +8,8 @@ class CaseInsensitiveChoice(click.Choice):
     I've requested that support for this be added to `click` itself, which
     would obsolete this module: https://github.com/pallets/click/issues/569
     """
+
     def convert(self, value, param, ctx):
         if value is None:
             return None
-        return super(CaseInsensitiveChoice, self).convert(
-            value.lower(), param, ctx)
+        return super(CaseInsensitiveChoice, self).convert(value.lower(), param, ctx)

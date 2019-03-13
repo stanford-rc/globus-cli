@@ -1,5 +1,6 @@
-import click
 import re
+
+import click
 
 
 class LocationType(click.ParamType):
@@ -16,5 +17,9 @@ class LocationType(click.ParamType):
             float(match.group(2))
             return value
         except (ValueError, AttributeError):
-            self.fail(("location {} is not two comma separated floats "
-                       "for lattitude and longitude".format(value)))
+            self.fail(
+                (
+                    "location {} is not two comma separated floats "
+                    "for lattitude and longitude".format(value)
+                )
+            )

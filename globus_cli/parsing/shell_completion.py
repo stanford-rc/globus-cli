@@ -1,13 +1,14 @@
 import os
 import shlex
 import textwrap
+
 import click
 
-from globus_cli.safeio import safeprint
-from globus_cli.parsing.hidden_option import HiddenOption
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
+from globus_cli.parsing.hidden_option import HiddenOption
+from globus_cli.safeio import safeprint
 
-SUPPORTED_SHELLS = ('BASH', 'ZSH')
+SUPPORTED_SHELLS = ("BASH", "ZSH")
 
 
 def safe_split_line(inputline):
@@ -44,8 +45,7 @@ def get_completion_context(args):
     root_command = click.get_current_context().find_root().command
     # build a new context object off of it, with resilient_parsing set so that
     # no callbacks are invoked
-    ctx = root_command.make_context('globus', list(args),
-                                    resilient_parsing=True)
+    ctx = root_command.make_context("globus", list(args), resilient_parsing=True)
 
     # walk down multicommands until we've matched on everything and are at a
     # terminal context that holds all of our completed args
@@ -70,8 +70,9 @@ def get_completion_context(args):
         # otherwise, grab that command, and build a subcontext to continue the
         # tree walk
         else:
-            ctx = command.make_context(args[0], args[1:], parent=ctx,
-                                       resilient_parsing=True)
+            ctx = command.make_context(
+                args[0], args[1:], parent=ctx, resilient_parsing=True
+            )
 
     # return the context we found
     return ctx
@@ -100,8 +101,9 @@ def get_all_choices(completed_args, cur, quoted):
 
     match_func = match_with_case
 
-    ctx_options = [p for p in ctx.command.get_params(ctx)
-                   if isinstance(p, click.Option)]
+    ctx_options = [
+        p for p in ctx.command.get_params(ctx) if isinstance(p, click.Option)
+    ]
 
     last_completed = None
     if completed_args:
@@ -121,11 +123,12 @@ def get_all_choices(completed_args, cur, quoted):
         # comparisons / matching later on
         if isinstance(matching_choice_opt.type, CaseInsensitiveChoice):
             match_func = match_nocase
-        choices = [(x, matching_choice_opt.help) for x in
-                   matching_choice_opt.type.choices]
+        choices = [
+            (x, matching_choice_opt.help) for x in matching_choice_opt.type.choices
+        ]
     # if cur looks like an option, just look for options
     # but skip if it's quoted text
-    elif cur and cur.startswith('-') and not quoted:
+    elif cur and cur.startswith("-") and not quoted:
         for param in ctx_options:
             # skip hidden options
             if isinstance(param, HiddenOption):
@@ -134,13 +137,14 @@ def get_all_choices(completed_args, cur, quoted):
                 for opt in optset:
                     # only add long-opts, never short opts to completion,
                     # unless the cur appears to be a short opt already
-                    if opt.startswith('--') or (
-                            len(cur) > 1 and cur[1] != '-'):
+                    if opt.startswith("--") or (len(cur) > 1 and cur[1] != "-"):
                         choices.append((opt, param.help))
     # and if it's a multicommand we see, get the list of subcommands
     elif isinstance(ctx.command, click.MultiCommand) and not quoted:
-        choices = [(cmdname, ctx.command.get_command(ctx, cmdname).short_help)
-                   for cmdname in ctx.command.list_commands(ctx)]
+        choices = [
+            (cmdname, ctx.command.get_command(ctx, cmdname).short_help)
+            for cmdname in ctx.command.list_commands(ctx)
+        ]
     else:
         pass
 
@@ -152,9 +156,9 @@ def get_all_choices(completed_args, cur, quoted):
 
 
 def do_bash_complete():
-    comp_line = os.environ.get('COMP_LINE', '')
+    comp_line = os.environ.get("COMP_LINE", "")
     comp_words, quoted = safe_split_line(comp_line)
-    cur_index = int(os.environ.get('COMP_POINT', len(comp_line)))
+    cur_index = int(os.environ.get("COMP_POINT", len(comp_line)))
 
     # now, figure out the current word in the line by "parsing"
     # the chunk of it up to cur_index
@@ -167,19 +171,18 @@ def do_bash_complete():
     else:
         completed_args = comp_words[1:-1]
 
-    choices = [name for (name, helpstr) in
-               get_all_choices(completed_args, cur, quoted)]
+    choices = [name for (name, helpstr) in get_all_choices(completed_args, cur, quoted)]
 
-    safeprint('\t'.join(choices), newline=False)
+    safeprint("\t".join(choices), newline=False)
     click.get_current_context().exit(0)
 
 
 def do_zsh_complete():
-    commandline = os.environ['COMMANDLINE']
+    commandline = os.environ["COMMANDLINE"]
     comp_words, quoted = safe_split_line(commandline)
     comp_words = comp_words[1:]
 
-    if comp_words and not commandline.endswith(' '):
+    if comp_words and not commandline.endswith(" "):
         cur = comp_words[-1]
         completed_args = comp_words[:-1]
     else:
@@ -200,22 +203,24 @@ def do_zsh_complete():
         "'" -- single quote string (will concatenate in ZSH)
         '   -- start single quotes again
         """
-        return (helpstr
-                .replace('"', '\\"')
-                .replace("'", "'\"'\"'")
-                .replace("`", "\\`")
-                .replace("$", "\\$"))
+        return (
+            helpstr.replace('"', '\\"')
+            .replace("'", "'\"'\"'")
+            .replace("`", "\\`")
+            .replace("$", "\\$")
+        )
 
     choices = get_all_choices(completed_args, cur, quoted)
-    choices = ['{}\\:"{}"'.format(name, clean_help(helpstr))
-               for (name, helpstr) in choices]
+    choices = [
+        '{}\\:"{}"'.format(name, clean_help(helpstr)) for (name, helpstr) in choices
+    ]
 
-    safeprint("_arguments '*: :(({}))'".format('\n'.join(choices)),
-              newline=False)
+    safeprint("_arguments '*: :(({}))'".format("\n".join(choices)), newline=False)
 
 
 def print_completer_option(f):
-    bash_shell_completer = textwrap.dedent("""\
+    bash_shell_completer = textwrap.dedent(
+        """\
     _globus_completion () {
       local IFS=$'\\t'
       if type globus > /dev/null; then
@@ -227,8 +232,10 @@ def print_completer_option(f):
       return 0
     }
     complete -F _globus_completion -o default globus;
-    """)
-    zsh_shell_completer = textwrap.dedent("""\
+    """
+    )
+    zsh_shell_completer = textwrap.dedent(
+        """\
     #compdef globus
     _globus () {
         if type globus > /dev/null; then
@@ -237,7 +244,8 @@ def print_completer_option(f):
         fi
     }
     compdef _globus globus
-    """)
+    """
+    )
 
     def callback(ctx, param, value):
         if not value or ctx.resilient_parsing:
@@ -247,15 +255,26 @@ def print_completer_option(f):
         elif value == "ZSH":
             safeprint(zsh_shell_completer)
         else:
-            raise ValueError('Unsupported shell completion')
+            raise ValueError("Unsupported shell completion")
         click.get_current_context().exit(0)
 
-    f = click.option("--completer", "--bash-completer",
-                     cls=HiddenOption, is_eager=True, expose_value=False,
-                     flag_value="BASH", callback=callback)(f)
-    f = click.option("--zsh-completer",
-                     cls=HiddenOption, is_eager=True, expose_value=False,
-                     flag_value="ZSH", callback=callback)(f)
+    f = click.option(
+        "--completer",
+        "--bash-completer",
+        cls=HiddenOption,
+        is_eager=True,
+        expose_value=False,
+        flag_value="BASH",
+        callback=callback,
+    )(f)
+    f = click.option(
+        "--zsh-completer",
+        cls=HiddenOption,
+        is_eager=True,
+        expose_value=False,
+        flag_value="ZSH",
+        callback=callback,
+    )(f)
     return f
 
 
@@ -264,17 +283,21 @@ def shell_complete_option(f):
         if not value or ctx.resilient_parsing:
             return
 
-        if value == 'BASH':
+        if value == "BASH":
             do_bash_complete()
-        elif value == 'ZSH':
+        elif value == "ZSH":
             do_zsh_complete()
         else:
-            raise ValueError('Unsupported shell completion')
+            raise ValueError("Unsupported shell completion")
 
         click.get_current_context().exit(0)
 
-    f = click.option('--shell-complete', cls=HiddenOption,
-                     is_eager=True, expose_value=False,
-                     type=click.Choice(SUPPORTED_SHELLS),
-                     callback=callback)(f)
+    f = click.option(
+        "--shell-complete",
+        cls=HiddenOption,
+        is_eager=True,
+        expose_value=False,
+        type=click.Choice(SUPPORTED_SHELLS),
+        callback=callback,
+    )(f)
     return f

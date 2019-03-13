@@ -1,28 +1,37 @@
+import shlex
 import unittest
+from datetime import datetime, timedelta
+
+import globus_sdk
+import six
+from click.testing import CliRunner
+from configobj import ConfigObj
+
+from globus_cli import main
+from globus_cli.config import (
+    AUTH_AT_EXPIRES_OPTNAME,
+    AUTH_AT_OPTNAME,
+    AUTH_RT_OPTNAME,
+    CLIENT_ID_OPTNAME,
+    CLIENT_SECRET_OPTNAME,
+    TRANSFER_AT_EXPIRES_OPTNAME,
+    TRANSFER_AT_OPTNAME,
+    TRANSFER_RT_OPTNAME,
+)
+from globus_cli.services.auth import get_auth_client
+from globus_cli.services.transfer import get_client
+from tests.framework.constants import (
+    CLITESTER1A_AUTH_RT,
+    CLITESTER1A_CLIENT_ID,
+    CLITESTER1A_CLIENT_SECRET,
+    CLITESTER1A_TRANSFER_RT,
+    GO_EP1_ID,
+)
+
 try:
     from mock import patch
 except ImportError:
     from unittest.mock import patch
-import six
-import shlex
-from click.testing import CliRunner
-from datetime import datetime, timedelta
-from configobj import ConfigObj
-
-import globus_sdk
-
-from globus_cli import main
-from globus_cli.config import (
-    CLIENT_ID_OPTNAME, CLIENT_SECRET_OPTNAME,
-    AUTH_RT_OPTNAME, AUTH_AT_OPTNAME, AUTH_AT_EXPIRES_OPTNAME,
-    TRANSFER_RT_OPTNAME, TRANSFER_AT_OPTNAME, TRANSFER_AT_EXPIRES_OPTNAME)
-from globus_cli.services.transfer import get_client
-from globus_cli.services.auth import get_auth_client
-
-from tests.framework.constants import (CLITESTER1A_CLIENT_ID,
-                                       CLITESTER1A_CLIENT_SECRET,
-                                       CLITESTER1A_TRANSFER_RT,
-                                       CLITESTER1A_AUTH_RT, GO_EP1_ID)
 
 
 def clean_sharing():
@@ -37,7 +46,8 @@ def clean_sharing():
     filter_string = "last_modified:," + hour_ago.strftime("%Y-%m-%d %H:%M:%S")
     try:
         old_files = tc.operation_ls(
-            GO_EP1_ID, path=path, filter=filter_string, num_results=None)
+            GO_EP1_ID, path=path, filter=filter_string, num_results=None
+        )
     except globus_sdk.TransferAPIError:
         return
 
@@ -60,17 +70,20 @@ def default_test_config(*args, **kwargs):
     # this way will not be tied to a config file on disk, meaning that
     # ConfigObj.filename = None and ConfigObj.write() returns a string without
     # writing anything to disk.
-    return ConfigObj({"cli": {
-        CLIENT_ID_OPTNAME: CLITESTER1A_CLIENT_ID,
-        CLIENT_SECRET_OPTNAME: CLITESTER1A_CLIENT_SECRET,
-        AUTH_RT_OPTNAME: CLITESTER1A_AUTH_RT,
-        AUTH_AT_OPTNAME: "",
-        AUTH_AT_EXPIRES_OPTNAME: 0,
-        TRANSFER_RT_OPTNAME: CLITESTER1A_TRANSFER_RT,
-        TRANSFER_AT_OPTNAME: "",
-        TRANSFER_AT_EXPIRES_OPTNAME: 0,
+    return ConfigObj(
+        {
+            "cli": {
+                CLIENT_ID_OPTNAME: CLITESTER1A_CLIENT_ID,
+                CLIENT_SECRET_OPTNAME: CLITESTER1A_CLIENT_SECRET,
+                AUTH_RT_OPTNAME: CLITESTER1A_AUTH_RT,
+                AUTH_AT_OPTNAME: "",
+                AUTH_AT_EXPIRES_OPTNAME: 0,
+                TRANSFER_RT_OPTNAME: CLITESTER1A_TRANSFER_RT,
+                TRANSFER_AT_OPTNAME: "",
+                TRANSFER_AT_EXPIRES_OPTNAME: 0,
+            }
         }
-    })
+    )
 
 
 class CliTestCase(unittest.TestCase):
@@ -79,6 +92,7 @@ class CliTestCase(unittest.TestCase):
     and then testing the results. Uses testing refresh tokens to authorize
     calls, and wraps a click CliRunner for running commands.
     """
+
     def __init__(self, desc):
         unittest.TestCase.__init__(self, desc)
         self._runner = CliRunner()
@@ -95,8 +109,9 @@ class CliTestCase(unittest.TestCase):
         clean_sharing()
 
     @patch("globus_cli.config.get_config_obj")
-    def run_line(self, line, mock_config, config=None,
-                 assert_exit_code=0, batch_input=None):
+    def run_line(
+        self, line, mock_config, config=None, assert_exit_code=0, batch_input=None
+    ):
         """
         Uses the CliRunner to run the given command line.
 
@@ -127,16 +142,23 @@ class CliTestCase(unittest.TestCase):
 
         # run the line. globus_cli.main is the "globus" part of the line
         # if we are expecting success (0), don't catch any exceptions.
-        result = self._runner.invoke(main, args[1:], input=batch_input,
-                                     catch_exceptions=bool(assert_exit_code))
+        result = self._runner.invoke(
+            main, args[1:], input=batch_input, catch_exceptions=bool(assert_exit_code)
+        )
         # confirm expected exit_code
         if result.exit_code != assert_exit_code:
             if isinstance(line, six.binary_type):
                 line = line.decode("utf-8")
-            raise(Exception(
-                (u"CliTest run_line exit_code assertion failed!\n"
-                 "Line: {}\nexited with {} when expecting {}\n"
-                 "Output: {}".format(line, result.exit_code,
-                                     assert_exit_code, result.output))))
+            raise (
+                Exception(
+                    (
+                        u"CliTest run_line exit_code assertion failed!\n"
+                        "Line: {}\nexited with {} when expecting {}\n"
+                        "Output: {}".format(
+                            line, result.exit_code, assert_exit_code, result.output
+                        )
+                    )
+                )
+            )
         # return the output for further testing
         return result.output
