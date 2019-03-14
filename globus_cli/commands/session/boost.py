@@ -75,7 +75,7 @@ def session_boost(identities, no_local_server, all):
     # otherwise default to a local server login flow
     else:
         safeprint(
-            "You are running 'globus session bost', "
+            "You are running 'globus session boost', "
             "which should automatically open a browser window for you to "
             "authenticate with specific identities.\n"
             "If this fails or you experience difficulty, try "
