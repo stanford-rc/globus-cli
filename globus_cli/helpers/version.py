@@ -2,8 +2,7 @@ import platform
 import site
 import sys
 
-from globus_cli.helpers.options import is_verbose, verbosity
-from globus_cli.safeio import safeprint
+from globus_cli.safeio import is_verbose, safeprint, verbosity
 from globus_cli.version import get_versions
 
 
@@ -15,10 +14,18 @@ def _get_package_data():
     problems, and to make iteration simpler.
     """
     moddata = []
-    modlist = ('click', 'configobj', 'cryptography', 'globus_cli',
-               'globus_sdk', 'jmespath', 'requests', 'six')
+    modlist = (
+        "click",
+        "configobj",
+        "cryptography",
+        "globus_cli",
+        "globus_sdk",
+        "jmespath",
+        "requests",
+        "six",
+    )
     if verbosity() < 2:
-        modlist = ('globus_cli', 'globus_sdk', 'requests')
+        modlist = ("globus_cli", "globus_sdk", "requests")
 
     for mod in modlist:
         cur = [mod]
@@ -27,16 +34,16 @@ def _get_package_data():
         except ImportError:
             loaded_mod = None
 
-        for attr in ('__version__', '__file__', '__path__'):
+        for attr in ("__version__", "__file__", "__path__"):
             # if loading failed, be sure to pad with error messages
             if loaded_mod is None:
-                cur.append('[import failed]')
+                cur.append("[import failed]")
                 continue
 
             try:
                 attrval = getattr(loaded_mod, attr)
             except AttributeError:
-                attrval = ''
+                attrval = ""
             cur.append(attrval)
         moddata.append(cur)
 
@@ -53,21 +60,24 @@ def print_version():
     """
     latest, current = get_versions()
     if latest is None:
-        safeprint(('Installed Version: {0}\n'
-                   'Failed to lookup latest version.')
-                  .format(current))
+        safeprint(
+            ("Installed Version: {0}\n" "Failed to lookup latest version.").format(
+                current
+            )
+        )
     else:
         safeprint(
-            ('Installed Version: {0}\n'
-             'Latest Version:    {1}\n'
-             '\n{2}').format(
-                current, latest,
-                'You are running the latest version of the Globus CLI'
-                if current == latest else
-                ('You should update your version of the Globus CLI with\n'
-                 '  globus update')
-                 if current < latest else
-                 'You are running a preview version of the Globus CLI'
+            ("Installed Version: {0}\n" "Latest Version:    {1}\n" "\n{2}").format(
+                current,
+                latest,
+                "You are running the latest version of the Globus CLI"
+                if current == latest
+                else (
+                    "You should update your version of the Globus CLI with\n"
+                    "  globus update"
+                )
+                if current < latest
+                else "You are running a preview version of the Globus CLI",
             )
         )
 
@@ -76,19 +86,18 @@ def print_version():
     if is_verbose():
         moddata = _get_package_data()
 
-        safeprint('\nVerbose Data\n---')
+        safeprint("\nVerbose Data\n---")
 
-        safeprint('platform:')
-        safeprint('  platform: {}'.format(platform.platform()))
-        safeprint('  py_implementation: {}'
-                  .format(platform.python_implementation()))
-        safeprint('  py_version: {}'.format(platform.python_version()))
-        safeprint('  sys.executable: {}'.format(sys.executable))
-        safeprint('  site.USER_BASE: {}'.format(site.USER_BASE))
+        safeprint("platform:")
+        safeprint("  platform: {}".format(platform.platform()))
+        safeprint("  py_implementation: {}".format(platform.python_implementation()))
+        safeprint("  py_version: {}".format(platform.python_version()))
+        safeprint("  sys.executable: {}".format(sys.executable))
+        safeprint("  site.USER_BASE: {}".format(site.USER_BASE))
 
-        safeprint('modules:')
+        safeprint("modules:")
         for mod, modversion, modfile, modpath in moddata:
-            safeprint('  {}:'.format(mod))
-            safeprint('    __version__: {}'.format(modversion))
-            safeprint('    __file__: {}'.format(modfile))
-            safeprint('    __path__: {}'.format(modpath))
+            safeprint("  {}:".format(mod))
+            safeprint("    __version__: {}".format(modversion))
+            safeprint("    __file__: {}".format(modfile))
+            safeprint("    __path__: {}".format(modpath))

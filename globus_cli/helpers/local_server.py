@@ -2,10 +2,12 @@ import logging
 import os
 import sys
 import threading
-from string import Template
 from contextlib import contextmanager
+from string import Template
 
 import six
+
+from globus_cli.safeio import safeprint
 
 try:
     import http.client as http_client
@@ -27,14 +29,13 @@ try:
 except ImportError:
     from urllib.parse import urlparse, parse_qsl
 
-from globus_cli.safeio import safeprint
-
 
 class LocalServerError(Exception):
     pass
 
 
-HTML_TEMPLATE = Template("""
+HTML_TEMPLATE = Template(
+    """
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
@@ -73,7 +74,8 @@ HTML_TEMPLATE = Template("""
   </main>
 </body>
 </html>
-""")
+"""
+)
 
 DOC_URL = """
 <a href="https://globus.github.io/globus-cli/">CLI Documentation</a>
@@ -85,49 +87,50 @@ def enable_requests_logging():
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.DEBUG)
-    requests_log = logging.getLogger('requests.packages.urllib3')
+    requests_log = logging.getLogger("requests.packages.urllib3")
     requests_log.setLevel(logging.DEBUG)
     requests_log.propagate = True
 
 
 def is_remote_session():
-    return os.environ.get('SSH_TTY', os.environ.get('SSH_CONNECTION'))
+    return os.environ.get("SSH_TTY", os.environ.get("SSH_CONNECTION"))
 
 
 class RedirectHandler(BaseHTTPRequestHandler):
+    def do_GET(self):  # noqa
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
 
-        def do_GET(self):  # noqa
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
+        query_params = dict(parse_qsl(urlparse(self.path).query))
+        code = query_params.get("code")
+        if code:
+            self.wfile.write(
+                six.b(
+                    HTML_TEMPLATE.substitute(
+                        post_login_message=DOC_URL, login_result="Login successful"
+                    )
+                )
+            )
+            self.server.return_code(code)
+        else:
+            msg = query_params.get("error_description", query_params.get("error"))
 
-            query_params = dict(parse_qsl(urlparse(self.path).query))
-            code = query_params.get('code')
-            if code:
-                self.wfile.write(
-                    six.b(
-                        HTML_TEMPLATE.substitute(
-                            post_login_message=DOC_URL,
-                            login_result='Login successful')))
-                self.server.return_code(code)
-            else:
-                msg = query_params.get(
-                    'error_description', query_params.get('error'))
+            self.wfile.write(
+                six.b(
+                    HTML_TEMPLATE.substitute(
+                        post_login_message=msg, login_result="Login failed"
+                    )
+                )
+            )
 
-                self.wfile.write(
-                    six.b(
-                        HTML_TEMPLATE.substitute(
-                            post_login_message=msg,
-                            login_result='Login failed')))
+            self.server.return_code(LocalServerError(msg))
 
-                self.server.return_code(LocalServerError(msg))
-
-        def log_message(self, format, *args):
-            return
+    def log_message(self, format, *args):
+        return
 
 
 class RedirectHTTPServer(HTTPServer, object):
-
     def __init__(self, listen, handler_class):
         super(RedirectHTTPServer, self).__init__(listen, handler_class)
 
@@ -147,13 +150,12 @@ class RedirectHTTPServer(HTTPServer, object):
         try:
             return self._auth_code_queue.get(block=True, timeout=3600)
         except Queue.Empty:
-            safeprint(
-                'Login timed out. Please try again.', write_to_stderr=True)
+            safeprint("Login timed out. Please try again.", write_to_stderr=True)
             sys.exit(1)
 
 
 @contextmanager
-def start_local_server(listen=('', 0)):
+def start_local_server(listen=("", 0)):
     server = RedirectHTTPServer(listen, RedirectHandler)
     thread = threading.Thread(target=server.serve_forever)
     thread.daemon = True

@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 
 
 def out_is_terminal():
@@ -11,4 +11,4 @@ def err_is_terminal():
 
 
 def term_is_interactive():
-    return os.getenv('PS1') is not None
+    return os.getenv("PS1") is not None

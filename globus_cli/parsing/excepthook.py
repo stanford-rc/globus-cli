@@ -10,12 +10,11 @@ generally types of SDK errors, and dispatch onto tht set of hooks.
 import sys
 
 import click
+from globus_sdk import exc
 from six import reraise
 
-from globus_sdk import exc
-
 from globus_cli.parsing.command_state import CommandState
-from globus_cli.safeio import safeprint, write_error_info, PrintableErrorField
+from globus_cli.safeio import PrintableErrorField, safeprint, write_error_info
 
 
 def exit_with_mapped_status(http_status):
@@ -24,8 +23,7 @@ def exit_with_mapped_status(http_status):
     status mapped by what we were given.
     """
     # get the mapping by looking up the state and getting the mapping attr
-    mapping = (click.get_current_context().ensure_object(CommandState)
-               .http_status_map)
+    mapping = click.get_current_context().ensure_object(CommandState).http_status_map
 
     # if there is a mapped exit code, exit with that. Otherwise, exit 1
     if http_status in mapping:
@@ -38,8 +36,10 @@ def session_hook(exception):
     """
     Expects an exception with an authorization_paramaters field in its raw_json
     """
-    safeprint("The resource you are trying to access requires you to "
-              "re-authenticate with specific identities.")
+    safeprint(
+        "The resource you are trying to access requires you to "
+        "re-authenticate with specific identities."
+    )
 
     params = exception.raw_json["authorization_parameters"]
     message = params.get("session_message")
@@ -49,72 +49,97 @@ def session_hook(exception):
     identities = params.get("session_required_identities")
     if identities:
         id_str = " ".join(identities)
-        safeprint("Please run\n\n"
-                  "    globus session boost {}\n\n"
-                  "to re-authenticate with the required identities"
-                  .format(id_str))
+        safeprint(
+            "Please run\n\n"
+            "    globus session boost {}\n\n"
+            "to re-authenticate with the required identities".format(id_str)
+        )
     else:
-        safeprint('Please use "globus session boost" to re-authenticate '
-                  'with specific identities'.format(id_str))
+        safeprint(
+            'Please use "globus session boost" to re-authenticate '
+            "with specific identities".format(id_str)
+        )
 
     exit_with_mapped_status(exception.http_status)
 
 
 def transferapi_hook(exception):
     write_error_info(
-        'Transfer API Error',
-        [PrintableErrorField('HTTP status', exception.http_status),
-         PrintableErrorField('request_id', exception.request_id),
-         PrintableErrorField('code', exception.code),
-         PrintableErrorField('message', exception.message, multiline=True)])
+        "Transfer API Error",
+        [
+            PrintableErrorField("HTTP status", exception.http_status),
+            PrintableErrorField("request_id", exception.request_id),
+            PrintableErrorField("code", exception.code),
+            PrintableErrorField("message", exception.message, multiline=True),
+        ],
+    )
     exit_with_mapped_status(exception.http_status)
 
 
 def authapi_hook(exception):
     write_error_info(
-        'Auth API Error',
-        [PrintableErrorField('HTTP status', exception.http_status),
-         PrintableErrorField('code', exception.code),
-         PrintableErrorField('message', exception.message, multiline=True)])
+        "Auth API Error",
+        [
+            PrintableErrorField("HTTP status", exception.http_status),
+            PrintableErrorField("code", exception.code),
+            PrintableErrorField("message", exception.message, multiline=True),
+        ],
+    )
     exit_with_mapped_status(exception.http_status)
 
 
 def globusapi_hook(exception):
     write_error_info(
-        'GLobus API Error',
-        [PrintableErrorField('HTTP status', exception.http_status),
-         PrintableErrorField('code', exception.code),
-         PrintableErrorField('message', exception.message, multiline=True)])
+        "GLobus API Error",
+        [
+            PrintableErrorField("HTTP status", exception.http_status),
+            PrintableErrorField("code", exception.code),
+            PrintableErrorField("message", exception.message, multiline=True),
+        ],
+    )
     exit_with_mapped_status(exception.http_status)
 
 
 def authentication_hook(exception):
     write_error_info(
         "No Authentication Error",
-        [PrintableErrorField("HTTP status", exception.http_status),
-         PrintableErrorField("code", exception.code),
-         PrintableErrorField("message", exception.message, multiline=True)],
-        message=("Globus CLI Error: No Authentication provided. Make sure "
-                 "you have logged in with 'globus login'."))
+        [
+            PrintableErrorField("HTTP status", exception.http_status),
+            PrintableErrorField("code", exception.code),
+            PrintableErrorField("message", exception.message, multiline=True),
+        ],
+        message=(
+            "Globus CLI Error: No Authentication provided. Make sure "
+            "you have logged in with 'globus login'."
+        ),
+    )
     exit_with_mapped_status(exception.http_status)
 
 
 def invalidrefresh_hook(exception):
     write_error_info(
         "Invalid Refresh Token",
-        [PrintableErrorField("HTTP status", exception.http_status),
-         PrintableErrorField("code", exception.code),
-         PrintableErrorField("message", exception.message, multiline=True)],
-        message=("Globus CLI Error: Your credentials are no longer "
-                 "valid. Please log in again with 'globus login'."))
+        [
+            PrintableErrorField("HTTP status", exception.http_status),
+            PrintableErrorField("code", exception.code),
+            PrintableErrorField("message", exception.message, multiline=True),
+        ],
+        message=(
+            "Globus CLI Error: Your credentials are no longer "
+            "valid. Please log in again with 'globus login'."
+        ),
+    )
     exit_with_mapped_status(exception.http_status)
 
 
 def globus_generic_hook(exception):
     write_error_info(
-        'Globus Error',
-        [PrintableErrorField('error_type', exception.__class__.__name__),
-         PrintableErrorField('message', str(exception), multiline=True)])
+        "Globus Error",
+        [
+            PrintableErrorField("error_type", exception.__class__.__name__),
+            PrintableErrorField("message", str(exception), multiline=True),
+        ],
+    )
     sys.exit(1)
 
 
@@ -152,8 +177,11 @@ def custom_except_hook(exc_info):
 
         # catch any session errors to give helpful instructions
         # on how to use globus session boost
-        elif (isinstance(exception, exc.GlobusAPIError) and exception.raw_json
-                and "authorization_parameters" in exception.raw_json):
+        elif (
+            isinstance(exception, exc.GlobusAPIError)
+            and exception.raw_json
+            and "authorization_parameters" in exception.raw_json
+        ):
             session_hook(exception)
 
         # handle the Globus-raised errors with our special hooks
@@ -185,5 +213,5 @@ def custom_except_hook(exc_info):
         # or NotImplementedError bubbled all the way up here: just print it
         # out, basically
         else:
-            safeprint(u'{}: {}'.format(exception_type.__name__, exception))
+            safeprint(u"{}: {}".format(exception_type.__name__, exception))
             sys.exit(1)

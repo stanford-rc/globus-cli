@@ -1,4 +1,5 @@
 import warnings
+
 import click
 import jmespath
 
@@ -6,12 +7,11 @@ from globus_cli import config
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
 from globus_cli.parsing.hidden_option import HiddenOption
 
-
 # Format Enum for output formatting
 # could use a namedtuple, but that's overkill
-JSON_FORMAT = 'json'
-TEXT_FORMAT = 'text'
-UNIX_FORMAT = 'unix'
+JSON_FORMAT = "json"
+TEXT_FORMAT = "text"
+UNIX_FORMAT = "unix"
 
 
 class CommandState(object):
@@ -64,16 +64,24 @@ def format_option(f):
             state.output_format = JSON_FORMAT
 
     f = click.option(
-        '-F', '--format',
+        "-F",
+        "--format",
         type=CaseInsensitiveChoice([UNIX_FORMAT, JSON_FORMAT, TEXT_FORMAT]),
-        help='Output format for stdout. Defaults to text',
-        expose_value=False, callback=callback)(f)
+        help="Output format for stdout. Defaults to text",
+        expose_value=False,
+        callback=callback,
+    )(f)
     f = click.option(
-        "--jmespath", "--jq",
-        help=("A JMESPath expression to apply to json output. "
-              "Takes precedence over any specified '--format' and forces "
-              "the format to be json processed by this expression"),
-        expose_value=False, callback=jmespath_callback)(f)
+        "--jmespath",
+        "--jq",
+        help=(
+            "A JMESPath expression to apply to json output. "
+            "Takes precedence over any specified '--format' and forces "
+            "the format to be json processed by this expression"
+        ),
+        expose_value=False,
+        callback=jmespath_callback,
+    )(f)
     return f
 
 
@@ -81,17 +89,22 @@ def debug_option(f):
     def callback(ctx, param, value):
         if not value or ctx.resilient_parsing:
             # turn off warnings altogether
-            warnings.simplefilter('ignore')
+            warnings.simplefilter("ignore")
             return
 
-        warnings.simplefilter('default')
+        warnings.simplefilter("default")
         state = ctx.ensure_object(CommandState)
         state.debug = True
         config.setup_logging(level="DEBUG")
 
     return click.option(
-        '--debug', is_flag=True, cls=HiddenOption,
-        expose_value=False, callback=callback, is_eager=True)(f)
+        "--debug",
+        is_flag=True,
+        cls=HiddenOption,
+        expose_value=False,
+        callback=callback,
+        is_eager=True,
+    )(f)
 
 
 def verbose_option(f):
@@ -130,9 +143,14 @@ def verbose_option(f):
             config.setup_logging(level="DEBUG")
 
     return click.option(
-        "--verbose", "-v", count=True,
-        expose_value=False, callback=callback, is_eager=True,
-        help="Control level of output")(f)
+        "--verbose",
+        "-v",
+        count=True,
+        expose_value=False,
+        callback=callback,
+        is_eager=True,
+        help="Control level of output",
+    )(f)
 
 
 def map_http_status_option(f):
@@ -145,11 +163,9 @@ def map_http_status_option(f):
         try:
             # we may be given a comma-delimited list of values
             # any cases of empty strings are dropped
-            pairs = [x for x in
-                     (y.strip() for y in value.split(','))
-                     if len(x)]
+            pairs = [x for x in (y.strip() for y in value.split(",")) if len(x)]
             # iterate over those pairs, splitting them on `=` signs
-            for http_stat, exit_stat in (pair.split('=') for pair in pairs):
+            for http_stat, exit_stat in (pair.split("=") for pair in pairs):
                 # "parse" as ints
                 http_stat, exit_stat = int(http_stat), int(exit_stat)
                 # force into the desired range
@@ -161,9 +177,10 @@ def map_http_status_option(f):
         # of args, or results weren't int()-able
         except ValueError:
             raise click.UsageError(
-                '--map-http-status must have an argument of the form '
+                "--map-http-status must have an argument of the form "
                 '"INT=INT,INT=INT,..." and values of exit codes must be in '
-                '0,1,50-99')
+                "0,1,50-99"
+            )
 
     def callback(ctx, param, value):
         """
@@ -174,7 +191,12 @@ def map_http_status_option(f):
             per_val_callback(ctx, v)
 
     return click.option(
-        '--map-http-status',
-        help=('Map HTTP statuses to any of these exit codes: 0,1,50-99. '
-              'e.g. "404=50,403=51"'),
-        expose_value=False, callback=callback, multiple=True)(f)
+        "--map-http-status",
+        help=(
+            "Map HTTP statuses to any of these exit codes: 0,1,50-99. "
+            'e.g. "404=50,403=51"'
+        ),
+        expose_value=False,
+        callback=callback,
+        multiple=True,
+    )(f)

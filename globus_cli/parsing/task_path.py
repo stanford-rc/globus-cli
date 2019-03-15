@@ -1,10 +1,12 @@
 import os
+
 import click
 
 
 class TaskPath(click.ParamType):
-    def __init__(self, base_dir=None, coerce_to_dir=False, normalize=True,
-                 require_absolute=False):
+    def __init__(
+        self, base_dir=None, coerce_to_dir=False, normalize=True, require_absolute=False
+    ):
         """
         Task Paths are paths for passing into Transfer or Delete tasks.
         They're only slightly more than string types: they can join themselves
@@ -35,25 +37,34 @@ class TaskPath(click.ParamType):
 
         if self.base_dir:
             self.path = os.path.join(self.base_dir, self.path)
-        if self.coerce_to_dir and not self.path.endswith('/'):
-            self.path += '/'
+        if self.coerce_to_dir and not self.path.endswith("/"):
+            self.path += "/"
         if self.normalize:
             self.path = os.path.normpath(self.path)
 
-        if self.require_absolute and not (self.path.startswith('/') or
-                                          self.path.startswith('~')):
-            self.fail('{} is not absolute (abspath required)'
-                      .format(self.path), param=param, ctx=ctx)
+        if self.require_absolute and not (
+            self.path.startswith("/") or self.path.startswith("~")
+        ):
+            self.fail(
+                "{} is not absolute (abspath required)".format(self.path),
+                param=param,
+                ctx=ctx,
+            )
 
         return self
 
     def __repr__(self):
         return "TaskPath({})".format(
-            ','.join(
+            ",".join(
                 "{}={}".format(name, getattr(self, name))
-                for name in
-                ('base_dir', 'coerce_to_dir', 'normalize', 'path',
-                 'orig_path'))
+                for name in (
+                    "base_dir",
+                    "coerce_to_dir",
+                    "normalize",
+                    "path",
+                    "orig_path",
+                )
+            )
         )
 
     def __str__(self):

@@ -1,8 +1,12 @@
 import errno
+
 import click
 
 from globus_cli.safeio.check_pty import (
-    term_is_interactive, err_is_terminal, out_is_terminal)
+    err_is_terminal,
+    out_is_terminal,
+    term_is_interactive,
+)
 
 
 def safeprint(message, write_to_stderr=False, newline=True):

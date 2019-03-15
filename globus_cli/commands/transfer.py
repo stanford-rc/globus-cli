@@ -1,17 +1,24 @@
 import click
-
 from globus_sdk import TransferData
+
 from globus_cli.parsing import (
-    CaseInsensitiveChoice, common_options, task_submission_options,
-    TaskPath, ENDPOINT_PLUS_OPTPATH, shlex_process_stdin,
-    HiddenOption)
-from globus_cli.safeio import formatted_print, FORMAT_TEXT_RECORD
+    ENDPOINT_PLUS_OPTPATH,
+    CaseInsensitiveChoice,
+    HiddenOption,
+    TaskPath,
+    common_options,
+    shlex_process_stdin,
+    task_submission_options,
+)
+from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
+from globus_cli.services.transfer import autoactivate, get_client
 
-from globus_cli.services.transfer import get_client, autoactivate
 
-
-@click.command('transfer', short_help='Submit a transfer task (asynchronous)',
-               help=("""\
+@click.command(
+    "transfer",
+    short_help="Submit a transfer task (asynchronous)",
+    help=(
+        """\
     Copy a file or directory from one endpoint to another as an asynchronous
     task.
 
@@ -61,45 +68,99 @@ from globus_cli.services.transfer import get_client, autoactivate
 
     If a transfer fails, CHECKSUM must be used to restart the transfer.
     All other levels can lead to data corruption.
-    """))
+    """
+    ),
+)
 @common_options
 @task_submission_options
-@click.option('--recursive', '-r', is_flag=True,
-              help=('SOURCE_PATH and DEST_PATH are both directories, do a '
-                    'recursive dir transfer'))
-@click.option('--sync-level', '-s', default=None, show_default=True,
-              type=CaseInsensitiveChoice(
-                  ("exists", "size", "mtime", "checksum")),
-              help=('How will the Transfer task determine whether or not to '
-                    'actually transfer a file over the network?'))
-@click.option('--preserve-mtime', is_flag=True, default=False,
-              help=('Preserve file and directory modification times.'))
-@click.option('--verify-checksum/--no-verify-checksum', default=True,
-              show_default=True,
-              help=('Verify checksum after transfer.'))
-@click.option('--encrypt', is_flag=True, default=False,
-              help=('Encrypt data sent through the network.'))
-@click.option('--delete', is_flag=True, default=False,
-              help=('Delete extraneous files in the destination directory. '
-                    'Only applies to recursive directory transfers.'))
-@click.option('--batch', is_flag=True,
-              help=('Accept a batch of source/dest path pairs on stdin (i.e. '
-                    'run in batchmode). '
-                    'Uses SOURCE_ENDPOINT_ID and DEST_ENDPOINT_ID as passed '
-                    'on the commandline. Commandline paths are still allowed '
-                    'and are used as prefixes to the batchmode inputs.'))
-@click.argument('source', metavar='SOURCE_ENDPOINT_ID[:SOURCE_PATH]',
-                type=ENDPOINT_PLUS_OPTPATH)
-@click.argument('destination', metavar='DEST_ENDPOINT_ID[:DEST_PATH]',
-                type=ENDPOINT_PLUS_OPTPATH)
-@click.option('--perf-cc', type=int, cls=HiddenOption)
-@click.option('--perf-p', type=int, cls=HiddenOption)
-@click.option('--perf-pp', type=int, cls=HiddenOption)
-@click.option('--perf-udt', is_flag=True, default=None, cls=HiddenOption)
-def transfer_command(batch, sync_level, recursive, destination, source, label,
-                     preserve_mtime, verify_checksum, encrypt, submission_id,
-                     dry_run, delete, deadline, skip_activation_check, notify,
-                     perf_cc, perf_p, perf_pp, perf_udt):
+@click.option(
+    "--recursive",
+    "-r",
+    is_flag=True,
+    help=(
+        "SOURCE_PATH and DEST_PATH are both directories, do a " "recursive dir transfer"
+    ),
+)
+@click.option(
+    "--sync-level",
+    "-s",
+    default=None,
+    show_default=True,
+    type=CaseInsensitiveChoice(("exists", "size", "mtime", "checksum")),
+    help=(
+        "How will the Transfer task determine whether or not to "
+        "actually transfer a file over the network?"
+    ),
+)
+@click.option(
+    "--preserve-mtime",
+    is_flag=True,
+    default=False,
+    help=("Preserve file and directory modification times."),
+)
+@click.option(
+    "--verify-checksum/--no-verify-checksum",
+    default=True,
+    show_default=True,
+    help=("Verify checksum after transfer."),
+)
+@click.option(
+    "--encrypt",
+    is_flag=True,
+    default=False,
+    help=("Encrypt data sent through the network."),
+)
+@click.option(
+    "--delete",
+    is_flag=True,
+    default=False,
+    help=(
+        "Delete extraneous files in the destination directory. "
+        "Only applies to recursive directory transfers."
+    ),
+)
+@click.option(
+    "--batch",
+    is_flag=True,
+    help=(
+        "Accept a batch of source/dest path pairs on stdin (i.e. "
+        "run in batchmode). "
+        "Uses SOURCE_ENDPOINT_ID and DEST_ENDPOINT_ID as passed "
+        "on the commandline. Commandline paths are still allowed "
+        "and are used as prefixes to the batchmode inputs."
+    ),
+)
+@click.argument(
+    "source", metavar="SOURCE_ENDPOINT_ID[:SOURCE_PATH]", type=ENDPOINT_PLUS_OPTPATH
+)
+@click.argument(
+    "destination", metavar="DEST_ENDPOINT_ID[:DEST_PATH]", type=ENDPOINT_PLUS_OPTPATH
+)
+@click.option("--perf-cc", type=int, cls=HiddenOption)
+@click.option("--perf-p", type=int, cls=HiddenOption)
+@click.option("--perf-pp", type=int, cls=HiddenOption)
+@click.option("--perf-udt", is_flag=True, default=None, cls=HiddenOption)
+def transfer_command(
+    batch,
+    sync_level,
+    recursive,
+    destination,
+    source,
+    label,
+    preserve_mtime,
+    verify_checksum,
+    encrypt,
+    submission_id,
+    dry_run,
+    delete,
+    deadline,
+    skip_activation_check,
+    notify,
+    perf_cc,
+    perf_p,
+    perf_pp,
+    perf_udt,
+):
     """
     Executor for `globus transfer`
     """
@@ -108,14 +169,17 @@ def transfer_command(batch, sync_level, recursive, destination, source, label,
 
     if recursive and batch:
         raise click.UsageError(
-            ('You cannot use --recursive in addition to --batch. '
-             'Instead, use --recursive on lines of --batch input '
-             'which need it'))
+            (
+                "You cannot use --recursive in addition to --batch. "
+                "Instead, use --recursive on lines of --batch input "
+                "which need it"
+            )
+        )
 
     if (cmd_source_path is None or cmd_dest_path is None) and (not batch):
         raise click.UsageError(
-            ('transfer requires either SOURCE_PATH and DEST_PATH or '
-             '--batch'))
+            ("transfer requires either SOURCE_PATH and DEST_PATH or " "--batch")
+        )
 
     # because python can't handle multiple **kwargs expansions in a single
     # call, we need to get a little bit clever
@@ -126,49 +190,67 @@ def transfer_command(batch, sync_level, recursive, destination, source, label,
     # put them together into a dict before passing to TransferData
     kwargs = {}
     perf_opts = dict(
-        (k, v) for (k, v) in
-        dict(perf_cc=perf_cc, perf_p=perf_p,
-             perf_pp=perf_pp, perf_udt=perf_udt).items()
-        if v is not None)
+        (k, v)
+        for (k, v) in dict(
+            perf_cc=perf_cc, perf_p=perf_p, perf_pp=perf_pp, perf_udt=perf_udt
+        ).items()
+        if v is not None
+    )
     kwargs.update(perf_opts)
     kwargs.update(notify)
 
     client = get_client()
     transfer_data = TransferData(
-        client, source_endpoint, dest_endpoint,
-        label=label, sync_level=sync_level, verify_checksum=verify_checksum,
-        preserve_timestamp=preserve_mtime, encrypt_data=encrypt,
-        submission_id=submission_id, delete_destination_extra=delete,
-        deadline=deadline, skip_activation_check=skip_activation_check,
-        **kwargs)
+        client,
+        source_endpoint,
+        dest_endpoint,
+        label=label,
+        sync_level=sync_level,
+        verify_checksum=verify_checksum,
+        preserve_timestamp=preserve_mtime,
+        encrypt_data=encrypt,
+        submission_id=submission_id,
+        delete_destination_extra=delete,
+        deadline=deadline,
+        skip_activation_check=skip_activation_check,
+        **kwargs
+    )
 
     if batch:
+
         @click.command()
-        @click.option('--recursive', '-r', is_flag=True)
-        @click.argument('source_path', type=TaskPath(base_dir=cmd_source_path))
-        @click.argument('dest_path', type=TaskPath(base_dir=cmd_dest_path))
+        @click.option("--recursive", "-r", is_flag=True)
+        @click.argument("source_path", type=TaskPath(base_dir=cmd_source_path))
+        @click.argument("dest_path", type=TaskPath(base_dir=cmd_dest_path))
         def process_batch_line(dest_path, source_path, recursive):
             """
             Parse a line of batch input and turn it into a transfer submission
             item.
             """
-            transfer_data.add_item(str(source_path), str(dest_path),
-                                   recursive=recursive)
+            transfer_data.add_item(
+                str(source_path), str(dest_path), recursive=recursive
+            )
 
         shlex_process_stdin(
             process_batch_line,
-            ('Enter transfers, line by line, as\n\n'
-             '    [--recursive] SOURCE_PATH DEST_PATH\n'))
+            (
+                "Enter transfers, line by line, as\n\n"
+                "    [--recursive] SOURCE_PATH DEST_PATH\n"
+            ),
+        )
     else:
-        transfer_data.add_item(cmd_source_path, cmd_dest_path,
-                               recursive=recursive)
+        transfer_data.add_item(cmd_source_path, cmd_dest_path, recursive=recursive)
 
     if dry_run:
         formatted_print(
-            transfer_data, response_key='DATA',
-            fields=(('Source Path', 'source_path'),
-                    ('Dest Path', 'destination_path'),
-                    ('Recursive', 'recursive')))
+            transfer_data,
+            response_key="DATA",
+            fields=(
+                ("Source Path", "source_path"),
+                ("Dest Path", "destination_path"),
+                ("Recursive", "recursive"),
+            ),
+        )
         # exit safely
         return
 
@@ -179,5 +261,8 @@ def transfer_command(batch, sync_level, recursive, destination, source, label,
         autoactivate(client, dest_endpoint, if_expires_in=60)
 
     res = client.submit_transfer(transfer_data)
-    formatted_print(res, text_format=FORMAT_TEXT_RECORD,
-                    fields=(('Message', 'message'), ('Task ID', 'task_id')))
+    formatted_print(
+        res,
+        text_format=FORMAT_TEXT_RECORD,
+        fields=(("Message", "message"), ("Task ID", "task_id")),
+    )

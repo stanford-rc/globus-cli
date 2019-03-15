@@ -1,89 +1,83 @@
 import logging.config
 import os
-from configobj import ConfigObj
 
 import globus_sdk
+from configobj import ConfigObj
 
 __all__ = [
     # option name constants
-    'OUTPUT_FORMAT_OPTNAME',
-    'MYPROXY_USERNAME_OPTNAME',
-    'AUTH_RT_OPTNAME',
-    'AUTH_AT_OPTNAME',
-    'AUTH_AT_EXPIRES_OPTNAME',
-    'TRANSFER_RT_OPTNAME',
-    'TRANSFER_AT_OPTNAME',
-    'AUTH_AT_EXPIRES_OPTNAME',
-    'CLIENT_ID_OPTNAME',
-    'CLIENT_SECRET_OPTNAME',
-
-    'GLOBUS_ENV',
-
-    'internal_native_client',
-    'internal_auth_client',
-
-    'get_output_format',
-    'get_auth_tokens',
-    'get_transfer_tokens',
-
-    'get_config_obj',
-    'write_option',
-    'remove_option',
-    'lookup_option',
+    "OUTPUT_FORMAT_OPTNAME",
+    "MYPROXY_USERNAME_OPTNAME",
+    "AUTH_RT_OPTNAME",
+    "AUTH_AT_OPTNAME",
+    "AUTH_AT_EXPIRES_OPTNAME",
+    "TRANSFER_RT_OPTNAME",
+    "TRANSFER_AT_OPTNAME",
+    "AUTH_AT_EXPIRES_OPTNAME",
+    "CLIENT_ID_OPTNAME",
+    "CLIENT_SECRET_OPTNAME",
+    "GLOBUS_ENV",
+    "internal_native_client",
+    "internal_auth_client",
+    "get_output_format",
+    "get_auth_tokens",
+    "get_transfer_tokens",
+    "get_config_obj",
+    "write_option",
+    "remove_option",
+    "lookup_option",
 ]
 
 
 # constants for use whenever we need to do things using
 # instance clients from the CLI Native App Template
 # primarily accessed via `internal_auth_client()`
-CLIENT_ID_OPTNAME = 'client_id'
-CLIENT_SECRET_OPTNAME = 'client_secret'
-TEMPLATE_ID_OPTNAME = 'template_id'
-DEFAULT_TEMPLATE_ID = '95fdeba8-fac2-42bd-a357-e068d82ff78e'
+CLIENT_ID_OPTNAME = "client_id"
+CLIENT_SECRET_OPTNAME = "client_secret"
+TEMPLATE_ID_OPTNAME = "template_id"
+DEFAULT_TEMPLATE_ID = "95fdeba8-fac2-42bd-a357-e068d82ff78e"
 
 # constants for global use
-OUTPUT_FORMAT_OPTNAME = 'output_format'
-MYPROXY_USERNAME_OPTNAME = 'default_myproxy_username'
-AUTH_RT_OPTNAME = 'auth_refresh_token'
-AUTH_AT_OPTNAME = 'auth_access_token'
-AUTH_AT_EXPIRES_OPTNAME = 'auth_access_token_expires'
-TRANSFER_RT_OPTNAME = 'transfer_refresh_token'
-TRANSFER_AT_OPTNAME = 'transfer_access_token'
-TRANSFER_AT_EXPIRES_OPTNAME = 'transfer_access_token_expires'
+OUTPUT_FORMAT_OPTNAME = "output_format"
+MYPROXY_USERNAME_OPTNAME = "default_myproxy_username"
+AUTH_RT_OPTNAME = "auth_refresh_token"
+AUTH_AT_OPTNAME = "auth_access_token"
+AUTH_AT_EXPIRES_OPTNAME = "auth_access_token_expires"
+TRANSFER_RT_OPTNAME = "transfer_refresh_token"
+TRANSFER_AT_OPTNAME = "transfer_access_token"
+TRANSFER_AT_EXPIRES_OPTNAME = "transfer_access_token_expires"
 
 # get the environment from env var (not exported)
-GLOBUS_ENV = os.environ.get('GLOBUS_SDK_ENVIRONMENT')
+GLOBUS_ENV = os.environ.get("GLOBUS_SDK_ENVIRONMENT")
 
 # if the env is set, rewrite the option names to have it as a prefix
 if GLOBUS_ENV:
-    AUTH_RT_OPTNAME = '{0}_auth_refresh_token'.format(GLOBUS_ENV)
-    AUTH_AT_OPTNAME = '{0}_auth_access_token'.format(GLOBUS_ENV)
-    AUTH_AT_EXPIRES_OPTNAME = '{0}_auth_access_token_expires'.format(
-        GLOBUS_ENV)
-    TRANSFER_RT_OPTNAME = '{0}_transfer_refresh_token'.format(GLOBUS_ENV)
-    TRANSFER_AT_OPTNAME = '{0}_transfer_access_token'.format(GLOBUS_ENV)
-    TRANSFER_AT_EXPIRES_OPTNAME = '{0}_transfer_access_token_expires'.format(
-        GLOBUS_ENV)
+    AUTH_RT_OPTNAME = "{0}_auth_refresh_token".format(GLOBUS_ENV)
+    AUTH_AT_OPTNAME = "{0}_auth_access_token".format(GLOBUS_ENV)
+    AUTH_AT_EXPIRES_OPTNAME = "{0}_auth_access_token_expires".format(GLOBUS_ENV)
+    TRANSFER_RT_OPTNAME = "{0}_transfer_refresh_token".format(GLOBUS_ENV)
+    TRANSFER_AT_OPTNAME = "{0}_transfer_access_token".format(GLOBUS_ENV)
+    TRANSFER_AT_EXPIRES_OPTNAME = "{0}_transfer_access_token_expires".format(GLOBUS_ENV)
 
-    CLIENT_ID_OPTNAME = '{0}_client_id'.format(GLOBUS_ENV)
-    CLIENT_SECRET_OPTNAME = '{0}_client_secret'.format(GLOBUS_ENV)
-    TEMPLATE_ID_OPTNAME = '{0}_template_id'.format(GLOBUS_ENV)
+    CLIENT_ID_OPTNAME = "{0}_client_id".format(GLOBUS_ENV)
+    CLIENT_SECRET_OPTNAME = "{0}_client_secret".format(GLOBUS_ENV)
+    TEMPLATE_ID_OPTNAME = "{0}_template_id".format(GLOBUS_ENV)
     DEFAULT_TEMPLATE_ID = {
-        'sandbox':      '33b6a241-bce4-4359-9c6d-09f88b3c9eef',
-        'integration':  'e0c31fd1-663b-44e1-840f-f4304bb9ee7a',
-        'test':         '0ebfd058-452f-40c3-babf-5a6b16a7b337',
-        'staging':      '3029c3cb-c8d9-4f2b-979c-c53330aa7327',
-        'preview':      'b2867dbb-0846-4579-8486-dc70763d700b',
+        "sandbox": "33b6a241-bce4-4359-9c6d-09f88b3c9eef",
+        "integration": "e0c31fd1-663b-44e1-840f-f4304bb9ee7a",
+        "test": "0ebfd058-452f-40c3-babf-5a6b16a7b337",
+        "staging": "3029c3cb-c8d9-4f2b-979c-c53330aa7327",
+        "preview": "b2867dbb-0846-4579-8486-dc70763d700b",
     }.get(GLOBUS_ENV, DEFAULT_TEMPLATE_ID)
 
 
 def get_config_obj(system=False, file_error=False):
     if system:
-        path = '/etc/globus.cfg'
+        path = "/etc/globus.cfg"
     else:
         path = os.path.expanduser("~/.globus.cfg")
 
-    conf = ConfigObj(path, encoding='utf-8', file_error=file_error)
+    conf = ConfigObj(path, encoding="utf-8", file_error=file_error)
 
     # delete any old whomai values in the cli section
     for key in conf.get("cli", {}):
@@ -94,7 +88,7 @@ def get_config_obj(system=False, file_error=False):
     return conf
 
 
-def lookup_option(option, section='cli', environment=None):
+def lookup_option(option, section="cli", environment=None):
     conf = get_config_obj()
     try:
         if environment:
@@ -105,7 +99,7 @@ def lookup_option(option, section='cli', environment=None):
         return None
 
 
-def remove_option(option, section='cli', system=False):
+def remove_option(option, section="cli", system=False):
     conf = get_config_obj(system=system)
 
     # if there's no section for the option we're removing, just return None
@@ -127,7 +121,7 @@ def remove_option(option, section='cli', system=False):
     return opt_val
 
 
-def write_option(option, value, section='cli', system=False):
+def write_option(option, value, section="cli", system=False):
     """
     Write an option to disk -- doesn't handle config reloading
     """
@@ -157,9 +151,9 @@ def get_auth_tokens():
         expires = int(expires)
 
     return {
-        'refresh_token': lookup_option(AUTH_RT_OPTNAME),
-        'access_token': lookup_option(AUTH_AT_OPTNAME),
-        'access_token_expires': expires
+        "refresh_token": lookup_option(AUTH_RT_OPTNAME),
+        "access_token": lookup_option(AUTH_AT_OPTNAME),
+        "access_token_expires": expires,
     }
 
 
@@ -174,9 +168,9 @@ def get_transfer_tokens():
         expires = int(expires)
 
     return {
-        'refresh_token': lookup_option(TRANSFER_RT_OPTNAME),
-        'access_token': lookup_option(TRANSFER_AT_OPTNAME),
-        'access_token_expires': expires
+        "refresh_token": lookup_option(TRANSFER_RT_OPTNAME),
+        "access_token": lookup_option(TRANSFER_AT_OPTNAME),
+        "access_token_expires": expires,
     }
 
 
@@ -210,8 +204,7 @@ def internal_auth_client(requires_instance=False, force_new_client=False):
 
     # if we are forcing a new client, delete any existing client
     if force_new_client and existing:
-        existing_client = globus_sdk.ConfidentialAppAuthClient(
-            client_id, client_secret)
+        existing_client = globus_sdk.ConfidentialAppAuthClient(client_id, client_secret)
         try:
             existing_client.delete("/v2/api/clients/{}".format(client_id))
 
@@ -223,12 +216,7 @@ def internal_auth_client(requires_instance=False, force_new_client=False):
     # if we require a new client to be made
     if force_new_client or (requires_instance and not existing):
         # register a new instance client with auth
-        body = {
-            "client": {
-                "template_id": template_id,
-                "name": "Globus CLI"
-            }
-        }
+        body = {"client": {"template_id": template_id, "name": "Globus CLI"}}
         res = template_client.post("/v2/api/clients", json_body=body)
 
         # get values and write to config
@@ -239,12 +227,14 @@ def internal_auth_client(requires_instance=False, force_new_client=False):
         write_option(CLIENT_SECRET_OPTNAME, client_secret)
 
         return globus_sdk.ConfidentialAppAuthClient(
-            client_id, client_secret, app_name="Globus CLI")
+            client_id, client_secret, app_name="Globus CLI"
+        )
 
     # if we already have a client, just return it
     elif existing:
         return globus_sdk.ConfidentialAppAuthClient(
-            client_id, client_secret, app_name="Globus CLI")
+            client_id, client_secret, app_name="Globus CLI"
+        )
 
     # fall-back to a native client to not break old logins
     # TOOD: eventually remove this behavior
@@ -254,26 +244,18 @@ def internal_auth_client(requires_instance=False, force_new_client=False):
 
 def setup_logging(level="DEBUG"):
     conf = {
-        'version': 1,
-        'formatters': {
-            'basic': {
-                'format':
-                '[%(levelname)s] %(name)s::%(funcName)s() %(message)s'
+        "version": 1,
+        "formatters": {
+            "basic": {"format": "[%(levelname)s] %(name)s::%(funcName)s() %(message)s"}
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "level": level,
+                "formatter": "basic",
             }
         },
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-                'level': level,
-                'formatter': 'basic'
-            }
-        },
-        'loggers': {
-            'globus_sdk': {
-                'level': level,
-                'handlers': ['console']
-            }
-        }
+        "loggers": {"globus_sdk": {"level": level, "handlers": ["console"]}},
     }
 
     logging.config.dictConfig(conf)

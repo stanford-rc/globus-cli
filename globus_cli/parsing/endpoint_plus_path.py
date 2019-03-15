@@ -8,11 +8,12 @@ class EndpointPlusPath(click.ParamType):
 
     Always produces a Tuple.
     """
-    name = 'endpoint plus path'
+
+    name = "endpoint plus path"
 
     def __init__(self, *args, **kwargs):
         # path requirement defaults to True, but can be tweaked by a kwarg
-        self.path_required = kwargs.pop('path_required', True)
+        self.path_required = kwargs.pop("path_required", True)
 
         super(EndpointPlusPath, self).__init__(*args, **kwargs)
 
@@ -45,7 +46,7 @@ class EndpointPlusPath(click.ParamType):
             return value
 
         # split the value on the first colon, leave the rest intact
-        splitval = value.split(':', 1)
+        splitval = value.split(":", 1)
         # first element is the endpoint_id
         endpoint_id = click.UUID(splitval[0])
 
@@ -60,7 +61,7 @@ class EndpointPlusPath(click.ParamType):
         path = path or None
 
         if path is None and self.path_required:
-            self.fail('The path component is required', param=param)
+            self.fail("The path component is required", param=param)
 
         return (endpoint_id, path)
 

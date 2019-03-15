@@ -7,13 +7,16 @@ and all other components will be hidden internals.
 """
 
 import sys
+
 import click
 
 from globus_cli.parsing.custom_group import GlobusCommandGroup
-from globus_cli.parsing.shell_completion import (
-    shell_complete_option, print_completer_option)
 from globus_cli.parsing.excepthook import custom_except_hook
 from globus_cli.parsing.shared_options import common_options
+from globus_cli.parsing.shell_completion import (
+    print_completer_option,
+    shell_complete_option,
+)
 
 
 class TopLevelGroup(GlobusCommandGroup):
@@ -23,6 +26,7 @@ class TopLevelGroup(GlobusCommandGroup):
     It's specialization is that it catches all exceptions from subcommands and
     passes them to a custom error handler.
     """
+
     def invoke(self, ctx):
         try:
             return super(TopLevelGroup, self).invoke(ctx)
@@ -31,7 +35,7 @@ class TopLevelGroup(GlobusCommandGroup):
 
 
 def globus_main_func(f):
-    f = click.group('globus', cls=TopLevelGroup)(f)
+    f = click.group("globus", cls=TopLevelGroup)(f)
     f = common_options(f)
     f = shell_complete_option(f)
     f = print_completer_option(f)

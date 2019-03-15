@@ -1,4 +1,4 @@
-__all__ = ['EXPLICIT_NULL']
+__all__ = ["EXPLICIT_NULL"]
 
 
 # this object is a sentinel value used to disambiguate values which are being

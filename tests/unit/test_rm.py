@@ -1,5 +1,5 @@
-from random import getrandbits
 import json
+from random import getrandbits
 
 from tests.framework.cli_testcase import CliTestCase
 from tests.framework.constants import GO_EP1_ID
@@ -12,11 +12,10 @@ def _load_probably_json_substring(x):
     Works well for these cases, where click.CliRunner gives us output
     containing both stderr and stdout.
     """
-    return json.loads(x[x.index('{'):x.rindex('}') + 1])
+    return json.loads(x[x.index("{") : x.rindex("}") + 1])
 
 
 class RMTests(CliTestCase):
-
     def test_recursive(self):
         """
         Makes a dir on ep1, then --recursive rm's it.
@@ -26,8 +25,7 @@ class RMTests(CliTestCase):
         path = "/~/rm_dir-{}".format(str(getrandbits(128)))
         self.tc.operation_mkdir(GO_EP1_ID, path)
 
-        output = self.run_line(
-            "globus rm -r -F json {}:{}".format(GO_EP1_ID, path))
+        output = self.run_line("globus rm -r -F json {}:{}".format(GO_EP1_ID, path))
         res = _load_probably_json_substring(output)
         self.assertEqual(res["status"], "SUCCEEDED")
 
@@ -36,8 +34,7 @@ class RMTests(CliTestCase):
         Attempts to remove a non-existant file. Confirms exit code 1
         """
         path = "/~/nofilehere.txt"
-        self.run_line(
-            "globus rm {}:{}".format(GO_EP1_ID, path), assert_exit_code=1)
+        self.run_line("globus rm {}:{}".format(GO_EP1_ID, path), assert_exit_code=1)
 
     def test_ignore_missing(self):
         """
@@ -61,16 +58,14 @@ class RMTests(CliTestCase):
 
         # remove all dirs with the prefix
         glob = "rm_dir{}*".format(rand)
-        output = self.run_line(
-            "globus rm -r -F json {}:{}".format(GO_EP1_ID, glob))
+        output = self.run_line("globus rm -r -F json {}:{}".format(GO_EP1_ID, glob))
         res = _load_probably_json_substring(output)
         self.assertEqual(res["status"], "SUCCEEDED")
 
         # confirm no dirs with the prefix exist on the endpoint
         filter_string = "name:~rm_dir{}*".format(rand)
         ls_doc = self.tc.operation_ls(GO_EP1_ID, filter=filter_string)
-        for item in ls_doc:
-            self.assertTrue(False)
+        self.assertEquals(list(ls_doc), [])
 
     def test_wild_globbing(self):
         """
@@ -85,16 +80,14 @@ class RMTests(CliTestCase):
 
         # remove all dirs with the prefix
         glob = "rm_dir{}-?".format(rand)
-        output = self.run_line(
-            "globus rm -r -F json {}:{}".format(GO_EP1_ID, glob))
+        output = self.run_line("globus rm -r -F json {}:{}".format(GO_EP1_ID, glob))
         res = _load_probably_json_substring(output)
         self.assertEqual(res["status"], "SUCCEEDED")
 
         # confirm no dirs with the prefix exist on the endpoint
         filter_string = "name:~rm_dir{}*".format(rand)
         ls_doc = self.tc.operation_ls(GO_EP1_ID, filter=filter_string)
-        for item in ls_doc:
-            self.assertTrue(False)
+        self.assertEquals(list(ls_doc), [])
 
     def test_bracket_globbing(self):
         """
@@ -109,16 +102,14 @@ class RMTests(CliTestCase):
 
         # remove all dirs with the prefix
         glob = "rm_dir{}-[012]".format(rand)
-        output = self.run_line(
-            "globus rm -r -F json {}:{}".format(GO_EP1_ID, glob))
+        output = self.run_line("globus rm -r -F json {}:{}".format(GO_EP1_ID, glob))
         res = _load_probably_json_substring(output)
         self.assertEqual(res["status"], "SUCCEEDED")
 
         # confirm no dirs with the prefix exist on the endpoint
         filter_string = "name:~rm_dir{}*".format(rand)
         ls_doc = self.tc.operation_ls(GO_EP1_ID, filter=filter_string)
-        for item in ls_doc:
-            self.assertTrue(False)
+        self.assertEquals(list(ls_doc), [])
 
     def test_timeout(self):
         """
@@ -129,9 +120,11 @@ class RMTests(CliTestCase):
         path = "/share/godata/file1.txt"
         output = self.run_line(
             "globus rm -r --timeout {} {}:{}".format(timeout, GO_EP1_ID, path),
-            assert_exit_code=1)
-        self.assertIn(("Task has yet to complete "
-                       "after {} seconds".format(timeout)), output)
+            assert_exit_code=1,
+        )
+        self.assertIn(
+            ("Task has yet to complete " "after {} seconds".format(timeout)), output
+        )
 
     def test_timeout_explicit_status(self):
         """
@@ -143,8 +136,11 @@ class RMTests(CliTestCase):
         status = 50
         path = "/share/godata/file1.txt"
         output = self.run_line(
-            "globus rm -r --timeout {} --timeout-exit-code {} {}:{}"
-            .format(timeout, status, GO_EP1_ID, path),
-            assert_exit_code=status)
-        self.assertIn(("Task has yet to complete "
-                       "after {} seconds".format(timeout)), output)
+            "globus rm -r --timeout {} --timeout-exit-code {} {}:{}".format(
+                timeout, status, GO_EP1_ID, path
+            ),
+            assert_exit_code=status,
+        )
+        self.assertIn(
+            ("Task has yet to complete " "after {} seconds".format(timeout)), output
+        )

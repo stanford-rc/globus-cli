@@ -1,16 +1,17 @@
 # -*- coding: utf8 -*-
 
-from random import getrandbits
-import unittest
-import six
 import json
+import unittest
+from random import getrandbits
+
+import six
 
 from tests.framework.cli_testcase import CliTestCase
 from tests.framework.constants import GO_EP1_ID
+from tests.framework.tools import on_windows
 
 
 class EncodingTests(CliTestCase):
-
     def dir_operations(self, input_name, expected_name=None):
         """
         Given an input directory name, makes the directory to test inputs,
@@ -26,11 +27,13 @@ class EncodingTests(CliTestCase):
         # if given a unicode name, run a unicode string
         if isinstance(input_name, six.text_type):
             make_output = self.run_line(
-                u"globus mkdir {}:~/{}".format(GO_EP1_ID, dir_name))
+                u"globus mkdir {}:~/{}".format(GO_EP1_ID, dir_name)
+            )
         # if given a byte string name, run a byte string
         else:
             make_output = self.run_line(
-                b"globus mkdir {}:~/{}".format(GO_EP1_ID, dir_name))
+                b"globus mkdir {}:~/{}".format(GO_EP1_ID, dir_name)
+            )
 
         self.assertIn("The directory was created successfully", make_output)
 
@@ -39,27 +42,26 @@ class EncodingTests(CliTestCase):
         ls_output = self.run_line(u"globus ls {}:~/".format(GO_EP1_ID))
         self.assertIn(expected, ls_output)
 
-        long_output = self.run_line(
-            u"globus ls -l {}:~/".format(GO_EP1_ID))
+        long_output = self.run_line(u"globus ls -l {}:~/".format(GO_EP1_ID))
         self.assertIn(expected, long_output)
         self.assertIn("Filename", long_output)
 
         json_output = json.loads(
-            self.run_line(
-                u"globus ls -F json {}:~/".format(GO_EP1_ID)))
+            self.run_line(u"globus ls -F json {}:~/".format(GO_EP1_ID))
+        )
         self.assertIn(expected, [i["name"] for i in json_output["DATA"]])
 
         # attempt to make the dir again to test error output:
         # if given a unicode name, run a unicode string
         if isinstance(input_name, six.text_type):
             make2_output = self.run_line(
-                u"globus mkdir {}:~/{}".format(GO_EP1_ID, dir_name),
-                assert_exit_code=1)
+                u"globus mkdir {}:~/{}".format(GO_EP1_ID, dir_name), assert_exit_code=1
+            )
         # if given a byte string name, run a byte string
         else:
             make2_output = self.run_line(
-                b"globus mkdir {}:~/{}".format(GO_EP1_ID, dir_name),
-                assert_exit_code=1)
+                b"globus mkdir {}:~/{}".format(GO_EP1_ID, dir_name), assert_exit_code=1
+            )
         self.assertIn("Path already exists", make2_output)
         self.assertIn(expected, make2_output)
 
@@ -67,11 +69,13 @@ class EncodingTests(CliTestCase):
         # if given a unicode name, run a unicode string
         if isinstance(input_name, six.text_type):
             delete_output = self.run_line(
-                u"globus delete -r {}:~/{}".format(GO_EP1_ID, dir_name))
+                u"globus delete -r {}:~/{}".format(GO_EP1_ID, dir_name)
+            )
         # if given a byte string name, run a byte string
         else:
             delete_output = self.run_line(
-                b"globus delete -r {}:~/{}".format(GO_EP1_ID, dir_name))
+                b"globus delete -r {}:~/{}".format(GO_EP1_ID, dir_name)
+            )
 
         self.assertIn("The delete has been accepted", delete_output)
 
@@ -83,14 +87,18 @@ class EncodingTests(CliTestCase):
         """
         # if given a unicode name, run a unicode string
         if isinstance(input_name, six.text_type):
-            create_output = json.loads(self.run_line(
-                u"globus endpoint create -F json --server {}".format(
-                    input_name)))
+            create_output = json.loads(
+                self.run_line(
+                    u"globus endpoint create -F json --server {}".format(input_name)
+                )
+            )
         # if given a byte string name, run a byte string
         else:
-            create_output = json.loads(self.run_line(
-                b"globus endpoint create -F json --server {}".format(
-                    input_name)))
+            create_output = json.loads(
+                self.run_line(
+                    b"globus endpoint create -F json --server {}".format(input_name)
+                )
+            )
         self.assertEqual(create_output["code"], "Created")
         self.assertEqual(create_output["code"], "Created")
         ep_id = create_output["id"]
@@ -103,24 +111,23 @@ class EncodingTests(CliTestCase):
         # if given a unicode name, run a unicode string
         if isinstance(input_name, six.text_type):
             update_output = self.run_line(
-                u"globus endpoint update {} --description {}".format(
-                    ep_id, input_name))
+                u"globus endpoint update {} --description {}".format(ep_id, input_name)
+            )
         # if given a byte string name, run a byte string
         else:
             update_output = self.run_line(
-                b"globus endpoint update {} --description {}".format(
-                    ep_id, input_name))
+                b"globus endpoint update {} --description {}".format(ep_id, input_name)
+            )
         self.assertIn("updated successfully", update_output)
 
         # confirm show sees updated description
-        show_output = json.loads(self.run_line(
-            "globus endpoint show {} -F json".format(ep_id)))
-        self.assertEqual((expected_name or input_name),
-                         show_output["description"])
+        show_output = json.loads(
+            self.run_line("globus endpoint show {} -F json".format(ep_id))
+        )
+        self.assertEqual((expected_name or input_name), show_output["description"])
 
         # delete
-        delete_output = self.run_line(
-            "globus endpoint delete {}".format(ep_id))
+        delete_output = self.run_line("globus endpoint delete {}".format(ep_id))
         self.assertIn("deleted successfully", delete_output)
 
     def test_quote_escaping(self):
@@ -141,6 +148,9 @@ class EncodingTests(CliTestCase):
         self.dir_operations(name, expected_name="a% b")
         self.ep_operations(name, expected_name="a% b")
 
+    @unittest.skipIf(
+        six.PY2 and on_windows(), "python2 Windows console issues (FIXME?)"
+    )
     def test_non_ascii_utf8(self):
         """
         Tests operations with a UTF-8 name containing non ASCII characters with
@@ -151,6 +161,9 @@ class EncodingTests(CliTestCase):
         self.ep_operations(name)
 
     @unittest.skipIf(six.PY3, "test run with Python 3")
+    @unittest.skipIf(
+        six.PY2 and on_windows(), "python2 Windows console issues (FIXME?)"
+    )
     def test_non_ascii_utf8_bytes(self):
         """
         Tests operations with a byte string encoded from non ASCII UTF-8.
@@ -162,6 +175,9 @@ class EncodingTests(CliTestCase):
         self.dir_operations(byte_name, expected_name=uni_name)
         self.ep_operations(byte_name, expected_name=uni_name)
 
+    @unittest.skipIf(
+        six.PY2 and on_windows(), "python2 Windows console issues (FIXME?)"
+    )
     def test_latin1(self):
         """
         Tests operations with latin-1 name that is not valid UTF-8.
@@ -176,6 +192,9 @@ class EncodingTests(CliTestCase):
         self.ep_operations(name)
 
     @unittest.skipIf(six.PY3, "test run with Python 3")
+    @unittest.skipIf(
+        six.PY2 and on_windows(), "python2 Windows console issues (FIXME?)"
+    )
     def test_invalid_utf8_bytes(self):
         """
         Tests operations with byte string that can be decoded with
@@ -186,11 +205,12 @@ class EncodingTests(CliTestCase):
         # the encoding for 'é' in latin-1 is a continuation byte in utf-8
         byte_name = b"\xe9"  # é's latin-1 encoding
 
-        make_output = self.run_line("globus mkdir {}:~/{}".format(
-            GO_EP1_ID, byte_name), assert_exit_code=1)
+        make_output = self.run_line(
+            "globus mkdir {}:~/{}".format(GO_EP1_ID, byte_name), assert_exit_code=1
+        )
         self.assertIn("UnicodeDecodeError", make_output)
 
         create_output = self.run_line(
-                "globus endpoint create --server {}".format(
-                    byte_name), assert_exit_code=1)
+            "globus endpoint create --server {}".format(byte_name), assert_exit_code=1
+        )
         self.assertIn("UnicodeDecodeError", create_output)

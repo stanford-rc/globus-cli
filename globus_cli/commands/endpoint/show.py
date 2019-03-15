@@ -1,12 +1,11 @@
 import click
 
 from globus_cli.parsing import common_options, endpoint_id_arg
-from globus_cli.safeio import formatted_print, FORMAT_TEXT_RECORD
-
+from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
 from globus_cli.services.transfer import get_client
 
 
-@click.command('show', help='Display a detailed endpoint definition')
+@click.command("show", help="Display a detailed endpoint definition")
 @common_options
 @endpoint_id_arg
 def endpoint_show(endpoint_id):
@@ -20,7 +19,7 @@ def endpoint_show(endpoint_id):
     formatted_print(
         res,
         text_format=FORMAT_TEXT_RECORD,
-        fields=GCP_FIELDS if res['is_globus_connect'] else STANDARD_FIELDS,
+        fields=GCP_FIELDS if res["is_globus_connect"] else STANDARD_FIELDS,
     )
 
 

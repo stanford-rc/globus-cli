@@ -20,19 +20,24 @@ def resolve_id_or_name(client, bookmark_id_or_name):
         try:
             res = client.get_bookmark(bookmark_id_or_name.lower())
         except TransferAPIError as exception:
-            if exception.code != 'BookmarkNotFound':
+            if exception.code != "BookmarkNotFound":
                 raise
 
     if not res:  # non-UUID input or UUID not found; fallback to match by name
         try:
             # n.b. case matters to the Transfer service for bookmark names, so
             # two bookmarks can exist whose names vary only by their case
-            res = next(bookmark_row for bookmark_row in client.bookmark_list()
-                       if bookmark_row['name'] == bookmark_id_or_name)
+            res = next(
+                bookmark_row
+                for bookmark_row in client.bookmark_list()
+                if bookmark_row["name"] == bookmark_id_or_name
+            )
 
         except StopIteration:
-            safeprint(u'No bookmark found for "{}"'.format(
-                      bookmark_id_or_name), write_to_stderr=True)
+            safeprint(
+                u'No bookmark found for "{}"'.format(bookmark_id_or_name),
+                write_to_stderr=True,
+            )
             click.get_current_context().exit(1)
 
     return res

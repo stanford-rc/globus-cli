@@ -1,14 +1,16 @@
 import click
 
 from globus_cli.parsing import (
-    common_options, endpoint_id_arg, endpoint_create_and_update_params,
-    validate_endpoint_create_and_update_params)
-from globus_cli.safeio import formatted_print, FORMAT_TEXT_RAW
+    common_options,
+    endpoint_create_and_update_params,
+    endpoint_id_arg,
+    validate_endpoint_create_and_update_params,
+)
+from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
+from globus_cli.services.transfer import assemble_generic_doc, get_client
 
-from globus_cli.services.transfer import get_client, assemble_generic_doc
 
-
-@click.command('update', help='Update attributes of an endpoint')
+@click.command("update", help="Update attributes of an endpoint")
 @common_options
 @endpoint_id_arg
 @endpoint_create_and_update_params(create=False)
@@ -30,9 +32,10 @@ def endpoint_update(**kwargs):
     else:
         endpoint_type = "server"
     validate_endpoint_create_and_update_params(
-        endpoint_type, get_res["subscription_id"], kwargs)
+        endpoint_type, get_res["subscription_id"], kwargs
+    )
 
     # make the update
-    ep_doc = assemble_generic_doc('endpoint', **kwargs)
+    ep_doc = assemble_generic_doc("endpoint", **kwargs)
     res = client.update_endpoint(endpoint_id, ep_doc)
-    formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key='message')
+    formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")

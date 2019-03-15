@@ -1,13 +1,13 @@
-import sys
-import subprocess
 import atexit
 import site
+import subprocess
+import sys
+
 import click
 
+from globus_cli.parsing import HiddenOption, common_options
 from globus_cli.safeio import safeprint
 from globus_cli.version import get_versions
-from globus_cli.parsing import common_options, HiddenOption
-
 
 # check if the source for this is inside of the USER_BASE
 # if so, a `pip install --user` was used
@@ -20,8 +20,8 @@ def _call_pip(*args):
     Invoke pip *safely* and in the *supported* way:
     https://pip.pypa.io/en/latest/user_guide/#using-pip-from-your-program
     """
-    all_args = [sys.executable, '-m', 'pip'] + list(args)
-    print('> {}'.format(' '.join(all_args)))
+    all_args = [sys.executable, "-m", "pip"] + list(args)
+    print("> {}".format(" ".join(all_args)))
     subprocess.check_call(all_args)
 
 
@@ -37,22 +37,21 @@ def _check_pip_installed():
     """
     try:
         subprocess.check_output(
-            [sys.executable, '-m', 'pip', '--version'],
-            stderr=subprocess.STDOUT)
+            [sys.executable, "-m", "pip", "--version"], stderr=subprocess.STDOUT
+        )
         return True
     except subprocess.CalledProcessError:
         return False
 
 
-@click.command('update', help='Update the Globus CLI to its latest version')
+@click.command("update", help="Update the Globus CLI to its latest version")
 @common_options(no_format_option=True, no_map_http_status_option=True)
-@click.option('--yes', is_flag=True,
-              help='Automatically say "yes" to all prompts')
+@click.option("--yes", is_flag=True, help='Automatically say "yes" to all prompts')
 # hidden options to fetch branches or tags from GitHub. One turns this mode
 # on or off, and the other is used to set a non-master target
 # --development-version implies --development
-@click.option('--development', is_flag=True, cls=HiddenOption)
-@click.option('--development-version', cls=HiddenOption, default=None)
+@click.option("--development", is_flag=True, cls=HiddenOption)
+@click.option("--development-version", cls=HiddenOption, default=None)
 def update_command(yes, development, development_version):
     """
     Executor for `globus update`
@@ -80,8 +79,7 @@ def update_command(yes, development, development_version):
     #   pip, anyone doing this is forced to get two copies of pip, which seems
     #   kind of nasty (even if "they're asking for it")
     if not _check_pip_installed():
-        safeprint("`globus update` requires pip. "
-                  "Please install pip and try again")
+        safeprint("`globus update` requires pip. " "Please install pip and try again")
         click.get_current_context().exit(1)
 
     # --development-version implies --development
@@ -93,46 +91,50 @@ def update_command(yes, development, development_version):
         # default to master
         development_version = development_version or "master"
         target_version = (
-            "https://github.com/globus/globus-cli/archive/{}"
-            ".tar.gz#egg=globus-cli"
-            ).format(development_version)
+            "https://github.com/globus/globus-cli/archive/{}" ".tar.gz#egg=globus-cli"
+        ).format(development_version)
     else:
         # lookup version from PyPi, abort if we can't get it
         latest, current = get_versions()
         if latest is None:
-            safeprint('Failed to lookup latest version. Aborting.')
+            safeprint("Failed to lookup latest version. Aborting.")
             click.get_current_context().exit(1)
 
         # in the case where we're already up to date, do nothing and exit
         if current == latest:
-            safeprint('You are already running the latest version: {}'
-                      .format(current))
+            safeprint("You are already running the latest version: {}".format(current))
             return
 
         # if we're up to date (or ahead, meaning a dev version was installed)
         # then prompt before continuing, respecting `--yes`
         else:
-            safeprint(('You are already running version {0}\n'
-                       'The latest version is           {1}')
-                      .format(current, latest))
+            safeprint(
+                (
+                    "You are already running version {0}\n"
+                    "The latest version is           {1}"
+                ).format(current, latest)
+            )
             if not yes and (
-                    not click.confirm('Continue with the upgrade?',
-                                      default=True)):
+                not click.confirm("Continue with the upgrade?", default=True)
+            ):
                 click.get_current_context().exit(1)
 
         # if we make it through to here, it means we didn't hit any safe (or
         # unsafe) abort conditions, so set the target version for upgrade to
         # the latest
-        target_version = 'globus-cli=={}'.format(latest)
+        target_version = "globus-cli=={}".format(latest)
 
     # print verbose warning/help message, to guide less fortunate souls who hit
     # Ctrl+C at a foolish time, lose connectivity, or don't invoke with `sudo`
     # on a global install of the CLI
     safeprint(
-        ("The Globus CLI will now update itself.\n"
-         "In the event that an error occurs or the update is interrupted, we "
-         "recommend uninstalling and reinstalling the CLI.\n"
-         "Update Target: {}\n").format(target_version))
+        (
+            "The Globus CLI will now update itself.\n"
+            "In the event that an error occurs or the update is interrupted, we "
+            "recommend uninstalling and reinstalling the CLI.\n"
+            "Update Target: {}\n"
+        ).format(target_version)
+    )
 
     # register the upgrade activity as an atexit function
     # this ensures that most library teardown (other than whatever libs might
@@ -147,7 +149,7 @@ def update_command(yes, development, development_version):
     # atexit method. Anything outside of atexit methods remains safe!
     @atexit.register
     def do_upgrade():
-        install_args = ['install', '--upgrade', target_version]
+        install_args = ["install", "--upgrade", target_version]
         if IS_USER_INSTALL:
-            install_args.insert(1, '--user')
+            install_args.insert(1, "--user")
         _call_pip(*install_args)

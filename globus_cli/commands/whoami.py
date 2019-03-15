@@ -1,20 +1,26 @@
 import click
-
 from globus_sdk.exc import AuthAPIError
 
-from globus_cli.safeio import (
-    safeprint, print_command_hint, formatted_print, FORMAT_TEXT_RECORD)
 from globus_cli.parsing import common_options
-from globus_cli.helpers import is_verbose
+from globus_cli.safeio import (
+    FORMAT_TEXT_RECORD,
+    formatted_print,
+    is_verbose,
+    print_command_hint,
+    safeprint,
+)
 from globus_cli.services.auth import get_auth_client
 
 
-@click.command('whoami',
-               help=('Show the currently logged-in primary identity.'))
+@click.command("whoami", help=("Show the currently logged-in primary identity."))
 @common_options(no_map_http_status_option=True)
-@click.option("--linked-identities", is_flag=True,
-              help=("Also show identities linked to the currently logged-in "
-                    "primary identity."))
+@click.option(
+    "--linked-identities",
+    is_flag=True,
+    help=(
+        "Also show identities linked to the currently logged-in " "primary identity."
+    ),
+)
 def whoami_command(linked_identities):
     """
     Executor for `globus whoami`
@@ -26,33 +32,52 @@ def whoami_command(linked_identities):
     try:
         res = client.oauth2_userinfo()
     except AuthAPIError:
-        safeprint('Unable to get user information. Please try '
-                  'logging in again.', write_to_stderr=True)
+        safeprint(
+            "Unable to get user information. Please try " "logging in again.",
+            write_to_stderr=True,
+        )
         click.get_current_context().exit(1)
 
     print_command_hint(
         "For information on which identities are in session see\n"
-        "  globus session show\n")
+        "  globus session show\n"
+    )
 
     # --linked-identities either displays all usernames or a table if verbose
     if linked_identities:
         try:
             formatted_print(
                 res["identity_set"],
-                fields=[("Username", "username"), ("Name", "name"),
-                        ("ID", "sub"), ("Email", "email")],
-                simple_text=(None if is_verbose() else "\n".join(
-                    [x["username"] for x in res["identity_set"]])))
+                fields=[
+                    ("Username", "username"),
+                    ("Name", "name"),
+                    ("ID", "sub"),
+                    ("Email", "email"),
+                ],
+                simple_text=(
+                    None
+                    if is_verbose()
+                    else "\n".join([x["username"] for x in res["identity_set"]])
+                ),
+            )
         except KeyError:
-            safeprint("Your current login does not have the consents required "
-                      "to view your full identity set. Please log in again "
-                      "to agree to the required consents.",
-                      write_to_stderr=True)
+            safeprint(
+                "Your current login does not have the consents required "
+                "to view your full identity set. Please log in again "
+                "to agree to the required consents.",
+                write_to_stderr=True,
+            )
 
     # Default output is the top level data
     else:
         formatted_print(
-            res, text_format=FORMAT_TEXT_RECORD,
-            fields=[("Username", "preferred_username"), ("Name", "name"),
-                    ("ID", "sub"), ("Email", "email")],
-            simple_text=(None if is_verbose() else res["preferred_username"]))
+            res,
+            text_format=FORMAT_TEXT_RECORD,
+            fields=[
+                ("Username", "preferred_username"),
+                ("Name", "name"),
+                ("ID", "sub"),
+                ("Email", "email"),
+            ],
+            simple_text=(None if is_verbose() else res["preferred_username"]),
+        )
