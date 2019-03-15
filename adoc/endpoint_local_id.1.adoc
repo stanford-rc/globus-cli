@@ -1,0 +1,66 @@
+= GLOBUS ENDPOINT LOCAL-ID(1)
+
+== NAME
+
+globus endpoint local-id - Display UUID of locally installed endpoint
+
+== SYNOPSIS
+
+*globus endpoint local-id* ['OPTIONS']
+
+== DESCRIPTION
+
+The *globus endpoint local-id* command looks for data referring to a local
+installation of Globus Connect software and displays the associated endpoint
+ID.
+
+This command only supports Globus Connect Personal for now.
+
+It operates by looking for Globus Connect Personal data in the current user's
+home directory.
+
+== OPTIONS
+
+*--personal*::
+
+Use local Globus Connect Personal endpoint (default).
+
+include::include/common_options.adoc[]
+
+
+== EXAMPLES
+
+Do a Globus ls command on the current local endpoint.
+
+----
+$ globus ls "$(globus endpoint local-id)"':/~/'
+----
+
+On the assumption that the default directory for Globus Connect Personal is the
+user's homedir, list files in the current working directory via Globus:
+
+----
+#!/bin/bash
+# NOTE: this script only works in subdirs of $HOME
+
+if [[ $PWD/ != $HOME/* ]]; then
+  echo "Only works in homedir" >&2
+  exit 1
+fi
+
+# get the CWD as a path relative to the homedir
+dir_to_ls=${PWD/#$HOME/'~'}
+
+ep_id="$(globus endpoint local-id)"
+
+globus ls "${ep_id}:/${dir_to_ls}"
+----
+
+
+== EXIT STATUS
+
+0 on success.
+
+1 if an error occurred
+
+2 if the command was used improperly.
