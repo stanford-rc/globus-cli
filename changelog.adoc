@@ -1,5 +1,9 @@
 = CLI Changelog
 
+== 1.10.1
+
+* Rename `globus session boost` command to `globus session update`.
+
 == 1.10.0
 
 Enhancements:
