@@ -18,7 +18,7 @@ def cleanup_bookmarks(tc):
 def cleanup_tasks(tc):
     tasks = tc.task_list(num_results=None, filter="status:ACTIVE,INACTIVE")
     for t in tasks:
-        tc.cancel_task(t['task_id'])
+        tc.cancel_task(t["task_id"])
 
 
 @click.command("cleanup")
