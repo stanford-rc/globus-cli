@@ -23,9 +23,9 @@ setup(
     version=version,
     packages=find_packages(exclude=["tests", "tests.*"]),
     install_requires=[
-        "globus-sdk==1.7.1",
-        "click>=6.6,<7.0",
-        "jmespath==0.9.2",
+        "globus-sdk==1.8.0",
+        "click>=7.0,<8.0",
+        "jmespath==0.9.4",
         "configobj>=5.0.6,<6.0.0",
         "requests>=2.0.0,<3.0.0",
         "six>=1.10.0,<2.0.0",
@@ -35,7 +35,7 @@ setup(
         #
         # as new versions of cryptography are released, we may need to update
         # this requirement
-        "cryptography>=1.8.1,<2.6.0",
+        "cryptography>=1.8.1,<3.0.0",
     ],
     extras_require={
         # deprecated, but do not remove -- doing so would break installs which
@@ -49,9 +49,9 @@ setup(
             "flake8>=3.0,<4.0",
             "isort>=4.3,<5.0",
             # black requires py3.6+
-            'black==18.9b0;python_version>="3.6"',
+            'black==19.3b0;python_version>="3.6"',
             # flake-bugbear requires py3.5+
-            'flake8-bugbear==18.8.0;python_version>="3.5"',
+            'flake8-bugbear==19.3.0;python_version>="3.5"',
             # testing
             "nose2==0.9.1",
             # mock on py2, py3.4 and py3.5
