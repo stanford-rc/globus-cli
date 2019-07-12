@@ -13,10 +13,7 @@ import click
 from globus_cli.parsing.custom_group import GlobusCommandGroup
 from globus_cli.parsing.excepthook import custom_except_hook
 from globus_cli.parsing.shared_options import common_options
-from globus_cli.parsing.shell_completion import (
-    print_completer_option,
-    shell_complete_option,
-)
+from globus_cli.parsing.shell_completion import print_completer_option
 
 
 class TopLevelGroup(GlobusCommandGroup):
@@ -37,6 +34,5 @@ class TopLevelGroup(GlobusCommandGroup):
 def globus_main_func(f):
     f = click.group("globus", cls=TopLevelGroup)(f)
     f = common_options(f)
-    f = shell_complete_option(f)
     f = print_completer_option(f)
     return f
