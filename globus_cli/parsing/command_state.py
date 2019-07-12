@@ -4,7 +4,6 @@ import click
 import jmespath
 
 from globus_cli import config
-from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
 
 # Format Enum for output formatting
 # could use a namedtuple, but that's overkill
@@ -68,7 +67,9 @@ def format_option(f):
     f = click.option(
         "-F",
         "--format",
-        type=CaseInsensitiveChoice([UNIX_FORMAT, JSON_FORMAT, TEXT_FORMAT]),
+        type=click.Choice(
+            [UNIX_FORMAT, JSON_FORMAT, TEXT_FORMAT], case_sensitive=False
+        ),
         help="Output format for stdout. Defaults to text",
         expose_value=False,
         callback=callback,

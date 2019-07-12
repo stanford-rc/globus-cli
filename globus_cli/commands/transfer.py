@@ -3,7 +3,6 @@ from globus_sdk import TransferData
 
 from globus_cli.parsing import (
     ENDPOINT_PLUS_OPTPATH,
-    CaseInsensitiveChoice,
     TaskPath,
     common_options,
     shlex_process_stdin,
@@ -85,7 +84,7 @@ from globus_cli.services.transfer import autoactivate, get_client
     "-s",
     default=None,
     show_default=True,
-    type=CaseInsensitiveChoice(("exists", "size", "mtime", "checksum")),
+    type=click.Choice(("exists", "size", "mtime", "checksum"), case_sensitive=False),
     help=(
         "How will the Transfer task determine whether or not to "
         "actually transfer a file over the network?"

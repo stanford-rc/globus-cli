@@ -1,6 +1,5 @@
 import click
 
-from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
 from globus_cli.parsing.command_state import (
     debug_option,
     format_option,
@@ -714,7 +713,7 @@ def server_add_and_update_opts(*args, **kwargs):
         f = click.option(
             "--scheme",
             help="Scheme for the Server.",
-            type=CaseInsensitiveChoice(("gsiftp", "ftp")),
+            type=click.Choice(("gsiftp", "ftp"), case_sensitive=False),
             default=default_scheme,
             show_default=add,
         )(f)

@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import CaseInsensitiveChoice, common_options, endpoint_id_arg
+from globus_cli.parsing import common_options, endpoint_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import assemble_generic_doc, get_client
 
@@ -15,7 +15,7 @@ from globus_cli.services.transfer import assemble_generic_doc, get_client
 @click.option(
     "--permissions",
     required=True,
-    type=CaseInsensitiveChoice(("r", "rw")),
+    type=click.Choice(("r", "rw"), case_sensitive=False),
     help="Permissions to add. Read-Only or Read/Write",
 )
 def update_command(permissions, rule_id, endpoint_id):

@@ -4,8 +4,6 @@ import textwrap
 
 import click
 
-from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
-
 SUPPORTED_SHELLS = ("BASH", "ZSH")
 
 
@@ -119,7 +117,10 @@ def get_all_choices(completed_args, cur, quoted):
     if matching_choice_opt:
         # catch the case where it's case insensitive, and we need to change our
         # comparisons / matching later on
-        if isinstance(matching_choice_opt.type, CaseInsensitiveChoice):
+        if (
+            isinstance(matching_choice_opt.type, click.Choice)
+            and not matching_choice_opt.type.case_sensitive
+        ):
             match_func = match_nocase
         choices = [
             (x, matching_choice_opt.help) for x in matching_choice_opt.type.choices

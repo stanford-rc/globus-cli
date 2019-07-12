@@ -8,7 +8,7 @@ from globus_cli.config import (
     OUTPUT_FORMAT_OPTNAME,
     write_option,
 )
-from globus_cli.parsing import CaseInsensitiveChoice, common_options
+from globus_cli.parsing import common_options
 
 
 @click.command(
@@ -33,7 +33,7 @@ explicit use of --myproxy-username.
 @click.option(
     "--default-output-format",
     help="The default format for the CLI to use when printing.",
-    type=CaseInsensitiveChoice(["json", "text"]),
+    type=click.Choice(["json", "text"], case_sensitive=False),
 )
 @click.option(
     "--default-myproxy-username",

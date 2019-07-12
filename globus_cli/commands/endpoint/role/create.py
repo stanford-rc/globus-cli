@@ -1,11 +1,6 @@
 import click
 
-from globus_cli.parsing import (
-    CaseInsensitiveChoice,
-    common_options,
-    endpoint_id_arg,
-    security_principal_opts,
-)
+from globus_cli.parsing import common_options, endpoint_id_arg, security_principal_opts
 from globus_cli.safeio import formatted_print
 from globus_cli.services.auth import maybe_lookup_identity_id
 from globus_cli.services.transfer import assemble_generic_doc, get_client
@@ -18,8 +13,9 @@ from globus_cli.services.transfer import assemble_generic_doc, get_client
 @click.option(
     "--role",
     required=True,
-    type=CaseInsensitiveChoice(
-        ("administrator", "access_manager", "activity_manager", "activity_monitor")
+    type=click.Choice(
+        ("administrator", "access_manager", "activity_manager", "activity_monitor"),
+        case_sensitive=False,
     ),
     help="A role to assign.",
 )

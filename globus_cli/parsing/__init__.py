@@ -1,4 +1,3 @@
-from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
 from globus_cli.parsing.custom_group import globus_group
 from globus_cli.parsing.endpoint_plus_path import (
     ENDPOINT_PLUS_OPTPATH,
@@ -28,7 +27,6 @@ from globus_cli.parsing.task_path import TaskPath
 __all__ = [
     "globus_group",
     "globus_main_func",
-    "CaseInsensitiveChoice",
     "ENDPOINT_PLUS_OPTPATH",
     "ENDPOINT_PLUS_REQPATH",
     "TaskPath",
