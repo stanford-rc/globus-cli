@@ -22,17 +22,19 @@ def list_commands():
         indent = 4
         min_space = 2
 
+        short_help = command.get_short_help_str()
+
         # if the output would be pinched too close together, or if the command
         # name would overflow, use two separate lines
         if len(command.name) > _command_length - min_space:
             safeprint(" " * indent + command.name)
-            safeprint(" " * (indent + _command_length) + command.short_help)
+            safeprint(" " * (indent + _command_length) + short_help)
         # otherwise, it's all cool to cram into one line, just ljust command
         # names so that they form a nice column
         else:
             safeprint(
                 " " * indent
-                + "{}{}".format(command.name.ljust(_command_length), command.short_help)
+                + "{}{}".format(command.name.ljust(_command_length), short_help)
             )
 
     def _print_cmd_group(command, parent_names):

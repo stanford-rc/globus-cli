@@ -5,7 +5,7 @@ import sys
 
 import click
 
-from globus_cli.parsing import HiddenOption, common_options
+from globus_cli.parsing import common_options
 from globus_cli.safeio import safeprint
 from globus_cli.version import get_versions
 
@@ -50,8 +50,8 @@ def _check_pip_installed():
 # hidden options to fetch branches or tags from GitHub. One turns this mode
 # on or off, and the other is used to set a non-master target
 # --development-version implies --development
-@click.option("--development", is_flag=True, cls=HiddenOption)
-@click.option("--development-version", cls=HiddenOption, default=None)
+@click.option("--development", is_flag=True, hidden=True)
+@click.option("--development-version", hidden=True, default=None)
 def update_command(yes, development, development_version):
     """
     Executor for `globus update`

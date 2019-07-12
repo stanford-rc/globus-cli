@@ -5,7 +5,6 @@ import textwrap
 import click
 
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
-from globus_cli.parsing.hidden_option import HiddenOption
 from globus_cli.safeio import safeprint
 
 SUPPORTED_SHELLS = ("BASH", "ZSH")
@@ -131,7 +130,7 @@ def get_all_choices(completed_args, cur, quoted):
     elif cur and cur.startswith("-") and not quoted:
         for param in ctx_options:
             # skip hidden options
-            if isinstance(param, HiddenOption):
+            if param.hidden:
                 continue
             for optset in (param.opts, param.secondary_opts):
                 for opt in optset:
@@ -261,7 +260,7 @@ def print_completer_option(f):
     f = click.option(
         "--completer",
         "--bash-completer",
-        cls=HiddenOption,
+        hidden=True,
         is_eager=True,
         expose_value=False,
         flag_value="BASH",
@@ -269,7 +268,7 @@ def print_completer_option(f):
     )(f)
     f = click.option(
         "--zsh-completer",
-        cls=HiddenOption,
+        hidden=True,
         is_eager=True,
         expose_value=False,
         flag_value="ZSH",
@@ -294,7 +293,7 @@ def shell_complete_option(f):
 
     f = click.option(
         "--shell-complete",
-        cls=HiddenOption,
+        hidden=True,
         is_eager=True,
         expose_value=False,
         type=click.Choice(SUPPORTED_SHELLS),

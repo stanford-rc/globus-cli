@@ -9,7 +9,6 @@ from globus_cli.parsing.command_state import (
 )
 from globus_cli.parsing.detect_and_decorate import detect_and_decorate
 from globus_cli.parsing.explicit_null import EXPLICIT_NULL
-from globus_cli.parsing.hidden_option import HiddenOption
 from globus_cli.parsing.iso_time import ISOTimeType
 from globus_cli.parsing.location import LocationType
 from globus_cli.parsing.version_option import version_option
@@ -643,7 +642,7 @@ def synchronous_task_wait_options(f):
             "a value in 0,1,50-99"
         ),
     )(f)
-    f = click.option("--meow", is_flag=True, cls=HiddenOption)(f)
+    f = click.option("--meow", is_flag=True, hidden=True)(f)
     return f
 
 

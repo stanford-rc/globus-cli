@@ -168,50 +168,44 @@ def custom_except_hook(exc_info):
         sys.excepthook(exception_type, exception, traceback)
 
     # we're not in debug mode, do custom handling
-    else:
 
-        # if it's a click exception, re-raise as original -- Click's main
-        # execution context will handle pretty-printing
-        if isinstance(exception, click.ClickException):
-            reraise(exception_type, exception, traceback)
+    # catch any session errors to give helpful instructions
+    # on how to use globus session update
+    if (
+        isinstance(exception, exc.GlobusAPIError)
+        and exception.raw_json
+        and "authorization_parameters" in exception.raw_json
+    ):
+        session_hook(exception)
 
-        # catch any session errors to give helpful instructions
-        # on how to use globus session update
-        elif (
-            isinstance(exception, exc.GlobusAPIError)
-            and exception.raw_json
-            and "authorization_parameters" in exception.raw_json
-        ):
-            session_hook(exception)
-
-        # handle the Globus-raised errors with our special hooks
-        # these will present the output (on stderr) as JSON
-        elif isinstance(exception, exc.TransferAPIError):
-            if exception.code == "ClientError.AuthenticationFailed":
-                authentication_hook(exception)
-            else:
-                transferapi_hook(exception)
-
-        elif isinstance(exception, exc.AuthAPIError):
-            if exception.code == "UNAUTHORIZED":
-                authentication_hook(exception)
-            # invalid_grant occurs when the users refresh tokens are not valid
-            elif exception.message == "invalid_grant":
-                invalidrefresh_hook(exception)
-            else:
-                authapi_hook(exception)
-
-        elif isinstance(exception, exc.GlobusAPIError):
-            globusapi_hook(exception)
-
-        # specific checks fell through -- now check if it's any kind of
-        # GlobusError
-        elif isinstance(exception, exc.GlobusError):
-            globus_generic_hook(exception)
-
-        # not a GlobusError, not a ClickException -- something like ValueError
-        # or NotImplementedError bubbled all the way up here: just print it
-        # out, basically
+    # handle the Globus-raised errors with our special hooks
+    # these will present the output (on stderr) as JSON
+    elif isinstance(exception, exc.TransferAPIError):
+        if exception.code == "ClientError.AuthenticationFailed":
+            authentication_hook(exception)
         else:
-            safeprint(u"{}: {}".format(exception_type.__name__, exception))
-            sys.exit(1)
+            transferapi_hook(exception)
+
+    elif isinstance(exception, exc.AuthAPIError):
+        if exception.code == "UNAUTHORIZED":
+            authentication_hook(exception)
+        # invalid_grant occurs when the users refresh tokens are not valid
+        elif exception.message == "invalid_grant":
+            invalidrefresh_hook(exception)
+        else:
+            authapi_hook(exception)
+
+    elif isinstance(exception, exc.GlobusAPIError):
+        globusapi_hook(exception)
+
+    # specific checks fell through -- now check if it's any kind of
+    # GlobusError
+    elif isinstance(exception, exc.GlobusError):
+        globus_generic_hook(exception)
+
+    # if it's a click exception, re-raise as original -- Click's main
+    # execution context will handle pretty-printing
+    # if it's an uncaught error of a more generic type, there will be no special
+    # handling
+    else:
+        reraise(exception_type, exception, traceback)

@@ -7,7 +7,7 @@ from globus_cli.helpers import (
     fill_delegate_proxy_activation_requirements,
     is_remote_session,
 )
-from globus_cli.parsing import HiddenOption, common_options, endpoint_id_arg
+from globus_cli.parsing import common_options, endpoint_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import activation_requirements_help_text, get_client
 
@@ -95,7 +95,7 @@ from globus_cli.services.transfer import activation_requirements_help_text, get_
         "Overrides any default myproxy username set in config."
     ),
 )
-@click.option("--myproxy-password", "-P", cls=HiddenOption)
+@click.option("--myproxy-password", "-P", hidden=True)
 @click.option(
     "--myproxy-lifetime",
     type=int,
