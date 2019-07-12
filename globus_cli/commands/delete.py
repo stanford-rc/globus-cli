@@ -26,11 +26,7 @@ from globus_cli.services.transfer import autoactivate, get_client
 @common_options
 @task_submission_options
 @delete_and_rm_options
-@click.argument(
-    "endpoint_plus_path",
-    metavar=ENDPOINT_PLUS_OPTPATH.metavar,
-    type=ENDPOINT_PLUS_OPTPATH,
-)
+@click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_OPTPATH)
 def delete_command(
     batch,
     ignore_missing,

@@ -7,11 +7,7 @@ from globus_cli.services.transfer import get_client
 
 @click.command("create", help="Create a bookmark for the current user")
 @common_options
-@click.argument(
-    "endpoint_plus_path",
-    metavar=ENDPOINT_PLUS_REQPATH.metavar,
-    type=ENDPOINT_PLUS_REQPATH,
-)
+@click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_REQPATH)
 @click.argument("bookmark_name")
 def bookmark_create(endpoint_plus_path, bookmark_name):
     """

@@ -33,11 +33,7 @@ from globus_cli.services.transfer import assemble_generic_doc, get_client
     metavar="MESSAGE",
     help="A custom message to add to email notifications",
 )
-@click.argument(
-    "endpoint_plus_path",
-    metavar=ENDPOINT_PLUS_REQPATH.metavar,
-    type=ENDPOINT_PLUS_REQPATH,
-)
+@click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_REQPATH)
 def create_command(
     principal, permissions, endpoint_plus_path, notify_email, notify_message
 ):

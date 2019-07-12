@@ -37,11 +37,7 @@ If none of these are given, "=" will be used
     short_help="List endpoint directory contents",
 )
 @common_options
-@click.argument(
-    "endpoint_plus_path",
-    metavar=ENDPOINT_PLUS_OPTPATH.metavar,
-    type=ENDPOINT_PLUS_OPTPATH,
-)
+@click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_OPTPATH)
 @click.option(
     "--all",
     "-a",

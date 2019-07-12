@@ -25,11 +25,7 @@ from globus_cli.services.transfer import autoactivate, get_client, task_wait_wit
 @task_submission_options
 @delete_and_rm_options(supports_batch=False, default_enable_globs=True)
 @synchronous_task_wait_options
-@click.argument(
-    "endpoint_plus_path",
-    metavar=ENDPOINT_PLUS_REQPATH.metavar,
-    type=ENDPOINT_PLUS_REQPATH,
-)
+@click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_REQPATH)
 def rm_command(
     ignore_missing,
     star_silent,
