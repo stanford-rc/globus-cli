@@ -1,9 +1,15 @@
 import click
 import six
 
-from globus_cli.parsing import ISOTimeType, common_options
+from globus_cli.parsing import common_options
 from globus_cli.safeio import formatted_print
 from globus_cli.services.transfer import get_client, iterable_response_to_dict
+
+
+def _format_date_callback(ctx, param, value):
+    if value is None:
+        return ""
+    return value.strftime("%Y-%m-%d %H:%M:%S")
 
 
 @click.command("list", help="List tasks for the current user")
@@ -54,22 +60,26 @@ from globus_cli.services.transfer import get_client, iterable_response_to_dict
 )
 @click.option(
     "--filter-requested-after",
-    type=ISOTimeType(),
+    type=click.DateTime(),
+    callback=_format_date_callback,
     help="Filter results to tasks that were requested after given time.",
 )
 @click.option(
     "--filter-requested-before",
-    type=ISOTimeType(),
+    type=click.DateTime(),
+    callback=_format_date_callback,
     help="Filter results to tasks that were requested before given time.",
 )
 @click.option(
     "--filter-completed-after",
-    type=ISOTimeType(),
+    type=click.DateTime(),
+    callback=_format_date_callback,
     help="Filter results to tasks that were completed after given time.",
 )
 @click.option(
     "--filter-completed-before",
-    type=ISOTimeType(),
+    type=click.DateTime(),
+    callback=_format_date_callback,
     help="Filter results to tasks that were completed before given time.",
 )
 def task_list(
@@ -117,12 +127,10 @@ def task_list(
     filter_string += _process_filterval("label", label_data)
 
     filter_string += _process_filterval(
-        "request_time",
-        [(filter_requested_after or ""), (filter_requested_before or "")],
+        "request_time", [filter_requested_after, filter_requested_before]
     )
     filter_string += _process_filterval(
-        "completion_time",
-        [(filter_completed_after or ""), (filter_completed_before or "")],
+        "completion_time", [filter_completed_after, filter_completed_before]
     )
 
     client = get_client()

@@ -5,7 +5,6 @@ from globus_cli.parsing.endpoint_plus_path import (
     ENDPOINT_PLUS_REQPATH,
 )
 from globus_cli.parsing.explicit_null import EXPLICIT_NULL
-from globus_cli.parsing.iso_time import ISOTimeType
 from globus_cli.parsing.main_command_decorator import globus_main_func
 from globus_cli.parsing.one_use_option import one_use_option
 from globus_cli.parsing.process_stdin import shlex_process_stdin
@@ -34,7 +33,6 @@ __all__ = [
     "ENDPOINT_PLUS_REQPATH",
     "TaskPath",
     "one_use_option",
-    "ISOTimeType",
     "EXPLICIT_NULL",
     "common_options",
     # Transfer options

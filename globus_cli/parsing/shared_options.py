@@ -9,7 +9,6 @@ from globus_cli.parsing.command_state import (
 )
 from globus_cli.parsing.detect_and_decorate import detect_and_decorate
 from globus_cli.parsing.explicit_null import EXPLICIT_NULL
-from globus_cli.parsing.iso_time import ISOTimeType
 from globus_cli.parsing.location import LocationType
 from globus_cli.parsing.version_option import version_option
 
@@ -491,6 +490,11 @@ def task_submission_options(f):
                 "notify_on_inactive": "inactive" in vals,
             }
 
+    def format_deadline_callback(ctx, param, value):
+        if not value:
+            return None
+        return value.strftime("%Y-%m-%d %H:%M:%S")
+
     f = click.option(
         "--dry-run",
         is_flag=True,
@@ -518,7 +522,8 @@ def task_submission_options(f):
     f = click.option(
         "--deadline",
         default=None,
-        type=ISOTimeType(),
+        type=click.DateTime(),
+        callback=format_deadline_callback,
         help="Set a deadline for this to be canceled if not completed by.",
     )(f)
     f = click.option(
