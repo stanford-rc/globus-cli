@@ -12,7 +12,6 @@ from globus_cli.safeio.get_option_vals import (
     outformat_is_json,
     outformat_is_unix,
 )
-from globus_cli.safeio.write import safeprint
 
 # make sure this is a tuple
 # if it's a list, pylint will freak out
@@ -74,7 +73,7 @@ def _jmespath_preprocess(res):
 def print_json_response(res):
     res = _jmespath_preprocess(res)
     res = json.dumps(res, indent=2, separators=(",", ": "), sort_keys=True)
-    safeprint(res)
+    click.echo(res)
 
 
 def print_unix_response(res):
@@ -85,7 +84,7 @@ def print_unix_response(res):
     # likely a scalar + non-scalar in an array, though there may be other cases
     # print good error and exit(2) (Count this as UsageError!)
     except AttributeError:
-        safeprint(
+        click.echo(
             "UNIX formatting of output failed."
             "\n  "
             "This usually means that data has a structure which cannot be "
@@ -93,7 +92,7 @@ def print_unix_response(res):
             "\n  "
             "To avoid this error in the future, ensure that you query the "
             'exact properties you want from output data with "--jmespath"',
-            write_to_stderr=True,
+            err=True,
         )
         click.get_current_context().exit(2)
 
@@ -102,7 +101,7 @@ def colon_formatted_print(data, named_fields):
     maxlen = max(len(n) for n, f in named_fields) + 1
     for name, field in named_fields:
         field_keyfunc = _key_to_keyfunc(field)
-        safeprint("{} {}".format((name + ":").ljust(maxlen), field_keyfunc(data)))
+        click.echo("{} {}".format((name + ":").ljust(maxlen), field_keyfunc(data)))
 
 
 def print_table(iterable, headers_and_keys, print_headers=True):
@@ -148,11 +147,11 @@ def print_table(iterable, headers_and_keys, print_headers=True):
 
     # print headers
     if print_headers:
-        safeprint(format_str.format(*[h for h in headers]))
-        safeprint(format_str.format(*["-" * w for w in widths]))
+        click.echo(format_str.format(*[h for h in headers]))
+        click.echo(format_str.format(*["-" * w for w in widths]))
     # print the rows of data
     for i in iterable:
-        safeprint(format_str.format(*[none_to_null(kf(i)) for kf in keyfuncs]))
+        click.echo(format_str.format(*[none_to_null(kf(i)) for kf in keyfuncs]))
 
 
 def formatted_print(
@@ -215,12 +214,12 @@ def formatted_print(
     def _print_as_text():
         # if we're given simple text, print that and exit
         if simple_text is not None:
-            safeprint(simple_text)
+            click.echo(simple_text)
             return
 
         # if there's a preamble, print it beofre any other text
         if text_preamble is not None:
-            safeprint(text_preamble)
+            click.echo(text_preamble)
 
         # if there's a response key, key into it
         data = response_data if response_key is None else response_data[response_key]
@@ -233,13 +232,13 @@ def formatted_print(
             _assert_fields()
             colon_formatted_print(data, fields)
         elif text_format == FORMAT_TEXT_RAW:
-            safeprint(data)
+            click.echo(data)
         elif text_format == FORMAT_TEXT_CUSTOM:
             _custom_text_formatter(data)
 
         # if there's an epilog, print it after any text
         if text_epilog is not None:
-            safeprint(text_epilog)
+            click.echo(text_epilog)
 
     if isinstance(text_format, six.string_types):
         text_format = text_format

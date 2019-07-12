@@ -17,7 +17,6 @@ from globus_cli.config import (
     remove_option,
 )
 from globus_cli.parsing import common_options
-from globus_cli.safeio import safeprint
 from globus_cli.services.auth import get_auth_client
 
 _RESCIND_HELP = """\
@@ -64,14 +63,14 @@ def logout_command():
     try:
         username = get_auth_client().oauth2_userinfo()["preferred_username"]
     except AuthAPIError:
-        safeprint(
+        click.echo(
             (
                 "Unable to lookup username. You may not be logged in. "
                 "Attempting logout anyway...\n"
             )
         )
         username = None
-    safeprint(
+    click.echo(
         u"Logging out of Globus{}\n".format(u" as " + username if username else "")
     )
 
@@ -91,7 +90,7 @@ def logout_command():
         # first lookup the token -- if not found we'll continue
         token = lookup_option(token_opt)
         if not token:
-            safeprint(
+            click.echo(
                 (
                     'Warning: Found no token named "{}"! '
                     "Recommend rescinding consent"
@@ -105,7 +104,7 @@ def logout_command():
         # if we network error, revocation failed -- print message and abort so
         # that we can revoke later when the network is working
         except globus_sdk.NetworkError:
-            safeprint(
+            click.echo(
                 (
                     "Failed to reach Globus to revoke tokens. "
                     "Because we cannot revoke these tokens, cancelling "
@@ -140,11 +139,11 @@ def logout_command():
 
     # if print_rescind_help is true, we printed warnings above
     # so, jam out an extra newline as a separator
-    safeprint(("\n" if print_rescind_help else "") + _LOGOUT_EPILOG)
+    click.echo(("\n" if print_rescind_help else "") + _LOGOUT_EPILOG)
 
     # if some token wasn't found in the config, it means its possible that the
     # config file was removed without logout
     # in that case, the user should rescind the CLI consent to invalidate any
     # potentially leaked refresh tokens, so print the help on that
     if print_rescind_help:
-        safeprint(_RESCIND_HELP)
+        click.echo(_RESCIND_HELP)

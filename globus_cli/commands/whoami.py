@@ -7,7 +7,6 @@ from globus_cli.safeio import (
     formatted_print,
     is_verbose,
     print_command_hint,
-    safeprint,
 )
 from globus_cli.services.auth import get_auth_client
 
@@ -32,9 +31,8 @@ def whoami_command(linked_identities):
     try:
         res = client.oauth2_userinfo()
     except AuthAPIError:
-        safeprint(
-            "Unable to get user information. Please try " "logging in again.",
-            write_to_stderr=True,
+        click.echo(
+            "Unable to get user information. Please try " "logging in again.", err=True
         )
         click.get_current_context().exit(1)
 
@@ -61,11 +59,11 @@ def whoami_command(linked_identities):
                 ),
             )
         except KeyError:
-            safeprint(
+            click.echo(
                 "Your current login does not have the consents required "
                 "to view your full identity set. Please log in again "
                 "to agree to the required consents.",
-                write_to_stderr=True,
+                err=True,
             )
 
     # Default output is the top level data

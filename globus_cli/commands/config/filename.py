@@ -2,7 +2,6 @@ import click
 
 from globus_cli.config import get_config_obj
 from globus_cli.parsing import common_options
-from globus_cli.safeio import safeprint
 
 
 @click.command("filename", help="Output the path of the config file")
@@ -14,7 +13,7 @@ def filename_command():
     try:
         config = get_config_obj(file_error=True)
     except IOError as e:
-        safeprint(e, write_to_stderr=True)
+        click.echo(e, err=True)
         click.get_current_context().exit(1)
     else:
-        safeprint(config.filename)
+        click.echo(config.filename)

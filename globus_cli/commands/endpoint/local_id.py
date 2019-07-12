@@ -2,7 +2,6 @@ import click
 from globus_sdk import LocalGlobusConnectPersonal
 
 from globus_cli.parsing import common_options, one_use_option
-from globus_cli.safeio import safeprint
 
 
 @click.command("local-id", help="Display UUID of locally installed endpoint")
@@ -21,11 +20,11 @@ def local_id(personal):
         try:
             ep_id = LocalGlobusConnectPersonal().endpoint_id
         except IOError as e:
-            safeprint(e, write_to_stderr=True)
+            click.echo(e, err=True)
             click.get_current_context().exit(1)
 
         if ep_id is not None:
-            safeprint(ep_id)
+            click.echo(ep_id)
         else:
-            safeprint("No Globus Connect Personal installation found.")
+            click.echo("No Globus Connect Personal installation found.")
             click.get_current_context().exit(1)

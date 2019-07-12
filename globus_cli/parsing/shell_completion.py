@@ -5,7 +5,6 @@ import textwrap
 import click
 
 from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
-from globus_cli.safeio import safeprint
 
 SUPPORTED_SHELLS = ("BASH", "ZSH")
 
@@ -172,7 +171,7 @@ def do_bash_complete():
 
     choices = [name for (name, helpstr) in get_all_choices(completed_args, cur, quoted)]
 
-    safeprint("\t".join(choices), newline=False)
+    click.echo("\t".join(choices), nl=False)
     click.get_current_context().exit(0)
 
 
@@ -214,7 +213,7 @@ def do_zsh_complete():
         '{}\\:"{}"'.format(name, clean_help(helpstr)) for (name, helpstr) in choices
     ]
 
-    safeprint("_arguments '*: :(({}))'".format("\n".join(choices)), newline=False)
+    click.echo("_arguments '*: :(({}))'".format("\n".join(choices)), nl=False)
 
 
 def print_completer_option(f):
@@ -250,9 +249,9 @@ def print_completer_option(f):
         if not value or ctx.resilient_parsing:
             return
         if value == "BASH":
-            safeprint(bash_shell_completer)
+            click.echo(bash_shell_completer)
         elif value == "ZSH":
-            safeprint(zsh_shell_completer)
+            click.echo(zsh_shell_completer)
         else:
             raise ValueError("Unsupported shell completion")
         click.get_current_context().exit(0)

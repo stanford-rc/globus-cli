@@ -5,9 +5,8 @@ import threading
 from contextlib import contextmanager
 from string import Template
 
+import click
 import six
-
-from globus_cli.safeio import safeprint
 
 try:
     import http.client as http_client
@@ -150,7 +149,7 @@ class RedirectHTTPServer(HTTPServer, object):
         try:
             return self._auth_code_queue.get(block=True, timeout=3600)
         except Queue.Empty:
-            safeprint("Login timed out. Please try again.", write_to_stderr=True)
+            click.echo("Login timed out. Please try again.", err=True)
             sys.exit(1)
 
 

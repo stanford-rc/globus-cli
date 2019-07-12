@@ -14,7 +14,7 @@ from globus_sdk import exc
 from six import reraise
 
 from globus_cli.parsing.command_state import CommandState
-from globus_cli.safeio import PrintableErrorField, safeprint, write_error_info
+from globus_cli.safeio import PrintableErrorField, write_error_info
 
 
 def exit_with_mapped_status(http_status):
@@ -36,7 +36,7 @@ def session_hook(exception):
     """
     Expects an exception with an authorization_paramaters field in its raw_json
     """
-    safeprint(
+    click.echo(
         "The resource you are trying to access requires you to "
         "re-authenticate with specific identities."
     )
@@ -44,18 +44,18 @@ def session_hook(exception):
     params = exception.raw_json["authorization_parameters"]
     message = params.get("session_message")
     if message:
-        safeprint("message: {}".format(message))
+        click.echo("message: {}".format(message))
 
     identities = params.get("session_required_identities")
     if identities:
         id_str = " ".join(identities)
-        safeprint(
+        click.echo(
             "Please run\n\n"
             "    globus session update {}\n\n"
             "to re-authenticate with the required identities".format(id_str)
         )
     else:
-        safeprint(
+        click.echo(
             'Please use "globus session update" to re-authenticate '
             "with specific identities".format(id_str)
         )
@@ -149,15 +149,6 @@ def custom_except_hook(exc_info):
     We don't want to show end users big scary stacktraces if they aren't python
     programmers, so slim it down to some basic info. We keep a "DEBUGMODE" env
     variable kicking around to let us turn on stacktraces if we ever need them.
-
-    Additionally, does global suppression of EPIPE errors, which often occur
-    when a python command is piped to a consumer like `head` which closes its
-    input stream before python has sent all of its output.
-    DANGER: There is a (small) risk that this will bite us if there are EPIPE
-    errors produced within the Globus SDK. We should keep an eye on this
-    possibility, as it may demand more sophisticated handling of EPIPE.
-    Possible TODO item to reduce this risk: inspect the exception and only hide
-    EPIPE if it comes from within the globus_cli package.
     """
     exception_type, exception, traceback = exc_info
 

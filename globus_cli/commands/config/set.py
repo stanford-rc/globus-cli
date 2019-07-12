@@ -2,7 +2,6 @@ import click
 
 from globus_cli.config import get_config_obj
 from globus_cli.parsing import common_options
-from globus_cli.safeio import safeprint
 
 
 @click.command("set", help="Set a value in the Globus config file")
@@ -26,5 +25,5 @@ def set_command(value, parameter):
     conf[section][parameter] = value
 
     # write to disk
-    safeprint("Writing updated config to {}".format(conf.filename))
+    click.echo("Writing updated config to {}".format(conf.filename))
     conf.write()

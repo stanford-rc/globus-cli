@@ -3,8 +3,6 @@ from uuid import UUID
 import click
 from globus_sdk.exc import TransferAPIError
 
-from globus_cli.safeio import safeprint
-
 
 def resolve_id_or_name(client, bookmark_id_or_name):
     # leading/trailing whitespace doesn't make sense for UUIDs and the Transfer
@@ -34,9 +32,8 @@ def resolve_id_or_name(client, bookmark_id_or_name):
             )
 
         except StopIteration:
-            safeprint(
-                u'No bookmark found for "{}"'.format(bookmark_id_or_name),
-                write_to_stderr=True,
+            click.echo(
+                u'No bookmark found for "{}"'.format(bookmark_id_or_name), err=True
             )
             click.get_current_context().exit(1)
 

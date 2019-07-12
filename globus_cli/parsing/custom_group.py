@@ -1,7 +1,6 @@
 import click
 
 from globus_cli.parsing.shared_options import common_options
-from globus_cli.safeio import safeprint
 
 
 class GlobusCommandGroup(click.Group):
@@ -24,7 +23,7 @@ class GlobusCommandGroup(click.Group):
         # for reference to the original version (as of 2017-02-26):
         # https://github.com/pallets/click/blob/02ea9ee7e864581258b4902d6e6c1264b0226b9f/click/core.py#L1039-L1052
         if self.no_args_is_help and not ctx.protected_args:
-            safeprint(ctx.get_help())
+            click.echo(ctx.get_help())
             ctx.exit()
         return super(GlobusCommandGroup, self).invoke(ctx)
 

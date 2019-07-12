@@ -8,12 +8,7 @@ from globus_cli.parsing import (
     synchronous_task_wait_options,
     task_submission_options,
 )
-from globus_cli.safeio import (
-    err_is_terminal,
-    formatted_print,
-    safeprint,
-    term_is_interactive,
-)
+from globus_cli.safeio import err_is_terminal, formatted_print, term_is_interactive
 from globus_cli.services.transfer import autoactivate, get_client, task_wait_with_io
 
 
@@ -89,7 +84,7 @@ def rm_command(
                 err=True,
             )
         ):
-            safeprint("Aborted.", write_to_stderr=True)
+            click.echo("Aborted.", err=True)
             click.get_current_context().exit(1)
     delete_data.add_item(path)
 
@@ -102,9 +97,7 @@ def rm_command(
     # respected, as it will be by `task wait`
     res = client.submit_delete(delete_data)
     task_id = res["task_id"]
-    safeprint(
-        'Delete task submitted under ID "{}"'.format(task_id), write_to_stderr=True
-    )
+    click.echo('Delete task submitted under ID "{}"'.format(task_id), err=True)
 
     # do a `task wait` equivalent, including printing and correct exit status
     task_wait_with_io(

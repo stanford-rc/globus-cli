@@ -2,7 +2,6 @@ import click
 
 from globus_cli.config import get_config_obj
 from globus_cli.parsing import common_options
-from globus_cli.safeio import safeprint
 
 
 @click.command("remove", help="Remove a value from the Globus config file")
@@ -25,5 +24,5 @@ def remove_command(parameter):
     del conf[section][parameter]
 
     # write to disk
-    safeprint("Writing updated config to {}".format(conf.filename))
+    click.echo("Writing updated config to {}".format(conf.filename))
     conf.write()

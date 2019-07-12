@@ -14,7 +14,6 @@ from globus_cli.config import (
     write_option,
 )
 from globus_cli.helpers.local_server import LocalServerError, start_local_server
-from globus_cli.safeio import safeprint
 
 SCOPES = (
     "openid profile email "
@@ -46,7 +45,7 @@ def do_link_auth_flow(session_params=None, force_new_client=False):
     additional_params = {"prompt": "login"}
     additional_params.update(session_params)
     linkprompt = "Please authenticate with Globus here"
-    safeprint(
+    click.echo(
         "{0}:\n{1}\n{2}\n{1}\n".format(
             linkprompt,
             "-" * len(linkprompt),
@@ -90,12 +89,12 @@ def do_local_server_auth_flow(session_params=None, force_new_client=False):
         auth_code = server.wait_for_code()
 
     if isinstance(auth_code, LocalServerError):
-        safeprint("Authorization failed: {}".format(auth_code), write_to_stderr=True)
+        click.echo("Authorization failed: {}".format(auth_code), err=True)
         click.get_current_context().exit(1)
     elif isinstance(auth_code, Exception):
-        safeprint(
+        click.echo(
             "Authorization failed with unexpected error:\n{}".format(auth_code),
-            write_to_stderr=True,
+            err=True,
         )
         click.get_current_context().exit(1)
 

@@ -6,7 +6,6 @@ import sys
 import click
 
 from globus_cli.parsing import common_options
-from globus_cli.safeio import safeprint
 from globus_cli.version import get_versions
 
 # check if the source for this is inside of the USER_BASE
@@ -79,7 +78,7 @@ def update_command(yes, development, development_version):
     #   pip, anyone doing this is forced to get two copies of pip, which seems
     #   kind of nasty (even if "they're asking for it")
     if not _check_pip_installed():
-        safeprint("`globus update` requires pip. " "Please install pip and try again")
+        click.echo("`globus update` requires pip. " "Please install pip and try again")
         click.get_current_context().exit(1)
 
     # --development-version implies --development
@@ -97,18 +96,18 @@ def update_command(yes, development, development_version):
         # lookup version from PyPi, abort if we can't get it
         latest, current = get_versions()
         if latest is None:
-            safeprint("Failed to lookup latest version. Aborting.")
+            click.echo("Failed to lookup latest version. Aborting.")
             click.get_current_context().exit(1)
 
         # in the case where we're already up to date, do nothing and exit
         if current == latest:
-            safeprint("You are already running the latest version: {}".format(current))
+            click.echo("You are already running the latest version: {}".format(current))
             return
 
         # if we're up to date (or ahead, meaning a dev version was installed)
         # then prompt before continuing, respecting `--yes`
         else:
-            safeprint(
+            click.echo(
                 (
                     "You are already running version {0}\n"
                     "The latest version is           {1}"
@@ -127,7 +126,7 @@ def update_command(yes, development, development_version):
     # print verbose warning/help message, to guide less fortunate souls who hit
     # Ctrl+C at a foolish time, lose connectivity, or don't invoke with `sudo`
     # on a global install of the CLI
-    safeprint(
+    click.echo(
         (
             "The Globus CLI will now update itself.\n"
             "In the event that an error occurs or the update is interrupted, we "

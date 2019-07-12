@@ -13,7 +13,6 @@ from globus_cli.safeio import (
     FORMAT_TEXT_RECORD,
     err_is_terminal,
     formatted_print,
-    safeprint,
     term_is_interactive,
 )
 from globus_cli.services.transfer import autoactivate, get_client
@@ -101,7 +100,7 @@ def delete_command(
                     err=True,
                 )
             ):
-                safeprint("Aborted.", write_to_stderr=True)
+                click.echo("Aborted.", err=True)
                 click.get_current_context().exit(1)
         delete_data.add_item(path)
 

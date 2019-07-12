@@ -8,7 +8,6 @@ from globus_cli.helpers import (
     is_remote_session,
 )
 from globus_cli.parsing import common_options, no_local_server_option
-from globus_cli.safeio import safeprint
 from globus_cli.services.auth import get_auth_client
 
 
@@ -38,11 +37,11 @@ def session_update(identities, no_local_server, all):
         try:
             identity_ids = [user["sub"] for user in res["identity_set"]]
         except KeyError:
-            safeprint(
+            click.echo(
                 "Your current login does not have the consents required "
                 "to view your full identity set. Please log in again "
                 "to agree to the required consents.",
-                write_to_stderr=True,
+                err=True,
             )
             click.get_current_context().exit(1)
 
@@ -67,7 +66,7 @@ def session_update(identities, no_local_server, all):
                         identity_ids.append(identity["id"])
                         break
                 else:
-                    safeprint("No such identity {}".format(val), write_to_stderr=True)
+                    click.echo("No such identity {}".format(val), err=True)
                     click.get_current_context().exit(1)
 
     # create session params once we have all identity ids
@@ -82,7 +81,7 @@ def session_update(identities, no_local_server, all):
 
     # otherwise default to a local server login flow
     else:
-        safeprint(
+        click.echo(
             "You are running 'globus session update', "
             "which should automatically open a browser window for you to "
             "authenticate with specific identities.\n"
@@ -92,7 +91,7 @@ def session_update(identities, no_local_server, all):
         )
         do_local_server_auth_flow(session_params=session_params)
 
-    safeprint(
+    click.echo(
         "\nYou have successfully updated your CLI session.\n"
         "Use 'globus session show' to see the updated session."
     )

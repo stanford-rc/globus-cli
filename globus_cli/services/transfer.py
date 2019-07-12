@@ -16,7 +16,7 @@ from globus_cli.config import (
     set_transfer_access_token,
 )
 from globus_cli.parsing import EXPLICIT_NULL
-from globus_cli.safeio import FORMAT_SILENT, formatted_print, safeprint
+from globus_cli.safeio import FORMAT_SILENT, formatted_print
 from globus_cli.services.recursive_ls import RecursiveLsResponse
 
 
@@ -251,7 +251,7 @@ def autoactivate(client, endpoint_id, if_expires_in=None):
             + activation_requirements_help_text(res, endpoint_id)
         )
 
-        safeprint(message, write_to_stderr=True)
+        click.echo(message, err=True)
         click.get_current_context().exit(1)
 
     else:
@@ -319,10 +319,10 @@ def task_wait_with_io(
         )
         if completed:
             if heartbeat:
-                safeprint("", write_to_stderr=True)
+                click.echo("", err=True)
             # meowing tasks wake up!
             if meow:
-                safeprint(
+                click.echo(
                     r"""
                   _..
   /}_{\           /.-'
@@ -330,7 +330,7 @@ def task_wait_with_io(
  ==._.==         ;
       \ i _..._ /,
       {_;/   {_//""",
-                    write_to_stderr=True,
+                    err=True,
                 )
 
             # TODO: possibly update TransferClient.task_wait so that we don't
@@ -348,32 +348,31 @@ def task_wait_with_io(
 
     # Tasks start out sleepy
     if meow:
-        safeprint(
+        click.echo(
             r"""
    |\      _,,,---,,_
    /,`.-'`'    -.  ;-;;,_
   |,4-  ) )-,_..;\ (  `'-'
  '---''(_/--'  `-'\_)""",
-            write_to_stderr=True,
+            err=True,
         )
 
     waited_time = 0
     while not timed_out(waited_time) and not check_completed():
         if heartbeat:
-            safeprint(".", write_to_stderr=True, newline=False)
+            click.echo(".", err=True, nl=False)
             sys.stderr.flush()
 
         waited_time += polling_interval
 
     # add a trailing newline to heartbeats if we fail
     if heartbeat:
-        safeprint("", write_to_stderr=True)
+        click.echo("", err=True)
 
     exit_code = 1
     if timed_out(waited_time):
-        safeprint(
-            "Task has yet to complete after {} seconds".format(timeout),
-            write_to_stderr=True,
+        click.echo(
+            "Task has yet to complete after {} seconds".format(timeout), err=True
         )
         exit_code = timeout_exit_code
 

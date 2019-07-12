@@ -2,7 +2,6 @@ import click
 
 from globus_cli.config import lookup_option
 from globus_cli.parsing import common_options
-from globus_cli.safeio import safeprint
 
 
 @click.command("show", help="Show a value from the Globus config file")
@@ -19,6 +18,6 @@ def show_command(parameter):
     value = lookup_option(parameter, section=section)
 
     if value is None:
-        safeprint("{} not set".format(parameter))
+        click.echo("{} not set".format(parameter))
     else:
-        safeprint("{} = {}".format(parameter, value))
+        click.echo("{} = {}".format(parameter, value))
