@@ -10,6 +10,7 @@ generally types of SDK errors, and dispatch onto tht set of hooks.
 import sys
 
 import click
+import click.exceptions
 from globus_sdk import exc
 from six import reraise
 
@@ -196,7 +197,14 @@ def custom_except_hook(exc_info):
 
     # if it's a click exception, re-raise as original -- Click's main
     # execution context will handle pretty-printing
-    # if it's an uncaught error of a more generic type, there will be no special
-    # handling
-    else:
+    elif isinstance(
+        exception, (click.ClickException, click.exceptions.Abort, click.exceptions.Exit)
+    ):
         reraise(exception_type, exception, traceback)
+
+    # not a GlobusError, not a ClickException -- something like ValueError
+    # or NotImplementedError bubbled all the way up here: just print it
+    # out, basically
+    else:
+        click.echo(u"{}: {}".format(exception_type.__name__, exception))
+        sys.exit(1)
