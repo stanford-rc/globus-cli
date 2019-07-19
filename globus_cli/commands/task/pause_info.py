@@ -1,7 +1,7 @@
 import click
 
 from globus_cli.parsing import common_options, task_id_arg
-from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print, safeprint
+from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
 from globus_cli.services.transfer import get_client
 
 EXPLICIT_PAUSE_MSG_FIELDS = [
@@ -59,7 +59,7 @@ def task_pause_info(task_id):
         effective_pause_rules = res["pause_rules"]
 
         if not explicit_pauses and not effective_pause_rules:
-            safeprint("Task {} is not paused.".format(task_id))
+            click.echo("Task {} is not paused.".format(task_id))
             click.get_current_context().exit(0)
 
         if explicit_pauses:

@@ -4,8 +4,6 @@ import click
 import jmespath
 
 from globus_cli import config
-from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
-from globus_cli.parsing.hidden_option import HiddenOption
 
 # Format Enum for output formatting
 # could use a namedtuple, but that's overkill
@@ -58,7 +56,10 @@ def format_option(f):
             return
 
         state = ctx.ensure_object(CommandState)
-        state.jmespath_expr = jmespath.compile(value)
+        try:
+            state.jmespath_expr = jmespath.compile(value)
+        except jmespath.exceptions.ParseError as e:
+            raise click.UsageError("jmespath ParseError: {}".format(e))
 
         if state.output_format == TEXT_FORMAT:
             state.output_format = JSON_FORMAT
@@ -66,7 +67,9 @@ def format_option(f):
     f = click.option(
         "-F",
         "--format",
-        type=CaseInsensitiveChoice([UNIX_FORMAT, JSON_FORMAT, TEXT_FORMAT]),
+        type=click.Choice(
+            [UNIX_FORMAT, JSON_FORMAT, TEXT_FORMAT], case_sensitive=False
+        ),
         help="Output format for stdout. Defaults to text",
         expose_value=False,
         callback=callback,
@@ -100,7 +103,7 @@ def debug_option(f):
     return click.option(
         "--debug",
         is_flag=True,
-        cls=HiddenOption,
+        hidden=True,
         expose_value=False,
         callback=callback,
         is_eager=True,

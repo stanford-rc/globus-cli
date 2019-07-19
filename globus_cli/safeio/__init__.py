@@ -20,10 +20,9 @@ from globus_cli.safeio.output_formatter import (
     FORMAT_TEXT_TABLE,
     formatted_print,
 )
-from globus_cli.safeio.write import print_command_hint, safeprint
+from globus_cli.safeio.write import print_command_hint
 
 __all__ = [
-    "safeprint",
     "print_command_hint",
     "PrintableErrorField",
     "write_error_info",

@@ -2,7 +2,9 @@ import platform
 import site
 import sys
 
-from globus_cli.safeio import is_verbose, safeprint, verbosity
+import click
+
+from globus_cli.safeio import is_verbose, verbosity
 from globus_cli.version import get_versions
 
 
@@ -60,13 +62,13 @@ def print_version():
     """
     latest, current = get_versions()
     if latest is None:
-        safeprint(
+        click.echo(
             ("Installed Version: {0}\n" "Failed to lookup latest version.").format(
                 current
             )
         )
     else:
-        safeprint(
+        click.echo(
             ("Installed Version: {0}\n" "Latest Version:    {1}\n" "\n{2}").format(
                 current,
                 latest,
@@ -86,18 +88,18 @@ def print_version():
     if is_verbose():
         moddata = _get_package_data()
 
-        safeprint("\nVerbose Data\n---")
+        click.echo("\nVerbose Data\n---")
 
-        safeprint("platform:")
-        safeprint("  platform: {}".format(platform.platform()))
-        safeprint("  py_implementation: {}".format(platform.python_implementation()))
-        safeprint("  py_version: {}".format(platform.python_version()))
-        safeprint("  sys.executable: {}".format(sys.executable))
-        safeprint("  site.USER_BASE: {}".format(site.USER_BASE))
+        click.echo("platform:")
+        click.echo("  platform: {}".format(platform.platform()))
+        click.echo("  py_implementation: {}".format(platform.python_implementation()))
+        click.echo("  py_version: {}".format(platform.python_version()))
+        click.echo("  sys.executable: {}".format(sys.executable))
+        click.echo("  site.USER_BASE: {}".format(site.USER_BASE))
 
-        safeprint("modules:")
+        click.echo("modules:")
         for mod, modversion, modfile, modpath in moddata:
-            safeprint("  {}:".format(mod))
-            safeprint("    __version__: {}".format(modversion))
-            safeprint("    __file__: {}".format(modfile))
-            safeprint("    __path__: {}".format(modpath))
+            click.echo("  {}:".format(mod))
+            click.echo("    __version__: {}".format(modversion))
+            click.echo("    __file__: {}".format(modfile))
+            click.echo("    __path__: {}".format(modpath))

@@ -1,6 +1,5 @@
 import click
 
-from globus_cli.parsing.case_insensitive_choice import CaseInsensitiveChoice
 from globus_cli.parsing.command_state import (
     debug_option,
     format_option,
@@ -9,8 +8,6 @@ from globus_cli.parsing.command_state import (
 )
 from globus_cli.parsing.detect_and_decorate import detect_and_decorate
 from globus_cli.parsing.explicit_null import EXPLICIT_NULL
-from globus_cli.parsing.hidden_option import HiddenOption
-from globus_cli.parsing.iso_time import ISOTimeType
 from globus_cli.parsing.location import LocationType
 from globus_cli.parsing.version_option import version_option
 
@@ -492,6 +489,11 @@ def task_submission_options(f):
                 "notify_on_inactive": "inactive" in vals,
             }
 
+    def format_deadline_callback(ctx, param, value):
+        if not value:
+            return None
+        return value.strftime("%Y-%m-%d %H:%M:%S")
+
     f = click.option(
         "--dry-run",
         is_flag=True,
@@ -519,7 +521,8 @@ def task_submission_options(f):
     f = click.option(
         "--deadline",
         default=None,
-        type=ISOTimeType(),
+        type=click.DateTime(),
+        callback=format_deadline_callback,
         help="Set a deadline for this to be canceled if not completed by.",
     )(f)
     f = click.option(
@@ -643,7 +646,7 @@ def synchronous_task_wait_options(f):
             "a value in 0,1,50-99"
         ),
     )(f)
-    f = click.option("--meow", is_flag=True, cls=HiddenOption)(f)
+    f = click.option("--meow", is_flag=True, hidden=True)(f)
     return f
 
 
@@ -710,7 +713,7 @@ def server_add_and_update_opts(*args, **kwargs):
         f = click.option(
             "--scheme",
             help="Scheme for the Server.",
-            type=CaseInsensitiveChoice(("gsiftp", "ftp")),
+            type=click.Choice(("gsiftp", "ftp"), case_sensitive=False),
             default=default_scheme,
             show_default=add,
         )(f)

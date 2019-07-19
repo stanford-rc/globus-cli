@@ -13,7 +13,6 @@ from globus_cli.safeio import (
     FORMAT_TEXT_RECORD,
     err_is_terminal,
     formatted_print,
-    safeprint,
     term_is_interactive,
 )
 from globus_cli.services.transfer import autoactivate, get_client
@@ -27,11 +26,7 @@ from globus_cli.services.transfer import autoactivate, get_client
 @common_options
 @task_submission_options
 @delete_and_rm_options
-@click.argument(
-    "endpoint_plus_path",
-    metavar=ENDPOINT_PLUS_OPTPATH.metavar,
-    type=ENDPOINT_PLUS_OPTPATH,
-)
+@click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_OPTPATH)
 def delete_command(
     batch,
     ignore_missing,
@@ -101,7 +96,7 @@ def delete_command(
                     err=True,
                 )
             ):
-                safeprint("Aborted.", write_to_stderr=True)
+                click.echo("Aborted.", err=True)
                 click.get_current_context().exit(1)
         delete_data.add_item(path)
 

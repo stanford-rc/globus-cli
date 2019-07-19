@@ -1,7 +1,6 @@
 import click
 
 from globus_cli.helpers import print_version
-from globus_cli.parsing.hidden_option import HiddenOption
 
 
 def version_option(f):
@@ -25,5 +24,5 @@ def version_option(f):
         expose_value=False,
         is_eager=True,
         callback=callback,
-        cls=HiddenOption,
+        hidden=True,
     )(f)

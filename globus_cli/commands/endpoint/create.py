@@ -46,7 +46,6 @@ GCP_FIELDS = [("Setup Key", "globus_connect_setup_key")]
     "--shared",
     default=None,
     type=ENDPOINT_PLUS_REQPATH,
-    metavar=ENDPOINT_PLUS_REQPATH.metavar,
     help=(
         "Create a shared endpoint hosted on the given endpoint "
         "and path. Mutually exclusive with --personal and "

@@ -13,7 +13,6 @@ from globus_cli.helpers import (
     is_remote_session,
 )
 from globus_cli.parsing import common_options, no_local_server_option
-from globus_cli.safeio import safeprint
 
 _SHARED_EPILOG = """\
 
@@ -69,7 +68,7 @@ You may force a new login with
 def login_command(no_local_server, force):
     # if not forcing, stop if user already logged in
     if not force and check_logged_in():
-        safeprint(_LOGGED_IN_RESPONSE)
+        click.echo(_LOGGED_IN_RESPONSE)
         return
 
     # use a link login if remote session or user requested
@@ -78,7 +77,7 @@ def login_command(no_local_server, force):
 
     # otherwise default to a local server login flow
     else:
-        safeprint(
+        click.echo(
             "You are running 'globus login', which should automatically open "
             "a browser window for you to login.\n"
             "If this fails or you experience difficulty, try "
@@ -88,7 +87,7 @@ def login_command(no_local_server, force):
         do_local_server_auth_flow(force_new_client=True)
 
     # print epilog
-    safeprint(_LOGIN_EPILOG)
+    click.echo(_LOGIN_EPILOG)
 
 
 def check_logged_in():

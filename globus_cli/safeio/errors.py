@@ -1,9 +1,9 @@
 import json
 
+import click
 from globus_sdk.base import safe_stringify
 
 from globus_cli.safeio.get_option_vals import outformat_is_json
-from globus_cli.safeio.write import safeprint
 
 
 class PrintableErrorField(object):
@@ -59,4 +59,4 @@ def write_error_info(error_name, fields, message=None):
         )
         message = u"{0} {1}".format(PrintableErrorField.TEXT_PREFIX, message)
 
-    safeprint(message, write_to_stderr=True)
+    click.echo(message, err=True)

@@ -7,11 +7,7 @@ from globus_cli.services.transfer import autoactivate, get_client
 
 @click.command("mkdir", help="Make a directory on an endpoint")
 @common_options
-@click.argument(
-    "endpoint_plus_path",
-    metavar=ENDPOINT_PLUS_REQPATH.metavar,
-    type=ENDPOINT_PLUS_REQPATH,
-)
+@click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_REQPATH)
 def mkdir_command(endpoint_plus_path):
     """
     Executor for `globus mkdir`

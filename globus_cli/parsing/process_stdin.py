@@ -1,7 +1,7 @@
 import shlex
 import sys
 
-from globus_cli.safeio import safeprint
+import click
 
 
 def shlex_process_stdin(process_command, helptext):
@@ -15,13 +15,13 @@ def shlex_process_stdin(process_command, helptext):
     """
     # if input is interactive, print help to stderr
     if sys.stdin.isatty():
-        safeprint(
+        click.echo(
             (
                 "{}\n".format(helptext) + "Lines are split with shlex in POSIX mode: "
                 "https://docs.python.org/library/shlex.html#parsing-rules\n"
                 "Terminate input with Ctrl+D or <EOF>\n"
             ),
-            write_to_stderr=True,
+            err=True,
         )
 
     # use readlines() rather than implicit file read line looping to force

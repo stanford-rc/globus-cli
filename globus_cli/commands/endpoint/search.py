@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import CaseInsensitiveChoice, common_options
+from globus_cli.parsing import common_options
 from globus_cli.safeio import formatted_print
 from globus_cli.services.auth import maybe_lookup_identity_id
 from globus_cli.services.transfer import (
@@ -16,7 +16,7 @@ from globus_cli.services.transfer import (
     "--filter-scope",
     default="all",
     show_default=True,
-    type=CaseInsensitiveChoice(
+    type=click.Choice(
         (
             "all",
             "administered-by-me",
@@ -26,7 +26,8 @@ from globus_cli.services.transfer import (
             "in-use",
             "shared-by-me",
             "shared-with-me",
-        )
+        ),
+        case_sensitive=False,
     ),
     help="The set of endpoints to search over.",
 )

@@ -5,7 +5,7 @@ import click
 from globus_sdk import GlobusResponse
 
 from globus_cli.parsing import common_options
-from globus_cli.safeio import FORMAT_TEXT_TABLE, formatted_print, is_verbose, safeprint
+from globus_cli.safeio import FORMAT_TEXT_TABLE, formatted_print, is_verbose
 from globus_cli.services.auth import get_auth_client
 
 
@@ -101,7 +101,7 @@ def get_identities_command(values):
         # UUID vice versa, or "NO_SUCH_IDENTITY" if the identity could not be
         # found
         for val in resolved_values:
-            safeprint(resolve_identity(val))
+            click.echo(resolve_identity(val))
 
     formatted_print(
         res,

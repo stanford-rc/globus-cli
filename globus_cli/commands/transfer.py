@@ -3,8 +3,6 @@ from globus_sdk import TransferData
 
 from globus_cli.parsing import (
     ENDPOINT_PLUS_OPTPATH,
-    CaseInsensitiveChoice,
-    HiddenOption,
     TaskPath,
     common_options,
     shlex_process_stdin,
@@ -86,7 +84,7 @@ from globus_cli.services.transfer import autoactivate, get_client
     "-s",
     default=None,
     show_default=True,
-    type=CaseInsensitiveChoice(("exists", "size", "mtime", "checksum")),
+    type=click.Choice(("exists", "size", "mtime", "checksum"), case_sensitive=False),
     help=(
         "How will the Transfer task determine whether or not to "
         "actually transfer a file over the network?"
@@ -136,10 +134,10 @@ from globus_cli.services.transfer import autoactivate, get_client
 @click.argument(
     "destination", metavar="DEST_ENDPOINT_ID[:DEST_PATH]", type=ENDPOINT_PLUS_OPTPATH
 )
-@click.option("--perf-cc", type=int, cls=HiddenOption)
-@click.option("--perf-p", type=int, cls=HiddenOption)
-@click.option("--perf-pp", type=int, cls=HiddenOption)
-@click.option("--perf-udt", is_flag=True, default=None, cls=HiddenOption)
+@click.option("--perf-cc", type=int, hidden=True)
+@click.option("--perf-p", type=int, hidden=True)
+@click.option("--perf-pp", type=int, hidden=True)
+@click.option("--perf-udt", is_flag=True, default=None, hidden=True)
 def transfer_command(
     batch,
     sync_level,

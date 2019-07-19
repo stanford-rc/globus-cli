@@ -8,8 +8,7 @@ from globus_cli.config import (
     OUTPUT_FORMAT_OPTNAME,
     write_option,
 )
-from globus_cli.parsing import CaseInsensitiveChoice, common_options
-from globus_cli.safeio import safeprint
+from globus_cli.parsing import common_options
 
 
 @click.command(
@@ -34,7 +33,7 @@ explicit use of --myproxy-username.
 @click.option(
     "--default-output-format",
     help="The default format for the CLI to use when printing.",
-    type=CaseInsensitiveChoice(["json", "text"]),
+    type=click.Choice(["json", "text"], case_sensitive=False),
 )
 @click.option(
     "--default-myproxy-username",
@@ -51,7 +50,7 @@ def init_command(default_output_format, default_myproxy_username):
     # otherwise)
     # finally, set it only if given and valid
     if not default_output_format:
-        safeprint(
+        click.echo(
             textwrap.fill(
                 'This must be one of "json" or "text". Other values will be '
                 "ignored. ENTER to skip."
@@ -68,7 +67,7 @@ def init_command(default_output_format, default_myproxy_username):
             default_output_format = None
 
     if not default_myproxy_username:
-        safeprint(textwrap.fill("ENTER to skip."))
+        click.echo(textwrap.fill("ENTER to skip."))
         default_myproxy_username = click.prompt(
             "Default myproxy username (cli.default_myproxy_username)",
             default="",
@@ -76,7 +75,7 @@ def init_command(default_output_format, default_myproxy_username):
         ).strip()
 
     # write to disk
-    safeprint(
+    click.echo(
         "\n\nWriting updated config to {0}".format(os.path.expanduser("~/.globus.cfg"))
     )
     write_option(OUTPUT_FORMAT_OPTNAME, default_output_format)

@@ -1,7 +1,7 @@
 import click
 
 from globus_cli.parsing import common_options, task_id_arg
-from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print, safeprint
+from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import get_client
 
 
@@ -56,7 +56,7 @@ def cancel_task(all, task_id):
 
         def _custom_text(res):
             for (i, (task_id, data)) in enumerate(cancellation_iterator(), start=1):
-                safeprint(
+                click.echo(
                     u"{} ({} of {}): {}".format(task_id, i, task_count, data["message"])
                 )
 

@@ -196,11 +196,14 @@ class EncodingTests(CliTestCase):
         six.PY2 and on_windows(), "python2 Windows console issues (FIXME?)"
     )
     def test_invalid_utf8_bytes(self):
-        """
+        r"""
         Tests operations with byte string that can be decoded with
         latin-1 but not with UTF-8. Confirms that this raises a
         UnicodeDecodeError, as the SDK/APIs can't handle decoding non UTF-8.
         This test is only run on Python 2 as bytes are not strings in Python 3.
+
+        You can imitate this in the command-line using a `printf` subshell, e.g.
+          globus mkdir "${GO_EP_1}:~/$(printf "\xe9")"
         """
         # the encoding for 'é' in latin-1 is a continuation byte in utf-8
         byte_name = b"\xe9"  # é's latin-1 encoding

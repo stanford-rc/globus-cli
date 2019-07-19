@@ -2,7 +2,6 @@ import click
 
 from globus_cli.parsing import (
     ENDPOINT_PLUS_REQPATH,
-    CaseInsensitiveChoice,
     common_options,
     security_principal_opts,
 )
@@ -21,7 +20,7 @@ from globus_cli.services.transfer import assemble_generic_doc, get_client
 @click.option(
     "--permissions",
     required=True,
-    type=CaseInsensitiveChoice(("r", "rw")),
+    type=click.Choice(("r", "rw"), case_sensitive=False),
     help="Permissions to add. Read-Only or Read/Write",
 )
 @click.option(
@@ -34,11 +33,7 @@ from globus_cli.services.transfer import assemble_generic_doc, get_client
     metavar="MESSAGE",
     help="A custom message to add to email notifications",
 )
-@click.argument(
-    "endpoint_plus_path",
-    metavar=ENDPOINT_PLUS_REQPATH.metavar,
-    type=ENDPOINT_PLUS_REQPATH,
-)
+@click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_REQPATH)
 def create_command(
     principal, permissions, endpoint_plus_path, notify_email, notify_message
 ):
