@@ -76,7 +76,7 @@ from globus_cli.services.transfer import autoactivate, get_client
     "-r",
     is_flag=True,
     help=(
-        "SOURCE_PATH and DEST_PATH are both directories, do a " "recursive dir transfer"
+        "SOURCE_PATH and DEST_PATH are both directories, do a recursive dir transfer"
     ),
 )
 @click.option(
@@ -176,7 +176,7 @@ def transfer_command(
 
     if (cmd_source_path is None or cmd_dest_path is None) and (not batch):
         raise click.UsageError(
-            ("transfer requires either SOURCE_PATH and DEST_PATH or " "--batch")
+            "transfer requires either SOURCE_PATH and DEST_PATH or --batch"
         )
 
     # because python can't handle multiple **kwargs expansions in a single

@@ -78,7 +78,7 @@ def update_command(yes, development, development_version):
     #   pip, anyone doing this is forced to get two copies of pip, which seems
     #   kind of nasty (even if "they're asking for it")
     if not _check_pip_installed():
-        click.echo("`globus update` requires pip. " "Please install pip and try again")
+        click.echo("`globus update` requires pip. Please install pip and try again")
         click.get_current_context().exit(1)
 
     # --development-version implies --development
@@ -90,7 +90,7 @@ def update_command(yes, development, development_version):
         # default to master
         development_version = development_version or "master"
         target_version = (
-            "https://github.com/globus/globus-cli/archive/{}" ".tar.gz#egg=globus-cli"
+            "https://github.com/globus/globus-cli/archive/{}.tar.gz#egg=globus-cli"
         ).format(development_version)
     else:
         # lookup version from PyPi, abort if we can't get it

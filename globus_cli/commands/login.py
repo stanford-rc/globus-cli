@@ -51,7 +51,7 @@ You may force a new login with
 
 @click.command(
     "login",
-    short_help=("Log into Globus to get credentials for " "the Globus CLI"),
+    short_help="Log into Globus to get credentials for the Globus CLI",
     help=(
         "Get credentials for the Globus CLI. "
         "Necessary before any Globus CLI commands which require "

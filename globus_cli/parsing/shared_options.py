@@ -183,7 +183,7 @@ def endpoint_create_and_update_params(*args, **kwargs):
         )(f)
         f = click.option(
             "--myproxy-server",
-            help=("Set the MyProxy Server URI " "(Globus Connect Server only)"),
+            help="Set the MyProxy Server URI (Globus Connect Server only)",
         )(f)
         f = click.option(
             "--oauth-server",
@@ -300,7 +300,7 @@ def validate_endpoint_create_and_update_params(endpoint_type, managed, params):
         # catch params with two option flags
         if params["public"] is False:
             raise click.UsageError(
-                "Option --private only allowed " "for Globus Connect Server endpoints"
+                "Option --private only allowed for Globus Connect Server endpoints"
             )
         # catch any params only usable with GCS
         for option in [
@@ -497,7 +497,7 @@ def task_submission_options(f):
     f = click.option(
         "--dry-run",
         is_flag=True,
-        help=("Don't actually submit the task, print submission " "data instead"),
+        help="Don't actually submit the task, print submission data instead",
     )(f)
     f = click.option(
         "--notify",
@@ -528,7 +528,7 @@ def task_submission_options(f):
     f = click.option(
         "--skip-activation-check",
         is_flag=True,
-        help=("Submit the task even if the endpoint(s) " "aren't currently activated."),
+        help="Submit the task even if the endpoint(s) aren't currently activated.",
     )(f)
 
     return f
@@ -767,7 +767,7 @@ def security_principal_opts(*args, **kwargs):
 
             if identity and provision_identity:
                 raise click.UsageError(
-                    "Only one of --identity or --provision-identity " "allowed"
+                    "Only one of --identity or --provision-identity allowed"
                 )
             if kwargs.get("principal") is not None:
                 if has_identity or group:

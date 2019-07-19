@@ -65,9 +65,7 @@ from globus_cli.services.transfer import activation_requirements_help_text, get_
     "--web",
     is_flag=True,
     default=False,
-    help=(
-        "Use web activation. Mutually exclusive with --myproxy " "and --delegate-proxy."
-    ),
+    help="Use web activation. Mutually exclusive with --myproxy  and --delegate-proxy.",
 )
 @click.option(
     "--no-browser",
@@ -83,9 +81,7 @@ from globus_cli.services.transfer import activation_requirements_help_text, get_
     "--myproxy",
     is_flag=True,
     default=False,
-    help=(
-        "Use myproxy activation. Mutually exclusive with --web " "and --delegate-proxy."
-    ),
+    help="Use myproxy activation. Mutually exclusive with --web and --delegate-proxy.",
 )
 @click.option(
     "--myproxy-username",
@@ -259,7 +255,7 @@ def endpoint_activate(
 
     # web activation
     elif web:
-        url = "https://app.globus.org/file-manager" "?origin_id={}".format(endpoint_id)
+        url = "https://app.globus.org/file-manager?origin_id={}".format(endpoint_id)
         if no_browser or is_remote_session():
             res = {"message": "Web activation url: {}".format(url), "url": url}
         else:

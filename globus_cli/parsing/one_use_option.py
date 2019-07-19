@@ -48,7 +48,7 @@ def one_use_option(*args, **kwargs):
     # cannot force a multiple or count option to be single use
     if "multiple" in kwargs or "count" in kwargs:
         raise ValueError(
-            "Internal error, one_use_option cannot be  used " "with multiple or count."
+            "Internal error, one_use_option cannot be used with multiple or count."
         )
 
     # cannot force a non Option Paramater (argument) to be a OneUseOption

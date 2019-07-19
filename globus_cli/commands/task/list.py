@@ -30,9 +30,7 @@ def _format_date_callback(ctx, param, value):
     "--filter-status",
     multiple=True,
     type=click.Choice(["ACTIVE", "INACTIVE", "FAILED", "SUCCEEDED"]),
-    help=(
-        "Task status to filter results by. " "This option can be used multiple times."
-    ),
+    help="Task status to filter results by. This option can be used multiple times.",
 )
 @click.option(
     "--filter-label",
@@ -54,8 +52,8 @@ def _format_date_callback(ctx, param, value):
     "--inexact / --exact",
     default=True,
     help=(
-        "Allows / disallows --filter-label and --filter-not-label to use"
-        " '*' as a wild-card character and ignore case"
+        "Allows / disallows --filter-label and --filter-not-label to use "
+        "'*' as a wild-card character and ignore case"
     ),
 )
 @click.option(

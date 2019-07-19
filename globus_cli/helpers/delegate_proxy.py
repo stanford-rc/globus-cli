@@ -213,7 +213,7 @@ def confirm_not_old_proxy(loaded_cert):
     # if the last CN is 'proxy' or 'limited proxy' we are in an old proxy
     if last_cn.value in ("proxy", "limited proxy"):
         raise ValueError(
-            "Proxy certificate is in an outdated format " "that is no longer supported"
+            "Proxy certificate is in an outdated format that is no longer supported"
         )
 
 

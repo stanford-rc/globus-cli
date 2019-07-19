@@ -50,7 +50,7 @@ If none of these are given, "=" will be used
     "-l",
     "long_output",
     is_flag=True,
-    help=("For text output only. Do long form output, kind " "of like `ls -l`"),
+    help="For text output only. Do long form output, kind of like `ls -l`",
 )
 @click.option(
     "--filter",
@@ -63,7 +63,7 @@ If none of these are given, "=" will be used
     "-r",
     is_flag=True,
     show_default=True,
-    help=("Do a recursive listing, up to the depth limit. " "Similar to `ls -R`"),
+    help="Do a recursive listing, up to the depth limit. Similar to `ls -R`",
 )
 @click.option(
     "--recursive-depth-limit",

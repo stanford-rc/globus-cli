@@ -63,13 +63,11 @@ def print_version():
     latest, current = get_versions()
     if latest is None:
         click.echo(
-            ("Installed Version: {0}\n" "Failed to lookup latest version.").format(
-                current
-            )
+            ("Installed Version: {0}\nFailed to lookup latest version.").format(current)
         )
     else:
         click.echo(
-            ("Installed Version: {0}\n" "Latest Version:    {1}\n" "\n{2}").format(
+            ("Installed Version: {0}\nLatest Version:    {1}\n\n{2}").format(
                 current,
                 latest,
                 "You are running the latest version of the Globus CLI"

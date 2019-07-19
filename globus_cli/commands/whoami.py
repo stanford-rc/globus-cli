@@ -16,9 +16,7 @@ from globus_cli.services.auth import get_auth_client
 @click.option(
     "--linked-identities",
     is_flag=True,
-    help=(
-        "Also show identities linked to the currently logged-in " "primary identity."
-    ),
+    help="Also show identities linked to the currently logged-in primary identity.",
 )
 def whoami_command(linked_identities):
     """
