@@ -83,6 +83,6 @@ class JMESPathTests(CliTestCase):
         that it gives a JMESPath ParseError.
         """
         output = self.run_line(
-            ("globus endpoint search 'Tutorial' --jmespath '{}'"), assert_exit_code=2
+            ("globus endpoint search 'Tutorial' --jmespath '{}'"), assert_exit_code=1
         )
-        self.assertIn("jmespath ParseError:", output)
+        self.assertIn("ParseError:", output)

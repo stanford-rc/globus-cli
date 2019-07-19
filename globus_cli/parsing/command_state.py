@@ -56,10 +56,7 @@ def format_option(f):
             return
 
         state = ctx.ensure_object(CommandState)
-        try:
-            state.jmespath_expr = jmespath.compile(value)
-        except jmespath.exceptions.ParseError as e:
-            raise click.UsageError("jmespath ParseError: {}".format(e))
+        state.jmespath_expr = jmespath.compile(value)
 
         if state.output_format == TEXT_FORMAT:
             state.output_format = JSON_FORMAT
