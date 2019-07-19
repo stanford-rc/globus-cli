@@ -1,8 +1,7 @@
 import click
 
 # pulled by running `_GLOBUS_COMPLETE=source globus` in a bash shell
-BASH_SHELL_COMPLETER = """
-_globus_completion() {
+BASH_SHELL_COMPLETER = r"""_globus_completion() {
     local IFS=$'
 '
     COMPREPLY=( $( env COMP_WORDS="${COMP_WORDS[*]}" \
@@ -26,8 +25,7 @@ _globus_completionetup() {
 _globus_completionetup;"""
 
 # pulled by running `_GLOBUS_COMPLETE=source_zsh globus` in a zsh shell
-ZSH_SHELL_COMPLETER = """\
-_globus_completion() {
+ZSH_SHELL_COMPLETER = r"""_globus_completion() {
     local -a completions
     local -a completions_with_descriptions
     local -a response
