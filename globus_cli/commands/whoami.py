@@ -32,7 +32,7 @@ def whoami_command(linked_identities):
         res = client.oauth2_userinfo()
     except AuthAPIError:
         click.echo(
-            "Unable to get user information. Please try " "logging in again.", err=True
+            "Unable to get user information. Please try logging in again.", err=True
         )
         click.get_current_context().exit(1)
 

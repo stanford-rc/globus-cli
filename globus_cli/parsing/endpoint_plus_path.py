@@ -26,10 +26,7 @@ class EndpointPlusPath(click.ParamType):
     @property
     def metavar(self):
         """
-        Metavar as a property, to satisfy the slight brokenness of
-        click.Argument
-        Tracked against Click as an issue:
-        https://github.com/pallets/click/issues/674
+        Metavar as a property, so that we can make it different if `path_required`
         """
         if self.path_required:
             return "ENDPOINT_ID:PATH"
