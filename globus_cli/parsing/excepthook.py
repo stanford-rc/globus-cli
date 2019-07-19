@@ -206,5 +206,9 @@ def custom_except_hook(exc_info):
     # or NotImplementedError bubbled all the way up here: just print it
     # out, basically
     else:
-        click.echo(u"{}: {}".format(exception_type.__name__, exception))
+        click.echo(
+            u"{}: {}".format(
+                click.style(exception_type.__name__, bold=True, fg="red"), exception
+            )
+        )
         sys.exit(1)

@@ -43,19 +43,23 @@ def write_error_info(error_name, fields, message=None):
 
     if outformat_is_json():
         # dictify joined tuple lists and dump to json string
-        message = json.dumps(
-            dict(
-                [("error_name", error_name)] + [(f.name, f.raw_value) for f in fields]
+        message = click.style(
+            json.dumps(
+                dict(
+                    [("error_name", error_name)]
+                    + [(f.name, f.raw_value) for f in fields]
+                ),
+                indent=2,
+                separators=(",", ": "),
+                sort_keys=True,
             ),
-            indent=2,
-            separators=(",", ": "),
-            sort_keys=True,
+            fg="yellow",
         )
     if not message:
         message = u"A{0} {1} Occurred.\n{2}".format(
             "n" if error_name[0] in "aeiouAEIOU" else "",
-            error_name,
-            "\n".join(f.value for f in fields),
+            click.style(error_name, bold=True, fg="red"),
+            click.style("\n".join(f.value for f in fields), fg="yellow"),
         )
         message = u"{0} {1}".format(PrintableErrorField.TEXT_PREFIX, message)
 
