@@ -55,7 +55,7 @@ def _format_date_callback(ctx, param, value):
     default=True,
     help=(
         "Allows / disallows --filter-label and --filter-not-label to use"
-        "* as a wild-card character and ignore case"
+        " '*' as a wild-card character and ignore case"
     ),
 )
 @click.option(
