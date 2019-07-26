@@ -2,12 +2,7 @@
 import click
 
 from globus_cli.services.transfer import get_client as get_tc
-from tests.framework.cli_testcase import default_test_config
-
-try:
-    from mock import patch
-except ImportError:
-    from unittest.mock import patch
+from tests.framework.tools import patch_config
 
 
 def cleanup_bookmarks(tc):
@@ -24,7 +19,7 @@ def cleanup_tasks(tc):
 @click.command("cleanup")
 @click.option("--cancel-jobs", is_flag=True)
 def main(cancel_jobs):
-    with patch("globus_cli.config.get_config_obj", new=default_test_config):
+    with patch_config():
         tc = get_tc()
         cleanup_bookmarks(tc)
 

@@ -48,7 +48,7 @@ $(VIRTUALENV)/bin/flake8 $(VIRTUALENV)/bin/nose2: test-requirements.txt $(VIRTUA
 
 test: $(VIRTUALENV)/bin/flake8 $(VIRTUALENV)/bin/nose2 localdev
 	$(VIRTUALENV)/bin/flake8
-	$(VIRTUALENV)/bin/nose2 --verbose
+	$(VIRTUALENV)/bin/pytest -v
 
 
 # run outside of tox because specifying a tox environment for py3.6+ is awkward
