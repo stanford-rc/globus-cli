@@ -6,8 +6,7 @@ from globus_cli.services.transfer import assemble_generic_doc, get_client
 
 
 @click.command(
-    "update",
-    help=("Update an access control rule, changing " "permissions on an endpoint"),
+    "update", help="Update an access control rule, changing permissions on an endpoint"
 )
 @endpoint_id_arg
 @common_options

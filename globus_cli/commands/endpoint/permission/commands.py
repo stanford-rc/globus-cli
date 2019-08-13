@@ -7,7 +7,7 @@ from globus_cli.parsing import globus_group
 
 
 @globus_group(
-    name="permission", help=("Manage endpoint permissions " "(Access Control Lists)")
+    name="permission", help="Manage endpoint permissions (Access Control Lists)"
 )
 def permission_command():
     pass

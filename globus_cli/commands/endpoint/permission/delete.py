@@ -5,9 +5,7 @@ from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import get_client
 
 
-@click.command(
-    "delete", help=("Delete an access control rule, removing " "permissions")
-)
+@click.command("delete", help="Delete an access control rule, removing permissions")
 @common_options
 @endpoint_id_arg
 @click.argument("rule_id")

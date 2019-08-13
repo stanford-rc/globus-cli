@@ -10,9 +10,7 @@ from globus_cli.services.auth import maybe_lookup_identity_id
 from globus_cli.services.transfer import assemble_generic_doc, get_client
 
 
-@click.command(
-    "create", help=("Create an access control rule, allowing new " "permissions")
-)
+@click.command("create", help="Create an access control rule, allowing new permissions")
 @common_options
 @security_principal_opts(
     allow_anonymous=True, allow_all_authenticated=True, allow_provision=True
@@ -26,7 +24,7 @@ from globus_cli.services.transfer import assemble_generic_doc, get_client
 @click.option(
     "--notify-email",
     metavar="EMAIL_ADDRESS",
-    help=("An email address to notify that " "the permission has been added"),
+    help="An email address to notify that the permission has been added",
 )
 @click.option(
     "--notify-message",
