@@ -35,7 +35,7 @@ from globus_cli.services.transfer import autoactivate, get_client
 
     \b
     Lines are of the form
-    [--recursive] SOURCE_PATH DEST_PATH
+    [--recursive] [--external-checksum TEXT] SOURCE_PATH DEST_PATH\n"
 
     Skips empty lines and allows comments beginning with "#".
 
@@ -128,6 +128,13 @@ from globus_cli.services.transfer import autoactivate, get_client
         "and are used as prefixes to the batchmode inputs."
     ),
 )
+@click.option('--external-checksum',
+              help=('An external checksum to verify source file and data '
+                    'transfer integrity. Assumed to be an MD5 checksum if '
+                    '--checksum-algorithm is not given.'))
+@click.option('--checksum-algorithm', default=None, show_default=True,
+              help=('Specify an algorithm for --external-checksum or '
+                    '--verify-checksum'))
 @click.argument(
     "source", metavar="SOURCE_ENDPOINT_ID[:SOURCE_PATH]", type=ENDPOINT_PLUS_OPTPATH
 )
@@ -144,6 +151,8 @@ def transfer_command(
     recursive,
     destination,
     source,
+    checksum_algorithm,
+    external_checksum,
     label,
     preserve_mtime,
     verify_checksum,
@@ -173,6 +182,19 @@ def transfer_command(
                 "which need it"
             )
         )
+
+    if external_checksum and batch:
+        raise click.UsageError(
+            (
+                "You cannot use --external-checksum in addition to --batch. "
+                "Instead, use --external-checksum on lines of --batch input "
+                "which need it"
+            )
+        )
+
+    if recursive and external_checksum:
+        raise click.UsageError(
+            "--recursive and --external-checksum are mutually exclusive")
 
     if (cmd_source_path is None or cmd_dest_path is None) and (not batch):
         raise click.UsageError(
@@ -217,27 +239,36 @@ def transfer_command(
     if batch:
 
         @click.command()
+        @click.option("--external-checksum")
         @click.option("--recursive", "-r", is_flag=True)
         @click.argument("source_path", type=TaskPath(base_dir=cmd_source_path))
         @click.argument("dest_path", type=TaskPath(base_dir=cmd_dest_path))
-        def process_batch_line(dest_path, source_path, recursive):
+        def process_batch_line(
+                dest_path, source_path, recursive, external_checksum):
             """
             Parse a line of batch input and turn it into a transfer submission
             item.
             """
-            transfer_data.add_item(
-                str(source_path), str(dest_path), recursive=recursive
-            )
+            if recursive and external_checksum:
+                raise click.UsageError("--recursive and --external-checksum "
+                                       "are mutually exclusive")
+            transfer_data.add_item(str(source_path), str(dest_path),
+                                   external_checksum=external_checksum,
+                                   checksum_algorithm=checksum_algorithm,
+                                   recursive=recursive)
 
         shlex_process_stdin(
             process_batch_line,
             (
                 "Enter transfers, line by line, as\n\n"
-                "    [--recursive] SOURCE_PATH DEST_PATH\n"
+                "    [--recursive] [--external-checksum TEXT] SOURCE_PATH DEST_PATH\n"
             ),
         )
     else:
-        transfer_data.add_item(cmd_source_path, cmd_dest_path, recursive=recursive)
+        transfer_data.add_item(cmd_source_path, cmd_dest_path,
+                               external_checksum=external_checksum,
+                               checksum_algorithm=checksum_algorithm,
+                               recursive=recursive)
 
     if dry_run:
         formatted_print(
@@ -247,6 +278,7 @@ def transfer_command(
                 ("Source Path", "source_path"),
                 ("Dest Path", "destination_path"),
                 ("Recursive", "recursive"),
+                ("External Checksum", "external_checksum"),
             ),
         )
         # exit safely
