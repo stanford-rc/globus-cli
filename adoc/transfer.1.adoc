@@ -46,7 +46,7 @@ Lines are split on spaces, respecting quotes, and every line is treated as
 a file or directory to transfer.
 
 Lines are of the form
-[--recursive] SOURCE_PATH DEST_PATH
+[--recursive] [--external-checksum CKSM] SOURCE_PATH DEST_PATH
 
 Empty lines and comments beginning with '#' are ignored.
 
@@ -60,12 +60,14 @@ these paths will be used as prefixes to their respective paths on stdin.
 *--batch*::
 
 Starts batch mode input for transfers, which takes lines in the form
-[--recursive] SOURCE_PATH DEST_PATH from stdin to transfer multiple
-files and/or directories. See "Batch Input" above for more information.
+[--recursive] [--external-checksum CKSM] SOURCE_PATH DEST_PATH from stdin to
+transfer multiple files and/or directories. See "Batch Input"
+above for more information.
 
-Mutually exclusive with *--recursive*.
+Mutually exclusive with *--recursive* and *--external-checksum*.
 i.e. This is invalid: 'globus transfer --recursive --batch ...'.
-Use of *--recursive* inside of batch input is distinct, and allowed.
+Use of *--recursive* or *--external-checksum* inside of batch input is
+distinct, and allowed.
 
 *-r, --recursive*::
 
@@ -74,9 +76,26 @@ of all files and directories inside of the source directory to the destination
 directory. Note that for batch input, each directory must be marked as
 recursive individually unlike 'globus delete'.
 
-Mutually exclusive with *--batch*.
+Mutually exclusive with *--batch* and *--external-checksum*.
 If you want to recursively transfer directories in *--batch* input, see
 "Batch Input" above.
+
+*--external-checksum TEXT*::
+
+If SOURCE_PATH and DEST_PATH are both files, specifies a checksum for verifying
+the integrity of SOURCE_PATH before the transfer and DEST_PATH after the
+transfer. If *--checksum-algorithm* is not given, this is assumed to be an
+MD5 checksum.
+
+Mutually exclusive with *--batch* and *--recursive*.
+If you want to specify external checksums in *--batch* input, see
+"Batch Input" above.
+
+*--checksum-algorithm TEXT*::
+
+Specifies the checksum algorithm to use when *--verify-checksum*,
+*--sync-level checksum*, or *-external-checksum* is given. The task will fail
+if both endpoints do not recognize and support the supplied algorithm name.
 
 *-s, --sync-level [exists|size|mtime|checksum]*::
 
@@ -104,6 +123,8 @@ will not have their modification times preserved.
 
 After transfer, verify that the source and destination file checksums match.
 If they don’t, re-transfer the entire file and keep trying until it succeeds.
+If *--checksum-algorithm* is not given, a mutually supported algorithm will be
+negotiated between the source and dest endpoints.
 Defaults to True.
 
 *--encrypt*::
