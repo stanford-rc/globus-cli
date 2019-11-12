@@ -1,6 +1,6 @@
 import json
 
-from tests.framework.constants import GO_EP1_ID, GO_EP2_ID
+from tests.constants import GO_EP1_ID, GO_EP2_ID
 
 
 def test_jmespath_noop(run_line):

@@ -2,7 +2,7 @@
 import click
 
 from globus_cli.services.transfer import get_client as get_tc
-from tests.framework.tools import patch_config
+from tests.utils import patch_config
 
 
 def cleanup_bookmarks(tc):

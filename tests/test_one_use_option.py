@@ -1,4 +1,4 @@
-from tests.framework.constants import GO_EP1_ID
+from tests.constants import GO_EP1_ID
 
 
 def test_multiple_argument_options(run_line):

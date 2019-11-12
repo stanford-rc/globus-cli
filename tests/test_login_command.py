@@ -7,7 +7,7 @@ except ImportError:
 import globus_sdk
 
 from globus_cli.config import AUTH_RT_OPTNAME, TRANSFER_RT_OPTNAME
-from tests.framework.tools import get_default_test_config
+from tests.utils import get_default_test_config
 
 
 def test_login_validates_token(run_line):

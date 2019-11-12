@@ -1,7 +1,7 @@
 import pytest
 
 from globus_cli.helpers import fill_delegate_proxy_activation_requirements
-from tests.framework.constants import PUBLIC_KEY
+from tests.constants import PUBLIC_KEY
 
 
 def test_fill_delegate_proxy_activation_requirements():
@@ -11,7 +11,7 @@ def test_fill_delegate_proxy_activation_requirements():
     fill_delegate_proxy_activation_requirements.
     """
     # file containing an expired x509 from a myproxy-logon
-    x509 = "tests/framework/files/cert.pem"
+    x509 = "tests/files/cert.pem"
 
     activation_requirements = {
         "DATA_TYPE": "activation_requirements",
@@ -44,9 +44,9 @@ def test_fill_delegate_proxy_activation_requirements():
     "errty,errmatch,inputfile",
     [
         (IOError, "No such file", "nosuchfile.pem"),
-        (ValueError, "Unable to parse PEM data", "tests/framework/constants.py"),
-        (ValueError, "Unable to parse PEM data", "tests/framework/files/no_cert.pem"),
-        (ValueError, "Failed to decode PEM data", "tests/framework/files/no_key.pem"),
+        (ValueError, "Unable to parse PEM data", "tests/constants.py"),
+        (ValueError, "Unable to parse PEM data", "tests/files/no_cert.pem"),
+        (ValueError, "Failed to decode PEM data", "tests/files/no_key.pem"),
     ],
 )
 def test_bad_x509(errty, errmatch, inputfile):

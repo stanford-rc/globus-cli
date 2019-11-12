@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from configobj import ConfigObj
 
 import globus_cli.config
-from tests.framework.constants import (
+from tests.constants import (
     CLITESTER1A_AUTH_RT,
     CLITESTER1A_CLIENT_ID,
     CLITESTER1A_CLIENT_SECRET,

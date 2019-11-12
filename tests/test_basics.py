@@ -1,7 +1,7 @@
 import json
 
-from tests.framework.constants import GO_EP1_ID, GO_EP2_ID
-from tests.framework.tools import on_windows
+from tests.constants import GO_EP1_ID, GO_EP2_ID
+from tests.utils import on_windows
 
 # TODO: remove this as part of handling #455
 PATHSEP = "\\" if on_windows() else "/"

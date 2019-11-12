@@ -1,7 +1,7 @@
 import json
 from random import getrandbits
 
-from tests.framework.constants import GO_EP1_ID
+from tests.constants import GO_EP1_ID
 
 
 def _load_probably_json_substring(x):

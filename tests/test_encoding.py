@@ -5,8 +5,8 @@ from random import getrandbits
 import pytest
 import six
 
-from tests.framework.constants import GO_EP1_ID
-from tests.framework.tools import on_windows
+from tests.constants import GO_EP1_ID
+from tests.utils import on_windows
 
 
 @pytest.fixture

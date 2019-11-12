@@ -11,15 +11,15 @@ from click.testing import CliRunner
 
 from globus_cli.services.auth import get_auth_client
 from globus_cli.services.transfer import get_client as get_transfer_client
-from tests.framework.constants import GO_EP1_ID
-from tests.framework.tools import patch_config
+from tests.constants import GO_EP1_ID
+from tests.utils import patch_config
 
 log = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="session")
 def test_file_dir():
-    return os.path.normpath(os.path.join(os.path.dirname(__file__), "framework/files"))
+    return os.path.normpath(os.path.join(os.path.dirname(__file__), "files"))
 
 
 @pytest.fixture
