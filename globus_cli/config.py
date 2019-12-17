@@ -189,7 +189,7 @@ def internal_auth_client(requires_instance=False, force_new_client=False):
     Looks up the values for this CLI's Instance Client in config
 
     If none exists and requires_instance is True or force_new_client is True,
-    registers a new Instance Client with GLobus Auth
+    registers a new Instance Client with Globus Auth
 
     If none exists and requires_instance is false, defaults to a Native Client
     for backwards compatibility

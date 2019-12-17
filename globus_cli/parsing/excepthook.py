@@ -91,7 +91,7 @@ def authapi_hook(exception):
 
 def globusapi_hook(exception):
     write_error_info(
-        "GLobus API Error",
+        "Globus API Error",
         [
             PrintableErrorField("HTTP status", exception.http_status),
             PrintableErrorField("code", exception.code),
