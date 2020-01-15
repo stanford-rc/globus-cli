@@ -215,6 +215,18 @@ def endpoint_activate(
 
     # myproxy activation
     if myproxy:
+        # fetch activation requirements
+        requirements_data = client.endpoint_get_activation_requirements(
+            endpoint_id
+        ).data
+        # filter to the myproxy requirements; ensure that there are values
+        myproxy_requirements_data = [
+            x for x in requirements_data["DATA"] if x["type"] == "myproxy"
+        ]
+        if not len(myproxy_requirements_data):
+            raise click.ClickException(
+                "This endpoint does not support myproxy activation"
+            )
 
         # get username and password
         if not (myproxy_username or default_myproxy_username):
@@ -222,31 +234,19 @@ def endpoint_activate(
         if not myproxy_password:
             myproxy_password = click.prompt("Myproxy password", hide_input=True)
 
-        no_server_msg = (
-            "This endpoint has no myproxy server "
-            "and so cannot be activated through myproxy"
-        )
-
-        requirements_data = client.endpoint_get_activation_requirements(
-            endpoint_id
-        ).data
-
-        if not len(requirements_data["DATA"]):
-            raise click.ClickException(no_server_msg)
-
-        for data in requirements_data["DATA"]:
-            # skip non-myproxy values
-            # although the API does not practice this today, in theory other
-            # activation types may have fields with the same names...
-            if data["type"] != "myproxy":
-                continue
-
+        # fill out the requirements data -- note that because everything has been done
+        # by reference, `requirements_data` still refers to the document containing
+        # these values
+        for data in myproxy_requirements_data:
             if data["name"] == "passphrase":
                 data["value"] = myproxy_password
             if data["name"] == "username":
                 data["value"] = myproxy_username or default_myproxy_username
             if data["name"] == "hostname" and data["value"] is None:
-                raise click.ClickException(no_server_msg)
+                raise click.ClickException(
+                    "This endpoint has no myproxy server "
+                    "and so cannot be activated through myproxy"
+                )
             # NOTE: remember that "0" is a possible value
             if data["name"] == "lifetime_in_hours" and myproxy_lifetime is not None:
                 data["value"] = str(myproxy_lifetime)
