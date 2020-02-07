@@ -15,20 +15,29 @@ def _normpath(path):
     Note that this does not preserve leading slashes in the same way as python's
     posixpath module -- it's not clear how Transfer would treat such paths and
     non-obvious that we need to allow such usage
+
+    Also, unlike normpath, we want to preserve trailing slashes because they may be
+    required
     """
     initial_slash = 1 if path.startswith("/") else 0
+    trailing_slash = 1 if path.endswith("/") and path != "/" else 0
     parts = path.split("/")
     new_parts = []
     for part in parts:
         if part in ("", "."):
             continue
         # either not adding a ".." OR chaining together multiple ".."s
-        if part != ".." or (new_parts and new_parts[-1] == ".."):
+        # OR working with a non-absolute path that starts with ".."
+        if (
+            part != ".."
+            or (new_parts and new_parts[-1] == "..")
+            or (not initial_slash and not new_parts)
+        ):
             new_parts.append(part)
         elif new_parts:  # adding a ".." to a path which isn't already ending in one
             new_parts.pop()
 
-    return ("/" * initial_slash) + "/".join(new_parts)
+    return ("/" * initial_slash) + "/".join(new_parts) + ("/" * trailing_slash)
 
 
 def _pathjoin(a, b):
