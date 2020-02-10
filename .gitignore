@@ -3,6 +3,7 @@
 /*.egg-info
 *.pyc
 /docs-source/_build/
+/.coverage
 
 #virtualenv
 /virtualenv/

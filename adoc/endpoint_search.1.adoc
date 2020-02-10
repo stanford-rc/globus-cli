@@ -44,7 +44,7 @@ Endpoints that have active or pending tasks submitted by the current user
 +
 recently-used;;
 Endpoints that have been used for tasks submitted by the current user in the
-last 90 days.  
+last 90 days.
 +
 shared-by-me;;
 Shared endpoints created by the current user

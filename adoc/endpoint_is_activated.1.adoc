@@ -71,4 +71,3 @@ fi
 used to change exit behavior on http error codes.
 
 2 if the command was used improperly.
-

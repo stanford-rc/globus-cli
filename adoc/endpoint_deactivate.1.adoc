@@ -13,7 +13,7 @@ globus endpoint deactivate - Remove endpoint activation credentials
 == DESCRIPTION
 
 *globus endpoint deactivate* removes the credential previously assigned to an
-endpoint by 'globus endpoint activate'.  
+endpoint by 'globus endpoint activate'.
 
 
 == OPTIONS

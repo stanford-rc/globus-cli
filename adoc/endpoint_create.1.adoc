@@ -60,7 +60,7 @@ $ globus endpoint create --server my_gcs_endpoint
 Create a shared endpoint hosted on another endpoint:
 ----
 $ host_ep=ddb59aef-6d04-11e5-ba46-22000b92c6ec
-$ globus endpoint create --shared host_ep:~/ my_shared_endpoint 
+$ globus endpoint create --shared host_ep:~/ my_shared_endpoint
 ----
 
 

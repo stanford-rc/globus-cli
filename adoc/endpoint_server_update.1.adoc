@@ -13,7 +13,7 @@ globus endpoint server update - Update existing server data
 == DESCRIPTION
 
 The *globus endpoint server update* command updates the fields on an existing
-server for an endpoint. 
+server for an endpoint.
 
 At least one field must be updated.
 

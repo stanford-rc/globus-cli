@@ -13,8 +13,8 @@ endpoints hosted on an endpoint.
 
 == DESCRIPTION
 
-The *globus endpoint my-shared-endpoint-list* command shows a list of all 
-shared endpoints hosted on the target endpoint for which the user has the 
+The *globus endpoint my-shared-endpoint-list* command shows a list of all
+shared endpoints hosted on the target endpoint for which the user has the
 "administrator" or "access_manager" effective roles.
 
 

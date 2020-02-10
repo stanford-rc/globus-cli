@@ -32,14 +32,12 @@ You can write and test commands interactively in this setup.
 Linting & Testing
 -----------------
 
-- All code is autoformatted with https://github.com/ambv/black[black] and
-   https://github.com/timothycrosley/isort[isort]. You may run
-    `make autoformat` to do this or configure these tools for use in your
-    editor.
-- All code must pass `make test`, which runs linting and tests.
+We use `tox` to run tests and `pre-commit` to run (optional) pre-commit hooks.
+Use `pre-commit install` to setup the hooks.
 
-NOTE: `black` requires python3.6+, so you may find it necessary to
-`make clean autoformat PYTHON_VERSION=python3.6` or equivalent.
+All code is autoformatted with https://github.com/ambv/black[black] and
+https://github.com/timothycrosley/isort[isort]. You may run
+`make lint` to do this or configure these tools for use in your editor.
 
 Expectations for Pull Requests
 ------------------------------

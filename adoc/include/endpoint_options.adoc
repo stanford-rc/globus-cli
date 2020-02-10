@@ -32,7 +32,7 @@ Default directory to use on this endpoint.
 
 *--force-encryption / --no-force-encryption*::
 
-(Un)Set this endpoint to force encryption of transfer data channels to 
+(Un)Set this endpoint to force encryption of transfer data channels to
 and from itself.
 
 *--disable-verify/--no-disable-verify*::
@@ -42,7 +42,7 @@ and from itself.
 *--public / --private*::
 
 Set this endpoint to be (in)visible to other users searching for endpoints.
-(Globus Connect Server endpoints only, all Globus Connect Personal endpoints 
+(Globus Connect Server endpoints only, all Globus Connect Personal endpoints
 are private and all shared endpoints are public)
 
 *--myproxy-dn* 'DOMAIN_NAME'::
@@ -82,7 +82,7 @@ exclusive with --no-managed.
 *--network-use* '[ normal | minimal | aggressive | custom ]'::
 
 Set this endpoint's network use level. If using custom, this endpoint's max
-and preferred concurrency and parallelism must be set. (Managed endpoints only) 
+and preferred concurrency and parallelism must be set. (Managed endpoints only)
 (Globus Connect Server endpoints only)
 
 *--max-concurrency* 'INT'::

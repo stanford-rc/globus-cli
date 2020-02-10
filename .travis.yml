@@ -3,20 +3,15 @@ dist: xenial
 language: python
 matrix:
   include:
+    - name: "lint"
+      python: "3.6"
+      env: TOXENV=lint
     - python: "2.7"
       env: TOXENV=py
-    # py2 linting build (flake8 on py2 can flag different stuff)
-    - name: "Python: 2.7 (linting)"
-      python: "2.7"
-      env: TOXENV=lint
     - python: "3.5"
       env: TOXENV=py
     - python: "3.6"
       env: TOXENV=py
-    # separate py3.6 linting build, which runs 'black --check' (no py2 support)
-    - name: "Python: 3.6 (linting)"
-      python: "3.6"
-      env: TOXENV=py36-lint
     - python: "3.7"
       env: TOXENV=py
     - python: "3.8"
@@ -28,14 +23,14 @@ matrix:
     - name: "py2 + windows"
       os: windows
       language: shell
-      env: TOXENV=py,lint PATH=/c/Python27:/c/Python27/Scripts:$PATH
+      env: TOXENV=py PATH=/c/Python27:/c/Python27/Scripts:$PATH
       before_install:
         - choco install python2
         - python -m pip install --upgrade pip wheel
     - name: "py3.8 + windows"
       os: windows
       language: shell
-      env: TOXENV=py,py38-lint PATH=/c/Python38:/c/Python38/Scripts:$PATH
+      env: TOXENV=py,lint PATH=/c/Python38:/c/Python38/Scripts:$PATH
       before_install:
         - choco install python3
         - python -m pip install --upgrade pip wheel
@@ -44,10 +39,10 @@ matrix:
       os: osx
       osx_image: xcode10.2  # py3.7 on macOS 10.14
       language: shell
-      env: TOXENV=py3,py37-lint
+      env: TOXENV=py3,lint
 cache: pip
 install:
   - pip install -U pip setuptools
-  - pip install -e '.[development]'
+  - pip install tox
 script:
   - tox
