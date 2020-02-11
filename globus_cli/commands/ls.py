@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import ENDPOINT_PLUS_OPTPATH, common_options
+from globus_cli.parsing import ENDPOINT_PLUS_OPTPATH, command
 from globus_cli.safeio import formatted_print, is_verbose, outformat_is_text
 from globus_cli.services.transfer import (
     autoactivate,
@@ -9,34 +9,7 @@ from globus_cli.services.transfer import (
 )
 
 
-@click.command(
-    "ls",
-    help=(
-        """\
-List the contents of a directory on an endpoint
-
-\b
-Filtering
-===
-
---filter takes "filter patterns" subject to the following rules.
-
-\b
-Filter patterns must start with "=", "~", "!", or "!~"
-If none of these are given, "=" will be used
-
-\b
-"=" does exact matching
-"~" does regex matching, supporting globs (*)
-"!" does inverse "=" matching
-"!~" does inverse "~" matching
-
-\b
-"~*.txt" matches all .txt files, for example"""
-    ),
-    short_help="List endpoint directory contents",
-)
-@common_options
+@command("ls", short_help="List endpoint directory contents")
 @click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_OPTPATH)
 @click.option(
     "--all",
@@ -86,7 +59,26 @@ def ls_command(
     filter_val,
 ):
     """
-    Executor for `globus ls`
+    List the contents of a directory on an endpoint
+
+    \b
+    Filtering
+    ===
+
+    --filter takes "filter patterns" subject to the following rules.
+
+    \b
+    Filter patterns must start with "=", "~", "!", or "!~"
+    If none of these are given, "=" will be used
+
+    \b
+    "=" does exact matching
+    "~" does regex matching, supporting globs (*)
+    "!" does inverse "=" matching
+    "!~" does inverse "~" matching
+
+    \b
+    "~*.txt" matches all .txt files, for example
     """
     endpoint_id, path = endpoint_plus_path
 

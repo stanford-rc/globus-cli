@@ -6,12 +6,12 @@ from globus_cli.commands.task.pause_info import task_pause_info
 from globus_cli.commands.task.show import show_task
 from globus_cli.commands.task.update import update_task
 from globus_cli.commands.task.wait import task_wait
-from globus_cli.parsing import globus_group
+from globus_cli.parsing import group
 
 
-@globus_group(name="task", help="Manage asynchronous tasks")
+@group("task")
 def task_command():
-    pass
+    """Manage asynchronous tasks"""
 
 
 task_command.add_command(task_list)

@@ -1,7 +1,5 @@
-import click
-
 from globus_cli.parsing import (
-    common_options,
+    command,
     endpoint_id_arg,
     server_add_and_update_opts,
     server_id_arg,
@@ -10,8 +8,7 @@ from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import assemble_generic_doc, get_client
 
 
-@click.command("update", help="Update attributes of a server on an endpoint")
-@common_options
+@command("update")
 @server_add_and_update_opts
 @endpoint_id_arg
 @server_id_arg
@@ -25,9 +22,7 @@ def server_update(
     incoming_data_ports,
     outgoing_data_ports,
 ):
-    """
-    Executor for `globus endpoint server update`
-    """
+    """Update attributes of a server on an endpoint"""
     client = get_client()
 
     server_doc = assemble_generic_doc(

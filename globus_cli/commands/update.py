@@ -5,7 +5,7 @@ import sys
 
 import click
 
-from globus_cli.parsing import common_options
+from globus_cli.parsing import command
 from globus_cli.version import get_versions
 
 # check if the source for this is inside of the USER_BASE
@@ -43,8 +43,7 @@ def _check_pip_installed():
         return False
 
 
-@click.command("update", help="Update the Globus CLI to its latest version")
-@common_options(no_format_option=True, no_map_http_status_option=True)
+@command("update", disable_options=["format", "map_http_status"])
 @click.option("--yes", is_flag=True, help='Automatically say "yes" to all prompts')
 # hidden options to fetch branches or tags from GitHub. One turns this mode
 # on or off, and the other is used to set a non-master target
@@ -52,9 +51,7 @@ def _check_pip_installed():
 @click.option("--development", is_flag=True, hidden=True)
 @click.option("--development-version", hidden=True, default=None)
 def update_command(yes, development, development_version):
-    """
-    Executor for `globus update`
-    """
+    """Update the Globus CLI to its latest version"""
     # enforce that pip MUST be installed
     # Why not just include it in the setup.py requirements? Mostly weak
     # reasons, but it shouldn't matter much.

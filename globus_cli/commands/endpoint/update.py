@@ -1,7 +1,5 @@
-import click
-
 from globus_cli.parsing import (
-    common_options,
+    command,
     endpoint_create_and_update_params,
     endpoint_id_arg,
     validate_endpoint_create_and_update_params,
@@ -10,14 +8,11 @@ from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import assemble_generic_doc, get_client
 
 
-@click.command("update", help="Update attributes of an endpoint")
-@common_options
+@command("update")
 @endpoint_id_arg
 @endpoint_create_and_update_params(create=False)
 def endpoint_update(**kwargs):
-    """
-    Executor for `globus endpoint update`
-    """
+    """Update attributes of an endpoint"""
     # validate params. Requires a get call to check the endpoint type
     client = get_client()
     endpoint_id = kwargs.pop("endpoint_id")

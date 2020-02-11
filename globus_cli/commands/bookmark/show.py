@@ -1,23 +1,17 @@
 import click
 
 from globus_cli.commands.bookmark.helpers import resolve_id_or_name
-from globus_cli.parsing import common_options
+from globus_cli.parsing import command
 from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print, is_verbose
 from globus_cli.services.transfer import get_client
 
 
-@click.command(
-    "show",
-    help=(
-        "Given a bookmark name or ID resolves bookmark in endpoint:"
-        "path format. Use --verbose for additional fields."
-    ),
-)
-@common_options
+@command("show")
 @click.argument("bookmark_id_or_name")
 def bookmark_show(bookmark_id_or_name):
     """
-    Executor for `globus bookmark show`
+    Given a bookmark name or ID resolves bookmark in endpoint:path format.
+    Use --verbose for additional fields.
     """
     client = get_client()
     res = resolve_id_or_name(client, bookmark_id_or_name)

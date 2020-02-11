@@ -1,22 +1,17 @@
 import click
 
-from globus_cli.parsing import common_options, task_id_arg
+from globus_cli.parsing import command, task_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import get_client
 
 
-@click.command(
-    "cancel", short_help="Cancel a task", help="Cancel a task owned by the current user"
-)
-@common_options
+@command("cancel", short_help="Cancel a task")
 @task_id_arg(required=False)
 @click.option(
     "--all", "-a", is_flag=True, help="Cancel all in-progress tasks that you own"
 )
 def cancel_task(all, task_id):
-    """
-    Executor for `globus task cancel`
-    """
+    """Cancel a task owned by the current user"""
 
     if bool(all) + bool(task_id) != 1:
         raise click.UsageError(

@@ -2,7 +2,7 @@ import click
 
 from globus_cli.parsing import (
     ENDPOINT_PLUS_REQPATH,
-    common_options,
+    command,
     endpoint_create_and_update_params,
     one_use_option,
     validate_endpoint_create_and_update_params,
@@ -15,16 +15,7 @@ COMMON_FIELDS = [("Message", "message"), ("Endpoint ID", "id")]
 GCP_FIELDS = [("Setup Key", "globus_connect_setup_key")]
 
 
-@click.command(
-    "create",
-    short_help="Create a new endpoint",
-    help=(
-        "Create a new endpoint. Requires a display name and exactly one of "
-        "--personal, --server, or --shared to make a Globus Connect "
-        "Personal, Globus Connect Server, or shared endpoint respectively."
-    ),
-)
-@common_options
+@command("create", short_help="Create a new endpoint")
 @endpoint_create_and_update_params(create=True)
 @one_use_option(
     "--personal",
@@ -54,7 +45,10 @@ GCP_FIELDS = [("Setup Key", "globus_connect_setup_key")]
 )
 def endpoint_create(**kwargs):
     """
-    Executor for `globus endpoint create`
+    Create a new endpoint.
+
+    Requires a display name and exactly one of --personal, --server, or --shared to make
+    a Globus Connect Personal, Globus Connect Server, or Shared endpoint respectively.
     """
     client = get_client()
 

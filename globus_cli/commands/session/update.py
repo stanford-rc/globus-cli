@@ -7,25 +7,25 @@ from globus_cli.helpers import (
     do_local_server_auth_flow,
     is_remote_session,
 )
-from globus_cli.parsing import common_options, no_local_server_option
+from globus_cli.parsing import command, no_local_server_option
 from globus_cli.services.auth import get_auth_client
 
 
-@click.command(
+@command(
     "update",
     short_help=("Update your CLI auth session"),
-    help=(
-        "Update your current CLI auth session by authenticating "
-        "with specific identities."
-    ),
+    disable_options=["format", "map_http_status"],
 )
-@common_options(no_format_option=True, no_map_http_status_option=True)
 @no_local_server_option
 @click.argument("identities", nargs=-1, required=False)
 @click.option(
     "--all", is_flag=True, help="authenticate with every identity in your identity set"
 )
 def session_update(identities, no_local_server, all):
+    """
+    Update your current CLI auth session by authenticating
+    with specific identities.
+    """
 
     if (not (identities or all)) or (identities and all):
         raise click.UsageError("Either give one or more IDENTITIES or use --all")

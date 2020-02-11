@@ -26,10 +26,14 @@ def common_options(*args, **kwargs):
 
     or
 
-    >>> @common_options(no_format_option=True)
+    >>> @common_options(disable_options=["format"])
     >>> def mycommand(abc, xyz):
     >>>     ...
+
+    to disable use of `--format`
     """
+
+    disable_opts = kwargs.get("disable_options", [])
 
     def decorate(f, **kwargs):
         """
@@ -42,11 +46,11 @@ def common_options(*args, **kwargs):
         f = click.help_option("-h", "--help")(f)
 
         # if the format option is being allowed, it needs to be applied to `f`
-        if not kwargs.get("no_format_option"):
+        if "format" not in disable_opts:
             f = format_option(f)
 
         # if the --map-http-status option is being allowed, ...
-        if not kwargs.get("no_map_http_status_option"):
+        if "map_http_status" not in disable_opts:
             f = map_http_status_option(f)
 
         return f

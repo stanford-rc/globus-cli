@@ -1,7 +1,6 @@
-import click
 from globus_sdk import TransferAPIError
 
-from globus_cli.parsing import common_options
+from globus_cli.parsing import command
 from globus_cli.safeio import formatted_print
 from globus_cli.services.transfer import (
     display_name_or_cname,
@@ -10,12 +9,9 @@ from globus_cli.services.transfer import (
 )
 
 
-@click.command("list", help="List bookmarks for the current user")
-@common_options
+@command("list")
 def bookmark_list():
-    """
-    Executor for `globus bookmark list`
-    """
+    """List bookmarks for the current user"""
     client = get_client()
 
     bookmark_iterator = client.bookmark_list()

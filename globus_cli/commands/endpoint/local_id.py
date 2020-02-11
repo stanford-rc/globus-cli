@@ -1,21 +1,18 @@
 import click
 from globus_sdk import LocalGlobusConnectPersonal
 
-from globus_cli.parsing import common_options, one_use_option
+from globus_cli.parsing import command, one_use_option
 
 
-@click.command("local-id", help="Display UUID of locally installed endpoint")
-@common_options(no_format_option=True, no_map_http_status_option=True)
+@command("local-id", disable_options=["format", "map_http_status"])
 @one_use_option(
     "--personal",
     is_flag=True,
     default=True,
-    help="Use local Globus Connect Personal endpoint (default) ",
+    help="Use local Globus Connect Personal endpoint (default)",
 )
 def local_id(personal):
-    """
-    Executor for `globus endpoint local-id`
-    """
+    """Display UUID of locally installed endpoint"""
     if personal:
         try:
             ep_id = LocalGlobusConnectPersonal().endpoint_id

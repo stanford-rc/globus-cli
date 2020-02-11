@@ -1,16 +1,13 @@
 import click
 
 from globus_cli.config import lookup_option
-from globus_cli.parsing import common_options
+from globus_cli.parsing import command
 
 
-@click.command("show", help="Show a value from the Globus config file")
-@common_options(no_format_option=True)
+@command("show", disable_options=["format"])
 @click.argument("parameter", required=True)
 def show_command(parameter):
-    """
-    Executor for `globus config show`
-    """
+    """Show a value from the Globus config file"""
     section = "cli"
     if "." in parameter:
         section, parameter = parameter.split(".", 1)

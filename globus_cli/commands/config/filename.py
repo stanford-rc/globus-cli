@@ -1,15 +1,12 @@
 import click
 
 from globus_cli.config import get_config_obj
-from globus_cli.parsing import common_options
+from globus_cli.parsing import command
 
 
-@click.command("filename", help="Output the path of the config file")
-@common_options(no_format_option=True, no_map_http_status_option=True)
+@command("filename", disable_options=["format", "map_http_status"])
 def filename_command():
-    """
-    Executor for `globus config filename`
-    """
+    """Output the path of the config file"""
     try:
         config = get_config_obj(file_error=True)
     except IOError as e:

@@ -8,28 +8,14 @@ from globus_cli.config import (
     OUTPUT_FORMAT_OPTNAME,
     write_option,
 )
-from globus_cli.parsing import common_options
+from globus_cli.parsing import command
 
 
-@click.command(
+@command(
     "init",
     short_help="Initialize all settings in the Globus Config file",
-    help="""
-Initialize your Clobus Config file with a series of prompts or passed
-options to set values used by the Globus CLI.
-
-Current settings that can be configured are:
-
-output_format: either 'text' for normal output or 'json' to display
-the machine parsable json used in the underlying Globus API.
-
-default_myproxy_username: a default username to use with 'globus endpoint
-activate --myproxy' If this value is set, the username prompt will be skipped
-when using myproxy authorization. This value can be overridden with an
-explicit use of --myproxy-username.
-""",
+    disable_options=["format"],
 )
-@common_options(no_format_option=True)
 @click.option(
     "--default-output-format",
     help="The default format for the CLI to use when printing.",
@@ -41,7 +27,18 @@ explicit use of --myproxy-username.
 )
 def init_command(default_output_format, default_myproxy_username):
     """
-    Executor for `globus config init`
+    Initialize your Clobus Config file with a series of prompts or passed
+    options to set values used by the Globus CLI.
+
+    Current settings that can be configured are:
+
+    output_format: either 'text' for normal output or 'json' to display
+    the machine parsable json used in the underlying Globus API.
+
+    default_myproxy_username: a default username to use with 'globus endpoint
+    activate --myproxy' If this value is set, the username prompt will be skipped
+    when using myproxy authorization. This value can be overridden with an
+    explicit use of --myproxy-username.
     """
     # now handle the output format, requires a little bit more care
     # first, prompt if it isn't given, but be clear that we have a sensible

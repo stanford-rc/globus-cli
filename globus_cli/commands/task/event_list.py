@@ -2,21 +2,18 @@ import json
 
 import click
 
-from globus_cli.parsing import common_options, task_id_arg
+from globus_cli.parsing import command, task_id_arg
 from globus_cli.safeio import formatted_print
 from globus_cli.services.transfer import get_client, iterable_response_to_dict
 
 
-@click.command("event-list", help="List Events for a given task")
-@common_options
+@command("event-list")
 @task_id_arg
 @click.option("--limit", default=10, show_default=True, help="Limit number of results.")
 @click.option("--filter-errors", is_flag=True, help="Filter results to errors")
 @click.option("--filter-non-errors", is_flag=True, help="Filter results to non errors")
 def task_event_list(task_id, limit, filter_errors, filter_non_errors):
-    """
-    Executor for `globus task-event-list`
-    """
+    """List Events for a given task"""
     client = get_client()
 
     # cannot filter by both errors and non errors

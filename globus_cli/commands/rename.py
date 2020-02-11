@@ -1,20 +1,17 @@
 import click
 
-from globus_cli.parsing import ENDPOINT_PLUS_REQPATH, common_options
+from globus_cli.parsing import ENDPOINT_PLUS_REQPATH, command
 from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import autoactivate, get_client
 
 
-@click.command("rename", help="Rename a file or directory on an endpoint")
-@common_options
+@command("rename")
 @click.argument("source", metavar="ENDPOINT_ID:SOURCE_PATH", type=ENDPOINT_PLUS_REQPATH)
 @click.argument(
     "destination", metavar="ENDPOINT_ID:DEST_PATH", type=ENDPOINT_PLUS_REQPATH
 )
 def rename_command(source, destination):
-    """
-    Executor for `globus rename`
-    """
+    """Rename a file or directory on an endpoint"""
     source_ep, source_path = source
     dest_ep, dest_path = destination
 

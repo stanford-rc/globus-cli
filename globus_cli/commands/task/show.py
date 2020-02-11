@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import common_options, task_id_arg
+from globus_cli.parsing import command, task_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
 from globus_cli.services.transfer import get_client, iterable_response_to_dict
 
@@ -69,8 +69,7 @@ def print_task_detail(client, task_id):
     )
 
 
-@click.command("show", help="Show detailed information about a specific task")
-@common_options
+@command("show")
 @task_id_arg
 @click.option(
     "--successful-transfers",
@@ -80,9 +79,7 @@ def print_task_detail(client, task_id):
     help="Show files that were transferred as result of this task.",
 )
 def show_task(successful_transfers, task_id):
-    """
-    Executor for `globus task show`
-    """
+    """Show detailed information about a specific task"""
     client = get_client()
 
     if successful_transfers:

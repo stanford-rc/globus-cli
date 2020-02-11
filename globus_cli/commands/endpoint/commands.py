@@ -11,12 +11,12 @@ from globus_cli.commands.endpoint.search import endpoint_search
 from globus_cli.commands.endpoint.server import server_command
 from globus_cli.commands.endpoint.show import endpoint_show
 from globus_cli.commands.endpoint.update import endpoint_update
-from globus_cli.parsing import globus_group
+from globus_cli.parsing import group
 
 
-@globus_group(name="endpoint", help="Manage Globus endpoint definitions")
+@group("endpoint")
 def endpoint_command():
-    pass
+    """Manage Globus endpoint definitions"""
 
 
 # groups

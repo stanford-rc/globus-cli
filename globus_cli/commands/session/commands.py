@@ -1,11 +1,11 @@
 from globus_cli.commands.session.show import session_show
 from globus_cli.commands.session.update import session_update
-from globus_cli.parsing import globus_group
+from globus_cli.parsing import group
 
 
-@globus_group(name="session", help="Manage your CLI auth session")
+@group("session")
 def session_command():
-    pass
+    """Manage your CLI auth session"""
 
 
 # commands

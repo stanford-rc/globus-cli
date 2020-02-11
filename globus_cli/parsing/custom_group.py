@@ -1,6 +1,8 @@
+import sys
+
 import click
 
-from globus_cli.parsing.shared_options import common_options
+from globus_cli.parsing.excepthook import custom_except_hook
 
 
 class GlobusCommandGroup(click.Group):
@@ -28,20 +30,16 @@ class GlobusCommandGroup(click.Group):
         return super(GlobusCommandGroup, self).invoke(ctx)
 
 
-def globus_group(*args, **kwargs):
+class TopLevelGroup(GlobusCommandGroup):
     """
-    Wrapper over click.group which sets GlobusCommandGroup as the Class
-
-    Caution!
-    Don't get snake-bitten by this. `globus_group` is a decorator which MUST
-    take arguments. It is not wrapped in our common detect-and-decorate pattern
-    to allow it to be used bare -- that wouldn't work (unnamed groups? weird
-    stuff)
+    This is a custom command type which is basically a click.Group, but is
+    designed specifically for the top level command.
+    It's specialization is that it catches all exceptions from subcommands and
+    passes them to a custom error handler.
     """
 
-    def inner_decorator(f):
-        f = click.group(*args, cls=GlobusCommandGroup, **kwargs)(f)
-        f = common_options(f)
-        return f
-
-    return inner_decorator
+    def invoke(self, ctx):
+        try:
+            return super(TopLevelGroup, self).invoke(ctx)
+        except Exception:
+            custom_except_hook(sys.exc_info())

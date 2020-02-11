@@ -16,12 +16,20 @@ from globus_cli.commands.transfer import transfer_command
 from globus_cli.commands.update import update_command
 from globus_cli.commands.version import version_command
 from globus_cli.commands.whoami import whoami_command
-from globus_cli.parsing import globus_main_func
+from globus_cli.parsing import main_group
 
 
-@globus_main_func
+@main_group
 def main():
-    pass
+    """
+    Interact with Globus from the command line
+
+    All `globus` subcommands support `--help` documentation.
+
+    Use `globus login` to get started!
+
+    The documentation is also online at https://docs.globus.org/cli/
+    """
 
 
 main.add_command(list_commands)

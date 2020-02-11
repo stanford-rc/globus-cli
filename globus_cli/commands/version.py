@@ -1,13 +1,8 @@
-import click
-
 from globus_cli.helpers import print_version
-from globus_cli.parsing import common_options
+from globus_cli.parsing import command
 
 
-@click.command("version", help="Show the version and exit")
-@common_options(no_format_option=True, no_map_http_status_option=True)
+@command("version", disable_options=["format", "map_http_status"])
 def version_command():
-    """
-    Executor for `globus version`
-    """
+    """Show the version and exit"""
     print_version()

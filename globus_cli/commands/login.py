@@ -12,7 +12,7 @@ from globus_cli.helpers import (
     do_local_server_auth_flow,
     is_remote_session,
 )
-from globus_cli.parsing import common_options, no_local_server_option
+from globus_cli.parsing import command, no_local_server_option
 
 _SHARED_EPILOG = """\
 
@@ -49,16 +49,11 @@ You may force a new login with
 )
 
 
-@click.command(
+@command(
     "login",
     short_help="Log into Globus to get credentials for the Globus CLI",
-    help=(
-        "Get credentials for the Globus CLI. "
-        "Necessary before any Globus CLI commands which require "
-        "authentication will work"
-    ),
+    disable_options=["format", "map_http_status"],
 )
-@common_options(no_format_option=True, no_map_http_status_option=True)
 @no_local_server_option
 @click.option(
     "--force",
@@ -66,6 +61,12 @@ You may force a new login with
     help=("Do a fresh login, ignoring any existing credentials"),
 )
 def login_command(no_local_server, force):
+    """
+    Get credentials for the Globus CLI
+
+    Necessary before any Globus CLI commands which require
+    authentication will work
+    """
     # if not forcing, stop if user already logged in
     if not force and check_logged_in():
         click.echo(_LOGGED_IN_RESPONSE)

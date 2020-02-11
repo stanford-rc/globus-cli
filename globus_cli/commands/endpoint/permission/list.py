@@ -1,18 +1,13 @@
-import click
-
-from globus_cli.parsing import common_options, endpoint_id_arg
+from globus_cli.parsing import command, endpoint_id_arg
 from globus_cli.safeio import formatted_print
 from globus_cli.services.auth import LazyIdentityMap
 from globus_cli.services.transfer import get_client
 
 
-@click.command("list", help="List of permissions on an endpoint")
-@common_options
+@command("list")
 @endpoint_id_arg
 def list_command(endpoint_id):
-    """
-    Executor for `globus endpoint permission list`
-    """
+    """List of permissions on an endpoint"""
     client = get_client()
 
     rules = client.endpoint_acl_list(endpoint_id)

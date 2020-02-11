@@ -3,7 +3,7 @@ from globus_sdk import DeleteData
 
 from globus_cli.parsing import (
     ENDPOINT_PLUS_REQPATH,
-    common_options,
+    command,
     delete_and_rm_options,
     synchronous_task_wait_options,
     task_submission_options,
@@ -12,16 +12,7 @@ from globus_cli.safeio import err_is_terminal, formatted_print, term_is_interact
 from globus_cli.services.transfer import autoactivate, get_client, task_wait_with_io
 
 
-@click.command(
-    "rm",
-    short_help="Delete a single path; wait for it to complete",
-    help=(
-        "Submit a Delete Task to delete a single path, "
-        "and then block and wait for it to complete. "
-        "Output is similar to 'globus task wait'"
-    ),
-)
-@common_options
+@command("rm", short_help="Delete a single path; wait for it to complete")
 @task_submission_options
 @delete_and_rm_options(supports_batch=False, default_enable_globs=True)
 @synchronous_task_wait_options
@@ -45,7 +36,10 @@ def rm_command(
     timeout_exit_code,
 ):
     """
-    Executor for `globus rm`
+    Submit a Delete Task to delete a single path, and then block and wait for it to
+    complete.
+
+    Output is similar to 'globus task wait'
     """
     endpoint_id, path = endpoint_plus_path
 

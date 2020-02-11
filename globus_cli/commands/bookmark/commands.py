@@ -3,12 +3,12 @@ from globus_cli.commands.bookmark.delete import bookmark_delete
 from globus_cli.commands.bookmark.list import bookmark_list
 from globus_cli.commands.bookmark.rename import bookmark_rename
 from globus_cli.commands.bookmark.show import bookmark_show
-from globus_cli.parsing import globus_group
+from globus_cli.parsing import group
 
 
-@globus_group(name="bookmark", help="Manage endpoint bookmarks")
+@group("bookmark")
 def bookmark_command():
-    pass
+    """Manage endpoint bookmarks"""
 
 
 bookmark_command.add_command(bookmark_list)

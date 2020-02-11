@@ -1,20 +1,15 @@
 from textwrap import dedent
 
-import click
-
-from globus_cli.parsing import common_options, endpoint_id_arg, server_id_arg
+from globus_cli.parsing import command, endpoint_id_arg, server_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
 from globus_cli.services.transfer import get_client
 
 
-@click.command("show", help="Show a server belonging to an endpoint")
-@common_options
+@command("show")
 @endpoint_id_arg
 @server_id_arg
 def server_show(endpoint_id, server_id):
-    """
-    Executor for `globus endpoint server show`
-    """
+    """Show a server belonging to an endpoint"""
     client = get_client()
 
     server_doc = client.get_endpoint_server(endpoint_id, server_id)

@@ -1,18 +1,13 @@
-import click
-
-from globus_cli.parsing import common_options, endpoint_id_arg
+from globus_cli.parsing import command, endpoint_id_arg
 from globus_cli.safeio import formatted_print
 from globus_cli.services.auth import LazyIdentityMap
 from globus_cli.services.transfer import get_client
 
 
-@click.command("list", help="List of assigned roles on an endpoint")
-@common_options
+@command("list")
 @endpoint_id_arg
 def role_list(endpoint_id):
-    """
-    Executor for `globus access endpoint-role-list`
-    """
+    """List of assigned roles on an endpoint"""
     client = get_client()
     roles = client.endpoint_role_list(endpoint_id)
 

@@ -1,21 +1,16 @@
 import time
 
-import click
 import globus_sdk
 
 from globus_cli.config import AUTH_AT_OPTNAME, internal_auth_client, lookup_option
-from globus_cli.parsing import common_options
+from globus_cli.parsing import command
 from globus_cli.safeio import formatted_print, print_command_hint
 from globus_cli.services.auth import LazyIdentityMap
 
 
-@click.command(
-    "show",
-    short_help="Show your current CLI auth session",
-    help="List all identities in your current CLI auth session.",
-)
-@common_options()
+@command("show", short_help="Show your current CLI auth session")
 def session_show():
+    """List all identities in your current CLI auth session."""
     # get a token to introspect, refreshing if neccecary
     auth_client = internal_auth_client()
     try:

@@ -2,7 +2,7 @@ from textwrap import dedent
 
 import click
 
-from globus_cli.parsing import common_options, endpoint_id_arg
+from globus_cli.parsing import command, endpoint_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import get_client, get_endpoint_w_server_list
 
@@ -49,21 +49,15 @@ def _detect_mode(server):
     return "hostname"
 
 
-@click.command(
-    "delete",
-    help="""\
-    Delete a server belonging to an endpoint
-
-    SERVER may be a server ID, HOSTNAME, HOSTNAME:PORT, or URI
-    ( SCHEME://HOSTNAME:PORT )
-    """,
-)
-@common_options
+@command("delete")
 @endpoint_id_arg
 @click.argument("server")
 def server_delete(endpoint_id, server):
     """
-    Executor for `globus endpoint server show`
+    Delete a server belonging to an endpoint
+
+    SERVER may be a server ID, HOSTNAME, HOSTNAME:PORT, or URI
+    ( SCHEME://HOSTNAME:PORT )
     """
     client = get_client()
 

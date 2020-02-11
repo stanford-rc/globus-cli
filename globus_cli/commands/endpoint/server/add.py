@@ -1,16 +1,9 @@
-import click
-
-from globus_cli.parsing import (
-    common_options,
-    endpoint_id_arg,
-    server_add_and_update_opts,
-)
+from globus_cli.parsing import command, endpoint_id_arg, server_add_and_update_opts
 from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import assemble_generic_doc, get_client
 
 
-@click.command("add", help="Add a server to an endpoint")
-@common_options
+@command("add")
 @server_add_and_update_opts(add=True)
 @endpoint_id_arg
 def server_add(
@@ -22,9 +15,7 @@ def server_add(
     incoming_data_ports,
     outgoing_data_ports,
 ):
-    """
-    Executor for `globus endpoint server add`
-    """
+    """Add a server to an endpoint"""
     client = get_client()
 
     server_doc = assemble_generic_doc(

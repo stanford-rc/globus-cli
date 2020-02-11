@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import common_options, task_id_arg
+from globus_cli.parsing import command, task_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
 from globus_cli.services.transfer import get_client
 
@@ -33,18 +33,12 @@ PAUSE_RULE_DISPLAY_FIELDS = [
 ]
 
 
-@click.command(
-    "pause-info",
-    help="Show messages from activity managers who have explicitly "
-    "paused the given in-progress task and list any active "
-    "pause rules that apply to it",
-    short_help="Show why an in-progress task is currently paused",
-)
-@common_options
+@command("pause-info", short_help="Show why an in-progress task is currently paused")
 @task_id_arg
 def task_pause_info(task_id):
     """
-    Executor for `globus task pause-info`
+    Show messages from activity managers who have explicitly paused the given
+    in-progress task and list any active pause rules that apply to it
     """
     client = get_client()
     res = client.task_pause_info(task_id)

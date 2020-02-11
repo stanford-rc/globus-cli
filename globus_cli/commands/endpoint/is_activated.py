@@ -1,20 +1,11 @@
 import click
 
-from globus_cli.parsing import common_options, endpoint_id_arg
+from globus_cli.parsing import command, endpoint_id_arg
 from globus_cli.safeio import formatted_print
 from globus_cli.services.transfer import activation_requirements_help_text, get_client
 
 
-@click.command(
-    "is-activated",
-    short_help="Check if an endpoint is activated",
-    help=(
-        "Check if an endpoint is activated or requires "
-        "activation. If it requires activation, exits with "
-        "status 1, otherwise exits with status 0."
-    ),
-)
-@common_options
+@command("is-activated", short_help="Check if an endpoint is activated")
 @endpoint_id_arg
 @click.option(
     "--until",
@@ -37,7 +28,9 @@ from globus_cli.services.transfer import activation_requirements_help_text, get_
 )
 def endpoint_is_activated(endpoint_id, until, absolute_time):
     """
-    Executor for `globus endpoint is-activated`
+    Check if an endpoint is activated or requires activation.
+
+    If it requires activation, exits with status 1, otherwise exits with status 0.
     """
     client = get_client()
     res = client.endpoint_get_activation_requirements(endpoint_id)

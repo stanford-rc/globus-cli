@@ -1,7 +1,7 @@
 import click
 import six
 
-from globus_cli.parsing import common_options
+from globus_cli.parsing import command
 from globus_cli.safeio import formatted_print
 from globus_cli.services.transfer import get_client, iterable_response_to_dict
 
@@ -12,8 +12,7 @@ def _format_date_callback(ctx, param, value):
     return value.strftime("%Y-%m-%d %H:%M:%S")
 
 
-@click.command("list", help="List tasks for the current user")
-@common_options
+@command("list")
 @click.option("--limit", default=10, show_default=True, help="Limit number of results.")
 @click.option(
     "--filter-task-id",
@@ -93,9 +92,7 @@ def task_list(
     filter_completed_after,
     filter_completed_before,
 ):
-    """
-    Executor for `globus task-list`
-    """
+    """List tasks for the current user"""
 
     def _process_filterval(prefix, value, default=None):
         if value:

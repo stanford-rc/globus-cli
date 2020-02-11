@@ -4,7 +4,7 @@ import uuid
 import click
 from globus_sdk import GlobusResponse
 
-from globus_cli.parsing import common_options
+from globus_cli.parsing import command
 from globus_cli.safeio import FORMAT_TEXT_TABLE, formatted_print, is_verbose
 from globus_cli.services.auth import get_auth_client
 
@@ -43,18 +43,13 @@ def _try_b32_decode(v):
         return None
 
 
-@click.command(
-    "get-identities",
-    short_help="Lookup Globus Auth Identities",
-    help="Lookup Globus Auth Identities given one or more uuids "
-    "and/or usernames. Either resolves each uuid to a username and "
-    "vice versa, or use --verbose for tabular output.",
-)
-@common_options
+@command("get-identities", short_help="Lookup Globus Auth Identities")
 @click.argument("values", required=True, nargs=-1)
 def get_identities_command(values):
     """
-    Executor for `globus get-identities`
+    Lookup Globus Auth Identities given one or more uuids
+    and/or usernames. Either resolves each uuid to a username and
+    vice versa, or use --verbose for tabular output
     """
     client = get_auth_client()
 

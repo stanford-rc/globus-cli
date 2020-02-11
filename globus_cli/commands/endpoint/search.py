@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import common_options
+from globus_cli.parsing import command
 from globus_cli.safeio import formatted_print
 from globus_cli.services.auth import maybe_lookup_identity_id
 from globus_cli.services.transfer import (
@@ -10,8 +10,7 @@ from globus_cli.services.transfer import (
 )
 
 
-@click.command("search", help="Search for Globus endpoints")
-@common_options
+@command("search")
 @click.option(
     "--filter-scope",
     default="all",
@@ -48,9 +47,7 @@ from globus_cli.services.transfer import (
 )
 @click.argument("filter_fulltext", required=False)
 def endpoint_search(filter_fulltext, limit, filter_owner_id, filter_scope):
-    """
-    Executor for `globus endpoint search`
-    """
+    """Search for Globus endpoints"""
     if filter_scope == "all" and not filter_fulltext:
         raise click.UsageError(
             "When searching all endpoints (--filter-scope=all, the default), "

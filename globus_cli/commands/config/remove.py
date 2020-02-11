@@ -1,16 +1,13 @@
 import click
 
 from globus_cli.config import get_config_obj
-from globus_cli.parsing import common_options
+from globus_cli.parsing import command
 
 
-@click.command("remove", help="Remove a value from the Globus config file")
-@common_options(no_format_option=True)
+@command("remove", disable_options=["format"])
 @click.argument("parameter", required=True)
 def remove_command(parameter):
-    """
-    Executor for `globus config remove`
-    """
+    """Remove a value from the Globus config file"""
     conf = get_config_obj()
 
     section = "cli"

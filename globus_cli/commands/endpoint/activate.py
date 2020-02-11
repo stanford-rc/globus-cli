@@ -7,59 +7,12 @@ from globus_cli.helpers import (
     fill_delegate_proxy_activation_requirements,
     is_remote_session,
 )
-from globus_cli.parsing import common_options, endpoint_id_arg
+from globus_cli.parsing import command, endpoint_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import activation_requirements_help_text, get_client
 
 
-@click.command(
-    "activate",
-    short_help="Activate an endpoint",
-    help="""
-    Activate an endpoint using Autoactivation, Myproxy, Delegate Proxy,
-    or Web activation.
-    Note that --web, --delegate-proxy, and --myproxy activation are mutually
-    exclusive options.
-
-    \b
-    Autoactivation will always be attempted unless the --no-autoactivate
-    option is given. If autoactivation succeeds any other activation options
-    will be ignored as the endpoint has already been successfully activated.
-
-    \b
-    To use Web activation use the --web option.
-    The CLI will try to open your default browser to the endpoint's activation
-    page, but if a remote CLI session is detected, or the --no-browser option
-    is given, a url will be printed for you to manually follow and activate
-    the endpoint.
-
-    \b
-    To use Myproxy activation give the --myproxy option.
-    Myproxy activation requires your username and password for the myproxy
-    server the endpoint is using for authentication. e.g. for default
-    Globus Connect Server endpoints this will be your login credentials for the
-    server the endpoint is hosted on.
-    You can enter your username when prompted, give your username with the
-    --myproxy-username option, or set a default myproxy username in config with
-    "globus config init" or "globus config set cli.default_myproxy_username".
-    For security it is recommended that you only enter your password when
-    prompted to hide your inputs and keep your password out of your
-    command history, but you may pass your password with the hidden
-    --myproxy-password or -P options.
-
-    \b
-    To use Delegate Proxy activation use the --delegate-proxy option with a
-    file containing an X.509 certificate as an argument (e.g. an X.509
-    gotten from the myproxy-logon command). This certificate must
-    be a valid credential or proxy credential for the user from an identity
-    provider accepted by the endpoint being activated, and the endpoint must be
-    configured with a gridmap that will match the globus user using this
-    command with the local user the certificate was made to. Note if the X.509
-    is valid, but the endpoint does not recognize the identity provider or the
-    user the error will not be detected until the user attempts to perform an
-    operation on the endpoint.""",
-)
-@common_options
+@command("activate", short_help="Activate an endpoint")
 @endpoint_id_arg
 @click.option(
     "--web",
@@ -149,7 +102,48 @@ def endpoint_activate(
     force,
 ):
     """
-    Executor for `globus endpoint activate`
+    Activate an endpoint using Autoactivation, Myproxy, Delegate Proxy,
+    or Web activation.
+    Note that --web, --delegate-proxy, and --myproxy activation are mutually
+    exclusive options.
+
+    \b
+    Autoactivation will always be attempted unless the --no-autoactivate
+    option is given. If autoactivation succeeds any other activation options
+    will be ignored as the endpoint has already been successfully activated.
+
+    \b
+    To use Web activation use the --web option.
+    The CLI will try to open your default browser to the endpoint's activation
+    page, but if a remote CLI session is detected, or the --no-browser option
+    is given, a url will be printed for you to manually follow and activate
+    the endpoint.
+
+    \b
+    To use Myproxy activation give the --myproxy option.
+    Myproxy activation requires your username and password for the myproxy
+    server the endpoint is using for authentication. e.g. for default
+    Globus Connect Server endpoints this will be your login credentials for the
+    server the endpoint is hosted on.
+    You can enter your username when prompted, give your username with the
+    --myproxy-username option, or set a default myproxy username in config with
+    "globus config init" or "globus config set cli.default_myproxy_username".
+    For security it is recommended that you only enter your password when
+    prompted to hide your inputs and keep your password out of your
+    command history, but you may pass your password with the hidden
+    --myproxy-password or -P options.
+
+    \b
+    To use Delegate Proxy activation use the --delegate-proxy option with a
+    file containing an X.509 certificate as an argument (e.g. an X.509
+    gotten from the myproxy-logon command). This certificate must
+    be a valid credential or proxy credential for the user from an identity
+    provider accepted by the endpoint being activated, and the endpoint must be
+    configured with a gridmap that will match the globus user using this
+    command with the local user the certificate was made to. Note if the X.509
+    is valid, but the endpoint does not recognize the identity provider or the
+    user the error will not be detected until the user attempts to perform an
+    operation on the endpoint.
     """
     default_myproxy_username = lookup_option(MYPROXY_USERNAME_OPTNAME)
     client = get_client()

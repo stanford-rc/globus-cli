@@ -1,17 +1,12 @@
-import click
-
-from globus_cli.parsing import common_options, endpoint_id_arg
+from globus_cli.parsing import command, endpoint_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
 from globus_cli.services.transfer import get_client
 
 
-@click.command("show", help="Display a detailed endpoint definition")
-@common_options
+@command("show")
 @endpoint_id_arg
 def endpoint_show(endpoint_id):
-    """
-    Executor for `globus endpoint show`
-    """
+    """Display a detailed endpoint definition"""
     client = get_client()
 
     res = client.get_endpoint(endpoint_id)

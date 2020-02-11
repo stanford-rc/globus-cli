@@ -3,15 +3,12 @@ from globus_cli.commands.config.init import init_command
 from globus_cli.commands.config.remove import remove_command
 from globus_cli.commands.config.set import set_command
 from globus_cli.commands.config.show import show_command
-from globus_cli.parsing import globus_group
+from globus_cli.parsing import group
 
 
-@globus_group(
-    "config",
-    short_help=("Manage your Globus config file. (Advanced Users)"),
-    help=(
-        """\
-    Manage your Globus config file.
+@group("config", short_help="Manage your Globus config file. (Advanced Users)")
+def config_command():
+    """Manage your Globus config file.
 
     Be aware that these commands are for advanced users with a strong
     understanding of the underlying Globus API.
@@ -32,10 +29,6 @@ from globus_cli.parsing import globus_group
         $ globus config show cli.output_format
     to show the same value more explicitly.
     """
-    ),
-)
-def config_command():
-    pass
 
 
 config_command.add_command(filename_command)

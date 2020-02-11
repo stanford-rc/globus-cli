@@ -1,13 +1,12 @@
 import click
 
-from globus_cli.parsing import common_options, endpoint_id_arg, security_principal_opts
+from globus_cli.parsing import command, endpoint_id_arg, security_principal_opts
 from globus_cli.safeio import formatted_print
 from globus_cli.services.auth import maybe_lookup_identity_id
 from globus_cli.services.transfer import assemble_generic_doc, get_client
 
 
-@click.command("create", help="Create a role on an endpoint")
-@common_options
+@command("create")
 @endpoint_id_arg
 @security_principal_opts(allow_provision=True)
 @click.option(
@@ -20,9 +19,7 @@ from globus_cli.services.transfer import assemble_generic_doc, get_client
     help="A role to assign.",
 )
 def role_create(role, principal, endpoint_id):
-    """
-    Executor for `globus endpoint role show`
-    """
+    """Create a role on an endpoint"""
     principal_type, principal_val = principal
 
     client = get_client()

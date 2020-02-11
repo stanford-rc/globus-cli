@@ -1,7 +1,7 @@
 import click
 from globus_sdk.exc import AuthAPIError
 
-from globus_cli.parsing import common_options
+from globus_cli.parsing import command
 from globus_cli.safeio import (
     FORMAT_TEXT_RECORD,
     formatted_print,
@@ -11,17 +11,14 @@ from globus_cli.safeio import (
 from globus_cli.services.auth import get_auth_client
 
 
-@click.command("whoami", help=("Show the currently logged-in primary identity."))
-@common_options(no_map_http_status_option=True)
+@command("whoami", disable_options=["map_http_status"])
 @click.option(
     "--linked-identities",
     is_flag=True,
     help="Also show identities linked to the currently logged-in primary identity.",
 )
 def whoami_command(linked_identities):
-    """
-    Executor for `globus whoami`
-    """
+    """Show the currently logged-in primary identity"""
     client = get_auth_client()
 
     # get userinfo from auth.

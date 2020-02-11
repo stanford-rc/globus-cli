@@ -1,17 +1,12 @@
 import click
 
-from globus_cli.parsing import (
-    ENDPOINT_PLUS_REQPATH,
-    common_options,
-    security_principal_opts,
-)
+from globus_cli.parsing import ENDPOINT_PLUS_REQPATH, command, security_principal_opts
 from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
 from globus_cli.services.auth import maybe_lookup_identity_id
 from globus_cli.services.transfer import assemble_generic_doc, get_client
 
 
-@click.command("create", help="Create an access control rule, allowing new permissions")
-@common_options
+@command("create")
 @security_principal_opts(
     allow_anonymous=True, allow_all_authenticated=True, allow_provision=True
 )
@@ -35,9 +30,7 @@ from globus_cli.services.transfer import assemble_generic_doc, get_client
 def create_command(
     principal, permissions, endpoint_plus_path, notify_email, notify_message
 ):
-    """
-    Executor for `globus endpoint permission create`
-    """
+    """Create an access control rule, allowing new permissions"""
     if not principal:
         raise click.UsageError("A security principal is required for this command")
 

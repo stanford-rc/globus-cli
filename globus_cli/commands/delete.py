@@ -4,7 +4,7 @@ from globus_sdk import DeleteData
 from globus_cli.parsing import (
     ENDPOINT_PLUS_OPTPATH,
     TaskPath,
-    common_options,
+    command,
     delete_and_rm_options,
     shlex_process_stdin,
     task_submission_options,
@@ -18,12 +18,7 @@ from globus_cli.safeio import (
 from globus_cli.services.transfer import autoactivate, get_client
 
 
-@click.command(
-    "delete",
-    short_help="Submit a delete task (asynchronous)",
-    help="Delete a file or directory from one endpoint as an asynchronous task.",
-)
-@common_options
+@command("delete", short_help="Submit a delete task (asynchronous)")
 @task_submission_options
 @delete_and_rm_options
 @click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_OPTPATH)
@@ -41,9 +36,7 @@ def delete_command(
     skip_activation_check,
     notify,
 ):
-    """
-    Executor for `globus delete`
-    """
+    """Delete a file or directory from one endpoint as an asynchronous task"""
     endpoint_id, path = endpoint_plus_path
     if path is None and (not batch):
         raise click.UsageError("delete requires either a PATH OR --batch")

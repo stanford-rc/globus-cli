@@ -4,7 +4,7 @@ from globus_sdk import TransferData
 from globus_cli.parsing import (
     ENDPOINT_PLUS_OPTPATH,
     TaskPath,
-    common_options,
+    command,
     shlex_process_stdin,
     task_submission_options,
 )
@@ -12,72 +12,13 @@ from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
 from globus_cli.services.transfer import autoactivate, get_client
 
 
-@click.command(
-    "transfer",
-    short_help="Submit a transfer task (asynchronous)",
-    help=(
-        """\
-    Copy a file or directory from one endpoint to another as an asynchronous
-    task.
-
-    \b
-    Batched Input
-    ===
-
-    If you use `SOURCE_PATH` and `DEST_PATH` without the `--batch` flag, you
-    will submit a single-file or single-directory transfer task.
-    This has behavior similar to `cp` and `cp -r`, across endpoints of course.
-
-    Using `--batch`, `globus transfer` can submit a task which transfers
-    multiple files or directories. Paths to transfer are taken from stdin.
-    Lines are split on spaces, respecting quotes, and every line is treated as
-    a file or directory to transfer.
-
-    \b
-    Lines are of the form
-    [--recursive] [--external-checksum TEXT] SOURCE_PATH DEST_PATH\n"
-
-    Skips empty lines and allows comments beginning with "#".
-
-    \b
-    If you use `--batch` and a commandline SOURCE_PATH and/or DEST_PATH, these
-    paths will be used as dir prefixes to any paths on stdin.
-
-    \b
-    Sync Levels
-    ===
-
-    Sync Levels are ways to decide whether or not files are copied, with the
-    following definitions:
-
-    EXISTS: Determine whether or not to transfer based on file existence.
-    If the destination file is absent, do the transfer.
-
-    SIZE: Determine whether or not to transfer based on the size of the file.
-    If destination file size does not match the source, do the transfer.
-
-    MTIME: Determine whether or not to transfer based on modification times.
-    If source has a newer modififed time than the destination, do the transfer.
-
-    CHECKSUM: Determine whether or not to transfer based on checksums of file
-    contents.
-    If source and destination contents differ, as determined by a checksum of
-    their contents, do the transfer.
-
-    If a transfer fails, CHECKSUM must be used to restart the transfer.
-    All other levels can lead to data corruption.
-    """
-    ),
-)
-@common_options
+@command("transfer", short_help="Submit a transfer task (asynchronous)")
 @task_submission_options
 @click.option(
     "--recursive",
     "-r",
     is_flag=True,
-    help=(
-        "SOURCE_PATH and DEST_PATH are both directories, do a recursive dir transfer"
-    ),
+    help="SOURCE_PATH and DEST_PATH are both directories, do a recursive dir transfer",
 )
 @click.option(
     "--sync-level",
@@ -94,19 +35,19 @@ from globus_cli.services.transfer import autoactivate, get_client
     "--preserve-mtime",
     is_flag=True,
     default=False,
-    help=("Preserve file and directory modification times."),
+    help="Preserve file and directory modification times.",
 )
 @click.option(
     "--verify-checksum/--no-verify-checksum",
     default=True,
     show_default=True,
-    help=("Verify checksum after transfer."),
+    help="Verify checksum after transfer.",
 )
 @click.option(
     "--encrypt",
     is_flag=True,
     default=False,
-    help=("Encrypt data sent through the network."),
+    help="Encrypt data sent through the network.",
 )
 @click.option(
     "--delete",
@@ -176,7 +117,55 @@ def transfer_command(
     perf_udt,
 ):
     """
-    Executor for `globus transfer`
+    Copy a file or directory from one endpoint to another as an asynchronous
+    task.
+
+    \b
+    Batched Input
+    ===
+
+    If you use `SOURCE_PATH` and `DEST_PATH` without the `--batch` flag, you
+    will submit a single-file or single-directory transfer task.
+    This has behavior similar to `cp` and `cp -r`, across endpoints of course.
+
+    Using `--batch`, `globus transfer` can submit a task which transfers
+    multiple files or directories. Paths to transfer are taken from stdin.
+    Lines are split on spaces, respecting quotes, and every line is treated as
+    a file or directory to transfer.
+
+    \b
+    Lines are of the form
+    [--recursive] [--external-checksum TEXT] SOURCE_PATH DEST_PATH\n
+
+    Skips empty lines and allows comments beginning with "#".
+
+    \b
+    If you use `--batch` and a commandline SOURCE_PATH and/or DEST_PATH, these
+    paths will be used as dir prefixes to any paths on stdin.
+
+    \b
+    Sync Levels
+    ===
+
+    Sync Levels are ways to decide whether or not files are copied, with the
+    following definitions:
+
+    EXISTS: Determine whether or not to transfer based on file existence.
+    If the destination file is absent, do the transfer.
+
+    SIZE: Determine whether or not to transfer based on the size of the file.
+    If destination file size does not match the source, do the transfer.
+
+    MTIME: Determine whether or not to transfer based on modification times.
+    If source has a newer modififed time than the destination, do the transfer.
+
+    CHECKSUM: Determine whether or not to transfer based on checksums of file
+    contents.
+    If source and destination contents differ, as determined by a checksum of
+    their contents, do the transfer.
+
+    If a transfer fails, CHECKSUM must be used to restart the transfer.
+    All other levels can lead to data corruption.
     """
     source_endpoint, cmd_source_path = source
     dest_endpoint, cmd_dest_path = destination
@@ -258,7 +247,7 @@ def transfer_command(
             """
             if recursive and external_checksum:
                 raise click.UsageError(
-                    "--recursive and --external-checksum " "are mutually exclusive"
+                    "--recursive and --external-checksum are mutually exclusive"
                 )
             transfer_data.add_item(
                 str(source_path),
