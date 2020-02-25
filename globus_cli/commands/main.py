@@ -2,6 +2,7 @@ from globus_cli.commands.bookmark import bookmark_command
 from globus_cli.commands.config import config_command
 from globus_cli.commands.delete import delete_command
 from globus_cli.commands.endpoint import endpoint_command
+from globus_cli.commands.endpoint_manager import endpoint_manager_command
 from globus_cli.commands.get_identities import get_identities_command
 from globus_cli.commands.list_commands import list_commands
 from globus_cli.commands.login import login_command
@@ -48,6 +49,7 @@ main.add_command(rename_command)
 main.add_command(delete_command)
 main.add_command(rm_command)
 main.add_command(transfer_command)
+main.add_command(endpoint_manager_command)
 
 main.add_command(endpoint_command)
 main.add_command(bookmark_command)
