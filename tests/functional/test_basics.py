@@ -1,10 +1,4 @@
-import json
-
 from tests.constants import GO_EP1_ID, GO_EP2_ID
-from tests.utils import on_windows
-
-# TODO: remove this as part of handling #455
-PATHSEP = "\\" if on_windows() else "/"
 
 
 def test_parsing(run_line):
@@ -126,25 +120,41 @@ def test_transfer_batchmode_dryrun(run_line):
         + str(GO_EP2_ID),
         stdin=batch_input,
     )
-    # rely on json.dumps() in order to get the quoting right in the Windows
-    # case
-    # FIXME: this should be removed after we resolve #455
-    for src, dst in [
-        ("abc", "{}def".format(PATHSEP)),
-        ("{}xyz".format(PATHSEP), "p{sep}q{sep}r".format(sep=PATHSEP)),
-    ]:
-        assert '"source_path": {}'.format(json.dumps(src)) in result.output
-        assert '"destination_path": {}'.format(json.dumps(dst)) in result.output
+    for src, dst in [("abc", "/def"), ("/xyz", "p/q/r")]:
+        assert '"source_path": "{}"'.format(src) in result.output
+        assert '"destination_path": "{}"'.format(dst) in result.output
 
 
 def test_delete_batchmode_dryrun(run_line):
     """
     Dry-runs a delete in batchmode
     """
-    batch_input = u"abc/def\n/xyz\n"
+    batch_input = u"abc/def\n/xyz\nabcdef\nabc/def/../xyz\n"
     result = run_line(
         "globus delete --batch --dry-run " + str(GO_EP1_ID), stdin=batch_input
     )
-    assert ("\n".join(("Path   ", "-------", "abc{sep}def", "{sep}xyz   \n"))).format(
-        sep=PATHSEP
-    ) == result.output
+    assert (
+        "\n".join(
+            ("Path   ", "-------", "abc/def", "/xyz   ", "abcdef ", "abc/xyz", "")
+        )
+        == result.output
+    )
+
+    batch_input = u"abc/def\n/xyz\n../foo\n"
+    result = run_line(
+        "globus delete --batch --dry-run {}:foo/bar/./baz".format(GO_EP1_ID),
+        stdin=batch_input,
+    )
+    assert (
+        "\n".join(
+            (
+                "Path               ",
+                "-------------------",
+                "foo/bar/baz/abc/def",
+                "/xyz               ",
+                "foo/bar/foo        ",
+                "",
+            )
+        )
+        == result.output
+    )
