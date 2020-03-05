@@ -13,4 +13,4 @@ def print_command_hint(message):
     before printing a given command hint message
     """
     if term_is_interactive() and err_is_terminal() and out_is_terminal():
-        click.echo(message, err=True)
+        click.echo(click.style(message, fg="yellow"), err=True)
