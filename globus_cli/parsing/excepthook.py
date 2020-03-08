@@ -48,6 +48,8 @@ def session_hook(exception):
         click.echo("message: {}".format(message))
 
     identities = params.get("session_required_identities")
+    domains = params.get("session_required_single_domain")
+
     if identities:
         id_str = " ".join(identities)
         click.echo(
@@ -55,11 +57,15 @@ def session_hook(exception):
             "    globus session update {}\n\n"
             "to re-authenticate with the required identities".format(id_str)
         )
-    else:
+    elif domains:
+        domain_str = " ".join(["--domain " + domain for domain in domains])
         click.echo(
-            'Please use "globus session update" to re-authenticate '
-            "with specific identities".format(id_str)
+            "Please run\n\n"
+            "    globus session update {}\n\n"
+            "to re-authenticate with a required domain".format(domain_str)
         )
+    else:
+        click.echo('Please use "globus session update" to re-authenticate ')
 
     exit_with_mapped_status(exception.http_status)
 

@@ -18,17 +18,19 @@ from globus_cli.services.auth import get_auth_client
 )
 @no_local_server_option
 @click.argument("identities", nargs=-1, required=False)
+@click.option("--domain", multiple=True, help="authenticate with a specific domain")
 @click.option(
     "--all", is_flag=True, help="authenticate with every identity in your identity set"
 )
-def session_update(identities, no_local_server, all):
+def session_update(identities, no_local_server, all, domain):
     """
     Update your current CLI auth session by authenticating
     with specific identities.
     """
+    session_params = {"session_message": "Authenticate to update your CLI session."}
 
-    if (not (identities or all)) or (identities and all):
-        raise click.UsageError("Either give one or more IDENTITIES or use --all")
+    if not (bool(identities) ^ all ^ bool(domain)):
+        raise click.UsageError("Either give IDENTITIES or use --all or --domain")
     auth_client = get_auth_client()
 
     # if --all use every identity id in the user's identity set
@@ -36,6 +38,7 @@ def session_update(identities, no_local_server, all):
         res = auth_client.oauth2_userinfo()
         try:
             identity_ids = [user["sub"] for user in res["identity_set"]]
+            session_params["session_required_identities"] = ",".join(identity_ids)
         except KeyError:
             click.echo(
                 "Your current login does not have the consents required "
@@ -46,7 +49,7 @@ def session_update(identities, no_local_server, all):
             click.get_current_context().exit(1)
 
     # otherwise try to resolve any non uuid values to identity ids
-    else:
+    elif identities:
         identity_ids = []
         identity_names = []
 
@@ -69,11 +72,17 @@ def session_update(identities, no_local_server, all):
                     click.echo("No such identity {}".format(val), err=True)
                     click.get_current_context().exit(1)
 
-    # create session params once we have all identity ids
-    session_params = {
-        "session_required_identities": ",".join(identity_ids),
-        "session_message": "Authenticate to update your CLI session.",
-    }
+        session_params["session_required_identities"] = ",".join(identity_ids)
+
+    elif domain:
+        session_params["session_required_single_domain"] = ",".join(domain)
+
+        print(session_params)
+
+    else:
+        raise click.UsageError(
+            "Either give one or more IDENTITIES or use --all or --domain"
+        )
 
     # use a link login if remote session or user requested
     if no_local_server or is_remote_session():
