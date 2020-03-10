@@ -23,7 +23,7 @@ setup(
     version=version,
     packages=find_packages(exclude=["tests", "tests.*"]),
     install_requires=[
-        "globus-sdk==1.8.0",
+        "globus-sdk==1.9.0",
         "click>=7.0,<8.0",
         "jmespath==0.9.4",
         "configobj>=5.0.6,<6.0.0",
