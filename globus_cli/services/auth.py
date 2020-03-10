@@ -3,19 +3,17 @@ import re
 from globus_sdk import AuthClient, RefreshTokenAuthorizer
 
 from globus_cli import version
-from globus_cli.config import (
-    get_auth_tokens,
-    internal_auth_client,
-    set_auth_access_token,
-)
+from globus_cli.config import get_auth_tokens, internal_auth_client, set_auth_tokens
 
 # what qualifies as a valid Identity Name?
 _IDENTITY_NAME_REGEX = r"^[a-zA-Z0-9]+.*@[a-zA-z0-9-]+\..*[a-zA-Z]+$"
 
 
-def _update_access_tokens(token_response):
+def _update_tokens(token_response):
     tokens = token_response.by_resource_server["auth.globus.org"]
-    set_auth_access_token(tokens["access_token"], tokens["expires_at_seconds"])
+    set_auth_tokens(
+        tokens["access_token"], tokens["refresh_token"], tokens["expires_at_seconds"]
+    )
 
 
 def is_valid_identity_name(identity_name):
@@ -41,7 +39,7 @@ def get_auth_client():
             internal_auth_client(),
             tokens["access_token"],
             tokens["access_token_expires"],
-            on_refresh=_update_access_tokens,
+            on_refresh=_update_tokens,
         )
 
     client = AuthClient(authorizer=authorizer, app_name=version.app_name)
