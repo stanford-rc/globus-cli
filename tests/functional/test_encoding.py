@@ -226,8 +226,3 @@ def test_invalid_utf8_bytes(run_line):
         "globus mkdir {}:~/{}".format(GO_EP1_ID, byte_name), assert_exit_code=1
     ).output
     assert "UnicodeDecodeError" in make_output
-
-    create_output = run_line(
-        "globus endpoint create --server {}".format(byte_name), assert_exit_code=1
-    ).output
-    assert "UnicodeDecodeError" in create_output
