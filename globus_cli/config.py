@@ -157,8 +157,9 @@ def get_auth_tokens():
     }
 
 
-def set_auth_access_token(token, expires_at):
-    write_option(AUTH_AT_OPTNAME, token)
+def set_auth_tokens(access_token, refresh_token, expires_at):
+    write_option(AUTH_AT_OPTNAME, access_token)
+    write_option(AUTH_RT_OPTNAME, refresh_token)
     write_option(AUTH_AT_EXPIRES_OPTNAME, expires_at)
 
 
@@ -174,8 +175,9 @@ def get_transfer_tokens():
     }
 
 
-def set_transfer_access_token(token, expires_at):
-    write_option(TRANSFER_AT_OPTNAME, token)
+def set_transfer_tokens(access_token, refresh_token, expires_at):
+    write_option(TRANSFER_AT_OPTNAME, access_token)
+    write_option(TRANSFER_RT_OPTNAME, refresh_token)
     write_option(TRANSFER_AT_EXPIRES_OPTNAME, expires_at)
 
 

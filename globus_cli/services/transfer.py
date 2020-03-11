@@ -13,7 +13,7 @@ from globus_cli import version
 from globus_cli.config import (
     get_transfer_tokens,
     internal_auth_client,
-    set_transfer_access_token,
+    set_transfer_tokens,
 )
 from globus_cli.parsing import EXPLICIT_NULL
 from globus_cli.safeio import FORMAT_SILENT, formatted_print
@@ -103,9 +103,11 @@ class RetryingTransferClient(TransferClient):
         return RecursiveLsResponse(self, endpoint_id, depth, filter_after_first, params)
 
 
-def _update_access_tokens(token_response):
+def _update_tokens(token_response):
     tokens = token_response.by_resource_server["transfer.api.globus.org"]
-    set_transfer_access_token(tokens["access_token"], tokens["expires_at_seconds"])
+    set_transfer_tokens(
+        tokens["access_token"], tokens["refresh_token"], tokens["expires_at_seconds"]
+    )
 
 
 def get_client():
@@ -119,7 +121,7 @@ def get_client():
             internal_auth_client(),
             tokens["access_token"],
             tokens["access_token_expires"],
-            on_refresh=_update_access_tokens,
+            on_refresh=_update_tokens,
         )
 
     return RetryingTransferClient(
