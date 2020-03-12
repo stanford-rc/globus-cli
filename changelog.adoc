@@ -1,5 +1,41 @@
 = CLI Changelog
 
+== 1.12.0
+
+Bugfixes:
+
+* If a new `refresh_token` is issued when a token refreshes, it will be stored
+  correctly.
+
+* Paths being joined for `--batch` mode for `globus transfer` and
+  `globus delete` on Windows were joined incorrectly with the platform path
+  separator (`\`). They are now joined correctly with `/`
+
+Enhancements:
+
+* Error and hint outputs are styled using colors when the output is being
+  written to a terminal.
+
+  ** Supports macOS and Linux by default using ANSI colors.
+
+  ** You can install colorama (`pip install colorama`) in the same
+     environment as the CLI to get color support on Windows.
+
+* Endpoints whose activation requirements do not include any myproxy
+  requirements now give an informative error message if myproxy activation is
+  attempted
+
+* Add support for `--external-checksum` and `--checksum-algorithm` in
+  `globus transfer` commands
+
+Other:
+
+* Internally, use the `globus_sdk.IdentityMap` construct, not a custom mapping type.
+
+* Remove official support for python3.4, add support for python3.8
+
+* Improvements to help text
+
 == 1.11.0
 
 Enhancements:
