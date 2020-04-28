@@ -18,9 +18,15 @@ from globus_cli.services.auth import get_auth_client
 )
 @no_local_server_option
 @click.argument("identities", nargs=-1, required=False)
-@click.option("--domain", multiple=True, help="authenticate with a specific domain")
 @click.option(
-    "--all", is_flag=True, help="authenticate with every identity in your identity set"
+    "--domain", multiple=True,
+    help="authenticate with a specific domain requirement. Can be passed "
+         "multiple times if multiple domains are required. "
+         "Mutually exclusive with IDENTITIES and --all")
+@click.option(
+    "--all", is_flag=True,
+    help="authenticate with every identity in your identity set. Mutually "
+         "exclusive with IDENTITIES and --domain"
 )
 def session_update(identities, no_local_server, all, domain):
     """
