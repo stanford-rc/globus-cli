@@ -1,5 +1,13 @@
 = CLI Changelog
 
+== 1.13.0
+
+Enhancements:
+
+* Add a new command, `globus endpoint set-subscription-id`, which allows
+  Subscription Managers to set the subscription on Endpoints where they may
+  not have administrative privileges
+
 == 1.12.0
 
 Bugfixes:
