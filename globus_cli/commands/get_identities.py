@@ -45,7 +45,8 @@ def _try_b32_decode(v):
 
 @command("get-identities", short_help="Lookup Globus Auth Identities")
 @click.argument("values", required=True, nargs=-1)
-def get_identities_command(values):
+@click.option("--provision", hidden=True, is_flag=True)
+def get_identities_command(values, provision):
     """
     Lookup Globus Auth Identities given one or more uuids
     and/or usernames. Either resolves each uuid to a username and
@@ -70,9 +71,11 @@ def get_identities_command(values):
     # then combine the calls into one response
     results = []
     if len(ids):
-        results += client.get_identities(ids=ids)["identities"]
+        results += client.get_identities(ids=ids, provision=provision)["identities"]
     if len(usernames):
-        results += client.get_identities(usernames=usernames)["identities"]
+        results += client.get_identities(usernames=usernames, provision=provision)[
+            "identities"
+        ]
     res = GlobusResponse({"identities": results})
 
     def _custom_text_format(identities):
