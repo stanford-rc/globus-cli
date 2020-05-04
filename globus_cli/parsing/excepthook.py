@@ -49,6 +49,7 @@ def session_hook(exception):
 
     identities = params.get("session_required_identities")
     domains = params.get("session_required_single_domain")
+    scopes = params.get("required_scopes")
 
     if identities:
         id_str = " ".join(identities)
@@ -67,6 +68,21 @@ def session_hook(exception):
     else:
         click.echo('Please use "globus session update" to re-authenticate ')
 
+    exit_with_mapped_status(exception.http_status)
+
+
+def scope_hook(exception):
+    """
+    Expects an exception with a required_scopes field in its raw_json
+    """
+    click.echo(
+        "The resource you are trying to access requires you to "
+        "consent to specific scopes. Please run\n\n"
+        "    globus consent {}\n\n"
+        "to consent to the required scopes".format(" ".join(
+            exception.raw_json["required_scopes"]))
+
+    )
     exit_with_mapped_status(exception.http_status)
 
 
@@ -175,6 +191,13 @@ def custom_except_hook(exc_info):
         and "authorization_parameters" in exception.raw_json
     ):
         session_hook(exception)
+
+    elif (
+        isinstance(exception, exc.GlobusAPIError)
+        and exception.raw_json
+        and "required_scopes" in exception.raw_json
+    ):
+        scope_hook(exception)
 
     # handle the Globus-raised errors with our special hooks
     # these will present the output (on stderr) as JSON

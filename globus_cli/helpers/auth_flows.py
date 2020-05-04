@@ -15,14 +15,15 @@ from globus_cli.config import (
 )
 from globus_cli.helpers.local_server import LocalServerError, start_local_server
 
-SCOPES = (
+DEFAULT_SCOPES = (
     "openid profile email "
     "urn:globus:auth:scope:auth.globus.org:view_identity_set "
     "urn:globus:auth:scope:transfer.api.globus.org:all"
 )
 
 
-def do_link_auth_flow(session_params=None, force_new_client=False):
+def do_link_auth_flow(
+        session_params=None, force_new_client=False, scopes=DEFAULT_SCOPES):
     """
     Prompts the user with a link to authenticate with globus auth
     and authorize the CLI to act on their behalf.
@@ -38,7 +39,7 @@ def do_link_auth_flow(session_params=None, force_new_client=False):
     auth_client.oauth2_start_flow(
         redirect_uri=auth_client.base_url + "v2/web/auth-code",
         refresh_tokens=True,
-        requested_scopes=SCOPES,
+        requested_scopes=scopes,
     )
 
     # prompt
@@ -61,7 +62,8 @@ def do_link_auth_flow(session_params=None, force_new_client=False):
     return True
 
 
-def do_local_server_auth_flow(session_params=None, force_new_client=False):
+def do_local_server_auth_flow(
+        session_params=None, force_new_client=False, scopes=DEFAULT_SCOPES):
     """
     Starts a local http server, opens a browser to have the user authenticate,
     and gets the code redirected to the server (no copy and pasting required)
@@ -78,7 +80,7 @@ def do_local_server_auth_flow(session_params=None, force_new_client=False):
             requires_instance=True, force_new_client=force_new_client
         )
         auth_client.oauth2_start_flow(
-            refresh_tokens=True, redirect_uri=redirect_uri, requested_scopes=SCOPES
+            refresh_tokens=True, redirect_uri=redirect_uri, requested_scopes=scopes
         )
         additional_params = {"prompt": "login"}
         additional_params.update(session_params)
