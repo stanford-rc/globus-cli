@@ -116,28 +116,42 @@ def exchange_code_and_store_config(auth_client, auth_code):
     tkn = tkn.by_resource_server
 
     # extract access tokens from final response
-    transfer_at = tkn["transfer.api.globus.org"]["access_token"]
-    transfer_at_expires = tkn["transfer.api.globus.org"]["expires_at_seconds"]
-    transfer_rt = tkn["transfer.api.globus.org"]["refresh_token"]
-    auth_at = tkn["auth.globus.org"]["access_token"]
-    auth_at_expires = tkn["auth.globus.org"]["expires_at_seconds"]
-    auth_rt = tkn["auth.globus.org"]["refresh_token"]
+    transfer_tkns = tkn.get("transfer.api.globus.org")
+    if transfer_tkns:
+        transfer_at = transfer_tkns["access_token"]
+        transfer_at_expires = transfer_tkns["expires_at_seconds"]
+        transfer_rt = transfer_tkns["refresh_token"]
 
-    # revoke any existing tokens
-    for token_opt in (
-        TRANSFER_RT_OPTNAME,
-        TRANSFER_AT_OPTNAME,
-        AUTH_RT_OPTNAME,
-        AUTH_AT_OPTNAME,
-    ):
-        token = lookup_option(token_opt)
-        if token:
-            auth_client.oauth2_revoke_token(token)
+        # revoke any existing tokens
+        for token_opt in (
+            TRANSFER_RT_OPTNAME,
+            TRANSFER_AT_OPTNAME,
+        ):
+            token = lookup_option(token_opt)
+            if token:
+                auth_client.oauth2_revoke_token(token)
 
-    # write new tokens to config
-    write_option(TRANSFER_RT_OPTNAME, transfer_rt)
-    write_option(TRANSFER_AT_OPTNAME, transfer_at)
-    write_option(TRANSFER_AT_EXPIRES_OPTNAME, transfer_at_expires)
-    write_option(AUTH_RT_OPTNAME, auth_rt)
-    write_option(AUTH_AT_OPTNAME, auth_at)
-    write_option(AUTH_AT_EXPIRES_OPTNAME, auth_at_expires)
+        # write new tokens to config
+        write_option(TRANSFER_RT_OPTNAME, transfer_rt)
+        write_option(TRANSFER_AT_OPTNAME, transfer_at)
+        write_option(TRANSFER_AT_EXPIRES_OPTNAME, transfer_at_expires)
+
+    auth_tkns = tkn.get("auth.globus.org")
+    if auth_tkns:
+        auth_at = auth_tkns["access_token"]
+        auth_at_expires = auth_tkns["expires_at_seconds"]
+        auth_rt = auth_tkns["refresh_token"]
+
+        # revoke any existing tokens
+        for token_opt in (
+            AUTH_RT_OPTNAME,
+            AUTH_AT_OPTNAME,
+        ):
+            token = lookup_option(token_opt)
+            if token:
+                auth_client.oauth2_revoke_token(token)
+
+        # write new tokens to config
+        write_option(AUTH_RT_OPTNAME, auth_rt)
+        write_option(AUTH_AT_OPTNAME, auth_at)
+        write_option(AUTH_AT_EXPIRES_OPTNAME, auth_at_expires)
