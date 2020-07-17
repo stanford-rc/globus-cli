@@ -1,3 +1,5 @@
+import functools
+
 import click
 
 from globus_cli.parsing.command_state import (
@@ -762,6 +764,7 @@ def server_add_and_update_opts(*args, **kwargs):
 
 def security_principal_opts(*args, **kwargs):
     def preprocess_security_principals(f):
+        @functools.wraps(f)
         def decorator(*args, **kwargs):
             identity = kwargs.pop("identity", None)
             group = kwargs.pop("group", None)
