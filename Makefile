@@ -10,9 +10,11 @@ CLI_VERSION=$(shell grep '^__version__' globus_cli/version.py | cut -d '"' -f2)
 localdev: .venv
 
 
-.PHONY: lint test
+.PHONY: lint test adoc
 lint:
 	tox -e lint
+adoc:
+	tox -e adoc
 test:
 	tox
 
