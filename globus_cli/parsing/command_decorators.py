@@ -41,6 +41,8 @@ def command(*args, **kwargs):
         if "cls" not in kwargs:
             kwargs["cls"] = GlobusCommand
 
+        kwargs["globus_disable_opts"] = disable_opts
+
         return common_options(disable_options=disable_opts)(
             click.command(*args, **kwargs)(func)
         )

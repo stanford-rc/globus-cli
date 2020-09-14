@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""manpage-like asciidoc generator for CLI web pages
+"""asciidoc generator for CLI web pages
 
-based heavily on click-man
+based originally on click-man, but significantly specialized for the globus-cli
 """
 import os
 import time
@@ -22,7 +22,7 @@ TARGET_DIR = os.path.join(HERE, "adoc")
 DATE = time.strftime("%Y-%m-%d", time.gmtime())
 
 
-DEFAULT_EXIT_STATUS_SECTION = """== EXIT STATUS
+EXIT_STATUS_SECTION = """== EXIT STATUS
 
 0 on success.
 
@@ -31,15 +31,32 @@ used to change exit behavior on http error codes.
 
 2 if the command was used improperly.
 """
+EXIT_STATUS_NOHTTP_SECTION = """== EXIT STATUS
+
+0 on success.
+
+1 if an error occurred
+
+2 if the command was used improperly.
+"""
 
 
 def _format_option(optstr):
     opt = optstr.split()
     optnames, optparams = [], []
+    slashopt = False
     for o in opt:
-        if not optparams and o.startswith("-"):
-            optnames.append(o)
+        if slashopt:
+            slashopt = False
+            optnames[-1] = optnames[-1] + " / " + o
             continue
+        if not optparams:
+            if o.startswith("-"):
+                optnames.append(o)
+                continue
+            elif o == "/":
+                slashopt = True
+                continue
         optparams.append(o)
     optnames = " ".join(optnames)
 
@@ -68,7 +85,7 @@ class AdocPage:
     def __init__(self, ctx):
         self.commandname = ctx.command_path
         self.short_help = ctx.command.get_short_help_str()
-        self.description = ctx.command.help
+        self.description = ctx.command.help.replace("\b\n", "")
         self.synopsis = _format_synopsis(ctx.command.collect_usage_pieces(ctx))
         self.options = [
             y
@@ -81,6 +98,7 @@ class AdocPage:
         ]
         self.output = ctx.command.adoc_output
         self.examples = ctx.command.adoc_examples
+        self.uses_http = "map_http_status" not in ctx.command.globus_disable_opts
 
     def __str__(self):
         sections = []
@@ -131,7 +149,11 @@ class AdocPage:
             if not self.examples.endswith("\n"):
                 sections.append("")
 
-        sections.append(DEFAULT_EXIT_STATUS_SECTION)
+        if self.uses_http:
+            sections.append(EXIT_STATUS_SECTION)
+        else:
+            sections.append(EXIT_STATUS_NOHTTP_SECTION)
+
         return "\n".join(sections)
 
 

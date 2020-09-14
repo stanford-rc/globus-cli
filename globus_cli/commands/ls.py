@@ -79,6 +79,8 @@ def ls_command(
 
     \b
     "~*.txt" matches all .txt files, for example
+
+    {AUTOMATIC_ACTIVATION}
     """
     endpoint_id, path = endpoint_plus_path
 

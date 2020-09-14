@@ -40,6 +40,8 @@ def rm_command(
     complete.
 
     Output is similar to 'globus task wait'
+
+    {AUTOMATIC_ACTIVATION}
     """
     endpoint_id, path = endpoint_plus_path
 

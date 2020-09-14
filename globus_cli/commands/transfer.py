@@ -166,6 +166,8 @@ def transfer_command(
 
     If a transfer fails, CHECKSUM must be used to restart the transfer.
     All other levels can lead to data corruption.
+
+    {AUTOMATIC_ACTIVATION}
     """
     source_endpoint, cmd_source_path = source
     dest_endpoint, cmd_dest_path = destination

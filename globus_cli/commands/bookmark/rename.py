@@ -6,7 +6,21 @@ from globus_cli.safeio import formatted_print
 from globus_cli.services.transfer import get_client
 
 
-@command("rename")
+@command(
+    "rename",
+    adoc_output=(
+        "When textual output is requested, the only output on a successful rename "
+        "is a success message."
+    ),
+    adoc_examples="""
+Rename a bookmark named "oldname" to "newname":
+
+[source,bash]
+----
+$ globus bookmark rename oldname newname
+----
+""",
+)
 @click.argument("bookmark_id_or_name")
 @click.argument("new_bookmark_name")
 def bookmark_rename(bookmark_id_or_name, new_bookmark_name):

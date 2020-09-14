@@ -8,7 +8,10 @@ from globus_cli.services.transfer import autoactivate, get_client
 @command("mkdir")
 @click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_REQPATH)
 def mkdir_command(endpoint_plus_path):
-    """Make a directory on an endpoint"""
+    """Make a directory on an endpoint
+
+    {AUTOMATIC_ACTIVATION}
+    """
     endpoint_id, path = endpoint_plus_path
 
     client = get_client()

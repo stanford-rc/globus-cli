@@ -12,11 +12,28 @@ class GlobusCommand(click.Command):
     and
       "adoc_examples"
     with defaults of None
+
+    It also automatically runs string formatting on command helptext to allow the
+    inclusion of common strings (e.g. autoactivation help).
     """
+
+    AUTOMATIC_ACTIVATION_HELPTEXT = """=== Automatic Endpoint Activation
+
+This command requires all endpoints it uses to be activated. It will attempt to
+auto-activate any endpoints that are not active, but if auto-activation fails,
+you will need to manually activate the endpoint. See 'globus endpoint activate'
+for more details."""
 
     def __init__(self, *args, **kwargs):
         self.adoc_output = kwargs.pop("adoc_output", None)
         self.adoc_examples = kwargs.pop("adoc_examples", None)
+        self.globus_disable_opts = kwargs.pop("globus_disable_opts", [])
+
+        helptext = kwargs.pop("help", None)
+        if helptext:
+            kwargs["help"] = helptext.format(
+                AUTOMATIC_ACTIVATION=self.AUTOMATIC_ACTIVATION_HELPTEXT
+            )
         super(GlobusCommand, self).__init__(*args, **kwargs)
 
 
