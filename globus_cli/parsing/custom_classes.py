@@ -5,6 +5,21 @@ import click
 from globus_cli.parsing.excepthook import custom_except_hook
 
 
+class GlobusCommand(click.Command):
+    """
+    A custom command class which stores the added attributes
+      "adoc_output"
+    and
+      "adoc_examples"
+    with defaults of None
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.adoc_output = kwargs.pop("adoc_output", None)
+        self.adoc_examples = kwargs.pop("adoc_examples", None)
+        super(GlobusCommand, self).__init__(*args, **kwargs)
+
+
 class GlobusCommandGroup(click.Group):
     """
     This is a click.Group with any customizations which we deem necessary

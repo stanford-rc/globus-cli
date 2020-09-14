@@ -2,10 +2,12 @@ import copy
 
 import click
 
+from globus_cli.parsing import command
+
 _command_length = 16
 
 
-@click.command(
+@command(
     "list-commands",
     short_help="List all CLI Commands",
     help=(

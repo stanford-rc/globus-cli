@@ -22,6 +22,17 @@ TARGET_DIR = os.path.join(HERE, "adoc")
 DATE = time.strftime("%Y-%m-%d", time.gmtime())
 
 
+DEFAULT_EXIT_STATUS_SECTION = """== EXIT STATUS
+
+0 on success.
+
+1 if a network or server error occurred, unless --map-http-status has been
+used to change exit behavior on http error codes.
+
+2 if the command was used improperly.
+"""
+
+
 def _format_option(optstr):
     opt = optstr.split()
     optnames, optparams = [], []
@@ -68,6 +79,8 @@ class AdocPage:
             ]
             if y
         ]
+        self.output = ctx.command.adoc_output
+        self.examples = ctx.command.adoc_examples
 
     def __str__(self):
         sections = []
@@ -98,8 +111,27 @@ class AdocPage:
                     "\n" + _format_option(opt) + "\n\n" + _format_multiline_str(desc)
                     for opt, desc in self.options
                 )
+                + "\n"
             )
 
+        if self.output:
+            sections.append(
+                f"""== OUTPUT
+
+{self.output}"""
+            )
+            if not self.output.endswith("\n"):
+                sections.append("")
+        if self.examples:
+            sections.append(
+                f"""== EXAMPLES
+
+{self.examples}"""
+            )
+            if not self.examples.endswith("\n"):
+                sections.append("")
+
+        sections.append(DEFAULT_EXIT_STATUS_SECTION)
         return "\n".join(sections)
 
 
