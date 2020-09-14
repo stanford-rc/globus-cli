@@ -15,7 +15,32 @@ COMMON_FIELDS = [("Message", "message"), ("Endpoint ID", "id")]
 GCP_FIELDS = [("Setup Key", "globus_connect_setup_key")]
 
 
-@command("create", short_help="Create a new endpoint")
+@command(
+    "create",
+    short_help="Create a new endpoint",
+    adoc_examples="""Create a Globus Connect Personal endpoint:
+
+[source,bash]
+----
+$ globus endpoint create --personal my_gcp_endpoint
+----
+
+Create a Globus Connect Server endpoint:
+
+[source,bash]
+----
+$ globus endpoint create --server my_gcs_endpoint
+----
+
+Create a shared endpoint hosted on another endpoint:
+
+[source,bash]
+----
+$ host_ep=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ globus endpoint create --shared host_ep:~/ my_shared_endpoint
+----
+""",
+)
 @endpoint_create_and_update_params(create=True)
 @one_use_option(
     "--personal",

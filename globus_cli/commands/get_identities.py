@@ -43,14 +43,46 @@ def _try_b32_decode(v):
         return None
 
 
-@command("get-identities", short_help="Lookup Globus Auth Identities")
+@command(
+    "get-identities",
+    short_help="Lookup Globus Auth Identities",
+    adoc_examples="""Resolve a user ID (outputs the user's username)
+
+[source,bash]
+----
+$ globus get-identities c699d42e-d274-11e5-bf75-1fc5bf53bb24
+----
+
+Resolve a username (outputs the user's ID)
+
+[source,bash]
+----
+$ globus get-identities go@globusid.org
+----
+
+Resolve multiple usernames and or IDs with tabular output
+
+[source,bash]
+----
+$ globus get-identities --verbose go@globusid.org clitester1a@globusid.org \
+84942ca8-17c4-4080-9036-2f58e0093869
+----
+""",
+)
 @click.argument("values", required=True, nargs=-1)
 @click.option("--provision", hidden=True, is_flag=True)
 def get_identities_command(values, provision):
     """
     Lookup Globus Auth Identities given one or more uuids
-    and/or usernames. Either resolves each uuid to a username and
-    vice versa, or use --verbose for tabular output
+    and/or usernames.
+
+    Default output resolves each UUID to a username and each username to a UUID,
+    with one output per line in the same order as the inputs.
+    If a particular input had no corresponding identity in Globus Auth,
+    "NO_SUCH_IDENTITY" is printed instead.
+
+    If more fields are desired, --verbose will give tabular output, but does not
+    guarantee order and ignores inputs with no corresponding Globus Auth identity.
     """
     client = get_auth_client()
 

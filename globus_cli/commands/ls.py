@@ -9,7 +9,72 @@ from globus_cli.services.transfer import (
 )
 
 
-@command("ls", short_help="List endpoint directory contents")
+@command(
+    "ls",
+    short_help="List endpoint directory contents",
+    adoc_examples=r"""List files and dirs in your default directory on an endpoint
+
+[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ globus ls $ep_id
+----
+
+List files and dirs on a specific path on an endpoint
+
+[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ globus ls $ep_id:/share/godata/
+----
+
+Do a *globus ls* requesting JSON formatted output
+
+[source,bash]
+----
+$ globus ls $ep_id:/share/godata/ --format=JSON
+----
+
+Take specific fields from the JSON output and format them into unix-friendly
+columnar output using '--jmespath' to query and '--format UNIX' to format
+output:
+
+[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$  globus ls $ep_id:/share/godata/ \
+    --jmespath 'DATA[*].[type, permissions, name, last_modified]' \
+    --format UNIX
+----
+
+=== Filtering
+
+List files and dirs on a specific path on an endpoint, filtering in various
+ways.
+
+[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ globus ls $ep_id:/share/godata/ --filter '~*.txt'  # all txt files
+$ globus ls $ep_id:/share/godata/ --filter '!~file1.*'  # not starting in "file1."
+$ globus ls $ep_id:/share/godata/ --filter '~*ile3.tx*'  # anything with "ile3.tx"
+$ globus ls $ep_id:/share/godata/ --filter '=file2.txt'  # only "file2.txt"
+$ globus ls $ep_id:/share/godata/ --filter 'file2.txt'  # same as '=file2.txt'
+$ globus ls $ep_id:/share/godata/ --filter '!=file2.txt'  # anything but "file2.txt"
+----
+
+Compare a grep with a *globus ls --filter*. These two are the same, but the
+filter will be faster because it doesn't require that filenames which are
+filtered out are returned to the CLI:
+
+[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ globus ls $ep_id:/share/godata/ | egrep '.*\.txt$'  # done with grep, okay
+$ globus ls $ep_id:/share/godata/ --filter '~*.txt'  # done with --filter, better
+----
+""",
+)
 @click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_OPTPATH)
 @click.option(
     "--all",
@@ -59,11 +124,15 @@ def ls_command(
     filter_val,
 ):
     """
-    List the contents of a directory on an endpoint
+    List the contents of a directory on an endpoint. If no path is given, the default
+    directory on that endpoint will be used.
+
+    If using text output files and directories are printed with one entry per line in
+    alphabetical order.  Directories are always displayed with a trailing '/'.
+
 
     \b
-    Filtering
-    ===
+    === Filtering
 
     --filter takes "filter patterns" subject to the following rules.
 

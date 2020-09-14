@@ -5,10 +5,21 @@ from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import autoactivate, get_client
 
 
-@command("mkdir")
+@command(
+    "mkdir",
+    short_help="Create a directory on an endpoint",
+    adoc_examples="""Create a directory under your home directory:
+
+[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ mkdir ep_id:~/testfolder
+----
+""",
+)
 @click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_REQPATH)
 def mkdir_command(endpoint_plus_path):
-    """Make a directory on an endpoint
+    """Make a directory on an endpoint at the given path.
 
     {AUTOMATIC_ACTIVATION}
     """

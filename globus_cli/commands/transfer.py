@@ -12,7 +12,97 @@ from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
 from globus_cli.services.transfer import autoactivate, get_client
 
 
-@command("transfer", short_help="Submit a transfer task (asynchronous)")
+@command(
+    "transfer",
+    short_help="Submit a transfer task (asynchronous)",
+    adoc_examples="""Transfer a single file:
+
+[source,bash]
+----
+$ source_ep=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ dest_ep=ddb59af0-6d04-11e5-ba46-22000b92c6ec
+$ globus transfer $source_ep:/share/godata/file1.txt $dest_ep:~/mynewfile.txt
+----
+
+Transfer a directory recursively:
+
+[source,bash]
+----
+$ source_ep=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ dest_ep=ddb59af0-6d04-11e5-ba46-22000b92c6ec
+$ globus transfer $source_ep:/share/godata/ $dest_ep:~/mynewdir/ --recursive
+----
+
+Use the batch input method to transfer multiple files and directories:
+
+[source,bash]
+----
+$ source_ep=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ dest_ep=ddb59af0-6d04-11e5-ba46-22000b92c6ec
+$ globus transfer $source_ep $dest_ep --batch
+# lines starting with '#' are comments
+# and blank lines (for spacing) are allowed
+
+# files in the batch
+/share/godata/file1.txt ~/myfile1.txt
+/share/godata/file2.txt ~/myfile2.txt
+/share/godata/file3.txt ~/myfile3.txt
+# these are recursive transfers in the batch
+# you can use -r, --recursive, and put the option before or after
+/share/godata ~/mygodatadir -r
+--recursive godata mygodatadir2
+<EOF>
+----
+
+Use the batch input method to transfer multiple files and directories, with a
+prefix on the source and destination endpoints (this is identical to the case
+above, but much more concise):
+
+[source,bash]
+----
+$ source_ep=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ dest_ep=ddb59af0-6d04-11e5-ba46-22000b92c6ec
+$ globus transfer $source_ep:/share/ $dest_ep:~/ --batch
+godata/file1.txt myfile1.txt
+godata/file2.txt myfile2.txt
+godata/file3.txt myfile3.txt
+godata mygodatadir -r
+--recursive godata mygodatadir2
+<EOF>
+----
+
+
+Consume a batch of files to transfer from a data file, submit the transfer
+task, get back its task ID for use in `globus task wait`, wait for up to 30
+seconds for the task to complete, and then print a success or failure message.
+
+[source,bash]
+----
+$ cat my_file_batch.txt
+/share/godata/file1.txt ~/myfile1.txt
+/share/godata/file2.txt ~/myfile2.txt
+/share/godata/file3.txt ~/myfile3.txt
+----
+
+[source,bash]
+----
+source_ep=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+dest_ep=ddb59af0-6d04-11e5-ba46-22000b92c6ec
+
+task_id="$(globus transfer $source_ep $dest_ep \
+    --jmespath 'task_id' --format=UNIX \
+    --batch < my_file_batch.txt)"
+
+echo "Waiting on 'globus transfer' task '$task_id'"
+globus task wait "$task_id" --timeout 30
+if [ $? -eq 0 ]; then
+    echo "$task_id completed successfully";
+else
+    echo "$task_id failed!";
+fi
+----
+""",
+)
 @task_submission_options
 @click.option(
     "--recursive",
@@ -120,13 +210,27 @@ def transfer_command(
     Copy a file or directory from one endpoint to another as an asynchronous
     task.
 
+    'globus transfer' has two modes. Single target, which transfers one
+    file or one directory, and batch, which takes in several lines to transfer
+    multiple files or directories. See "Batch Input" below for more information.
+
+    'globus transfer' will always place the dest files in a
+    consistent, deterministic location.  The contents of a source directory will
+    be placed inside the dest directory.  A source file will be copied to
+    the dest file path, which must not be an existing  directory.  All
+    intermediate / parent directories on the dest will be automatically
+    created if they don't exist.
+
+    If the files or directories given as input are symbolic links, they are
+    followed.  However, no other symbolic links are followed and no symbolic links
+    are ever created on the dest.
+
     \b
-    Batched Input
-    ===
+    === Batched Input
 
     If you use `SOURCE_PATH` and `DEST_PATH` without the `--batch` flag, you
     will submit a single-file or single-directory transfer task.
-    This has behavior similar to `cp` and `cp -r`, across endpoints of course.
+    This has behavior similar to `cp` and `cp -r` across endpoints.
 
     Using `--batch`, `globus transfer` can submit a task which transfers
     multiple files or directories. Paths to transfer are taken from stdin.
@@ -144,8 +248,7 @@ def transfer_command(
     paths will be used as dir prefixes to any paths on stdin.
 
     \b
-    Sync Levels
-    ===
+    === Sync Levels
 
     Sync Levels are ways to decide whether or not files are copied, with the
     following definitions:

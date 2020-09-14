@@ -7,11 +7,9 @@ from globus_cli.parsing.excepthook import custom_except_hook
 
 class GlobusCommand(click.Command):
     """
-    A custom command class which stores the added attributes
-      "adoc_output"
-    and
-      "adoc_examples"
-    with defaults of None
+    A custom command class which stores the special attributes
+    of the form "adoc_*" with defaults of None. This lets us pass additional info to the
+    adoc generator.
 
     It also automatically runs string formatting on command helptext to allow the
     inclusion of common strings (e.g. autoactivation help).
@@ -28,6 +26,7 @@ for more details."""
         self.adoc_output = kwargs.pop("adoc_output", None)
         self.adoc_examples = kwargs.pop("adoc_examples", None)
         self.globus_disable_opts = kwargs.pop("globus_disable_opts", [])
+        self.adoc_exit_status = kwargs.pop("adoc_exit_status", None)
 
         helptext = kwargs.pop("help", None)
         if helptext:

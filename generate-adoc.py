@@ -99,6 +99,7 @@ class AdocPage:
         self.output = ctx.command.adoc_output
         self.examples = ctx.command.adoc_examples
         self.uses_http = "map_http_status" not in ctx.command.globus_disable_opts
+        self.exit_status_text = ctx.command.adoc_exit_status
 
     def __str__(self):
         sections = []
@@ -149,7 +150,15 @@ class AdocPage:
             if not self.examples.endswith("\n"):
                 sections.append("")
 
-        if self.uses_http:
+        if self.exit_status_text:
+            sections.append(
+                f"""== EXIT STATUS
+
+{self.exit_status_text}"""
+            )
+            if not self.exit_status_text.endswith("\n"):
+                sections.append("")
+        elif self.uses_http:
             sections.append(EXIT_STATUS_SECTION)
         else:
             sections.append(EXIT_STATUS_NOHTTP_SECTION)
