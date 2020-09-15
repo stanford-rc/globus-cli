@@ -12,7 +12,70 @@ def _format_date_callback(ctx, param, value):
     return value.strftime("%Y-%m-%d %H:%M:%S")
 
 
-@command("list")
+@command(
+    "list",
+    short_help="List your tasks",
+    adoc_output="""When text output is requested, the following fields are used:
+
+- 'Task ID'
+- 'Status'
+- 'Type'
+- 'Source Display Name'
+- 'Dest Display Name'
+- 'Label'
+""",
+    adoc_examples="""List results in a text table:
+
+[source,bash]
+----
+$ globus task list
+----
+
+List the first 100 tasks which were completed between May 2015 and July 2015,
+but whose labels aren't the exact string 'autolabel':
+
+[source,bash]
+----
+$ globus task list --limit 100 \
+    --filter-completed-after 2015-05-01 \
+    --filter-completed-before 2015-07-30 \
+    --filter-not-label 'autolabel' --exact
+----
+
+List active transfers in a tabular format suitable for consumption by unix
+tools:
+
+[source,bash]
+----
+$ globus task list --format unix \
+    --jmespath 'DATA[?status==`ACTIVE`].[task_id, source_endpoint_id, destination_endpoint_id, label]'
+----
+
+NOTE: 'destination_endpoint_id' will be 'None' in the case of Delete tasks.
+
+Cancel all tasks with expired credentials:
+
+[source,bash]
+----
+# careful: do not quote this output, but instead rely on the shell's
+# word-splitting for this for-loop
+for id in $(globus task list --filter-status=INACTIVE \
+                             --format=UNIX \
+                             --jmespath='DATA[*].task_id'); do
+    globus task cancel $id
+done
+----
+
+Print out task statuses with links to their pages in the web UI:
+
+[source,bash]
+----
+globus task list --format=unix --jmespath='DATA[*].[task_id, status]' | \
+    awk '{printf "Task %s is currently %s\n", $1, $2;
+          printf "View at https://app.globus.org/activity/%s\n\n", $1}'
+----
+""",  # noqa: E501
+)
 @click.option("--limit", default=10, show_default=True, help="Limit number of results.")
 @click.option(
     "--filter-task-id",
@@ -92,7 +155,12 @@ def task_list(
     filter_completed_after,
     filter_completed_before,
 ):
-    """List tasks for the current user"""
+    """
+    List tasks for the current user.
+
+    This lists your most recent tasks. The tasks displayed may be filtered by a number
+    of attributes, each with a separate commandline option.
+    """
 
     def _process_filterval(prefix, value, default=None):
         if value:

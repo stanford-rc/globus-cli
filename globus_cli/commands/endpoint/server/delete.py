@@ -49,15 +49,27 @@ def _detect_mode(server):
     return "hostname"
 
 
-@command("delete")
+@command(
+    "delete",
+    short_help="Delete a server belonging to an endpoint",
+    adoc_examples="""[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ server_id=294682
+$ globus endpoint server delete $ep_id $server_id
+----
+""",
+)
 @endpoint_id_arg
 @click.argument("server")
 def server_delete(endpoint_id, server):
     """
-    Delete a server belonging to an endpoint
+    Delete a server belonging to an endpoint.
 
     SERVER may be a server ID, HOSTNAME, HOSTNAME:PORT, or URI
-    ( SCHEME://HOSTNAME:PORT )
+    (`SCHEME://HOSTNAME:PORT`)
+
+    To get the IDs of servers to remove use 'globus endpoint server list'.
     """
     client = get_client()
 

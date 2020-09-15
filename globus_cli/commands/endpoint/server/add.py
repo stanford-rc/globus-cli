@@ -3,7 +3,18 @@ from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import assemble_generic_doc, get_client
 
 
-@command("add")
+@command(
+    "add",
+    short_help="Add a server to an endpoint",
+    adoc_examples="""Add a server with a url of gridftp.example.org to an endpoint
+
+[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ globus endpoint server add $ep_id --hostname gridftp.example.org
+----
+""",
+)
 @server_add_and_update_opts(add=True)
 @endpoint_id_arg
 def server_add(
@@ -15,7 +26,11 @@ def server_add(
     incoming_data_ports,
     outgoing_data_ports,
 ):
-    """Add a server to an endpoint"""
+    """
+    Add a server to an endpoint.
+
+    An endpoint must be a Globus Connect Server endpoint to have servers.
+    """
     client = get_client()
 
     server_doc = assemble_generic_doc(

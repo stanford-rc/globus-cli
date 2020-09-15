@@ -69,7 +69,56 @@ def print_task_detail(client, task_id):
     )
 
 
-@command("show")
+@command(
+    "show",
+    short_help="Show detailed information about a task",
+    adoc_output="""
+When text output is requested, output varies slightly between 'TRANSFER' and
+'DELETE' tasks, and between active and completed tasks.
+
+All of the following which apply will be shown:
+
+- 'Task ID'
+- 'Type'
+- 'Status'
+- 'Is Paused'
+- 'Label'
+- 'Files'
+- 'Directories'
+- 'Source Endpoint'
+- 'Source Endpoint ID'
+- 'Destination Endpoint'
+- 'Destination Endpoint ID'
+- 'Endpoint'
+- 'Endpoint ID'
+- 'Completion Time'
+- 'Deadline'
+- 'Details'
+- 'Request Time'
+- 'Bytes Transferred'
+- 'Bytes Per Second'
+- 'Faults'
+- 'Total Subtasks'
+- 'Subtasks Succeeded'
+- 'Subtasks Pending'
+- 'Subtasks Retrying'
+- 'Subtasks Failed'
+- 'Subtasks Canceled'
+- 'Subtasks Expired'
+
+If *--successful-transfers* is given, the following fields are used:
+
+- 'Source Path'
+- 'Destination Path'
+""",
+    adoc_examples="""Show detailed info about a task as text
+
+[source,bash]
+----
+$ globus task show TASK_ID
+----
+""",
+)
 @task_id_arg
 @click.option(
     "--successful-transfers",
@@ -79,7 +128,11 @@ def print_task_detail(client, task_id):
     help="Show files that were transferred as result of this task.",
 )
 def show_task(successful_transfers, task_id):
-    """Show detailed information about a specific task"""
+    """
+    Print information detailing the status and other info about a task.
+
+    The task may be pending, completed, or in progress.
+    """
     client = get_client()
 
     if successful_transfers:

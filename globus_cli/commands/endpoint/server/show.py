@@ -5,11 +5,23 @@ from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
 from globus_cli.services.transfer import get_client
 
 
-@command("show")
+@command(
+    "show",
+    short_help="Show an endpoint server",
+    adoc_examples="""[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ server_id=207976
+$ globus endpoint server show $ep_id $server_id
+----
+""",
+)
 @endpoint_id_arg
 @server_id_arg
 def server_show(endpoint_id, server_id):
-    """Show a server belonging to an endpoint"""
+    """
+    Display inofrmation about a server belonging to an endpoint.
+    """
     client = get_client()
 
     server_doc = client.get_endpoint_server(endpoint_id, server_id)

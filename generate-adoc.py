@@ -168,7 +168,7 @@ def render_page(ctx):
 def write_pages(name, cmd, parent_ctx=None):
     ctx = click.Context(cmd, info_name=name, parent=parent_ctx)
 
-    if not isinstance(cmd, click.Group):
+    if not isinstance(cmd, click.Group) and not getattr(cmd, "adoc_skip", True):
         cmd_name = ctx.command_path.replace(" ", "-")
         cmd_name = cmd_name[len("globus-") :]
         path = os.path.join(TARGET_DIR, cmd_name + ".adoc")

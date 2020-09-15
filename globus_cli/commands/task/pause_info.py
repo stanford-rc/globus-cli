@@ -33,12 +33,45 @@ PAUSE_RULE_DISPLAY_FIELDS = [
 ]
 
 
-@command("pause-info", short_help="Show why an in-progress task is currently paused")
+@command(
+    "pause-info",
+    short_help="Show why an in-progress task is currently paused",
+    adoc_output="""
+When text output is requested, output is broken apart into explicit pause rules
+applied to the specific task (explicit pauses), and "effective pause rules"
+which apply to the task by virtue of the endpoint(s) it uses.
+
+Explicit pauses are listed with any of the following fields which apply:
+
+- 'Source Endpoint'
+- 'Source Shared Endpoint'
+- 'Destination Endpoint'
+- 'Destination Shared Endpoint'
+
+which refer to the messages which may be set by these various endpoints.
+
+Effective pause rules are listed with these fields:
+
+- 'Operations'
+- 'On Endpoint'
+- 'All Users'
+- 'Message'
+""",
+    adoc_examples="""Show why a task is paused, producing JSON output:
+
+[source,bash]
+----
+$ globus task pause-info TASK_ID --format JSON
+----
+""",
+)
 @task_id_arg
 def task_pause_info(task_id):
     """
     Show messages from activity managers who have explicitly paused the given
-    in-progress task and list any active pause rules that apply to it
+    in-progress task and list any active pause rules that apply to it.
+
+    This command displays no information for tasks which are not paused.
     """
     client = get_client()
     res = client.task_pause_info(task_id)
