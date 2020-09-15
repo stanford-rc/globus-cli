@@ -7,6 +7,7 @@ import os
 import time
 
 import click
+import requests
 from pkg_resources import load_entry_point
 
 version_ns = {}
@@ -18,7 +19,16 @@ CLI = load_entry_point("globus-cli", "console_scripts", "globus")
 
 TARGET_DIR = os.path.dirname(__file__)
 
-DATE = time.strftime("%Y-%m-%d", time.gmtime())
+try:
+    # try to fetch last release date
+    last_release = requests.get(
+        "https://api.github.com/repos/globus/globus-cli/releases/latest"
+    )
+    REV_DATE = time.strptime(last_release.json()["published_at"], "%Y-%m-%dT%H:%M:%SZ")
+except Exception:
+    # fallback to current time
+    REV_DATE = time.gmtime()
+REV_DATE = time.strftime("%B %d, %Y", REV_DATE)
 
 
 EXIT_STATUS_TEXT = """0 on success.
@@ -103,6 +113,7 @@ class AdocPage:
     def __str__(self):
         sections = []
         sections.append(f"= {self.commandname.upper()}\n")
+
         sections.append(
             f"""== NAME
 
@@ -216,8 +227,20 @@ def collect_commands(heading, name, cmd, parent_ctx=None):
 
 def generate_index():
     with open(os.path.join(TARGET_DIR, "index.adoc"), "w") as f:
+        # header required for globus docs to specify extra attributes
+        f.write(
+            """---
+menu_weight: 10
+short_title: Reference
+---
+"""
+        )
         for heading, commands in collect_commands(
-            "= Command Line Interface (CLI) Reference", "globus", CLI
+            f"""= Command Line Interface (CLI) Reference
+
+[doc-info]*Last Updated: {REV_DATE}*""",
+            "globus",
+            CLI,
         ):
             f.write(heading + "\n\n")
             for cmd in commands:
