@@ -168,8 +168,8 @@ def write_pages(name, cmd, parent_ctx=None):
     ctx = click.Context(cmd, info_name=name, parent=parent_ctx)
 
     if not isinstance(cmd, click.Group) and not getattr(cmd, "adoc_skip", True):
-        cmd_name = ctx.command_path.replace(" ", "-")
-        cmd_name = cmd_name[len("globus-") :]
+        cmd_name = ctx.command_path.replace(" ", "_")
+        cmd_name = cmd_name[len("globus_") :]
         path = os.path.join(TARGET_DIR, cmd_name + ".adoc")
         print(f"rendering {name} to {path}")
 
@@ -182,5 +182,49 @@ def write_pages(name, cmd, parent_ctx=None):
         write_pages(subcmdname, subcmd, parent_ctx=ctx)
 
 
+class CmdForIndex:
+    def __init__(self, name, cmd, parent_ctx):
+        ctx = click.Context(cmd, info_name=name, parent=parent_ctx)
+        self.name = name
+        self.link = name.replace(" ", "_")[len("globus_") :]
+        self.summary = ctx.command.get_short_help_str()
+
+
+def collect_commands(heading, name, cmd, parent_ctx=None):
+    ctx = click.Context(cmd, info_name=name, parent=parent_ctx)
+    subcommands = []
+    sub_groups = []
+    for subcmdname, subcmd in getattr(cmd, "commands", {}).items():
+        fullname = name + " " + subcmdname
+        # explicitly skip hiden commands and `globus config`
+        if subcmd.hidden or fullname == "globus config":
+            continue
+        if isinstance(subcmd, click.Group):
+            sub_groups.append((fullname, subcmd))
+        else:
+            subcommands.append(CmdForIndex(fullname, subcmd, ctx))
+
+    if subcommands:
+        yield heading, subcommands
+
+    for groupname, group in sub_groups:
+        for subheading, subcommands in collect_commands(
+            f"== {groupname} commands", groupname, group
+        ):
+            yield subheading, subcommands
+
+
+def generate_index():
+    with open(os.path.join(TARGET_DIR, "index.adoc"), "w") as f:
+        for heading, commands in collect_commands(
+            "= Command Line Interface (CLI) Reference", "globus", CLI
+        ):
+            f.write(heading + "\n\n")
+            for cmd in commands:
+                f.write(f"link:{cmd.link}[{cmd.name}]::\n")
+                f.write(cmd.summary + "\n\n")
+
+
 if __name__ == "__main__":
     write_pages("globus", CLI)
+    generate_index()

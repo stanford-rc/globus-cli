@@ -20,11 +20,12 @@ class SubscriptionIdType(click.ParamType):
             self.fail("{} is not a valid Subscription ID".format(value), param, ctx)
 
 
-@command("set-subscription-id")
+@command("set-subscription-id", short_help="Set an endpoint's subscription")
 @endpoint_id_arg
 @click.argument("SUBSCRIPTION_ID", type=SubscriptionIdType())
 def set_endpoint_subscription_id(**kwargs):
-    """Set an endpoint's subscription
+    """
+    Set an endpoint's subscription ID.
 
     Unlike the '--managed' flag for 'globus endpoint update', this operation does not
     require you to be an admin of the endpoint. It is useful in cases where you are a
