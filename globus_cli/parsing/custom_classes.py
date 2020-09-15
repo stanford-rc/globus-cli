@@ -27,6 +27,7 @@ for more details."""
         self.adoc_examples = kwargs.pop("adoc_examples", None)
         self.globus_disable_opts = kwargs.pop("globus_disable_opts", [])
         self.adoc_exit_status = kwargs.pop("adoc_exit_status", None)
+        self.adoc_synopsis = kwargs.pop("adoc_synopsis", None)
 
         helptext = kwargs.pop("help", None)
         if helptext:

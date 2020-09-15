@@ -15,11 +15,23 @@ def _shared_with_keyfunc(rule):
         return rule["principal_type"]
 
 
-@command("show")
+@command(
+    "show",
+    short_help="Display an access control rule",
+    adoc_examples="""[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ rule_id=1ddeddda-1ae8-11e7-bbe4-22000b9a448b
+$ globus endpoint permission show $ep_id $rule_id
+----
+""",
+)
 @endpoint_id_arg
 @click.argument("rule_id")
 def show_command(endpoint_id, rule_id):
-    """Show a permission on an endpoint"""
+    """
+    Show detailed information about a single access control rule on an endpoint.
+    """
     client = get_client()
 
     rule = client.get_endpoint_acl_rule(endpoint_id, rule_id)

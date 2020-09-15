@@ -6,7 +6,23 @@ from globus_cli.services.auth import maybe_lookup_identity_id
 from globus_cli.services.transfer import assemble_generic_doc, get_client
 
 
-@command("create")
+@command(
+    "create",
+    short_help="Add a role to an endpoint",
+    adoc_output=(
+        "Textual output is a simple success message in the absence of errors, "
+        "containing the ID of the created role."
+    ),
+    adoc_examples="""Grant 'demo@globus.org' the 'activity_monitor' role on
+'ddb59aef-6d04-11e5-ba46-22000b92c6ec':
+
+[source,bash]
+----
+$ globus endpoint role create 'ddb59aef-6d04-11e5-ba46-22000b92c6ec' \
+    --identity 'demo@globus.org' --role activity_monitor
+----
+""",
+)
 @endpoint_id_arg
 @security_principal_opts(allow_provision=True)
 @click.option(
@@ -19,7 +35,16 @@ from globus_cli.services.transfer import assemble_generic_doc, get_client
     help="A role to assign.",
 )
 def role_create(role, principal, endpoint_id):
-    """Create a role on an endpoint"""
+    """
+    Create a role on an endpoint.
+    You must have sufficient privileges to modify the roles on the endpoint.
+
+    Either *--group* or *--identity* is required. You may not pass both.
+    Which one of these options you use will determine the 'Principal Type' on the
+    role, and the value given will be the 'Principal' of the resulting role.
+    The term "Principal" is used in the sense of "a security principal", an entity
+    which has some privileges associated with it.
+    """
     principal_type, principal_val = principal
 
     client = get_client()

@@ -10,7 +10,29 @@ from globus_cli.services.transfer import (
 )
 
 
-@command("search")
+@command(
+    "search",
+    short_help="Find and discover endpoints",
+    adoc_synopsis="""
+`globus endpoint search [OPTIONS] FILTER_FULLTEXT`
+
+`globus endpoint search --filter-scope SCOPE [OPTIONS] [FILTER_FULLTEXT]`
+""",
+    adoc_examples="""Search for the Globus tutorial endpoints
+
+[source,bash]
+----
+$ globus endpoint search Tutorial --filter-owner-id go@globusid.org
+----
+
+Search for endpoints owned by the current user
+
+[source,bash]
+----
+$ globus endpoint search --filter-scope my-endpoints
+----
+""",
+)
 @click.option(
     "--filter-scope",
     default="all",
@@ -47,7 +69,14 @@ from globus_cli.services.transfer import (
 )
 @click.argument("filter_fulltext", required=False)
 def endpoint_search(filter_fulltext, limit, filter_owner_id, filter_scope):
-    """Search for Globus endpoints"""
+    """
+    Search for Globus endpoints with search filters. If --filter-scope is set to the
+    default of 'all', then FILTER_FULLTEXT is required.
+
+    If FILTER_FULLTEXT is given, endpoints which have attributes (display name,
+    legacy name, description, organization, department, keywords) that match the
+    search text will be returned. The result size limit is 100 endpoints.
+    """
     if filter_scope == "all" and not filter_fulltext:
         raise click.UsageError(
             "When searching all endpoints (--filter-scope=all, the default), "

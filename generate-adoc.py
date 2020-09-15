@@ -22,18 +22,14 @@ TARGET_DIR = os.path.join(HERE, "adoc")
 DATE = time.strftime("%Y-%m-%d", time.gmtime())
 
 
-EXIT_STATUS_SECTION = """== EXIT STATUS
-
-0 on success.
+EXIT_STATUS_TEXT = """0 on success.
 
 1 if a network or server error occurred, unless --map-http-status has been
 used to change exit behavior on http error codes.
 
 2 if the command was used improperly.
 """
-EXIT_STATUS_NOHTTP_SECTION = """== EXIT STATUS
-
-0 on success.
+EXIT_STATUS_NOHTTP_TEXT = """0 on success.
 
 1 if an error occurred
 
@@ -86,7 +82,9 @@ class AdocPage:
         self.commandname = ctx.command_path
         self.short_help = ctx.command.get_short_help_str()
         self.description = ctx.command.help.replace("\b\n", "")
-        self.synopsis = _format_synopsis(ctx.command.collect_usage_pieces(ctx))
+        self.synopsis = ctx.command.adoc_synopsis or _format_synopsis(
+            ctx.command.collect_usage_pieces(ctx)
+        )
         self.options = [
             y
             for y in [
@@ -98,8 +96,10 @@ class AdocPage:
         ]
         self.output = ctx.command.adoc_output
         self.examples = ctx.command.adoc_examples
-        self.uses_http = "map_http_status" not in ctx.command.globus_disable_opts
-        self.exit_status_text = ctx.command.adoc_exit_status
+        uses_http = "map_http_status" not in ctx.command.globus_disable_opts
+        self.exit_status_text = ctx.command.adoc_exit_status or (
+            EXIT_STATUS_TEXT if uses_http else EXIT_STATUS_NOHTTP_TEXT
+        )
 
     def __str__(self):
         sections = []
@@ -150,18 +150,13 @@ class AdocPage:
             if not self.examples.endswith("\n"):
                 sections.append("")
 
-        if self.exit_status_text:
-            sections.append(
-                f"""== EXIT STATUS
+        sections.append(
+            f"""== EXIT STATUS
 
 {self.exit_status_text}"""
-            )
-            if not self.exit_status_text.endswith("\n"):
-                sections.append("")
-        elif self.uses_http:
-            sections.append(EXIT_STATUS_SECTION)
-        else:
-            sections.append(EXIT_STATUS_NOHTTP_SECTION)
+        )
+        if not self.exit_status_text.endswith("\n"):
+            sections.append("")
 
         return "\n".join(sections)
 
