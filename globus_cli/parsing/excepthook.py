@@ -58,9 +58,38 @@ def session_hook(exception):
     else:
         click.echo(
             'Please use "globus session update" to re-authenticate '
-            "with specific identities".format(id_str)
+            "with specific identities"
         )
 
+    exit_with_mapped_status(exception.http_status)
+
+
+def consent_required_hook(exception):
+    """
+    Expects an exception with a required_scopes field in its raw_json
+    """
+    click.echo(
+        "The resource you are trying to access requires you to "
+        "consent to additional access for the Globus CLI."
+    )
+
+    required_scopes = exception.raw_json.get("required_scopes")
+    if not required_scopes:
+        click.secho(
+            "Fatal Error: ConsentRequired but no required_scopes!", bold=True, fg="red"
+        )
+        sys.exit(255)
+    message = exception.raw_json.get("message")
+    if message:
+        click.echo("message: {}".format(message))
+
+    click.echo(
+        "\nPlease run\n\n"
+        "  globus session consent {}\n\n".format(
+            " ".join("'{}'".format(x) for x in required_scopes)
+        )
+        + "to login with the required scopes"
+    )
     exit_with_mapped_status(exception.http_status)
 
 
@@ -169,6 +198,15 @@ def custom_except_hook(exc_info):
         and "authorization_parameters" in exception.raw_json
     ):
         session_hook(exception)
+
+    # catch any consent required errors to give helpful instructions
+    # on how to use `globus session update --consents`
+    if (
+        isinstance(exception, exc.GlobusAPIError)
+        and exception.raw_json
+        and exception.raw_json.get("code") == "ConsentRequired"
+    ):
+        consent_required_hook(exception)
 
     # handle the Globus-raised errors with our special hooks
     # these will present the output (on stderr) as JSON

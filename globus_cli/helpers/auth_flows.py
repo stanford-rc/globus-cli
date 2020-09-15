@@ -113,29 +113,35 @@ def exchange_code_and_store_config(auth_client, auth_code):
     tkn = auth_client.oauth2_exchange_code_for_tokens(auth_code)
     tkn = tkn.by_resource_server
 
+    store_queue = []
+
+    def _enqueue(optname, newval, revoke=True):
+        store_queue.append((optname, newval, revoke))
+
     # extract access tokens from final response
-    transfer_at = tkn["transfer.api.globus.org"]["access_token"]
-    transfer_at_expires = tkn["transfer.api.globus.org"]["expires_at_seconds"]
-    transfer_rt = tkn["transfer.api.globus.org"]["refresh_token"]
-    auth_at = tkn["auth.globus.org"]["access_token"]
-    auth_at_expires = tkn["auth.globus.org"]["expires_at_seconds"]
-    auth_rt = tkn["auth.globus.org"]["refresh_token"]
+    if "transfer.api.globus.org" in tkn:
+        _enqueue(TRANSFER_RT_OPTNAME, tkn["transfer.api.globus.org"]["refresh_token"])
+        _enqueue(TRANSFER_AT_OPTNAME, tkn["transfer.api.globus.org"]["access_token"])
+        _enqueue(
+            TRANSFER_AT_EXPIRES_OPTNAME,
+            tkn["transfer.api.globus.org"]["expires_at_seconds"],
+            revoke=False,
+        )
+    if "auth.globus.org" in tkn:
+        _enqueue(AUTH_RT_OPTNAME, tkn["auth.globus.org"]["refresh_token"])
+        _enqueue(AUTH_AT_OPTNAME, tkn["auth.globus.org"]["access_token"])
+        _enqueue(
+            AUTH_AT_EXPIRES_OPTNAME,
+            tkn["auth.globus.org"]["expires_at_seconds"],
+            revoke=False,
+        )
 
     # revoke any existing tokens
-    for token_opt in (
-        TRANSFER_RT_OPTNAME,
-        TRANSFER_AT_OPTNAME,
-        AUTH_RT_OPTNAME,
-        AUTH_AT_OPTNAME,
-    ):
-        token = lookup_option(token_opt)
+    for optname in [optname for (optname, _val, revoke) in store_queue if revoke]:
+        token = lookup_option(optname)
         if token:
             auth_client.oauth2_revoke_token(token)
 
-    # write new tokens to config
-    write_option(TRANSFER_RT_OPTNAME, transfer_rt)
-    write_option(TRANSFER_AT_OPTNAME, transfer_at)
-    write_option(TRANSFER_AT_EXPIRES_OPTNAME, transfer_at_expires)
-    write_option(AUTH_RT_OPTNAME, auth_rt)
-    write_option(AUTH_AT_OPTNAME, auth_at)
-    write_option(AUTH_AT_EXPIRES_OPTNAME, auth_at_expires)
+    # write new data to config
+    for optname, newval, _revoke in store_queue:
+        write_option(optname, newval)
