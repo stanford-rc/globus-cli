@@ -46,6 +46,47 @@ EXIT_STATUS_NOHTTP_TEXT = """0 on success.
 """
 
 
+def walk_contexts(name="globus", cmd=CLI, parent_ctx=None):
+    """
+    A recursive walk over click Contexts for all commands in a tree
+    Returns the results in a tree-like structure as triples,
+      (context, subcommands, subgroups)
+
+    subcommands is a list of contexts
+    subgroups is a list of (context, subcommands, subgroups) triples
+    """
+    current_ctx = click.Context(cmd, info_name=name, parent=parent_ctx)
+    cmds, groups = [], []
+    for subcmdname, subcmd in getattr(cmd, "commands", {}).items():
+        fullname = name + " " + subcmdname
+        # explicitly skip hidden commands and `globus config`
+        if subcmd.hidden or fullname == "globus config":
+            continue
+        # non-group commands which don't set adoc_skip=False are not properly subclassed
+        # from GlobusCommand, skip them
+        if not isinstance(subcmd, click.Group) and getattr(subcmd, "adoc_skip", True):
+            continue
+
+        if not isinstance(subcmd, click.Group):
+            cmds.append(click.Context(subcmd, info_name=subcmdname, parent=current_ctx))
+        else:
+            groups.append(walk_contexts(subcmdname, subcmd, current_ctx))
+
+    return (current_ctx, cmds, groups)
+
+
+def iter_all_commands(tree=None):
+    if not tree:
+        ctx, subcmds, subgroups = walk_contexts()
+    else:
+        ctx, subcmds, subgroups = tree
+    for cmd in subcmds:
+        yield cmd
+    for g in subgroups:
+        for cmd in iter_all_commands(g):
+            yield cmd
+
+
 def _format_option(optstr):
     opt = optstr.split()
     optnames, optparams = [], []
@@ -66,7 +107,7 @@ def _format_option(optstr):
     optnames = " ".join(optnames)
 
     optnames = f"*{optnames}*"
-    optparams = [f"'{x}'" for x in optparams]
+    optparams = [f"`{x}`" for x in optparams]
     if optparams:
         optparams = " " + " ".join(optparams)
     else:
@@ -171,57 +212,31 @@ class AdocPage:
         return "\n".join(sections)
 
 
-def render_page(ctx):
-    return str(AdocPage(ctx))
+def write_pages():
+    for ctx in iter_all_commands():
+        cmd = ctx.command
+
+        if not isinstance(cmd, click.Group) and not getattr(cmd, "adoc_skip", True):
+            cmd_name = ctx.command_path.replace(" ", "_")
+            cmd_name = cmd_name[len("globus_") :]
+            path = os.path.join(TARGET_DIR, cmd_name + ".adoc")
+            print(f"rendering {ctx.command_path} to {path}")
+
+            with open(path, "w") as f:
+                f.write(str(AdocPage(ctx)))
 
 
-def write_pages(name, cmd, parent_ctx=None):
-    ctx = click.Context(cmd, info_name=name, parent=parent_ctx)
+def commands_with_headings(heading, tree=None):
+    if not tree:
+        ctx, subcmds, subgroups = walk_contexts()
+    else:
+        ctx, subcmds, subgroups = tree
+    if subcmds:
+        yield heading, subcmds
 
-    if not isinstance(cmd, click.Group) and not getattr(cmd, "adoc_skip", True):
-        cmd_name = ctx.command_path.replace(" ", "_")
-        cmd_name = cmd_name[len("globus_") :]
-        path = os.path.join(TARGET_DIR, cmd_name + ".adoc")
-        print(f"rendering {name} to {path}")
-
-        with open(path, "w") as f:
-            f.write(render_page(ctx))
-
-    for subcmdname, subcmd in getattr(cmd, "commands", {}).items():
-        if subcmd.hidden:
-            continue
-        write_pages(subcmdname, subcmd, parent_ctx=ctx)
-
-
-class CmdForIndex:
-    def __init__(self, name, cmd, parent_ctx):
-        ctx = click.Context(cmd, info_name=name, parent=parent_ctx)
-        self.name = name
-        self.link = name.replace(" ", "_")[len("globus_") :]
-        self.summary = ctx.command.get_short_help_str()
-
-
-def collect_commands(heading, name, cmd, parent_ctx=None):
-    ctx = click.Context(cmd, info_name=name, parent=parent_ctx)
-    subcommands = []
-    sub_groups = []
-    for subcmdname, subcmd in getattr(cmd, "commands", {}).items():
-        fullname = name + " " + subcmdname
-        # explicitly skip hiden commands and `globus config`
-        if subcmd.hidden or fullname == "globus config":
-            continue
-        if isinstance(subcmd, click.Group):
-            sub_groups.append((fullname, subcmd))
-        else:
-            subcommands.append(CmdForIndex(fullname, subcmd, ctx))
-
-    if subcommands:
-        yield heading, subcommands
-
-    for groupname, group in sub_groups:
-        for subheading, subcommands in collect_commands(
-            f"== {groupname} commands", groupname, group
-        ):
+    for subgrouptree in subgroups:
+        heading = f"== {subgrouptree[0].command_path} commands"
+        for subheading, subcommands in commands_with_headings(heading, subgrouptree):
             yield subheading, subcommands
 
 
@@ -235,19 +250,18 @@ short_title: Reference
 ---
 """
         )
-        for heading, commands in collect_commands(
+        for heading, commands in commands_with_headings(
             f"""= Command Line Interface (CLI) Reference
 
-[doc-info]*Last Updated: {REV_DATE}*""",
-            "globus",
-            CLI,
+[doc-info]*Last Updated: {REV_DATE}*"""
         ):
             f.write(heading + "\n\n")
-            for cmd in commands:
-                f.write(f"link:{cmd.link}[{cmd.name}]::\n")
-                f.write(cmd.summary + "\n\n")
+            for ctx in commands:
+                link = ctx.command_path.replace(" ", "_")[len("globus_") :]
+                f.write(f"link:{link}[{ctx.command_path}]::\n")
+                f.write(ctx.command.get_short_help_str() + "\n\n")
 
 
 if __name__ == "__main__":
-    write_pages("globus", CLI)
+    write_pages()
     generate_index()
