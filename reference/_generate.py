@@ -16,8 +16,7 @@ VERSION = version_ns["__version__"]
 
 CLI = load_entry_point("globus-cli", "console_scripts", "globus")
 
-HERE = os.path.dirname(__file__)
-TARGET_DIR = os.path.join(HERE, "adoc")
+TARGET_DIR = os.path.dirname(__file__)
 
 DATE = time.strftime("%Y-%m-%d", time.gmtime())
 
