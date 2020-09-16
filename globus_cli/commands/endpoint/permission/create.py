@@ -50,7 +50,7 @@ def create_command(
     principal, permissions, endpoint_plus_path, notify_email, notify_message
 ):
     """
-    Create a new access control on the the target endpoint granting users new
+    Create a new access control rule on the target endpoint, granting users new
     permissions on the given path.
 
     The target endpoint must be a shared endpoint, as only these use access control

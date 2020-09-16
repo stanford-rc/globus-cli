@@ -10,13 +10,7 @@ import click
 import requests
 from pkg_resources import load_entry_point
 
-version_ns = {}
-with open(os.path.join("globus_cli", "version.py")) as f:
-    exec(f.read(), version_ns)
-VERSION = version_ns["__version__"]
-
 CLI = load_entry_point("globus-cli", "console_scripts", "globus")
-
 TARGET_DIR = os.path.dirname(__file__)
 
 try:
@@ -30,7 +24,6 @@ except Exception:
     REV_DATE = time.gmtime()
 REV_DATE = time.strftime("%B %d, %Y", REV_DATE)
 
-
 EXIT_STATUS_TEXT = """0 on success.
 
 1 if a network or server error occurred, unless --map-http-status has been
@@ -40,7 +33,7 @@ used to change exit behavior on http error codes.
 """
 EXIT_STATUS_NOHTTP_TEXT = """0 on success.
 
-1 if an error occurred
+1 if an error occurred.
 
 2 if the command was used improperly.
 """
@@ -58,9 +51,8 @@ def walk_contexts(name="globus", cmd=CLI, parent_ctx=None):
     current_ctx = click.Context(cmd, info_name=name, parent=parent_ctx)
     cmds, groups = [], []
     for subcmdname, subcmd in getattr(cmd, "commands", {}).items():
-        fullname = name + " " + subcmdname
         # explicitly skip hidden commands and `globus config`
-        if subcmd.hidden or fullname == "globus config":
+        if subcmd.hidden or (name + " " + subcmdname) == "globus config":
             continue
         # non-group commands which don't set adoc_skip=False are not properly subclassed
         # from GlobusCommand, skip them
@@ -76,10 +68,7 @@ def walk_contexts(name="globus", cmd=CLI, parent_ctx=None):
 
 
 def iter_all_commands(tree=None):
-    if not tree:
-        ctx, subcmds, subgroups = walk_contexts()
-    else:
-        ctx, subcmds, subgroups = tree
+    ctx, subcmds, subgroups = tree or walk_contexts()
     for cmd in subcmds:
         yield cmd
     for g in subgroups:
@@ -90,34 +79,16 @@ def iter_all_commands(tree=None):
 def _format_option(optstr):
     opt = optstr.split()
     optnames, optparams = [], []
-    slashopt = False
     for o in opt:
-        if slashopt:
-            slashopt = False
-            optnames[-1] = optnames[-1] + " / " + o
-            continue
         if not optparams:
-            if o.startswith("-"):
+            # options like '--foo / --bar' or '--foo, --bar'
+            if o.startswith("-") or o == "/":
                 optnames.append(o)
                 continue
-            elif o == "/":
-                slashopt = True
-                continue
         optparams.append(o)
-    optnames = " ".join(optnames)
-
-    optnames = f"*{optnames}*"
-    optparams = [f"`{x}`" for x in optparams]
-    if optparams:
-        optparams = " " + " ".join(optparams)
-    else:
-        optparams = ""
-
-    return f"{optnames}{optparams}::"
-
-
-def _format_multiline_str(s):
-    return s.replace("\n\n", "\n+\n")
+    optnames = "*" + " ".join(optnames) + "*"
+    optparams = " ".join([f"`{x}`" for x in optparams])
+    return f"{optnames}{' ' if optparams else ''}{optparams}::\n"
 
 
 def _format_synopsis(usage_pieces):
@@ -135,15 +106,15 @@ class AdocPage:
         self.synopsis = ctx.command.adoc_synopsis or _format_synopsis(
             ctx.command.collect_usage_pieces(ctx)
         )
-        self.options = [
-            y
+        self.options = "\n\n".join(
+            _format_option(y[0]) + "\n" + y[1].replace("\n\n", "\n+\n")
             for y in [
                 x.get_help_record(ctx)
                 for x in ctx.command.params
                 if isinstance(x, click.Option)
             ]
             if y
-        ]
+        )
         self.output = ctx.command.adoc_output
         self.examples = ctx.command.adoc_examples
         uses_http = "map_http_status" not in ctx.command.globus_disable_opts
@@ -154,86 +125,35 @@ class AdocPage:
     def __str__(self):
         sections = []
         sections.append(f"= {self.commandname.upper()}\n")
-
-        sections.append(
-            f"""== NAME
-
-{self.commandname} - {self.short_help}
-"""
-        )
-        sections.append(
-            f"""== SYNOPSIS
-
-`{self.commandname} {self.synopsis}`
-"""
-        )
+        sections.append(f"== NAME\n\n{self.commandname} - {self.short_help}\n")
+        sections.append(f"== SYNOPSIS\n\n`{self.commandname} {self.synopsis}`\n")
         if self.description:
-            sections.append(
-                f"""== DESCRIPTION
-
-{self.description}
-"""
-            )
+            sections.append(f"== DESCRIPTION\n\n{self.description}\n")
         if self.options:
-            sections.append(
-                "== OPTIONS\n"
-                + "\n".join(
-                    "\n" + _format_option(opt) + "\n\n" + _format_multiline_str(desc)
-                    for opt, desc in self.options
-                )
-                + "\n"
-            )
-
+            sections.append(f"== OPTIONS\n{self.options}\n")
         if self.output:
-            sections.append(
-                f"""== OUTPUT
-
-{self.output}"""
-            )
-            if not self.output.endswith("\n"):
-                sections.append("")
+            sections.append(f"== OUTPUT\n\n{self.output}\n")
         if self.examples:
-            sections.append(
-                f"""== EXAMPLES
-
-{self.examples}"""
-            )
-            if not self.examples.endswith("\n"):
-                sections.append("")
-
-        sections.append(
-            f"""== EXIT STATUS
-
-{self.exit_status_text}"""
-        )
-        if not self.exit_status_text.endswith("\n"):
-            sections.append("")
-
+            sections.append(f"== EXAMPLES\n\n{self.examples}\n")
+        sections.append(f"== EXIT STATUS\n\n{self.exit_status_text}\n")
         return "\n".join(sections)
 
 
 def write_pages():
     for ctx in iter_all_commands():
-        cmd = ctx.command
-
-        if not isinstance(cmd, click.Group) and not getattr(cmd, "adoc_skip", True):
-            cmd_name = ctx.command_path.replace(" ", "_")
-            cmd_name = cmd_name[len("globus_") :]
+        if not isinstance(ctx.command, click.Group) and not getattr(
+            ctx.command, "adoc_skip", True
+        ):
+            cmd_name = ctx.command_path.replace(" ", "_")[len("globus_") :]
             path = os.path.join(TARGET_DIR, cmd_name + ".adoc")
-            print(f"rendering {ctx.command_path} to {path}")
-
             with open(path, "w") as f:
                 f.write(str(AdocPage(ctx)))
 
 
 def commands_with_headings(heading, tree=None):
-    if not tree:
-        ctx, subcmds, subgroups = walk_contexts()
-    else:
-        ctx, subcmds, subgroups = tree
+    ctx, subcmds, subgroups = tree or walk_contexts()
     if subcmds:
         yield heading, subcmds
-
     for subgrouptree in subgroups:
         heading = f"== {subgrouptree[0].command_path} commands"
         for subheading, subcommands in commands_with_headings(heading, subgrouptree):
@@ -243,13 +163,7 @@ def commands_with_headings(heading, tree=None):
 def generate_index():
     with open(os.path.join(TARGET_DIR, "index.adoc"), "w") as f:
         # header required for globus docs to specify extra attributes
-        f.write(
-            """---
-menu_weight: 10
-short_title: Reference
----
-"""
-        )
+        f.write("---\nmenu_weight: 10\nshort_title: Reference\n---\n")
         for heading, commands in commands_with_headings(
             f"""= Command Line Interface (CLI) Reference
 
