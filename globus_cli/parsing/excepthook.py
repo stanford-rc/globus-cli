@@ -68,10 +68,20 @@ def consent_required_hook(exception):
     """
     Expects an exception with a required_scopes field in its raw_json
     """
-    click.echo(
-        "The resource you are trying to access requires you to "
-        "consent to additional access for the Globus CLI."
-    )
+    message = exception.raw_json.get("message")
+
+    # specialized message for data_access errors
+    # otherwise, use more generic phrasing
+    if message == "Missing required data_access consent":
+        click.echo(
+            "The collection you are trying to access data on requires you to "
+            "grant consent for the Globus CLI to access it."
+        )
+    else:
+        click.echo(
+            "The resource you are trying to access requires you to "
+            "consent to additional access for the Globus CLI."
+        )
 
     required_scopes = exception.raw_json.get("required_scopes")
     if not required_scopes:
@@ -79,7 +89,6 @@ def consent_required_hook(exception):
             "Fatal Error: ConsentRequired but no required_scopes!", bold=True, fg="red"
         )
         sys.exit(255)
-    message = exception.raw_json.get("message")
     if message:
         click.echo("message: {}".format(message))
 
