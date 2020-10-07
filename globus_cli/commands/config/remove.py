@@ -4,7 +4,7 @@ from globus_cli.config import get_config_obj
 from globus_cli.parsing import command
 
 
-@command("remove", disable_options=["format"])
+@command("remove", disable_options=["format"], adoc_skip=True)
 @click.argument("parameter", required=True)
 def remove_command(parameter):
     """Remove a value from the Globus config file"""

@@ -14,4 +14,4 @@ def test_helptext_for_commands_with_security_principal_opts(run_line):
     assert "Create a role on an endpoint" in result.output
 
     result = run_line("globus endpoint permission create --help")
-    assert "Create an access control rule, allowing new permissions" in result.output
+    assert "Create a new access control rule on the target endpoint" in result.output

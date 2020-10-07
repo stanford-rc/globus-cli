@@ -9,9 +9,33 @@ from globus_cli.services.transfer import (
 )
 
 
-@command("list")
+@command(
+    "list",
+    adoc_output="""When textual output is requested, the following fields are displayed:
+- 'Name'
+- 'Bookmark ID'
+- 'Endpoint ID'
+- 'Endpoint Name'
+- 'Path'
+""",
+    adoc_examples="""
+[source,bash]
+----
+$ globus bookmark list
+----
+
+Format specific fields in the bookmark list into unix-friendly columnar
+output:
+
+[source,bash]
+----
+$ globus bookmark list --jmespath='DATA[*].[name, endpoint_id]' --format=unix
+----
+""",
+    short_help="List your bookmarks",
+)
 def bookmark_list():
-    """List bookmarks for the current user"""
+    """List all bookmarks for the current user"""
     client = get_client()
 
     bookmark_iterator = client.bookmark_list()

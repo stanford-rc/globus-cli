@@ -15,6 +15,7 @@ from globus_cli.parsing import command
     "init",
     short_help="Initialize all settings in the Globus Config file",
     disable_options=["format"],
+    adoc_skip=True,
 )
 @click.option(
     "--default-output-format",

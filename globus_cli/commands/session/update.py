@@ -13,7 +13,7 @@ from globus_cli.services.auth import get_auth_client
 
 @command(
     "update",
-    short_help=("Update your CLI auth session"),
+    short_help="Update your CLI auth session",
     disable_options=["format", "map_http_status"],
 )
 @no_local_server_option
@@ -25,6 +25,14 @@ def session_update(identities, no_local_server, all):
     """
     Update your current CLI auth session by authenticating
     with specific identities.
+
+    This command starts an authentication flow with Globus Auth similarly to
+    'globus login' but specifies which identities to authenticate with.
+
+    After successful authentication, the user's CLI auth session will be updated
+    with any new identities and current Auth Times.
+
+    The given UUIDs or usernames must be in the user's identity set.
     """
 
     if (not (identities or all)) or (identities and all):

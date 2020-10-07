@@ -12,7 +12,34 @@ from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import activation_requirements_help_text, get_client
 
 
-@command("activate", short_help="Activate an endpoint")
+@command(
+    "activate",
+    short_help="Activate an endpoint",
+    adoc_examples="""Activate an endpoint using just Automatic activation:
+
+[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ globus endpoint activate $ep_id
+----
+
+Activate an endpoint using Web activation
+
+[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ globus endpoint activate $ep_id --web
+----
+
+Activate an endpoiont using Myproxy activation, skipping the username prompt.
+
+[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ globus endpoint activate $ep_id --myproxy -U username
+----
+""",
+)
 @endpoint_id_arg
 @click.option(
     "--web",

@@ -5,6 +5,39 @@ import click
 from globus_cli.parsing.excepthook import custom_except_hook
 
 
+class GlobusCommand(click.Command):
+    """
+    A custom command class which stores the special attributes
+    of the form "adoc_*" with defaults of None. This lets us pass additional info to the
+    adoc generator.
+
+    It also automatically runs string formatting on command helptext to allow the
+    inclusion of common strings (e.g. autoactivation help).
+    """
+
+    AUTOMATIC_ACTIVATION_HELPTEXT = """=== Automatic Endpoint Activation
+
+This command requires all endpoints it uses to be activated. It will attempt to
+auto-activate any endpoints that are not active, but if auto-activation fails,
+you will need to manually activate the endpoint. See 'globus endpoint activate'
+for more details."""
+
+    def __init__(self, *args, **kwargs):
+        self.adoc_skip = kwargs.pop("adoc_skip", False)
+        self.adoc_output = kwargs.pop("adoc_output", None)
+        self.adoc_examples = kwargs.pop("adoc_examples", None)
+        self.globus_disable_opts = kwargs.pop("globus_disable_opts", [])
+        self.adoc_exit_status = kwargs.pop("adoc_exit_status", None)
+        self.adoc_synopsis = kwargs.pop("adoc_synopsis", None)
+
+        helptext = kwargs.pop("help", None)
+        if helptext:
+            kwargs["help"] = helptext.format(
+                AUTOMATIC_ACTIVATION=self.AUTOMATIC_ACTIVATION_HELPTEXT
+            )
+        super(GlobusCommand, self).__init__(*args, **kwargs)
+
+
 class GlobusCommandGroup(click.Group):
     """
     This is a click.Group with any customizations which we deem necessary

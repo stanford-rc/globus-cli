@@ -8,7 +8,11 @@ and all other components will be hidden internals.
 
 import click
 
-from globus_cli.parsing.custom_group import GlobusCommandGroup, TopLevelGroup
+from globus_cli.parsing.custom_classes import (
+    GlobusCommand,
+    GlobusCommandGroup,
+    TopLevelGroup,
+)
 from globus_cli.parsing.shared_options import common_options
 from globus_cli.parsing.shell_completion import print_completer_option
 
@@ -23,13 +27,21 @@ def main_group(f):
 def command(*args, **kwargs):
     """
     A helper for decorating commands a-la `click.command`, but pulling the help string
-    from `<function>.__doc__` by default. Fancy!
+    from `<function>.__doc__` by default.
+
+    Also allows the use of custom arguments, which are stored on the command, as in
+    "adoc_examples".
     """
     disable_opts = kwargs.pop("disable_options", [])
 
     def _inner_decorator(func):
         if "help" not in kwargs:
             kwargs["help"] = func.__doc__
+
+        if "cls" not in kwargs:
+            kwargs["cls"] = GlobusCommand
+
+        kwargs["globus_disable_opts"] = disable_opts
 
         return common_options(disable_options=disable_opts)(
             click.command(*args, **kwargs)(func)

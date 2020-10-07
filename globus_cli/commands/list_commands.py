@@ -2,10 +2,12 @@ import copy
 
 import click
 
+from globus_cli.parsing import command
+
 _command_length = 16
 
 
-@click.command(
+@command(
     "list-commands",
     short_help="List all CLI Commands",
     help=(
@@ -15,6 +17,16 @@ _command_length = 16
     ),
 )
 def list_commands():
+    """
+    Prints the name and a short description of every command available in the globus
+    cli. Commands are grouped by their parent commands,
+    e.g. 'globus endpoint activate' is listed as 'activate' under 'globus endpoint'.
+
+    Note that commands with the same listed name under different parent commands
+    are distinct. e.g. 'globus task update' is a distinct command from
+    'globus endpoint update'.
+    """
+
     def _print_cmd(command):
         # print commands with short_help
         indent = 4

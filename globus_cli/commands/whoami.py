@@ -11,14 +11,51 @@ from globus_cli.safeio import (
 from globus_cli.services.auth import get_auth_client
 
 
-@command("whoami", disable_options=["map_http_status"])
+@command(
+    "whoami",
+    disable_options=["map_http_status"],
+    short_help="Show the currently logged-in identity",
+    adoc_output="""Note: this output is not affected by sessions in any way. For information
+on which of your identities are in session use *globus session show*
+
+If no options are given the default output is just the preferred
+username of the logged in identity.
+
+If *--linked-identities* is given the output will be each username in the
+logged-in user's identity set.
+
+If *--verbose* is given, the following fields will be output, either in
+a record format or a table format if *--linked-identities* is also given.
+
+- 'Username'
+- 'Name'
+- 'ID'
+- 'Email'
+""",
+    adoc_examples="""Display multiple fields of the current user's information:
+
+[source,bash]
+----
+$ globus whoami -v
+----
+
+Display each username in the current user's identity set:
+
+[source,bash]
+----
+$ globus whoami --linked-identities
+----
+""",
+)
 @click.option(
     "--linked-identities",
     is_flag=True,
     help="Also show identities linked to the currently logged-in primary identity.",
 )
 def whoami_command(linked_identities):
-    """Show the currently logged-in primary identity"""
+    """
+    Display information for the currently logged-in user.
+    """
     client = get_auth_client()
 
     # get userinfo from auth.

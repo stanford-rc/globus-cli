@@ -6,10 +6,19 @@ from globus_cli.services.auth import get_auth_client
 from globus_cli.services.transfer import get_client
 
 
-@command("list")
+@command(
+    "list",
+    short_help="List access control rules",
+    adoc_examples="""[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ globus endpoint permission list $ep_id
+----
+""",
+)
 @endpoint_id_arg
 def list_command(endpoint_id):
-    """List of permissions on an endpoint"""
+    """List all rules in an endpoint's access control list."""
     client = get_client()
 
     rules = client.endpoint_acl_list(endpoint_id)

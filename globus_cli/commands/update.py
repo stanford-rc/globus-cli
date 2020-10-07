@@ -43,7 +43,11 @@ def _check_pip_installed():
         return False
 
 
-@command("update", disable_options=["format", "map_http_status"])
+@command(
+    "update",
+    disable_options=["format", "map_http_status"],
+    short_help="Update the Globus CLI to its  latest version",
+)
 @click.option("--yes", is_flag=True, help='Automatically say "yes" to all prompts')
 # hidden options to fetch branches or tags from GitHub. One turns this mode
 # on or off, and the other is used to set a non-master target
@@ -51,7 +55,16 @@ def _check_pip_installed():
 @click.option("--development", is_flag=True, hidden=True)
 @click.option("--development-version", hidden=True, default=None)
 def update_command(yes, development, development_version):
-    """Update the Globus CLI to its latest version"""
+    """Update the Globus CLI to its latest version.
+
+    NOTE: This command requires having pip. If you used an alternative method
+    of installing the Globus CLI you can install pip to run this command,
+    or manually update the Globus CLI using the method you used for install.
+
+    The *globus update* command checks if a more recent version of the Globus CLI
+    is available on PyPi, and if so asks for user consent to update to the most
+    recent version available.
+    """
     # enforce that pip MUST be installed
     # Why not just include it in the setup.py requirements? Mostly weak
     # reasons, but it shouldn't matter much.

@@ -12,7 +12,26 @@ from globus_cli.safeio import err_is_terminal, formatted_print, term_is_interact
 from globus_cli.services.transfer import autoactivate, get_client, task_wait_with_io
 
 
-@command("rm", short_help="Delete a single path; wait for it to complete")
+@command(
+    "rm",
+    short_help="Delete a single path; wait for it to complete",
+    adoc_examples="""Delete a single file.
+
+[source,bash]
+----
+$ ep_id=ddb59af0-6d04-11e5-ba46-22000b92c6ec
+$ globus rm $ep_id:~/myfile.txt
+----
+
+Delete a directory recursively.
+
+[source,bash]
+----
+$ ep_id=ddb59af0-6d04-11e5-ba46-22000b92c6ec
+$ globus rm $ep_id:~/mydir --recursive
+----
+""",
+)
 @task_submission_options
 @delete_and_rm_options(supports_batch=False, default_enable_globs=True)
 @synchronous_task_wait_options
@@ -39,7 +58,12 @@ def rm_command(
     Submit a Delete Task to delete a single path, and then block and wait for it to
     complete.
 
-    Output is similar to 'globus task wait'
+    Output is similar to *globus task wait*, and it is safe to *globus task wait*
+    on a *globus rm* which timed out.
+
+    Symbolic links are never followed - only unlinked (deleted).
+
+    {AUTOMATIC_ACTIVATION}
     """
     endpoint_id, path = endpoint_plus_path
 

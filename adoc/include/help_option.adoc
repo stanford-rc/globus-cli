@@ -1,3 +1,0 @@
-*-h, --help*::
-
-Show help text for this command.

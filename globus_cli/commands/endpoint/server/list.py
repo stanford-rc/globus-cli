@@ -3,10 +3,19 @@ from globus_cli.safeio import FORMAT_TEXT_RECORD, FORMAT_TEXT_TABLE, formatted_p
 from globus_cli.services.transfer import get_endpoint_w_server_list
 
 
-@command("list")
+@command(
+    "list",
+    short_help="List all servers for an endpoint",
+    adoc_examples="""[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ globus endpoint server list $ep_id
+----
+""",
+)
 @endpoint_id_arg
 def server_list(endpoint_id):
-    """List all servers belonging to an endpoint"""
+    """List all servers belonging to an endpoint."""
     # raises usage error on shares for us
     endpoint, server_list = get_endpoint_w_server_list(endpoint_id)
 

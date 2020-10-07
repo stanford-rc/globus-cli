@@ -4,7 +4,7 @@ from globus_cli.config import get_config_obj
 from globus_cli.parsing import command
 
 
-@command("set", disable_options=["format"])
+@command("set", disable_options=["format"], adoc_skip=True)
 @click.argument("parameter", required=True)
 @click.argument("value", required=True)
 def set_command(value, parameter):

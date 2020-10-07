@@ -5,13 +5,54 @@ from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import get_client
 
 
-@command("cancel", short_help="Cancel a task")
+@command(
+    "cancel",
+    short_help="Cancel a task",
+    adoc_synopsis="""
+`globus task cancel [OPTIONS] TASK_ID`
+
+`globus task cancel --all [OPTIONS]`
+""",
+    adoc_output="""
+Output depends on whether or not '--all' was provided, and of course on the
+requested output format.
+
+If '--all' is requested, output will contain all task IDs which were
+cancelled. If, in addition to this, the output format is text, the results will
+be streamed as tasks are cancelled. JSON output is buffered and printed all at
+once, after all of the cancellations.
+
+When '--all' is not passed, output is a simple success message indicating that
+the task was cancelled, or an error.
+""",
+    adoc_examples="""Cancel a specific task
+
+[source,bash]
+----
+$ globus task cancel TASK_ID
+----
+
+Cancel all tasks
+
+[source,bash]
+----
+$ globus task cancel --all
+----
+""",
+)
 @task_id_arg(required=False)
 @click.option(
     "--all", "-a", is_flag=True, help="Cancel all in-progress tasks that you own"
 )
 def cancel_task(all, task_id):
-    """Cancel a task owned by the current user"""
+    """
+    Cancel a task you own or all tasks which you own.
+
+    This includes not only currently executing tasks, but also any queued tasks which
+    you may have which have not started execution.
+
+    You must either provide the '--all' option or a 'TASK_ID'.
+    """
 
     if bool(all) + bool(task_id) != 1:
         raise click.UsageError(

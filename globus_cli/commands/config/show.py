@@ -4,7 +4,7 @@ from globus_cli.config import lookup_option
 from globus_cli.parsing import command
 
 
-@command("show", disable_options=["format"])
+@command("show", disable_options=["format"], adoc_skip=True)
 @click.argument("parameter", required=True)
 def show_command(parameter):
     """Show a value from the Globus config file"""

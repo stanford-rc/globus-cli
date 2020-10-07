@@ -8,7 +8,19 @@ from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import assemble_generic_doc, get_client
 
 
-@command("update")
+@command(
+    "update",
+    short_help="Update an endpoint server",
+    adoc_examples="""Change an existing server's scheme to use ftp:
+
+[source,bash]
+----
+$ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
+$ server_id=294682
+$ globus endpoint server update $ep_id $server_id --scheme ftp
+----
+""",
+)
 @server_add_and_update_opts
 @endpoint_id_arg
 @server_id_arg
@@ -22,7 +34,11 @@ def server_update(
     incoming_data_ports,
     outgoing_data_ports,
 ):
-    """Update attributes of a server on an endpoint"""
+    """
+    Update the attributes of a server on an endpoint.
+
+    At least one field must be updated.
+    """
     client = get_client()
 
     server_doc = assemble_generic_doc(

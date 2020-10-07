@@ -56,8 +56,12 @@ def logout_command():
     """
     Logout of the Globus CLI
 
-    Removes your Globus tokens from local storage,
-    and revokes them so that they cannot be used anymore
+    This command both removes all tokens used for authenticating the user from local
+    storage and revokes them so that they cannot be used anymore globally.
+
+    If an expected token cannot be found in local storage a warning will be raised
+    as it is possible the token still exists and needs to be manually rescinded
+    at https://auth.globus.org/consents for security.
     """
     # try to get the user's preferred username from userinfo
     # if an API error is raised, they probably are not logged in

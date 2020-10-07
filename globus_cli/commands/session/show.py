@@ -8,9 +8,36 @@ from globus_cli.safeio import formatted_print, print_command_hint
 from globus_cli.services.auth import get_auth_client
 
 
-@command("show", short_help="Show your current CLI auth session")
+@command(
+    "show",
+    short_help="Show your current CLI auth session",
+    adoc_output="""Note: this output will not show your primary identity if it is not
+in session. For information on your identity set use 'globus whoami'.
+
+When textual output is requested, the output will be a table with
+the following fields:
+
+- 'Username'
+- 'ID'
+- 'Auth Time'
+
+When JSON output is requested the output will also have the session id
+if needed.
+""",
+    adoc_examples="""Display the current session with JSON output
+
+[source,bash]
+----
+$ globus session show --format json
+----
+""",
+)
 def session_show():
-    """List all identities in your current CLI auth session."""
+    """List all identities in your current CLI auth session.
+
+    Lists identities that are in the session tied to the CLI's access tokens along with
+    the time the user authenticated with that identity.
+    """
     # get a token to introspect, refreshing if neccecary
     auth_client = internal_auth_client()
     try:

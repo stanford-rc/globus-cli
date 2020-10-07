@@ -64,8 +64,20 @@ def login_command(no_local_server, force):
     """
     Get credentials for the Globus CLI
 
-    Necessary before any Globus CLI commands which require
-    authentication will work
+    Necessary before any Globus CLI commands which require authentication will work
+
+    This command directs you to the page necessary to permit the Globus CLI to make API
+    calls for you, and gets the OAuth2 tokens needed to use those permissions.
+
+    The default login method opens your browser to the Globus CLI's authorization
+    page, where you can read and consent to the permissions required to use the
+    Globus CLI. The CLI then takes care of getting the credentials through a
+    local server.
+
+    If the CLI detects you are on a remote session, or the --no-local-server option is
+    used, the CLI will instead print a link for you to manually follow to the Globus
+    CLI's authorization page. After consenting you will then need to copy and paste the
+    given access code from the web to the CLI.
     """
     # if not forcing, stop if user already logged in
     if not force and check_logged_in():
