@@ -1,8 +1,8 @@
+# build and release new docs as a release asset
 name: Build Docs
 on:
-  push:
-    branches:
-      - autobuild-doc
+  release:
+    types: [created]
 jobs:
   doc:
     name: Build Docs
@@ -21,16 +21,14 @@ jobs:
           ./reference/_generate.py
           # bundle as tarball without the _generate.py script
           tar --exclude "*.py" -czf cli-reference.tar.gz reference/
-      # upload as an artifact -- to download, use the GitHub APIs
-      # you can find this workflow's ID by listing workflows using:
-      #   https://docs.github.com/en/rest/reference/actions#list-repository-workflows
-      # then find the last run for a branch:
-      #   https://docs.github.com/en/rest/reference/actions#list-workflow-runs-for-a-repository
-      #
-      # and list artifacts for a run:
-      #   https://docs.github.com/en/rest/reference/actions#list-workflow-run-artifacts
+      # upload as a release asset
       - name: Upload Autodoc
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: cli-reference
-          path: ./cli-reference.tar.gz
+          # upload URL is pulled from the release event
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./cli-reference.tar.gz
+          asset_name: cli-reference.tar.gz
+          asset_content_type: application/gzip
