@@ -19,8 +19,9 @@ jobs:
       - name: Generate Autodoc
         run: |
           ./reference/_generate.py
-          # bundle as tarball without the _generate.py script
-          tar --exclude "*.py" -czf cli-reference.tar.gz reference/
+          # bundle as tarball without the _generate.py script or .gitignore
+          # use `-h` to dereference the changelog link
+          tar --exclude "*.py" --exclude '.gitignore' -czf cli-reference.tar.gz -h reference/
       # upload as a release asset
       - name: Upload Autodoc
         uses: actions/upload-release-asset@v1
