@@ -14,9 +14,9 @@ except ImportError:
     import httplib as http_client
 
 try:
-    from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 except ImportError:
-    from http.server import HTTPServer, BaseHTTPRequestHandler
+    from http.server import BaseHTTPRequestHandler, HTTPServer
 
 try:
     import Queue
@@ -24,9 +24,9 @@ except ImportError:
     import queue as Queue
 
 try:
-    from urlparse import urlparse, parse_qsl
+    from urlparse import parse_qsl, urlparse
 except ImportError:
-    from urllib.parse import urlparse, parse_qsl
+    from urllib.parse import parse_qsl, urlparse
 
 
 class LocalServerError(Exception):

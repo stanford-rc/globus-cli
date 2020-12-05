@@ -23,7 +23,7 @@ setup(
     version=version,
     packages=find_packages(exclude=["tests", "tests.*"]),
     install_requires=[
-        "globus-sdk==1.9.0",
+        "globus-sdk==1.9.1",
         "click>=7.1.1,<8.0",
         "jmespath==0.9.4",
         "configobj>=5.0.6,<6.0.0",
@@ -50,6 +50,10 @@ setup(
             # not just py2: py3 versions of mock don't all have the same
             # interface!
             'mock==2.0.0;python_version<"3.6"',
+            'black==20.8b1;python_version>="3.6"',
+            'isort>=5.6.4,<6.0;python_version>="3.6"',
+            "flake8>=3.8.4,<4.0",
+            'flake8-bugbear==20.11.1;python_version>="3.6"',
         ],
     },
     entry_points={"console_scripts": ["globus = globus_cli:main"]},
@@ -67,9 +71,9 @@ setup(
         "Operating System :: POSIX",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
 )
