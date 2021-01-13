@@ -118,33 +118,36 @@ def update_command(yes, development, development_version):
         # latest version supported by the current platform/runtime . So exit 0 with a
         # warning
         if current == upgrade_target:
-            click.echo(
-                click.style(
-                    (
-                        "You are running the latest version ({}) supported by your "
-                        "runtime environment.\n"
-                        "However, a newer version ({}) is available.\n"
-                        "You need to uninstall and reinstall the CLI in order to "
-                        "update."
-                    ).format(upgrade_target, latest),
-                    fg="yellow",
+            if upgrade_target != latest:
+                click.echo(
+                    click.style(
+                        (
+                            "You are running the latest version ({}) supported by "
+                            "python2.\n"
+                            "However, a newer version ({}) is available.\n"
+                            "If you would like to update to the latest version, you "
+                            "need to reinstall globus-cli using python3."
+                        ).format(upgrade_target, latest),
+                        fg="yellow",
+                    )
                 )
-            )
             return
 
-        # if we're up to date (or ahead, meaning a dev version was installed)
-        # then prompt before continuing, respecting `--yes`
-        else:
-            click.echo(
-                (
-                    "You are already running version {}\n"
-                    "The latest version for you is   {}"
-                ).format(current, upgrade_target)
+        # show the version(s) and prompt to continue
+        explain_upgrade = "The latest version is {}".format(latest)
+        if upgrade_target != latest:
+            explain_upgrade = """\
+The latest version for python2 is {0}
+The latest version for python3 is {1}.
+If you would like to install version {1}, you must reinstall globus-cli using python3.
+""".format(
+                upgrade_target, latest
             )
-            if not yes and (
-                not click.confirm("Continue with the upgrade?", default=True)
-            ):
-                click.get_current_context().exit(1)
+        click.echo(
+            "You are already running version {}\n" "{}".format(current, explain_upgrade)
+        )
+        if not yes and (not click.confirm("Continue with the upgrade?", default=True)):
+            click.get_current_context().exit(1)
 
         # if we make it through to here, it means we didn't hit any safe (or
         # unsafe) abort conditions, so set the target version for upgrade to

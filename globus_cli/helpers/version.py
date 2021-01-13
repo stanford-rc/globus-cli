@@ -53,15 +53,22 @@ def _get_package_data():
 
 
 def _get_versionblock_message(current, latest, upgrade_target):
-    base = """\
-Installed Version: {}
-Latest Version:    {}""".format(
-        current, latest
-    )
     if latest == upgrade_target:
-        return base
+        return """\
+Installed version:  {}
+Latest version:     {}""".format(
+            current, latest
+        )
+    # latest != upgrade_target means it's a py2 environment where we're capped at <2.0
     else:
-        return base + "\nUpgrade Target:    {}".format(upgrade_target)
+        return """\
+You are running the Globus CLI on python2
+
+Installed version:           {}
+Latest version for python2:  {}
+Latest version for python3:  {}""".format(
+            current, upgrade_target, latest
+        )
 
 
 def _get_post_message(current, latest, upgrade_target):
@@ -73,18 +80,19 @@ def _get_post_message(current, latest, upgrade_target):
         return "You should update your version of the Globus CLI with\n  globus update"
     if current == upgrade_target:
         return """\
-You are running the latest version of the Globus CLI supported by
-your runtime.
+You are running the latest version of the Globus CLI supported by python2.
 
-To upgrade to the latest version of the CLI, you will need to
-uninstall and reinstall the CLI."""
+To upgrade to the latest version of the CLI ({}), you will need to
+uninstall and reinstall the CLI using python3.""".format(
+            latest
+        )
     if current < upgrade_target:
         return """\
 You should update your version of the Globus CLI.
-However, your runtime does not support the latest version.
+However, your python2 runtime does not support the latest version.
 
 You may update with the 'globus update' command, but we recommend that
-you uninstall and reinstall the CLI."""
+you uninstall and reinstall the CLI using python3."""
     # should be unreachable
     return "Unrecognized status. You may be on a development version."
 
