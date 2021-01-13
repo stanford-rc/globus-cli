@@ -104,7 +104,7 @@ def update_command(yes, development, development_version):
         ).format(development_version)
     else:
         # lookup version from PyPi, abort if we can't get it
-        latest, current = get_versions()
+        upgrade_target, latest, current = get_versions()
         if latest is None:
             click.echo("Failed to lookup latest version. Aborting.")
             click.get_current_context().exit(1)
@@ -114,14 +114,32 @@ def update_command(yes, development, development_version):
             click.echo("You are already running the latest version: {}".format(current))
             return
 
+        # we are not all the way up to date (did not match `latest`) but we match the
+        # latest version supported by the current platform/runtime . So exit 0 with a
+        # warning
+        if current == upgrade_target:
+            click.echo(
+                click.style(
+                    (
+                        "You are running the latest version ({}) supported by your "
+                        "runtime environment.\n"
+                        "However, a newer version ({}) is available.\n"
+                        "You need to uninstall and reinstall the CLI in order to "
+                        "update."
+                    ).format(upgrade_target, latest),
+                    fg="yellow",
+                )
+            )
+            return
+
         # if we're up to date (or ahead, meaning a dev version was installed)
         # then prompt before continuing, respecting `--yes`
         else:
             click.echo(
                 (
-                    "You are already running version {0}\n"
-                    "The latest version is           {1}"
-                ).format(current, latest)
+                    "You are already running version {}\n"
+                    "The latest version for you is   {}"
+                ).format(current, upgrade_target)
             )
             if not yes and (
                 not click.confirm("Continue with the upgrade?", default=True)
@@ -131,7 +149,7 @@ def update_command(yes, development, development_version):
         # if we make it through to here, it means we didn't hit any safe (or
         # unsafe) abort conditions, so set the target version for upgrade to
         # the latest
-        target_version = "globus-cli=={}".format(latest)
+        target_version = "globus-cli=={}".format(upgrade_target)
 
     # print verbose warning/help message, to guide less fortunate souls who hit
     # Ctrl+C at a foolish time, lose connectivity, or don't invoke with `sudo`
