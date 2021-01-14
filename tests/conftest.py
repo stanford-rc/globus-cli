@@ -1,17 +1,14 @@
-import json
 import logging
 import os
 import shlex
-from datetime import datetime, timedelta
 
-import globus_sdk
 import pytest
+import responses
 import six
 from click.testing import CliRunner
 
 from globus_cli.services.auth import get_auth_client
 from globus_cli.services.transfer import get_client as get_transfer_client
-from tests.constants import GO_EP1_ID
 from tests.utils import patch_config
 
 log = logging.getLogger(__name__)
@@ -20,44 +17,6 @@ log = logging.getLogger(__name__)
 @pytest.fixture(scope="session")
 def test_file_dir():
     return os.path.normpath(os.path.join(os.path.dirname(__file__), "files"))
-
-
-@pytest.fixture
-def user_data(test_file_dir):
-    ret = {}
-    for uname in ("clitester1a", "clitester1alinked", "go"):
-        with open(os.path.join(test_file_dir, uname + "@globusid.org.json")) as f:
-            ret[uname] = json.load(f)
-    return ret
-
-
-@pytest.fixture(scope="session", autouse=True)
-def clean_sharing():
-    """
-    Cleans out any files in ~/.globus/sharing/ on go#ep1 older than an hour at the start
-    of each testsuite run
-    """
-    with patch_config():
-        tc = get_transfer_client()
-
-        path = "~/.globus/sharing/"
-        hour_ago = datetime.utcnow() - timedelta(hours=1)
-        filter_string = "last_modified:," + hour_ago.strftime("%Y-%m-%d %H:%M:%S")
-        try:
-            old_files = tc.operation_ls(
-                GO_EP1_ID, path=path, filter=filter_string, num_results=None
-            )
-        except globus_sdk.TransferAPIError:
-            return
-
-        kwargs = {"notify_on_succeeded": False, "notify_on_fail": False}
-        ddata = globus_sdk.DeleteData(tc, GO_EP1_ID, **kwargs)
-
-        for item in old_files:
-            ddata.add_item(path + item["name"])
-
-        if len(ddata["DATA"]):
-            tc.submit_delete(ddata)
 
 
 @pytest.fixture
@@ -114,39 +73,15 @@ def ac():
         return get_auth_client()
 
 
-# magical cleanup collections
-# each of these fixtures records data to pass through the autocleaner
-@pytest.fixture
-def created_endpoints():
-    return []
-
-
-@pytest.fixture
-def created_bookmark_names():
-    return []
-
-
 @pytest.fixture(autouse=True)
-def autoclean(request, created_endpoints, created_bookmark_names, tc):
-    def clean_endpoints():
-        for x in created_endpoints:
-            tc.delete_endpoint(x)
+def mocked_responses():
+    """
+    All tests enable `responses` patching of the `requests` package, replacing
+    all HTTP calls.
+    """
+    responses.start()
 
-    def clean_bookmarks():
-        if not created_bookmark_names:
-            return
+    yield
 
-        for bm in tc.bookmark_list():
-            if bm["name"] in created_bookmark_names:
-                try:
-                    tc.delete_bookmark(bm["id"])
-                except globus_sdk.GlobusAPIError:
-                    log.exception("API error on bookmark tests cleanup")
-                except globus_sdk.NetworkError:
-                    log.exception("Network error on bookmark tests cleanup")
-
-    def clean():
-        clean_endpoints()
-        clean_bookmarks()
-
-    request.addfinalizer(clean)
+    responses.stop()
+    responses.reset()

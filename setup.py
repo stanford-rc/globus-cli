@@ -46,6 +46,7 @@ setup(
             # testing
             "pytest<5",
             "pytest-cov<3.0",
+            "responses==0.12.1",
             # mock on py2 and py3.5
             # not just py2: py3 versions of mock don't all have the same
             # interface!
