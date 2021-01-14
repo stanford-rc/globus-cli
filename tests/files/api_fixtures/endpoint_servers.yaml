@@ -39,6 +39,7 @@ transfer:
         {
           "DATA_TYPE": "endpoint",
           "id": "096a65b1-3e90-44e6-9cb4-550b2d5401c0",
+          "subscription_id": null,
           "display_name": "myserver",
           "organization": "My Org",
           "username": "auser",
@@ -101,6 +102,7 @@ transfer:
         {
           "DATA_TYPE": "endpoint",
           "id": "06e2c959-d311-4bab-b2ea-25ad77d9fc12",
+          "subscription_id": null,
           "display_name": "mygcp",
           "organization": "My Org",
           "username": "auser",
@@ -175,6 +177,7 @@ transfer:
         {
           "DATA_TYPE": "endpoint",
           "id": "9fbee8d6-d705-4f86-80cf-32f6b265ce88",
+          "subscription_id": null,
           "display_name": "myserver",
           "organization": "My Org",
           "username": "auser",

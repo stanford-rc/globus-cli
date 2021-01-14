@@ -1,5 +1,6 @@
 metadata:
   endpoint_id: "1405823f-0597-4a16-b296-46d4f0ae4b15"
+  gcp_endpoint_id: "06e2c959-d311-4bab-b2ea-25ad77d9fc12"
   share_id: "b379e973-f5c5-4501-8377-5a0ecf37a99b"
 
 transfer:
@@ -14,6 +15,60 @@ transfer:
           "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
           "request_id": "ABCdef789"
         }
+  /endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15:
+    put:
+      json:
+        {
+          "DATA_TYPE": "result",
+          "code": "Updated",
+          "message": "Endpoint updated successfully",
+          "request_id": "SlzMEdxjp",
+          "resource": "/endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15"
+        }
+    get:
+      json:
+        {
+          "DATA_TYPE": "endpoint",
+          "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+          "subscription_id": null,
+          "display_name": "myserver",
+          "organization": "My Org",
+          "username": "auser",
+          "description": "Example gridftp endpoint.",
+          "public": false,
+          "is_globus_connect": false,
+          "globus_connect_setup_key": null,
+          "gcp_connected": null,
+          "gcp_paused": null,
+          "s3_url": null,
+          "s3_owner_activated": false,
+          "host_endpoint_id": null,
+          "host_path": null,
+          "disable_verify": false,
+          "force_encryption": false,
+          "myproxy_server": null,
+          "myproxy_dn": null,
+          "oauth_server": null,
+          "default_directory": null,
+          "activated": false,
+          "expires_in": 0,
+          "expire_time": "2000-01-02 03:45:06+00:00",
+          "shareable": true,
+          "acl_available": false,
+          "acl_editable": false,
+          "in_use": false,
+          "DATA": [
+            {
+              "DATA_TYPE": "server",
+              "hostname": "example.org",
+              "uri": "gsiftp://example.org:2811",
+              "port": 2811,
+              "scheme": "gsiftp",
+              "id": 985,
+              "subject": "/O=Grid/OU=Example/CN=host/girdftp.example.org"
+            }
+          ]
+        }
   /shared_endpoint:
     post:
       json:
@@ -23,4 +78,111 @@ transfer:
           "message": "Shared endpoint created",
           "id": "b379e973-f5c5-4501-8377-5a0ecf37a99b",
           "request_id": "ABCdef789"
+        }
+  # shared EP
+  /endpoint/b379e973-f5c5-4501-8377-5a0ecf37a99b:
+    put:
+      json:
+        {
+          "DATA_TYPE": "result",
+          "code": "Updated",
+          "message": "Endpoint updated successfully",
+          "request_id": "SlzMEdxjp",
+          "resource": "/endpoint/b379e973-f5c5-4501-8377-5a0ecf37a99b"
+        }
+    get:
+      json:
+        {
+          "DATA_TYPE": "endpoint",
+          "id": "b379e973-f5c5-4501-8377-5a0ecf37a99b",
+          "subscription_id": null,
+          "display_name": "myshare",
+          "organization": "My Org",
+          "username": "auser",
+          "description": "Example shared endpoint.",
+          "public": false,
+          "is_globus_connect": false,
+          "globus_connect_setup_key": null,
+          "gcp_connected": null,
+          "gcp_paused": null,
+          "s3_url": null,
+          "s3_owner_activated": false,
+          "host_endpoint_id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+          "host_path": "/",
+          "disable_verify": false,
+          "force_encryption": false,
+          "myproxy_server": null,
+          "myproxy_dn": null,
+          "oauth_server": null,
+          "default_directory": null,
+          "activated": false,
+          "expires_in": 0,
+          "expire_time": "2000-01-02 03:45:06+00:00",
+          "shareable": true,
+          "acl_available": true,
+          "acl_editable": true,
+          "in_use": false,
+          "DATA": [
+          ]
+        }
+  # gcp endpoint
+  /endpoint/06e2c959-d311-4bab-b2ea-25ad77d9fc12:
+    put:
+      json:
+        {
+          "DATA_TYPE": "result",
+          "code": "Updated",
+          "message": "Endpoint updated successfully",
+          "request_id": "SlzMEdxjp",
+          "resource": "/endpoint/06e2c959-d311-4bab-b2ea-25ad77d9fc12"
+        }
+    get:
+      json:
+        {
+          "DATA_TYPE": "endpoint",
+          "id": "06e2c959-d311-4bab-b2ea-25ad77d9fc12",
+          "subscription_id": null,
+          "display_name": "mygcp",
+          "organization": "My Org",
+          "username": "auser",
+          "description": "Example gcp endpoint.",
+          "public": false,
+          "is_globus_connect": true,
+          "globus_connect_setup_key": "8d09216f-7a76-4568-84a2-1275e2a805ec",
+          "gcp_connected": true,
+          "gcp_paused": false,
+          "s3_url": null,
+          "s3_owner_activated": false,
+          "host_endpoint_id": null,
+          "host_path": null,
+          "disable_verify": false,
+          "force_encryption": false,
+          "myproxy_server": null,
+          "myproxy_dn": null,
+          "oauth_server": null,
+          "default_directory": null,
+          "activated": false,
+          "expires_in": 0,
+          "expire_time": "2000-01-02 03:45:06+00:00",
+          "shareable": true,
+          "acl_available": false,
+          "acl_editable": false,
+          "in_use": false,
+          "DATA": [
+            {
+              "DATA_TYPE": "server",
+              "hostname": null,
+              "id": 512656,
+              "incoming_data_port_end": null,
+              "incoming_data_port_start": null,
+              "is_connected": false,
+              "is_paused": false,
+              "outgoing_data_port_end": null,
+              "outgoing_data_port_start": null,
+              "port": null,
+              "scheme": null,
+              "subject": "/C=US/O=Globus Consortium/OU=Globus Connect Service/CN=5ce26d28-8992-11ea-8aca-02a02b772791",
+              "uri": null
+            }
+          ]
         }
