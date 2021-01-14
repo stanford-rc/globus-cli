@@ -1,4 +1,5 @@
 import os
+import time
 from contextlib import contextmanager
 
 from configobj import ConfigObj
@@ -36,11 +37,11 @@ def get_default_test_config():
                 globus_cli.config.CLIENT_ID_OPTNAME: CLITESTER1A_CLIENT_ID,
                 globus_cli.config.CLIENT_SECRET_OPTNAME: CLITESTER1A_CLIENT_SECRET,
                 globus_cli.config.AUTH_RT_OPTNAME: CLITESTER1A_AUTH_RT,
-                globus_cli.config.AUTH_AT_OPTNAME: "",
-                globus_cli.config.AUTH_AT_EXPIRES_OPTNAME: 0,
+                globus_cli.config.AUTH_AT_OPTNAME: "AuthAT",
+                globus_cli.config.AUTH_AT_EXPIRES_OPTNAME: int(time.time()) + 120,
                 globus_cli.config.TRANSFER_RT_OPTNAME: CLITESTER1A_TRANSFER_RT,
-                globus_cli.config.TRANSFER_AT_OPTNAME: "",
-                globus_cli.config.TRANSFER_AT_EXPIRES_OPTNAME: 0,
+                globus_cli.config.TRANSFER_AT_OPTNAME: "TransferAT",
+                globus_cli.config.TRANSFER_AT_EXPIRES_OPTNAME: int(time.time()) + 120,
             }
         }
     )

@@ -6,6 +6,7 @@ import pytest
 import responses
 import six
 from click.testing import CliRunner
+from globus_sdk.base import slash_join
 
 from globus_cli.services.auth import get_auth_client
 from globus_cli.services.transfer import get_client as get_transfer_client
@@ -55,7 +56,7 @@ def run_line(cli_runner, request):
             result = cli_runner.invoke(
                 main, args[1:], input=stdin, catch_exceptions=bool(assert_exit_code)
             )
-            assert result.exit_code == assert_exit_code
+            assert result.exit_code == assert_exit_code, result.output
             return result
 
     return func
@@ -74,14 +75,64 @@ def ac():
 
 
 @pytest.fixture(autouse=True)
-def mocked_responses():
+def mocked_responses(monkeypatch):
     """
     All tests enable `responses` patching of the `requests` package, replacing
     all HTTP calls.
     """
     responses.start()
 
+    # while request mocking is running, ensure GLOBUS_SDK_ENVIRONMENT is set to
+    # production
+    monkeypatch.setitem(os.environ, "GLOBUS_SDK_ENVIRONMENT", "production")
+
     yield
 
     responses.stop()
     responses.reset()
+
+
+@pytest.fixture
+def register_api_route(mocked_responses):
+    # copied almost verbatim from the SDK testsuite
+    def func(
+        service,
+        path,
+        method=responses.GET,
+        adding_headers=None,
+        replace=False,
+        match_querystring=False,
+        **kwargs
+    ):
+        base_url_map = {
+            "auth": "https://auth.globus.org/",
+            "nexus": "https://nexus.api.globusonline.org/",
+            "transfer": "https://transfer.api.globus.org/v0.10",
+            "search": "https://search.api.globus.org/",
+        }
+        assert service in base_url_map
+        base_url = base_url_map.get(service)
+        full_url = slash_join(base_url, path)
+
+        # can set it to `{}` explicitly to clear the default
+        if adding_headers is None:
+            adding_headers = {"Content-Type": "application/json"}
+
+        if replace:
+            responses.replace(
+                method,
+                full_url,
+                headers=adding_headers,
+                match_querystring=match_querystring,
+                **kwargs
+            )
+        else:
+            responses.add(
+                method,
+                full_url,
+                headers=adding_headers,
+                match_querystring=match_querystring,
+                **kwargs
+            )
+
+    return func
