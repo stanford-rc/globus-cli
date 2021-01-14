@@ -1,0 +1,7 @@
+metadata:
+  submission_id: "5902daab-ffea-4e83-84f6-f69e5f8b7bb3"
+
+transfer:
+  /submission_id:
+    get:
+      json: {"value": "5902daab-ffea-4e83-84f6-f69e5f8b7bb3"}

@@ -7,11 +7,14 @@ import responses
 import six
 from click.testing import CliRunner
 from globus_sdk.base import slash_join
+from ruamel.yaml import YAML
 
 from globus_cli.services.auth import get_auth_client
 from globus_cli.services.transfer import get_client as get_transfer_client
+from tests.constants import GO_EP1_ID, GO_EP2_ID
 from tests.utils import patch_config
 
+yaml = YAML()
 log = logging.getLogger(__name__)
 
 
@@ -134,5 +137,28 @@ def register_api_route(mocked_responses):
                 match_querystring=match_querystring,
                 **kwargs
             )
+
+    return func
+
+
+@pytest.fixture
+def load_api_fixtures(register_api_route, test_file_dir):
+    def func(filename):
+        filename = os.path.join(test_file_dir, "api_fixtures", filename)
+        with open(filename) as fp:
+            data = yaml.load(fp.read())
+        for service, routes in data.items():
+            # allow use of the key "metadata" to expose extra data from a fixture file
+            # to the user of it
+            if service == "metadata":
+                continue
+            for path, methods in routes.items():
+                # allow /endpoint/{GO_EP1_ID} as a path
+                path = path.format(GO_EP1_ID=GO_EP1_ID, GO_EP2_ID=GO_EP2_ID)
+                for method, params in methods.items():
+                    register_api_route(service, path, method=method.upper(), **params)
+
+        # after registration, return the raw fixture data
+        return data
 
     return func

@@ -1,5 +1,3 @@
-import uuid
-
 from tests.constants import GO_EP1_ID, GO_EP2_ID
 
 
@@ -46,70 +44,39 @@ def test_invalid_command(run_line):
     assert "Error: No such command" in result.output
 
 
-def test_whoami(run_line, register_api_route):
+def test_whoami(run_line, load_api_fixtures):
     """
     Runs whoami to confirm test config successfully setup
     """
-    user_id = str(uuid.uuid4())
-    register_api_route(
-        "auth",
-        "/v2/oauth2/userinfo",
-        json={
-            "preferred_username": "foo@globusid.org",
-            "name": "Foo McUser",
-            "sub": user_id,
-            "email": "foo.mcuser@globus.org",
-        },
-    )
-
+    load_api_fixtures("foo_user_info.yaml")
     result = run_line("globus whoami")
     assert result.output == "foo@globusid.org\n"
 
 
-def test_whoami_no_auth(run_line, register_api_route):
+def test_whoami_no_auth(run_line, load_api_fixtures):
     """
     Runs whoami with config set to be empty, confirms no login seen.
     """
-    register_api_route(
-        "auth",
-        "/v2/oauth2/userinfo",
-        status=401,
-        json={"code": "UNAUTHORIZED", "message": "foo bar"},
-    )
+    load_api_fixtures("all_authentication_failed.yaml")
     result = run_line("globus whoami", config={}, assert_exit_code=1)
     assert "Unable to get user information" in result.output
 
 
-def test_json_raw_string_output(run_line, register_api_route):
+def test_json_raw_string_output(run_line, load_api_fixtures):
     """
     Get single-field jmespath output and make sure it's quoted
     """
-    user_id = str(uuid.uuid4())
-    register_api_route(
-        "auth",
-        "/v2/oauth2/userinfo",
-        json={
-            "preferred_username": "foo@globusid.org",
-            "name": "Foo McUser",
-            "sub": user_id,
-            "email": "foo.mcuser@globus.org",
-        },
-    )
+    load_api_fixtures("foo_user_info.yaml")
     result = run_line("globus whoami --jmespath name")
     assert '"Foo McUser"\n' == result.output
 
 
-def test_auth_call_no_auth(run_line, register_api_route):
+def test_auth_call_no_auth(run_line, load_api_fixtures):
     """
     Runs get-identities with config set to be empty,
     confirms No Authentication CLI error.
     """
-    register_api_route(
-        "auth",
-        "/v2/api/identities",
-        status=401,
-        json={"code": "UNAUTHORIZED", "message": "foo bar"},
-    )
+    load_api_fixtures("all_authentication_failed.yaml")
     result = run_line(
         "globus get-identities foo@globusid.org",
         config={},
@@ -118,66 +85,33 @@ def test_auth_call_no_auth(run_line, register_api_route):
     assert "No Authentication provided." in result.output
 
 
-def test_auth_call(run_line, register_api_route):
+def test_auth_call(run_line, load_api_fixtures):
     """
     Runs get-identities using test auth refresh token to confirm
     test auth refresh token is live and configured correctly
     """
-    user_id = str(uuid.uuid4())
-    idp_id = str(uuid.uuid4())
-    register_api_route(
-        "auth",
-        "/v2/api/identities",
-        json={
-            "identities": [
-                {
-                    "username": "foo@globusid.org",
-                    "name": "Foo McUser",
-                    "id": user_id,
-                    "identity_provider": idp_id,
-                    "organization": "McUser Group",
-                    "status": "used",
-                    "email": "foo.mcuser@globus.org",
-                }
-            ]
-        },
-    )
+    data = load_api_fixtures("foo_user_info.yaml")
+    user_id = data["metadata"]["user_id"]
     result = run_line("globus get-identities foo@globusid.org")
     assert user_id in result.output
 
 
-def test_transfer_call_no_auth(run_line, register_api_route):
+def test_transfer_call_no_auth(run_line, load_api_fixtures):
     """
     Runs ls with config set to be empty,
     confirms No Authentication CLI error.
     """
-    register_api_route(
-        "transfer",
-        "/endpoint/{}/autoactivate".format(GO_EP1_ID),
-        method="POST",
-        status=401,
-        json={
-            "code": "ClientError.AuthenticationFailed",
-            "message": "foo bar",
-            "request_id": "abc123",
-        },
-    )
+    load_api_fixtures("all_authentication_failed.yaml")
     result = run_line("globus ls " + str(GO_EP1_ID), config={}, assert_exit_code=1)
     assert "No Authentication provided." in result.output
 
 
-def test_transfer_call(run_line, register_api_route):
+def test_transfer_call(run_line, load_api_fixtures, register_api_route):
     """
     Runs ls using test transfer refresh token to confirm
     test transfer refresh token is live and configured correctly
     """
-    register_api_route(
-        "transfer",
-        "/endpoint/{}/autoactivate".format(GO_EP1_ID),
-        method="POST",
-        # exact data doesn't matter, just not the failure code
-        json={"code": "AutoActivated.BogusCode"},
-    )
+    load_api_fixtures("transfer_activate_success.yaml")
     register_api_route(
         "transfer",
         "/operation/endpoint/{}/ls".format(GO_EP1_ID),
@@ -208,27 +142,13 @@ def test_transfer_call(run_line, register_api_route):
     assert "home/" in result.output
 
 
-def test_transfer_batchmode_dryrun(run_line, register_api_route):
+def test_transfer_batchmode_dryrun(run_line, load_api_fixtures):
     """
     Dry-runs a transfer in batchmode, confirms batchmode inputs received
     """
     # put a submission ID and autoactivate response in place
-    submission_id = str(uuid.uuid4())
-    register_api_route("transfer", "/submission_id", json={"value": submission_id})
-    register_api_route(
-        "transfer",
-        "/endpoint/{}/autoactivate".format(GO_EP1_ID),
-        method="POST",
-        # exact data doesn't matter, just not the failure code
-        json={"code": "AutoActivated.BogusCode"},
-    )
-    register_api_route(
-        "transfer",
-        "/endpoint/{}/autoactivate".format(GO_EP2_ID),
-        method="POST",
-        # exact data doesn't matter, just not the failure code
-        json={"code": "AutoActivated.BogusCode"},
-    )
+    load_api_fixtures("get_submission_id.yaml")
+    load_api_fixtures("transfer_activate_success.yaml")
 
     batch_input = u"abc /def\n/xyz p/q/r\n"
     result = run_line(
@@ -243,20 +163,13 @@ def test_transfer_batchmode_dryrun(run_line, register_api_route):
         assert '"destination_path": "{}"'.format(dst) in result.output
 
 
-def test_delete_batchmode_dryrun(run_line, register_api_route):
+def test_delete_batchmode_dryrun(run_line, load_api_fixtures):
     """
     Dry-runs a delete in batchmode
     """
     # put a submission ID and autoactivate response in place
-    submission_id = str(uuid.uuid4())
-    register_api_route("transfer", "/submission_id", json={"value": submission_id})
-    register_api_route(
-        "transfer",
-        "/endpoint/{}/autoactivate".format(GO_EP1_ID),
-        method="POST",
-        # exact data doesn't matter, just not the failure code
-        json={"code": "AutoActivated.BogusCode"},
-    )
+    load_api_fixtures("get_submission_id.yaml")
+    load_api_fixtures("transfer_activate_success.yaml")
 
     batch_input = u"abc/def\n/xyz\nabcdef\nabc/def/../xyz\n"
     result = run_line(
