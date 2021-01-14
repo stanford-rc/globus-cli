@@ -52,6 +52,51 @@ def _get_package_data():
     return moddata
 
 
+def _get_versionblock_message(current, latest, upgrade_target):
+    if latest == upgrade_target:
+        return """\
+Installed version:  {}
+Latest version:     {}""".format(
+            current, latest
+        )
+    # latest != upgrade_target means it's a py2 environment where we're capped at <2.0
+    else:
+        return """\
+You are running the Globus CLI on python2
+
+Installed version:           {}
+Latest version for python2:  {}
+Latest version for python3:  {}""".format(
+            current, upgrade_target, latest
+        )
+
+
+def _get_post_message(current, latest, upgrade_target):
+    if current == latest:
+        return "You are running the latest version of the Globus CLI"
+    if current > latest:
+        return "You are running a preview version of the Globus CLI"
+    if upgrade_target == latest:
+        return "You should update your version of the Globus CLI with\n  globus update"
+    if current == upgrade_target:
+        return """\
+You are running the latest version of the Globus CLI supported by python2.
+
+To upgrade to the latest version of the CLI ({}), you will need to
+uninstall and reinstall the CLI using python3.""".format(
+            latest
+        )
+    if current < upgrade_target:
+        return """\
+You should update your version of the Globus CLI.
+However, your python2 runtime does not support the latest version.
+
+You may update with the 'globus update' command, but we recommend that
+you uninstall and reinstall the CLI using python3."""
+    # should be unreachable
+    return "Unrecognized status. You may be on a development version."
+
+
 def print_version():
     """
     Print out the current version, and at least try to fetch the latest from
@@ -60,25 +105,16 @@ def print_version():
     It may seem odd that this isn't in globus_cli.version , but it's done this
     way to separate concerns over printing the version from looking it up.
     """
-    latest, current = get_versions()
+    upgrade_target, latest, current = get_versions()
     if latest is None:
         click.echo(
             ("Installed Version: {0}\nFailed to lookup latest version.").format(current)
         )
     else:
         click.echo(
-            ("Installed Version: {0}\nLatest Version:    {1}\n\n{2}").format(
-                current,
-                latest,
-                "You are running the latest version of the Globus CLI"
-                if current == latest
-                else (
-                    "You should update your version of the Globus CLI with\n"
-                    "  globus update"
-                )
-                if current < latest
-                else "You are running a preview version of the Globus CLI",
-            )
+            _get_versionblock_message(current, latest, upgrade_target)
+            + "\n\n"
+            + _get_post_message(current, latest, upgrade_target)
         )
 
     # verbose shows more platform and python info
