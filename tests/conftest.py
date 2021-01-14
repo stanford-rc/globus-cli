@@ -10,6 +10,7 @@ from globus_sdk.base import slash_join
 from ruamel.yaml import YAML
 
 from globus_cli.services.auth import get_auth_client
+from globus_cli.services.transfer import RetryingTransferClient
 from globus_cli.services.transfer import get_client as get_transfer_client
 from tests.constants import GO_EP1_ID, GO_EP2_ID
 from tests.utils import patch_config
@@ -162,3 +163,9 @@ def load_api_fixtures(register_api_route, test_file_dir):
         return data
 
     return func
+
+
+@pytest.fixture(autouse=True)
+def _reduce_transfer_client_retries(monkeypatch):
+    """to make tests fail faster on network errors"""
+    monkeypatch.setattr(RetryingTransferClient, "default_retries", 1)

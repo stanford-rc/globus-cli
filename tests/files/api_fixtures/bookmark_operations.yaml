@@ -1,0 +1,59 @@
+metadata:
+  bookmark_id: "1405823f-0597-4a16-b296-46d4f0ae4b15"
+  bookmark_name: sharebm
+  bookmark_name_after_update: updated_sharebm
+
+transfer:
+  /bookmark:
+    post:
+      json:
+        {
+          "DATA_TYPE": "bookmark",
+          "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+          "name": "sharebm",
+          "endpoint_id": "ddb59aef-6d04-11e5-ba46-22000b92c6ec",
+          "path": "/share/"
+        }
+  /bookmark/1405823f-0597-4a16-b296-46d4f0ae4b15:
+    get:
+      json:
+        {
+          "DATA_TYPE": "bookmark",
+          "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+          "name": "sharebm",
+          "endpoint_id": "ddb59aef-6d04-11e5-ba46-22000b92c6ec",
+          "path": "/share/"
+        }
+    put:
+      json:
+        {
+          "DATA_TYPE": "bookmark",
+          "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+          "name": "updated_sharebm",
+          "endpoint_id": "ddb59aef-6d04-11e5-ba46-22000b92c6ec",
+          "path": "/share/"
+        }
+    delete:
+      json:
+        {
+          "DATA_TYPE": "result",
+          "code": "Deleted",
+          "message": "Bookmark '1405823f-0597-4a16-b296-46d4f0ae4b15' deleted successfully",
+          "resource": "/bookmark/a624df8b",
+          "request_id": "ABCdef789"
+        }
+  /bookmark_list:
+    get:
+      json:
+        {
+          "DATA_TYPE": "bookmark_list",
+          "DATA": [
+            {
+              "DATA_TYPE": "bookmark",
+              "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+              "name": "sharebm",
+              "endpoint_id": "ddb59aef-6d04-11e5-ba46-22000b92c6ec",
+              "path": "/share/"
+            }
+          ]
+        }

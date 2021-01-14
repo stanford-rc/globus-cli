@@ -1,120 +1,94 @@
 import json
-import uuid
-
-import pytest
 
 from tests.constants import GO_EP1_ID
 
 
-@pytest.fixture
-def gen_bookmark_name(created_bookmark_names):
-    def f(name=""):
-        if name:
-            name = name + "-"
-        bmname = "{}{}".format(name, str(uuid.uuid1()))
-        created_bookmark_names.append(bmname)
-        return bmname
-
-    return f
-
-
-@pytest.fixture
-def bookmark1(gen_bookmark_name, tc):
-    bm1name = gen_bookmark_name(name="bm1")
-    res = tc.create_bookmark(
-        {"endpoint_id": GO_EP1_ID, "path": "/home/", "name": bm1name}
-    )
-    bm1id = res["id"]
-    return (bm1name, bm1id)
-
-
-@pytest.fixture
-def bm1name(bookmark1):
-    return bookmark1[0]
-
-
-@pytest.fixture
-def bm1id(bookmark1):
-    return bookmark1[1]
-
-
-def test_bookmark_create(gen_bookmark_name, run_line):
+def test_bookmark_create(run_line, load_api_fixtures):
     """
     Runs bookmark create, confirms simple things about text and json output
     """
-    result = run_line(
-        ("globus bookmark create " "{}:{} {}").format(
-            GO_EP1_ID, "/share/", gen_bookmark_name(name="sharebm")
-        )
-    )
-    assert "Bookmark ID: " in result.output
+    data = load_api_fixtures("bookmark_operations.yaml")
+    bookmark_id = data["metadata"]["bookmark_id"]
+    result = run_line("globus bookmark create {}:/share/ sharebm".format(GO_EP1_ID))
+    assert "Bookmark ID: {}".format(bookmark_id) in result.output
 
-    bm2name = gen_bookmark_name(name="share bookmark 2")
+    # repeat, but with JSON output
     json_output = json.loads(
         run_line(
-            ('globus bookmark create -F json {}:{} "{}"').format(
-                GO_EP1_ID, "/share/dne/", bm2name
-            )
+            "globus bookmark create -Fjson {}:/share/ sharebm".format(GO_EP1_ID)
         ).output
     )
-    assert json_output["name"] == bm2name
-    assert json_output["path"] == "/share/dne/"
+    assert json_output["id"] == bookmark_id
+    assert json_output["name"] == "sharebm"
+    assert json_output["path"] == "/share/"
     assert json_output["endpoint_id"] == GO_EP1_ID
 
 
-def test_bookmark_show(gen_bookmark_name, bm1name, bm1id, run_line):
+def test_bookmark_show(run_line, load_api_fixtures):
     """
     Runs bookmark show on bm1's name and id.
     Confirms both inputs work, and verbose output is as expected.
     """
+    data = load_api_fixtures("bookmark_operations.yaml")
+    bookmark_id = data["metadata"]["bookmark_id"]
+    bookmark_name = data["metadata"]["bookmark_name"]
+
     # id
-    result = run_line('globus bookmark show "{}"'.format(bm1id))
-    assert "{}:/home/\n".format(GO_EP1_ID) == result.output
+    result = run_line('globus bookmark show "{}"'.format(bookmark_id))
+    assert "{}:/share/\n".format(GO_EP1_ID) == result.output
 
     # name
-    result = run_line('globus bookmark show "{}"'.format(bm1name))
-    assert "{}:/home/\n".format(GO_EP1_ID) == result.output
+    result = run_line('globus bookmark show "{}"'.format(bookmark_name))
+    assert "{}:/share/\n".format(GO_EP1_ID) == result.output
 
     # verbose
-    result = run_line("globus bookmark show -v {}".format(bm1id))
+    result = run_line("globus bookmark show -v {}".format(bookmark_id))
     assert "Endpoint ID: {}".format(GO_EP1_ID) in result.output
 
 
-def test_bookmark_rename_by_id(gen_bookmark_name, run_line, bm1id):
+def test_bookmark_rename_by_id(run_line, load_api_fixtures):
     """
-    Runs bookmark rename on bm1's id. Confirms can be shown by new name.
+    Runs bookmark rename on bm1's id.
     """
-    new_name = gen_bookmark_name(name="new_bm1")
-    result = run_line('globus bookmark rename "{}" "{}"'.format(bm1id, new_name))
+    data = load_api_fixtures("bookmark_operations.yaml")
+    bookmark_id = data["metadata"]["bookmark_id"]
+    updated_bookmark_name = data["metadata"]["bookmark_name_after_update"]
+
+    result = run_line(
+        'globus bookmark rename "{}" "{}"'.format(bookmark_id, updated_bookmark_name)
+    )
     assert "Success" in result.output
 
-    result = run_line('globus bookmark show -v "{}"'.format(new_name))
-    assert "ID:          {}".format(bm1id) in result.output
 
-
-def test_bookmark_rename_by_name(gen_bookmark_name, run_line, bm1name, bm1id):
+def test_bookmark_rename_by_name(run_line, load_api_fixtures):
     """
     Runs bookmark rename on bm1's name. Confirms can be shown by new name.
     """
-    new_name = gen_bookmark_name(name="new_bm1")
-    result = run_line('globus bookmark rename "{}" "{}"'.format(bm1name, new_name))
+    data = load_api_fixtures("bookmark_operations.yaml")
+    bookmark_name = data["metadata"]["bookmark_name"]
+    updated_bookmark_name = data["metadata"]["bookmark_name_after_update"]
+
+    result = run_line(
+        'globus bookmark rename "{}" "{}"'.format(bookmark_name, updated_bookmark_name)
+    )
     assert "Success" in result.output
 
-    result = run_line('globus bookmark show -v "{}"'.format(new_name))
-    assert "ID:          {}".format(bm1id) in result.output
 
-
-def test_bookmark_delete_by_id(gen_bookmark_name, run_line, bm1id):
+def test_bookmark_delete_by_id(run_line, load_api_fixtures):
     """
     Runs bookmark delete on bm1's id. Confirms success message.
     """
-    result = run_line('globus bookmark delete "{}"'.format(bm1id))
+    data = load_api_fixtures("bookmark_operations.yaml")
+    bookmark_id = data["metadata"]["bookmark_id"]
+    result = run_line('globus bookmark delete "{}"'.format(bookmark_id))
     assert "deleted successfully" in result.output
 
 
-def test_bookmark_delete_by_name(gen_bookmark_name, run_line, bm1name):
+def test_bookmark_delete_by_name(run_line, load_api_fixtures):
     """
     Runs bookmark delete on bm1's name. Confirms success message.
     """
-    result = run_line('globus bookmark delete "{}"'.format(bm1name))
+    data = load_api_fixtures("bookmark_operations.yaml")
+    bookmark_name = data["metadata"]["bookmark_name"]
+    result = run_line('globus bookmark delete "{}"'.format(bookmark_name))
     assert "deleted successfully" in result.output
