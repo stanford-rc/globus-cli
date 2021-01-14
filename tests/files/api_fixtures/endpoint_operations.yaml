@@ -1,0 +1,26 @@
+metadata:
+  endpoint_id: "1405823f-0597-4a16-b296-46d4f0ae4b15"
+  share_id: "b379e973-f5c5-4501-8377-5a0ecf37a99b"
+
+transfer:
+  /endpoint:
+    post:
+      json:
+        {
+          "DATA_TYPE": "endpoint_create_result",
+          "code": "Created",
+          "message": "Endpoint created",
+          "globus_connect_setup_key": null,
+          "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+          "request_id": "ABCdef789"
+        }
+  /shared_endpoint:
+    post:
+      json:
+        {
+          "DATA_TYPE": "endpoint_create_result",
+          "code": "Created",
+          "message": "Shared endpoint created",
+          "id": "b379e973-f5c5-4501-8377-5a0ecf37a99b",
+          "request_id": "ABCdef789"
+        }
