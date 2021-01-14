@@ -1,6 +1,6 @@
-.. image:: https://travis-ci.org/globus/globus-cli.svg?branch=master
+.. image:: https://github.com/globus/globus-cli/workflows/build/badge.svg?event=push
     :alt: build status
-    :target: https://travis-ci.org/globus/globus-cli
+    :target: https://github.com/globus/globus-cli/actions?query=workflow%3Abuild
 .. image:: https://badge.fury.io/py/globus-cli.svg
     :alt: PyPi Version
     :target: https://badge.fury.io/py/globus-cli
