@@ -191,19 +191,13 @@ def register_api_route(mocked_responses):
 
 
 def _iter_fixture_routes(routes):
-    # walk a fixture file either as a nested dict or list of routes
-    # lists allow us to workaround duplicates when they only differ by params
-    if isinstance(routes, list):
-        for x in routes:
-            # copy and remove elements
-            params = {**x}
-            path = params.pop("path")
-            method = params.pop("method")
-            yield path, method, params
-    else:
-        for path, methods in routes.items():
-            for method, params in methods.items():
-                yield path, method, params
+    # walk a fixture file either as a list of routes
+    for x in routes:
+        # copy and remove elements
+        params = {**x}
+        path = params.pop("path")
+        method = params.pop("method", "get")
+        yield path, method, params
 
 
 @pytest.fixture

@@ -2,7 +2,6 @@
 transfer:
   # listing on "/"
   - path: /operation/endpoint/{GO_EP1_ID}/ls
-    method: get
     query_params:
       path: "/"
       show_hidden: 0
@@ -81,7 +80,6 @@ transfer:
       }
   # recursive listing on "/share"
   - path: /operation/endpoint/{GO_EP1_ID}/ls
-    method: get
     query_params:
       path: "/share"
       show_hidden: 0
@@ -114,7 +112,6 @@ transfer:
         "total": 1
       }
   - path: /operation/endpoint/{GO_EP1_ID}/ls
-    method: get
     query_params:
       path: "/share/godata"
       show_hidden: 0
@@ -178,7 +175,6 @@ transfer:
       }
   # recursive listing on / with depth 1, covered by above, plus these...
   - path: /operation/endpoint/{GO_EP1_ID}/ls
-    method: get
     query_params:
       path: "/home"
       show_hidden: 0
@@ -211,7 +207,6 @@ transfer:
         "total": 1
       }
   - path: /operation/endpoint/{GO_EP1_ID}/ls
-    method: get
     query_params:
       path: "/mnt"
       show_hidden: 0
@@ -228,7 +223,6 @@ transfer:
         "total": 0
       }
   - path: /operation/endpoint/{GO_EP1_ID}/ls
-    method: get
     query_params:
       path: "/not shareable"
       show_hidden: 0
