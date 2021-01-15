@@ -1,6 +1,3 @@
-from tests.constants import GO_EP1_ID, GO_EP2_ID
-
-
 def test_parsing(run_line):
     """
     Runs --help and confirms the option is parsed
@@ -96,17 +93,17 @@ def test_auth_call(run_line, load_api_fixtures):
     assert user_id in result.output
 
 
-def test_transfer_call_no_auth(run_line, load_api_fixtures):
+def test_transfer_call_no_auth(run_line, load_api_fixtures, go_ep1_id):
     """
     Runs ls with config set to be empty,
     confirms No Authentication CLI error.
     """
     load_api_fixtures("all_authentication_failed.yaml")
-    result = run_line("globus ls " + str(GO_EP1_ID), config={}, assert_exit_code=1)
+    result = run_line("globus ls " + go_ep1_id, config={}, assert_exit_code=1)
     assert "No Authentication provided." in result.stderr
 
 
-def test_transfer_call(run_line, load_api_fixtures, register_api_route):
+def test_transfer_call(run_line, load_api_fixtures, register_api_route, go_ep1_id):
     """
     Runs ls using test transfer refresh token to confirm
     test transfer refresh token is live and configured correctly
@@ -114,7 +111,7 @@ def test_transfer_call(run_line, load_api_fixtures, register_api_route):
     load_api_fixtures("transfer_activate_success.yaml")
     register_api_route(
         "transfer",
-        "/operation/endpoint/{}/ls".format(GO_EP1_ID),
+        "/operation/endpoint/{}/ls".format(go_ep1_id),
         json={
             # not *quite* verbatim data from the API, but very similar and in the right
             # format with all fields populated
@@ -138,11 +135,11 @@ def test_transfer_call(run_line, load_api_fixtures, register_api_route):
             ]
         },
     )
-    result = run_line("globus ls " + str(GO_EP1_ID) + ":/")
+    result = run_line("globus ls " + go_ep1_id + ":/")
     assert "home/" in result.output
 
 
-def test_transfer_batchmode_dryrun(run_line, load_api_fixtures):
+def test_transfer_batchmode_dryrun(run_line, load_api_fixtures, go_ep1_id, go_ep2_id):
     """
     Dry-runs a transfer in batchmode, confirms batchmode inputs received
     """
@@ -152,10 +149,7 @@ def test_transfer_batchmode_dryrun(run_line, load_api_fixtures):
 
     batch_input = u"abc /def\n/xyz p/q/r\n"
     result = run_line(
-        "globus transfer -F json --batch --dry-run "
-        + str(GO_EP1_ID)
-        + " "
-        + str(GO_EP2_ID),
+        "globus transfer -F json --batch --dry-run " + go_ep1_id + " " + go_ep2_id,
         stdin=batch_input,
     )
     for src, dst in [("abc", "/def"), ("/xyz", "p/q/r")]:
@@ -163,7 +157,7 @@ def test_transfer_batchmode_dryrun(run_line, load_api_fixtures):
         assert '"destination_path": "{}"'.format(dst) in result.output
 
 
-def test_delete_batchmode_dryrun(run_line, load_api_fixtures):
+def test_delete_batchmode_dryrun(run_line, load_api_fixtures, go_ep1_id):
     """
     Dry-runs a delete in batchmode
     """
@@ -172,9 +166,7 @@ def test_delete_batchmode_dryrun(run_line, load_api_fixtures):
     load_api_fixtures("transfer_activate_success.yaml")
 
     batch_input = u"abc/def\n/xyz\nabcdef\nabc/def/../xyz\n"
-    result = run_line(
-        "globus delete --batch --dry-run " + str(GO_EP1_ID), stdin=batch_input
-    )
+    result = run_line("globus delete --batch --dry-run " + go_ep1_id, stdin=batch_input)
     assert (
         "\n".join(
             ("Path   ", "-------", "abc/def", "/xyz   ", "abcdef ", "abc/xyz", "")
@@ -184,7 +176,7 @@ def test_delete_batchmode_dryrun(run_line, load_api_fixtures):
 
     batch_input = u"abc/def\n/xyz\n../foo\n"
     result = run_line(
-        "globus delete --batch --dry-run {}:foo/bar/./baz".format(GO_EP1_ID),
+        "globus delete --batch --dry-run {}:foo/bar/./baz".format(go_ep1_id),
         stdin=batch_input,
     )
     assert (

@@ -1,30 +1,28 @@
 import json
 
-from tests.constants import GO_EP1_ID
 
-
-def test_bookmark_create(run_line, load_api_fixtures):
+def test_bookmark_create(run_line, load_api_fixtures, go_ep1_id):
     """
     Runs bookmark create, confirms simple things about text and json output
     """
     data = load_api_fixtures("bookmark_operations.yaml")
     bookmark_id = data["metadata"]["bookmark_id"]
-    result = run_line("globus bookmark create {}:/share/ sharebm".format(GO_EP1_ID))
+    result = run_line("globus bookmark create {}:/share/ sharebm".format(go_ep1_id))
     assert "Bookmark ID: {}".format(bookmark_id) in result.output
 
     # repeat, but with JSON output
     json_output = json.loads(
         run_line(
-            "globus bookmark create -Fjson {}:/share/ sharebm".format(GO_EP1_ID)
+            "globus bookmark create -Fjson {}:/share/ sharebm".format(go_ep1_id)
         ).output
     )
     assert json_output["id"] == bookmark_id
     assert json_output["name"] == "sharebm"
     assert json_output["path"] == "/share/"
-    assert json_output["endpoint_id"] == GO_EP1_ID
+    assert json_output["endpoint_id"] == go_ep1_id
 
 
-def test_bookmark_show(run_line, load_api_fixtures):
+def test_bookmark_show(run_line, load_api_fixtures, go_ep1_id):
     """
     Runs bookmark show on bm1's name and id.
     Confirms both inputs work, and verbose output is as expected.
@@ -35,15 +33,15 @@ def test_bookmark_show(run_line, load_api_fixtures):
 
     # id
     result = run_line('globus bookmark show "{}"'.format(bookmark_id))
-    assert "{}:/share/\n".format(GO_EP1_ID) == result.output
+    assert "{}:/share/\n".format(go_ep1_id) == result.output
 
     # name
     result = run_line('globus bookmark show "{}"'.format(bookmark_name))
-    assert "{}:/share/\n".format(GO_EP1_ID) == result.output
+    assert "{}:/share/\n".format(go_ep1_id) == result.output
 
     # verbose
     result = run_line("globus bookmark show -v {}".format(bookmark_id))
-    assert "Endpoint ID: {}".format(GO_EP1_ID) in result.output
+    assert "Endpoint ID: {}".format(go_ep1_id) in result.output
 
 
 def test_bookmark_rename_by_id(run_line, load_api_fixtures):

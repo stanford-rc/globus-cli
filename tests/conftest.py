@@ -13,10 +13,19 @@ from ruamel.yaml import YAML
 
 import globus_cli.config
 from globus_cli.services.transfer import RetryingTransferClient
-from tests.constants import GO_EP1_ID, GO_EP2_ID
 
 yaml = YAML()
 log = logging.getLogger(__name__)
+
+
+@pytest.fixture(scope="session")
+def go_ep1_id():
+    return "ddb59aef-6d04-11e5-ba46-22000b92c6ec"
+
+
+@pytest.fixture(scope="session")
+def go_ep2_id():
+    return "ddb59af0-6d04-11e5-ba46-22000b92c6ec"
 
 
 @pytest.fixture
@@ -204,7 +213,7 @@ def _iter_fixture_routes(routes):
 
 
 @pytest.fixture
-def load_api_fixtures(register_api_route, test_file_dir):
+def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id):
     def func(filename):
         filename = os.path.join(test_file_dir, "api_fixtures", filename)
         with open(filename) as fp:
@@ -217,7 +226,7 @@ def load_api_fixtures(register_api_route, test_file_dir):
 
             for path, method, params in _iter_fixture_routes(routes):
                 # allow /endpoint/{GO_EP1_ID} as a path
-                use_path = path.format(GO_EP1_ID=GO_EP1_ID, GO_EP2_ID=GO_EP2_ID)
+                use_path = path.format(GO_EP1_ID=go_ep1_id, GO_EP2_ID=go_ep2_id)
                 if "query_params" in params:
                     # copy and set match_querystring=True
                     params = {"match_querystring": True, **params}

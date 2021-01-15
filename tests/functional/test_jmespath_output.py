@@ -1,7 +1,5 @@
 import json
 
-from tests.constants import GO_EP2_ID
-
 
 def test_jmespath_noop(run_line, load_api_fixtures):
     """
@@ -18,7 +16,7 @@ def test_jmespath_noop(run_line, load_api_fixtures):
     assert result.output == jmespathresult.output
 
 
-def test_jmespath_extract_from_list(run_line, load_api_fixtures):
+def test_jmespath_extract_from_list(run_line, load_api_fixtures, go_ep2_id):
     """
     Uses jmespath to extract a value from a list result using a filter.
     Confirms that the result is identical to a direct fetch of that
@@ -32,11 +30,11 @@ def test_jmespath_extract_from_list(run_line, load_api_fixtures):
             "globus endpoint search 'Tutorial' "
             "--filter-owner-id go@globusid.org "
             "--jmespath 'DATA[?id==`{}`] | [0]'"
-        ).format(GO_EP2_ID)
+        ).format(go_ep2_id)
     )
     outputdict = json.loads(result.output)
 
-    show_result = run_line("globus endpoint show {} -Fjson".format(GO_EP2_ID))
+    show_result = run_line("globus endpoint show {} -Fjson".format(go_ep2_id))
     showdict = json.loads(show_result.output)
 
     # check specific keys because search includes `_rank` and doesn't

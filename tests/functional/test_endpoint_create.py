@@ -4,8 +4,6 @@ import re
 import pytest
 import responses
 
-from tests.constants import GO_EP1_ID
-
 
 def test_gcp_creation(run_line, load_api_fixtures):
     """
@@ -20,7 +18,7 @@ def test_gcp_creation(run_line, load_api_fixtures):
     assert "id" in res
 
 
-def test_shared_creation(run_line, load_api_fixtures):
+def test_shared_creation(run_line, load_api_fixtures, go_ep1_id):
     """
     Runs endpoint create with --shared and a host path
     Confirms shared endpoint is created successfully
@@ -29,7 +27,7 @@ def test_shared_creation(run_line, load_api_fixtures):
     load_api_fixtures("endpoint_operations.yaml")
     result = run_line(
         "globus endpoint create share_create "
-        "-F json --shared {}:/~/".format(GO_EP1_ID)
+        "-F json --shared {}:/~/".format(go_ep1_id)
     )
     res = json.loads(result.output)
     assert res["DATA_TYPE"] == "endpoint_create_result"
@@ -84,11 +82,11 @@ def test_text_ouptut(run_line, load_api_fixtures, ep_type):
     "ep_type,type_opts",
     [
         ("personal", ("--personal",)),
-        ("share", ("--shared", "{}:/~/".format(GO_EP1_ID))),
+        ("share", ("--shared", "{GO_EP1_ID}:/~/")),
         ("server", ("--server",)),
     ],
 )
-def test_general_options(run_line, load_api_fixtures, ep_type, type_opts):
+def test_general_options(run_line, load_api_fixtures, ep_type, type_opts, go_ep1_id):
     """
     Creates a shared, personal, and server endpoints using options
     available for all endpoint types. Confirms expected values through SDK
@@ -154,7 +152,7 @@ def test_general_options(run_line, load_api_fixtures, ep_type, type_opts):
         "myendpoint",
         "-F",
         "json",
-        *type_opts,
+        *(x.format(GO_EP1_ID=go_ep1_id) for x in type_opts),
     ]
     for item in option_dicts:
         line.append(item["opt"])
@@ -172,10 +170,10 @@ def test_general_options(run_line, load_api_fixtures, ep_type, type_opts):
     "ep_type,type_opts",
     [
         ("personal", ("--personal",)),
-        ("share", ("--shared", "{}:/~/".format(GO_EP1_ID))),
+        ("share", ("--shared", "{GO_EP1_ID}:/~/")),
     ],
 )
-def test_invalid_gcs_only_options(run_line, ep_type, type_opts):
+def test_invalid_gcs_only_options(run_line, ep_type, type_opts, go_ep1_id):
     """
     For all GCS only options, tries to create a GCP and shared endpoint
     Confirms invalid options are caught at the CLI level rather than API
@@ -191,7 +189,7 @@ def test_invalid_gcs_only_options(run_line, ep_type, type_opts):
     for opt in options:
         result = run_line(
             "globus endpoint create invalid_gcs {} {} ".format(
-                " ".join(type_opts), opt
+                " ".join(x.format(GO_EP1_ID=go_ep1_id) for x in type_opts), opt
             ),
             assert_exit_code=2,
         )
