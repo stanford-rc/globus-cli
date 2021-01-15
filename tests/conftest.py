@@ -105,9 +105,12 @@ def run_line(cli_runner, request, patch_config):
             raise (
                 Exception(
                     (
-                        "CliTest run_line exit_code assertion failed!\n"
-                        "Line:\n{}\nexited with {} when expecting {}\n"
-                        "stdout:\n{}\nstderr:\n{}\nnetwork calls recorded:\n{}".format(
+                        (
+                            "CliTest run_line exit_code assertion failed!\n"
+                            "Line:\n{}\nexited with {} when expecting {}\n"
+                            "stdout:\n{}\nstderr:\n{}\nnetwork calls recorded:"
+                            "\n  {}"
+                        ).format(
                             line,
                             result.exit_code,
                             assert_exit_code,
