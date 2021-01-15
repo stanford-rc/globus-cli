@@ -206,7 +206,7 @@ def _iter_fixture_routes(routes):
     # walk a fixture file either as a list of routes
     for x in routes:
         # copy and remove elements
-        params = {**x}
+        params = dict(x)
         path = params.pop("path")
         method = params.pop("method", "get")
         yield path, method, params
@@ -229,7 +229,7 @@ def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id):
                 use_path = path.format(GO_EP1_ID=go_ep1_id, GO_EP2_ID=go_ep2_id)
                 if "query_params" in params:
                     # copy and set match_querystring=True
-                    params = {"match_querystring": True, **params}
+                    params = dict(match_querystring=True, **params)
                     # remove and encode query params
                     query_params = six.moves.urllib.parse.urlencode(
                         params.pop("query_params")

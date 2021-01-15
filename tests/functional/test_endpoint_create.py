@@ -145,14 +145,8 @@ def test_general_options(run_line, load_api_fixtures, ep_type, type_opts, go_ep1
             x["expected"] = x["val"]
 
     # make and run the line, get and track the id for cleanup
-    line = [
-        "globus",
-        "endpoint",
-        "create",
-        "myendpoint",
-        "-F",
-        "json",
-        *(x.format(GO_EP1_ID=go_ep1_id) for x in type_opts),
+    line = ["globus", "endpoint", "create", "myendpoint", "-F", "json"] + [
+        x.format(GO_EP1_ID=go_ep1_id) for x in type_opts
     ]
     for item in option_dicts:
         line.append(item["opt"])
