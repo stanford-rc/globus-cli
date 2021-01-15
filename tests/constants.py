@@ -1,17 +1,6 @@
 GO_EP1_ID = "ddb59aef-6d04-11e5-ba46-22000b92c6ec"
 GO_EP2_ID = "ddb59af0-6d04-11e5-ba46-22000b92c6ec"
 
-# ----------- #
-# credentials #
-# ----------- #
-CLITESTER1A_TRANSFER_RT = "fooBarBazTransferRefreshToken"
-CLITESTER1A_AUTH_RT = "fooBarBazAuthRefreshToken"
-CLITESTER1A_CLIENT_ID = "839a51eb-1bc1-4d10-b36d-b6c0c8589a3f"
-CLITESTER1A_CLIENT_SECRET = "fooBarBazClientSecret"
-# --------------- #
-# end credentials #
-# --------------- #
-
 # public key from an activation requirements response from a GCS endpoint
 PUBLIC_KEY = """
 -----BEGIN PUBLIC KEY-----

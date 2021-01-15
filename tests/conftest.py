@@ -1,22 +1,62 @@
 import logging
 import os
 import shlex
+import time
 
 import pytest
 import responses
 import six
 from click.testing import CliRunner
+from configobj import ConfigObj
 from globus_sdk.base import slash_join
 from ruamel.yaml import YAML
 
-from globus_cli.services.auth import get_auth_client
+import globus_cli.config
 from globus_cli.services.transfer import RetryingTransferClient
-from globus_cli.services.transfer import get_client as get_transfer_client
 from tests.constants import GO_EP1_ID, GO_EP2_ID
-from tests.utils import patch_config
 
 yaml = YAML()
 log = logging.getLogger(__name__)
+
+
+@pytest.fixture
+def default_test_config():
+    """
+    Returns a ConfigObj with the clitester's refresh tokens as if the
+    clitester was logged in and a call to get_config_obj was made.
+    """
+    # create a ConfgObj from a dict of testing constants. a ConfigObj created
+    # this way will not be tied to a config file on disk, meaning that
+    # ConfigObj.filename = None and ConfigObj.write() returns a string without
+    # writing anything to disk.
+    return ConfigObj(
+        {
+            "cli": {
+                globus_cli.config.CLIENT_ID_OPTNAME: "fakeClientIDString",
+                globus_cli.config.CLIENT_SECRET_OPTNAME: "fakeClientSecret",
+                globus_cli.config.AUTH_RT_OPTNAME: "AuthRT",
+                globus_cli.config.AUTH_AT_OPTNAME: "AuthAT",
+                globus_cli.config.AUTH_AT_EXPIRES_OPTNAME: int(time.time()) + 120,
+                globus_cli.config.TRANSFER_RT_OPTNAME: "TransferRT",
+                globus_cli.config.TRANSFER_AT_OPTNAME: "TransferAT",
+                globus_cli.config.TRANSFER_AT_EXPIRES_OPTNAME: int(time.time()) + 120,
+            }
+        }
+    )
+
+
+@pytest.fixture
+def patch_config(monkeypatch, default_test_config):
+    def func(conf=None):
+        if conf is None:
+            conf = default_test_config
+
+        def mock_get_config():
+            return conf
+
+        monkeypatch.setattr(globus_cli.config, "get_config_obj", mock_get_config)
+
+    return func
 
 
 @pytest.fixture(scope="session")
@@ -30,7 +70,7 @@ def cli_runner():
 
 
 @pytest.fixture
-def run_line(cli_runner, request):
+def run_line(cli_runner, request, patch_config):
     """
     Uses the CliRunner to run the given command line.
 
@@ -46,41 +86,30 @@ def run_line(cli_runner, request):
     def func(line, config=None, assert_exit_code=0, stdin=None):
         from globus_cli import main
 
-        with patch_config(config):
-            # split line into args and confirm line starts with "globus"
-            # python2 shlex can't handle non ascii unicode
-            if six.PY2 and isinstance(line, six.text_type):
-                args = [a for a in shlex.split(line.encode("utf-8"))]
-            else:
-                args = shlex.split(line)
-            assert args[0] == "globus"
+        patch_config(config)
 
-            # run the line. globus_cli.main is the "globus" part of the line
-            # if we are expecting success (0), don't catch any exceptions.
-            result = cli_runner.invoke(
-                main, args[1:], input=stdin, catch_exceptions=bool(assert_exit_code)
+        # split line into args and confirm line starts with "globus"
+        # python2 shlex can't handle non ascii unicode
+        if six.PY2 and isinstance(line, six.text_type):
+            args = [a for a in shlex.split(line.encode("utf-8"))]
+        else:
+            args = shlex.split(line)
+        assert args[0] == "globus"
+
+        # run the line. globus_cli.main is the "globus" part of the line
+        # if we are expecting success (0), don't catch any exceptions.
+        result = cli_runner.invoke(
+            main, args[1:], input=stdin, catch_exceptions=bool(assert_exit_code)
+        )
+        if result.exit_code != assert_exit_code:
+            log.error(
+                "network calls:\n%s",
+                "\n".join(r.request.url for r in responses.calls),
             )
-            if result.exit_code != assert_exit_code:
-                log.error(
-                    "network calls:\n%s",
-                    "\n".join(r.request.url for r in responses.calls),
-                )
-            assert result.exit_code == assert_exit_code, result.output
-            return result
+        assert result.exit_code == assert_exit_code, result.output
+        return result
 
     return func
-
-
-@pytest.fixture
-def tc():
-    with patch_config():
-        return get_transfer_client()
-
-
-@pytest.fixture
-def ac():
-    with patch_config():
-        return get_auth_client()
 
 
 @pytest.fixture(autouse=True)
