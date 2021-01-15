@@ -1,36 +1,31 @@
 import json
 
-from tests.constants import GO_EP1_ID, GO_EP2_ID
+from tests.constants import GO_EP2_ID
 
 
-def test_jmespath_noop(run_line):
+def test_jmespath_noop(run_line, load_api_fixtures):
     """
     Runs some simple fetch operations and confirms that `--jmespath '@'`
     doesn't change the output (but also that it overrides --format TEXT)
     """
-    result = run_line("globus endpoint show {} -Fjson".format(GO_EP1_ID))
+    data = load_api_fixtures("endpoint_operations.yaml")
+    epid = data["metadata"]["endpoint_id"]
+    result = run_line("globus endpoint show {} -Fjson".format(epid))
     jmespathresult = run_line(
-        "globus endpoint show {} -Ftext --jmespath '@'".format(GO_EP1_ID)
+        "globus endpoint show {} -Ftext --jmespath '@'".format(epid)
     )
 
-    # Drop fields that can be affected by concurrent test runs
-    output_json_dict = json.loads(result.output)
-    output_jmespath_dict = json.loads(jmespathresult.output)
-    for obj in (output_json_dict, output_jmespath_dict):
-        obj.pop("in_use")
-        obj.pop("expire_time")
-    output_fixed = json.dumps(output_json_dict)
-    jmespathoutput_fixed = json.dumps(output_jmespath_dict)
-
-    assert output_fixed == jmespathoutput_fixed
+    assert result.output == jmespathresult.output
 
 
-def test_jmespath_extract_from_list(run_line):
+def test_jmespath_extract_from_list(run_line, load_api_fixtures):
     """
     Uses jmespath to extract a value from a list result using a filter.
     Confirms that the result is identical to a direct fetch of that
     resource.
     """
+    load_api_fixtures("endpoint_operations.yaml")
+    load_api_fixtures("go_user_info.yaml")
     # list tutorial endpoints with a search, but extract go#ep2
     result = run_line(
         (
@@ -46,7 +41,7 @@ def test_jmespath_extract_from_list(run_line):
 
     # check specific keys because search includes `_rank` and doesn't
     # include the server list
-    # just a random selection of "probably stable" values for this test
+    # just a semi-random selection of values for this test
     for k in ("id", "display_name", "owner_id", "subscription_id"):
         assert outputdict[k] == showdict[k]
 
