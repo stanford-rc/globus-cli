@@ -60,6 +60,11 @@ def run_line(cli_runner, request):
             result = cli_runner.invoke(
                 main, args[1:], input=stdin, catch_exceptions=bool(assert_exit_code)
             )
+            if result.exit_code != assert_exit_code:
+                log.error(
+                    "network calls:\n%s",
+                    "\n".join(r.request.url for r in responses.calls),
+                )
             assert result.exit_code == assert_exit_code, result.output
             return result
 
@@ -142,6 +147,22 @@ def register_api_route(mocked_responses):
     return func
 
 
+def _iter_fixture_routes(routes):
+    # walk a fixture file either as a nested dict or list of routes
+    # lists allow us to workaround duplicates when they only differ by params
+    if isinstance(routes, list):
+        for x in routes:
+            # copy and remove elements
+            params = {**x}
+            path = params.pop("path")
+            method = params.pop("method")
+            yield path, method, params
+    else:
+        for path, methods in routes.items():
+            for method, params in methods.items():
+                yield path, method, params
+
+
 @pytest.fixture
 def load_api_fixtures(register_api_route, test_file_dir):
     def func(filename):
@@ -153,11 +174,20 @@ def load_api_fixtures(register_api_route, test_file_dir):
             # to the user of it
             if service == "metadata":
                 continue
-            for path, methods in routes.items():
+
+            for path, method, params in _iter_fixture_routes(routes):
                 # allow /endpoint/{GO_EP1_ID} as a path
-                path = path.format(GO_EP1_ID=GO_EP1_ID, GO_EP2_ID=GO_EP2_ID)
-                for method, params in methods.items():
-                    register_api_route(service, path, method=method.upper(), **params)
+                use_path = path.format(GO_EP1_ID=GO_EP1_ID, GO_EP2_ID=GO_EP2_ID)
+                if "query_params" in params:
+                    # copy and set match_querystring=True
+                    params = {"match_querystring": True, **params}
+                    # remove and encode query params
+                    query_params = six.moves.urllib.parse.urlencode(
+                        params.pop("query_params")
+                    )
+                    # modify path (assume no prior params)
+                    use_path = use_path + "?" + query_params
+                register_api_route(service, use_path, method=method.upper(), **params)
 
         # after registration, return the raw fixture data
         return data
