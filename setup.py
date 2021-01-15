@@ -23,9 +23,9 @@ setup(
     version=version,
     packages=find_packages(exclude=["tests", "tests.*"]),
     install_requires=[
-        "globus-sdk==1.9.1",
+        "globus-sdk==1.10.0",
         "click>=7.1.1,<8.0",
-        "jmespath==0.9.4",
+        "jmespath==0.10.0",
         "configobj>=5.0.6,<6.0.0",
         "requests>=2.0.0,<3.0.0",
         "six>=1.10.0,<2.0.0",
@@ -35,7 +35,7 @@ setup(
         #
         # as new versions of cryptography are released, we may need to update
         # this requirement
-        "cryptography>=1.8.1,<3.0.0",
+        "cryptography>=1.8.1,<3.4.0",
     ],
     extras_require={
         # deprecated, but do not remove -- doing so would break installs which
@@ -50,9 +50,7 @@ setup(
             "responses==0.12.1",
             # loading fixture data
             "ruamel.yaml==0.16.12",
-            # mock on py2 and py3.5
-            # not just py2: py3 versions of mock don't all have the same
-            # interface!
+            # mock on py2
             'mock==2.0.0;python_version<"3.6"',
             'black==20.8b1;python_version>="3.6"',
             'isort>=5.6.4,<6.0;python_version>="3.6"',
