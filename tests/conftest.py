@@ -66,7 +66,7 @@ def test_file_dir():
 
 @pytest.fixture
 def cli_runner():
-    return CliRunner()
+    return CliRunner(mix_stderr=False)
 
 
 @pytest.fixture
@@ -102,11 +102,25 @@ def run_line(cli_runner, request, patch_config):
             main, args[1:], input=stdin, catch_exceptions=bool(assert_exit_code)
         )
         if result.exit_code != assert_exit_code:
-            log.error(
-                "network calls:\n%s",
-                "\n".join(r.request.url for r in responses.calls),
+            raise (
+                Exception(
+                    (
+                        "CliTest run_line exit_code assertion failed!\n"
+                        "Line:\n{}\nexited with {} when expecting {}\n"
+                        "stdout:\n{}\nstderr:\n{}\nnetwork calls recorded:\n{}".format(
+                            line,
+                            result.exit_code,
+                            assert_exit_code,
+                            result.stdout,
+                            result.stderr,
+                            (
+                                "\n  ".join(r.request.url for r in responses.calls)
+                                or "  <none>"
+                            ),
+                        )
+                    )
+                )
             )
-        assert result.exit_code == assert_exit_code, result.output
         return result
 
     return func

@@ -195,7 +195,7 @@ def test_invalid_gcs_only_options(run_line, ep_type, type_opts):
             ),
             assert_exit_code=2,
         )
-        assert "Globus Connect Server" in result.output
+        assert "Globus Connect Server" in result.stderr
 
 
 def test_invalid_managed_only_options(run_line):
@@ -215,4 +215,4 @@ def test_invalid_managed_only_options(run_line):
             "globus endpoint create invalid_managed --server {}".format(opt),
             assert_exit_code=2,
         )
-        assert "managed endpoints" in result.output
+        assert "managed endpoints" in result.stderr

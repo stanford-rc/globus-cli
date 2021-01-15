@@ -54,12 +54,12 @@ def test_server_delete_by_hostname_many_matches(run_line, load_api_fixtures):
     result = run_line(
         "globus endpoint server delete {} example.org".format(epid), assert_exit_code=2
     )
-    assert "Multiple servers matched" in result.output
-    assert "example.com" not in result.output
+    assert "Multiple servers matched" in result.stderr
+    assert "example.com" not in result.stderr
     for i in dotorg_servers:
-        assert str(i) in result.output
+        assert str(i) in result.stderr
     for i in dotcom_servers:
-        assert str(i) not in result.output
+        assert str(i) not in result.stderr
 
 
 def test_server_delete_on_gcp(run_line, load_api_fixtures):
@@ -70,5 +70,5 @@ def test_server_delete_on_gcp(run_line, load_api_fixtures):
     )
     assert (
         "You cannot delete servers from Globus Connect Personal endpoints"
-        in result.output
+        in result.stderr
     )

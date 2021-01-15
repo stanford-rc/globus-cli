@@ -14,8 +14,8 @@ def test_multiple_argument_options(run_line):
         assert_exit_code=2,
     )
 
-    assert "Invalid value for '--shared'" in result.output
-    assert "Option used multiple times." in result.output
+    assert "Invalid value for '--shared'" in result.stderr
+    assert "Option used multiple times." in result.stderr
 
 
 def test_multiple_flag_options(run_line):
@@ -27,5 +27,5 @@ def test_multiple_flag_options(run_line):
         "globus endpoint create ep_name --personal --personal", assert_exit_code=2
     )
 
-    assert "Invalid value for '--personal'" in result.output
-    assert "Option used multiple times." in result.output
+    assert "Invalid value for '--personal'" in result.stderr
+    assert "Option used multiple times." in result.stderr

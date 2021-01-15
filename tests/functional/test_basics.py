@@ -33,7 +33,7 @@ def test_command_missing_args(run_line):
     Runs get-identities without values, confirms exit_code 2
     """
     result = run_line("globus get-identities", assert_exit_code=2)
-    assert "Error: Missing argument" in result.output
+    assert "Error: Missing argument" in result.stderr
 
 
 def test_invalid_command(run_line):
@@ -41,7 +41,7 @@ def test_invalid_command(run_line):
     Runs globus invalid-command, confirms Error
     """
     result = run_line("globus invalid-command", assert_exit_code=2)
-    assert "Error: No such command" in result.output
+    assert "Error: No such command" in result.stderr
 
 
 def test_whoami(run_line, load_api_fixtures):
@@ -59,7 +59,7 @@ def test_whoami_no_auth(run_line, load_api_fixtures):
     """
     load_api_fixtures("all_authentication_failed.yaml")
     result = run_line("globus whoami", config={}, assert_exit_code=1)
-    assert "Unable to get user information" in result.output
+    assert "Unable to get user information" in result.stderr
 
 
 def test_json_raw_string_output(run_line, load_api_fixtures):
@@ -82,7 +82,7 @@ def test_auth_call_no_auth(run_line, load_api_fixtures):
         config={},
         assert_exit_code=1,
     )
-    assert "No Authentication provided." in result.output
+    assert "No Authentication provided." in result.stderr
 
 
 def test_auth_call(run_line, load_api_fixtures):
@@ -103,7 +103,7 @@ def test_transfer_call_no_auth(run_line, load_api_fixtures):
     """
     load_api_fixtures("all_authentication_failed.yaml")
     result = run_line("globus ls " + str(GO_EP1_ID), config={}, assert_exit_code=1)
-    assert "No Authentication provided." in result.output
+    assert "No Authentication provided." in result.stderr
 
 
 def test_transfer_call(run_line, load_api_fixtures, register_api_route):
