@@ -81,7 +81,7 @@ $ globus ls $ep_id:/share/godata/ --filter '~*.txt'  # done with --filter, bette
     "-a",
     "show_hidden",
     is_flag=True,
-    help=("Show files and directories that start with `.`"),
+    help="Show files and directories that start with `.`",
 )
 @click.option(
     "--long",

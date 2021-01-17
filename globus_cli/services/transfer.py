@@ -25,9 +25,11 @@ class RetryingTransferClient(TransferClient):
     Wrapper around TransferClient that retries safe resources on NetworkErrors
     """
 
-    def __init__(self, tries=10, *args, **kwargs):
+    default_retries = 10
+
+    def __init__(self, tries=None, *args, **kwargs):
         super(RetryingTransferClient, self).__init__(*args, **kwargs)
-        self.tries = tries
+        self.tries = tries or self.default_retries
 
     def retry(self, f, *args, **kwargs):
         """
@@ -124,9 +126,7 @@ def get_client():
             on_refresh=_update_tokens,
         )
 
-    return RetryingTransferClient(
-        tries=10, authorizer=authorizer, app_name=version.app_name
-    )
+    return RetryingTransferClient(authorizer=authorizer, app_name=version.app_name)
 
 
 def display_name_or_cname(ep_doc):

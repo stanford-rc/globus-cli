@@ -1,0 +1,9 @@
+transfer:
+  - path: /endpoint/{GO_EP1_ID}/autoactivate
+    method: post
+    # exact data doesn't matter, just not the failure code
+    json: {"code": "AutoActivated.BogusCode"}
+  - path: /endpoint/{GO_EP2_ID}/autoactivate
+    method: post
+    # exact data doesn't matter, just not the failure code
+    json: {"code": "AutoActivated.BogusCode"}

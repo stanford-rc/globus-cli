@@ -1,81 +1,106 @@
 import json
 import re
 
-from tests.constants import GO_EP1_ID
+import pytest
+import responses
 
 
-def test_gcp_creation(run_line, created_endpoints):
+def test_gcp_creation(run_line, load_api_fixtures):
     """
     Runs endpoint create with --personal
     Confirms personal endpoint is created successfully
     """
+    load_api_fixtures("gcp_create.yaml")
     result = run_line("globus endpoint create --personal personal_create -F json")
     res = json.loads(result.output)
     assert res["DATA_TYPE"] == "endpoint_create_result"
     assert res["code"] == "Created"
     assert "id" in res
-    # track asset for cleanup
-    created_endpoints.append(res["id"])
 
 
-def test_shared_creation(run_line, created_endpoints):
+def test_shared_creation(run_line, load_api_fixtures, go_ep1_id):
     """
     Runs endpoint create with --shared and a host path
     Confirms shared endpoint is created successfully
     """
+    load_api_fixtures("transfer_activate_success.yaml")
+    load_api_fixtures("endpoint_operations.yaml")
     result = run_line(
         "globus endpoint create share_create "
-        "-F json --shared {}:/~/".format(GO_EP1_ID)
+        "-F json --shared {}:/~/".format(go_ep1_id)
     )
     res = json.loads(result.output)
     assert res["DATA_TYPE"] == "endpoint_create_result"
     assert res["code"] == "Created"
     assert "Shared endpoint" in res["message"]
     assert "id" in res
-    # track asset for cleanup
-    created_endpoints.append(res["id"])
 
 
-def test_gcs_creation(run_line, created_endpoints):
+def test_gcs_creation(run_line, load_api_fixtures):
     """
     Runs endpoint create with --server
     Confirms endpoint is created successfully
     """
-    result = run_line("globus endpoint create gcs_create " "--server -F json")
+    load_api_fixtures("endpoint_operations.yaml")
+    result = run_line("globus endpoint create gcs_create --server -F json")
     res = json.loads(result.output)
     assert res["DATA_TYPE"] == "endpoint_create_result"
     assert res["code"] == "Created"
     assert res["globus_connect_setup_key"] is None
     assert "id" in res
-    # track asset for cleanup
-    created_endpoints.append(res["id"])
 
 
-def test_text_ouptut(run_line, created_endpoints):
+@pytest.mark.parametrize("ep_type", ["personal", "server"])
+def test_text_ouptut(run_line, load_api_fixtures, ep_type):
     """
     Creates GCP and GCS endpoint
     Confirms (non)presence of setup key in text output
     """
-    # GCP
-    result = run_line("globus endpoint create gcp_text --personal")
-    assert "Setup Key:" in result.output
-    ep_id = re.search(r"Endpoint ID:\s*(\S*)", result.output).group(1)
-    created_endpoints.append(ep_id)
+    if ep_type == "personal":
+        opt = "--personal"
+        data = load_api_fixtures("gcp_create.yaml")
+        ep_id = data["metadata"]["endpoint_id"]
+        setup_key = data["metadata"]["setup_key"]
+    else:
+        opt = "--server"
+        data = load_api_fixtures("endpoint_operations.yaml")
+        ep_id = data["metadata"]["endpoint_id"]
+        setup_key = None
 
-    # GCS
-    result = run_line("globus endpoint create gcs_text --server")
-    assert "Setup Key:" not in result.output
-    ep_id = re.search(r"Endpoint ID:\s*(\S*)", result.output).group(1)
-    created_endpoints.append(ep_id)
+    result = run_line("globus endpoint create gcp_text {}".format(opt))
+    got_ep_id = re.search(r"Endpoint ID:\s*(\S*)", result.output).group(1)
+    assert got_ep_id == ep_id
+
+    if ep_type == "personal":
+        got_setup_key = re.search(r"Setup Key:\s*(\S*)", result.output).group(1)
+        assert got_setup_key == setup_key
+    else:
+        assert "Setup Key:" not in result.output
 
 
-def test_general_options(run_line, tc, created_endpoints):
+@pytest.mark.parametrize(
+    "ep_type,type_opts",
+    [
+        ("personal", ("--personal",)),
+        ("share", ("--shared", "{GO_EP1_ID}:/~/")),
+        ("server", ("--server",)),
+    ],
+)
+def test_general_options(run_line, load_api_fixtures, ep_type, type_opts, go_ep1_id):
     """
     Creates a shared, personal, and server endpoints using options
     available for all endpoint types. Confirms expected values through SDK
     """
-    # options with the same option value and expected value
-    same_value_dict = [
+    if ep_type == "personal":
+        load_api_fixtures("gcp_create.yaml")
+    else:
+        load_api_fixtures("endpoint_operations.yaml")
+    if ep_type == "share":
+        load_api_fixtures("transfer_activate_success.yaml")
+
+    # options with option value and expected value
+    # if expected value is not set, it will be copied from the option value
+    option_dicts = [
         {"opt": "--description", "key": "description", "val": "sometext"},
         {"opt": "--default-directory", "key": "default_directory", "val": "/share/"},
         {"opt": "--organization", "key": "organization", "val": "someorg"},
@@ -84,82 +109,65 @@ def test_general_options(run_line, tc, created_endpoints):
         {"opt": "--contact-email", "key": "contact_email", "val": "a@b.c"},
         {"opt": "--contact-info", "key": "contact_info", "val": "info"},
         {"opt": "--info-link", "key": "info_link", "val": "http://a.b"},
-    ]
-    # options that have differing option values and expected values
-    diff_value_dict = [
         {
             "opt": "--force-encryption",
             "key": "force_encryption",
-            "val": "",
+            "val": None,
             "expected": True,
         },
         {
             "opt": "--disable-verify",
             "key": "disable_verify",
-            "val": "",
+            "val": None,
             "expected": True,
         },
     ]
-
-    # for each endpoint type
-    for ep_type in ["--shared {}:/~/".format(GO_EP1_ID), "--personal", "--server"]:
-
-        # make and run the line, get and track the id for cleanup
-        line = "globus endpoint create general_options " "-F json {} ".format(ep_type)
-        for item in same_value_dict + diff_value_dict:
-            line += "{} {} ".format(item["opt"], item["val"])
-        ep_id = json.loads(run_line(line).output)["id"]
-        created_endpoints.append(ep_id)
-
-        # get and confirm values from SDK get_endpoint
-        res = tc.get_endpoint(ep_id)
-        for item in same_value_dict:
-            assert item["val"] == res[item["key"]]
-        for item in diff_value_dict:
-            assert item["expected"] == res[item["key"]]
-
-
-def test_server_only_options(run_line, tc, created_endpoints):
-    """
-    Runs endpoint create with options only valid for GCS
-    Confirms expected values gotten through SDK
-    """
-    # options with the same option value and expected value
-    same_value_dict = [
-        {"opt": "--myproxy-dn", "key": "myproxy_dn", "val": "/dn"},
-        {"opt": "--myproxy-server", "key": "myproxy_server", "val": "srv.example.com"},
-    ]
-    # options that have differing option values and expected values
-    diff_value_dict = [
-        {"opt": "--private", "key": "public", "val": "", "expected": False},
-        {
-            "opt": "--location",
-            "key": "location",
-            "val": "1.1,2",
-            "expected": "1.10,2.00",
-        },
-    ]
+    if ep_type == "server":
+        option_dicts.extend(
+            [
+                {"opt": "--myproxy-dn", "key": "myproxy_dn", "val": "/dn"},
+                {
+                    "opt": "--myproxy-server",
+                    "key": "myproxy_server",
+                    "val": "srv.example.com",
+                },
+                {"opt": "--private", "key": "public", "val": "", "expected": False},
+                {
+                    "opt": "--location",
+                    "key": "location",
+                    "val": "1.1,2",
+                    "expected": "1.1,2",
+                },
+            ]
+        )
+    for x in option_dicts:
+        if "expected" not in x:
+            x["expected"] = x["val"]
 
     # make and run the line, get and track the id for cleanup
-    line = "globus endpoint create valid_gcs " "--server -F json "
-    for item in same_value_dict + diff_value_dict:
-        line += "{} {} ".format(item["opt"], item["val"])
-    ep_id = json.loads(run_line(line).output)["id"]
-    created_endpoints.append(ep_id)
+    line = ["globus", "endpoint", "create", "myendpoint", "-F", "json"] + [
+        x.format(GO_EP1_ID=go_ep1_id) for x in type_opts
+    ]
+    for item in option_dicts:
+        line.append(item["opt"])
+        if item["val"]:
+            line.append(item["val"])
+    run_line(" ".join(line))
 
-    # get and confirm values from SDK get_endpoint
-    res = tc.get_endpoint(ep_id)
-    for item in same_value_dict:
-        assert item["val"] == res[item["key"]]
-    for item in diff_value_dict:
-        assert item["expected"] == res[item["key"]]
-
-
-# TODO: test against a managed endpoint
-# def test_valid_managed_options(run_line):
+    # get and confirm values which were sent as JSON
+    sent_data = json.loads(responses.calls[-1].request.body)
+    for item in option_dicts:
+        assert item["expected"] == sent_data[item["key"]]
 
 
-def test_invalid_gcs_only_options(run_line):
+@pytest.mark.parametrize(
+    "ep_type,type_opts",
+    [
+        ("personal", ("--personal",)),
+        ("share", ("--shared", "{GO_EP1_ID}:/~/")),
+    ],
+)
+def test_invalid_gcs_only_options(run_line, ep_type, type_opts, go_ep1_id):
     """
     For all GCS only options, tries to create a GCP and shared endpoint
     Confirms invalid options are caught at the CLI level rather than API
@@ -173,12 +181,13 @@ def test_invalid_gcs_only_options(run_line):
         "--location 1,1",
     ]
     for opt in options:
-        for ep_type in ["--shared {}:/~/".format(GO_EP1_ID), "--personal"]:
-            result = run_line(
-                ("globus endpoint create invalid_gcs " "{} {} ".format(ep_type, opt)),
-                assert_exit_code=2,
-            )
-            assert "Globus Connect Server" in result.output
+        result = run_line(
+            "globus endpoint create invalid_gcs {} {} ".format(
+                " ".join(x.format(GO_EP1_ID=go_ep1_id) for x in type_opts), opt
+            ),
+            assert_exit_code=2,
+        )
+        assert "Globus Connect Server" in result.stderr
 
 
 def test_invalid_managed_only_options(run_line):
@@ -195,7 +204,7 @@ def test_invalid_managed_only_options(run_line):
     ]
     for opt in options:
         result = run_line(
-            ("globus endpoint create invalid_managed " "--server {}".format(opt)),
+            "globus endpoint create invalid_managed --server {}".format(opt),
             assert_exit_code=2,
         )
-        assert "managed endpoints" in result.output
+        assert "managed endpoints" in result.stderr

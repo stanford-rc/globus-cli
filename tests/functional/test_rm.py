@@ -1,7 +1,33 @@
 import json
-from random import getrandbits
 
-from tests.constants import GO_EP1_ID
+import pytest
+import responses
+
+import globus_cli.services.transfer
+
+
+@pytest.fixture
+def patch_sleep(monkeypatch):
+    sleep_calls = []
+
+    def mock_sleep(*args, **kwargs):
+        sleep_calls.append((args, kwargs))
+
+    monkeypatch.setattr(globus_cli.services.transfer.time, "sleep", mock_sleep)
+
+    return sleep_calls
+
+
+def _get_delete_call():
+    # get the delete call, parse the body, and return both
+    try:
+        delete_call = next(
+            r.request for r in responses.calls if r.request.url.endswith("/delete")
+        )
+    except StopIteration:
+        return None, None
+    sent_data = json.loads(delete_call.body)
+    return delete_call, sent_data
 
 
 def _load_probably_json_substring(x):
@@ -14,138 +40,84 @@ def _load_probably_json_substring(x):
     return json.loads(x[x.index("{") : x.rindex("}") + 1])
 
 
-def test_recursive(run_line, tc):
+def test_recursive(run_line, load_api_fixtures, go_ep1_id):
     """
     Makes a dir on ep1, then --recursive rm's it.
     Confirms delete task was successful.
     """
-    # name randomized to prevent collision
-    path = "/~/rm_dir-{}".format(str(getrandbits(128)))
-    tc.operation_mkdir(GO_EP1_ID, path)
+    load_api_fixtures("transfer_activate_success.yaml")
+    load_api_fixtures("get_submission_id.yaml")
+    load_api_fixtures("submit_delete_success.yaml")
 
-    result = run_line("globus rm -r -F json {}:{}".format(GO_EP1_ID, path))
+    result = run_line("globus rm -r -F json {}:/foo".format(go_ep1_id))
     res = _load_probably_json_substring(result.output)
     assert res["status"] == "SUCCEEDED"
 
 
-def test_no_file(run_line):
+def test_no_file(run_line, load_api_fixtures, go_ep1_id):
     """
-    Attempts to remove a non-existant file. Confirms exit code 1
+    Attempts to remove a non-existent file. Confirms exit code 1
     """
-    path = "/~/nofilehere.txt"
-    run_line("globus rm {}:{}".format(GO_EP1_ID, path), assert_exit_code=1)
+    load_api_fixtures("transfer_activate_success.yaml")
+    load_api_fixtures("get_submission_id.yaml")
+    load_api_fixtures("submit_delete_failed.yaml")
+
+    run_line("globus rm {}:/nosuchfile.txt".format(go_ep1_id), assert_exit_code=1)
+
+    # confirm that we sent `ignore_missing=False`
+    # makes sense in context with the ignore-missing test below
+    _delete_call, sent_data = _get_delete_call()
+    assert sent_data["ignore_missing"] is False
 
 
-def test_ignore_missing(run_line):
+def test_ignore_missing(run_line, load_api_fixtures, go_ep1_id):
     """
     Attempts to remove a non-existant file path, with --ignore-missing.
     Confirms exit code 0 and silent output.
     """
+    load_api_fixtures("transfer_activate_success.yaml")
+    load_api_fixtures("get_submission_id.yaml")
+    load_api_fixtures("submit_delete_success.yaml")
+
     path = "/~/nofilehere.txt"
-    result = run_line("globus rm -f {}:{}".format(GO_EP1_ID, path))
-    assert "Delete task submitted under ID " in result.output
+    result = run_line("globus rm -f {}:{}".format(go_ep1_id, path))
+    assert "Delete task submitted under ID " in result.stderr
+
+    # confirm that we sent `ignore_missing=True`
+    _delete_call, sent_data = _get_delete_call()
+    assert sent_data["ignore_missing"] is True
 
 
-def test_pattern_globbing(run_line, tc):
+def test_timeout(run_line, load_api_fixtures, patch_sleep, go_ep1_id):
     """
-    Makes 3 dirs with the same prefix, and uses * globbing to rm them all.
-    Confirms delete task was successful and removed 3 dirs.
+    If a task is retrying without success, `rm` should wait and eventually time out.
     """
-    # mark all dirs with a random generated prefix to prevent collision
-    rand = str(getrandbits(128))
-    for i in range(3):
-        path = "/~/rm_dir{}-{}".format(rand, i)
-        tc.operation_mkdir(GO_EP1_ID, path)
+    load_api_fixtures("transfer_activate_success.yaml")
+    load_api_fixtures("get_submission_id.yaml")
+    load_api_fixtures("submit_delete_queued.yaml")
 
-    # remove all dirs with the prefix
-    glob = "rm_dir{}*".format(rand)
-    result = run_line("globus rm -r -F json {}:{}".format(GO_EP1_ID, glob))
-    res = _load_probably_json_substring(result.output)
-    assert res["status"] == "SUCCEEDED"
-
-    # confirm no dirs with the prefix exist on the endpoint
-    filter_string = "name:~rm_dir{}*".format(rand)
-    ls_doc = tc.operation_ls(GO_EP1_ID, filter=filter_string)
-    assert list(ls_doc) == []
-
-
-def test_wild_globbing(run_line, tc):
-    """
-    Makes 3 dirs with the same prefix, and uses ? globbing to rm them all.
-    Confirms delete task was successful and removed 3 dirs.
-    """
-    # mark all dirs with a random generated prefix to prevent collision
-    rand = str(getrandbits(128))
-    for i in range(3):
-        path = "/~/rm_dir{}-{}".format(rand, i)
-        tc.operation_mkdir(GO_EP1_ID, path)
-
-    # remove all dirs with the prefix
-    glob = "rm_dir{}-?".format(rand)
-    result = run_line("globus rm -r -F json {}:{}".format(GO_EP1_ID, glob))
-    res = _load_probably_json_substring(result.output)
-    assert res["status"] == "SUCCEEDED"
-
-    # confirm no dirs with the prefix exist on the endpoint
-    filter_string = "name:~rm_dir{}*".format(rand)
-    ls_doc = tc.operation_ls(GO_EP1_ID, filter=filter_string)
-    assert list(ls_doc) == []
-
-
-def test_bracket_globbing(run_line, tc):
-    """
-    Makes 3 dirs with the same prefix, and uses [] globbing to rm them all.
-    Confirms delete task was successful and removed 3 dirs.
-    """
-    # mark all dirs with a random generated prefix to prevent collision
-    rand = str(getrandbits(128))
-    for i in range(3):
-        path = "/~/rm_dir{}-{}".format(rand, i)
-        tc.operation_mkdir(GO_EP1_ID, path)
-
-    # remove all dirs with the prefix
-    glob = "rm_dir{}-[012]".format(rand)
-    result = run_line("globus rm -r -F json {}:{}".format(GO_EP1_ID, glob))
-    res = _load_probably_json_substring(result.output)
-    assert res["status"] == "SUCCEEDED"
-
-    # confirm no dirs with the prefix exist on the endpoint
-    filter_string = "name:~rm_dir{}*".format(rand)
-    ls_doc = tc.operation_ls(GO_EP1_ID, filter=filter_string)
-    assert list(ls_doc) == []
-
-
-def test_timeout(run_line):
-    """
-    Attempts to remove a path we are not allowed to remove,
-    confirms rm times out and exits 1 after given timeout.
-    """
-    timeout = 2
-    path = "/share/godata/file1.txt"
     result = run_line(
-        "globus rm -r --timeout {} {}:{}".format(timeout, GO_EP1_ID, path),
+        "globus rm -r --timeout 2 {}:/foo/bar.txt".format(go_ep1_id),
         assert_exit_code=1,
     )
-    assert (
-        "Task has yet to complete " "after {} seconds".format(timeout)
-    ) in result.output
+    assert "Task has yet to complete after 2 seconds" in result.stderr
 
 
-def test_timeout_explicit_status(run_line):
+def test_timeout_explicit_status(run_line, load_api_fixtures, patch_sleep, go_ep1_id):
     """
-    Attempts to remove a path we are not allowed to remove,
-    confirms rm times out and exits STATUS after given timeout, where
+    As above, submit a task which sits queued and times out.
+    Confirms rm exits STATUS after given timeout, where
     STATUS is set via the --timeout-exit-code opt
     """
-    timeout = 1
+    load_api_fixtures("transfer_activate_success.yaml")
+    load_api_fixtures("get_submission_id.yaml")
+    load_api_fixtures("submit_delete_queued.yaml")
+
     status = 50
-    path = "/share/godata/file1.txt"
     result = run_line(
-        "globus rm -r --timeout {} --timeout-exit-code {} {}:{}".format(
-            timeout, status, GO_EP1_ID, path
+        "globus rm -r --timeout 1 --timeout-exit-code {} {}:/foo/bar.txt".format(
+            status, go_ep1_id
         ),
         assert_exit_code=status,
     )
-    assert (
-        "Task has yet to complete " "after {} seconds".format(timeout)
-    ) in result.output
+    assert "Task has yet to complete after 1 seconds" in result.stderr

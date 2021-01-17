@@ -1,0 +1,76 @@
+metadata:
+  task_id: "6b0aed60-575c-11eb-87bb-02187389bd35"
+
+transfer:
+  - path: /delete
+    method: post
+    json:
+      {
+        "DATA_TYPE": "delete_result",
+        "code": "Accepted",
+        "message": "The delete has been accepted and a task has been created and queued for execution",
+        "request_id": "sIGJoWevc",
+        "resource": "/delete",
+        "submission_id": "5902daab-ffea-4e83-84f6-f69e5f8b7bb3",
+        "task_id": "6b0aed60-575c-11eb-87bb-02187389bd35",
+        "task_link": {
+          "DATA_TYPE": "link",
+          "href": "task/6b0aed60-575c-11eb-87bb-02187389bd35?format=json",
+          "rel": "related",
+          "resource": "task",
+          "title": "related task"
+        }
+      }
+  - path: /task/6b0aed60-575c-11eb-87bb-02187389bd35
+    json:
+      {
+        "bytes_checksummed": 0,
+        "bytes_transferred": 0,
+        "canceled_by_admin": null,
+        "canceled_by_admin_message": null,
+        "command": "API 0.10",
+        "completion_time": null,
+        "deadline": "2021-01-16T18:13:10+00:00",
+        "delete_destination_extra": false,
+        "destination_endpoint": null,
+        "destination_endpoint_display_name": null,
+        "destination_endpoint_id": null,
+        "directories": 0,
+        "effective_bytes_per_second": 0,
+        "encrypt_data": false,
+        "fatal_error": null,
+        "faults": 0,
+        "files": 1,
+        "files_skipped": 0,
+        "files_transferred": 0,
+        "history_deleted": false,
+        "is_ok": true,
+        "is_paused": false,
+        "key": "active,2021-01-15T18:13:10.478759",
+        "label": null,
+        "nice_status": "Queued",
+        "nice_status_details": null,
+        "nice_status_expires_in": -1,
+        "nice_status_short_description": "Queued",
+        "owner_id": "ae332d86-d274-11e5-b885-b31714a110e9",
+        "preserve_timestamp": false,
+        "recursive_symlinks": null,
+        "request_time": "2021-01-15T18:13:10+00:00",
+        "source_endpoint": "go#ep1",
+        "source_endpoint_display_name": "Globus Tutorial Endpoint 1",
+        "source_endpoint_id": "ddb59aef-6d04-11e5-ba46-22000b92c6ec",
+        "status": "ACTIVE",
+        "subtasks_canceled": 0,
+        "subtasks_expired": 0,
+        "subtasks_failed": 0,
+        "subtasks_pending": 1,
+        "subtasks_retrying": 0,
+        "subtasks_succeeded": 0,
+        "subtasks_total": 1,
+        "symlinks": 0,
+        "sync_level": null,
+        "task_id": "6b0aed60-575c-11eb-87bb-02187389bd35",
+        "type": "DELETE",
+        "username": "sirosen",
+        "verify_checksum": false
+      }

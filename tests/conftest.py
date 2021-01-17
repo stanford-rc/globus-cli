@@ -1,20 +1,71 @@
-import json
 import logging
 import os
 import shlex
-from datetime import datetime, timedelta
+import time
 
-import globus_sdk
 import pytest
+import responses
 import six
 from click.testing import CliRunner
+from configobj import ConfigObj
+from globus_sdk.base import slash_join
+from ruamel.yaml import YAML
 
-from globus_cli.services.auth import get_auth_client
-from globus_cli.services.transfer import get_client as get_transfer_client
-from tests.constants import GO_EP1_ID
-from tests.utils import patch_config
+import globus_cli.config
+from globus_cli.services.transfer import RetryingTransferClient
 
+yaml = YAML()
 log = logging.getLogger(__name__)
+
+
+@pytest.fixture(scope="session")
+def go_ep1_id():
+    return "ddb59aef-6d04-11e5-ba46-22000b92c6ec"
+
+
+@pytest.fixture(scope="session")
+def go_ep2_id():
+    return "ddb59af0-6d04-11e5-ba46-22000b92c6ec"
+
+
+@pytest.fixture
+def default_test_config():
+    """
+    Returns a ConfigObj with the clitester's refresh tokens as if the
+    clitester was logged in and a call to get_config_obj was made.
+    """
+    # create a ConfgObj from a dict of testing constants. a ConfigObj created
+    # this way will not be tied to a config file on disk, meaning that
+    # ConfigObj.filename = None and ConfigObj.write() returns a string without
+    # writing anything to disk.
+    return ConfigObj(
+        {
+            "cli": {
+                globus_cli.config.CLIENT_ID_OPTNAME: "fakeClientIDString",
+                globus_cli.config.CLIENT_SECRET_OPTNAME: "fakeClientSecret",
+                globus_cli.config.AUTH_RT_OPTNAME: "AuthRT",
+                globus_cli.config.AUTH_AT_OPTNAME: "AuthAT",
+                globus_cli.config.AUTH_AT_EXPIRES_OPTNAME: int(time.time()) + 120,
+                globus_cli.config.TRANSFER_RT_OPTNAME: "TransferRT",
+                globus_cli.config.TRANSFER_AT_OPTNAME: "TransferAT",
+                globus_cli.config.TRANSFER_AT_EXPIRES_OPTNAME: int(time.time()) + 120,
+            }
+        }
+    )
+
+
+@pytest.fixture
+def patch_config(monkeypatch, default_test_config):
+    def func(conf=None):
+        if conf is None:
+            conf = default_test_config
+
+        def mock_get_config():
+            return conf
+
+        monkeypatch.setattr(globus_cli.config, "get_config_obj", mock_get_config)
+
+    return func
 
 
 @pytest.fixture(scope="session")
@@ -23,50 +74,12 @@ def test_file_dir():
 
 
 @pytest.fixture
-def user_data(test_file_dir):
-    ret = {}
-    for uname in ("clitester1a", "clitester1alinked", "go"):
-        with open(os.path.join(test_file_dir, uname + "@globusid.org.json")) as f:
-            ret[uname] = json.load(f)
-    return ret
-
-
-@pytest.fixture(scope="session", autouse=True)
-def clean_sharing():
-    """
-    Cleans out any files in ~/.globus/sharing/ on go#ep1 older than an hour at the start
-    of each testsuite run
-    """
-    with patch_config():
-        tc = get_transfer_client()
-
-        path = "~/.globus/sharing/"
-        hour_ago = datetime.utcnow() - timedelta(hours=1)
-        filter_string = "last_modified:," + hour_ago.strftime("%Y-%m-%d %H:%M:%S")
-        try:
-            old_files = tc.operation_ls(
-                GO_EP1_ID, path=path, filter=filter_string, num_results=None
-            )
-        except globus_sdk.TransferAPIError:
-            return
-
-        kwargs = {"notify_on_succeeded": False, "notify_on_fail": False}
-        ddata = globus_sdk.DeleteData(tc, GO_EP1_ID, **kwargs)
-
-        for item in old_files:
-            ddata.add_item(path + item["name"])
-
-        if len(ddata["DATA"]):
-            tc.submit_delete(ddata)
-
-
-@pytest.fixture
 def cli_runner():
-    return CliRunner()
+    return CliRunner(mix_stderr=False)
 
 
 @pytest.fixture
-def run_line(cli_runner, request):
+def run_line(cli_runner, request, patch_config):
     """
     Uses the CliRunner to run the given command line.
 
@@ -82,71 +95,156 @@ def run_line(cli_runner, request):
     def func(line, config=None, assert_exit_code=0, stdin=None):
         from globus_cli import main
 
-        with patch_config(config):
-            # split line into args and confirm line starts with "globus"
-            # python2 shlex can't handle non ascii unicode
-            if six.PY2 and isinstance(line, six.text_type):
-                args = [a for a in shlex.split(line.encode("utf-8"))]
-            else:
-                args = shlex.split(line)
-            assert args[0] == "globus"
+        patch_config(config)
 
-            # run the line. globus_cli.main is the "globus" part of the line
-            # if we are expecting success (0), don't catch any exceptions.
-            result = cli_runner.invoke(
-                main, args[1:], input=stdin, catch_exceptions=bool(assert_exit_code)
+        # split line into args and confirm line starts with "globus"
+        # python2 shlex can't handle non ascii unicode
+        if six.PY2 and isinstance(line, six.text_type):
+            args = [a for a in shlex.split(line.encode("utf-8"))]
+        else:
+            args = shlex.split(line)
+        assert args[0] == "globus"
+
+        # run the line. globus_cli.main is the "globus" part of the line
+        # if we are expecting success (0), don't catch any exceptions.
+        result = cli_runner.invoke(
+            main, args[1:], input=stdin, catch_exceptions=bool(assert_exit_code)
+        )
+        if result.exit_code != assert_exit_code:
+            raise (
+                Exception(
+                    (
+                        (
+                            "CliTest run_line exit_code assertion failed!\n"
+                            "Line:\n{}\nexited with {} when expecting {}\n"
+                            "stdout:\n{}\nstderr:\n{}\nnetwork calls recorded:"
+                            "\n  {}"
+                        ).format(
+                            line,
+                            result.exit_code,
+                            assert_exit_code,
+                            result.stdout,
+                            result.stderr,
+                            (
+                                "\n  ".join(r.request.url for r in responses.calls)
+                                or "  <none>"
+                            ),
+                        )
+                    )
+                )
             )
-            assert result.exit_code == assert_exit_code
-            return result
+        return result
 
     return func
 
 
-@pytest.fixture
-def tc():
-    with patch_config():
-        return get_transfer_client()
+@pytest.fixture(autouse=True)
+def mocked_responses(monkeypatch):
+    """
+    All tests enable `responses` patching of the `requests` package, replacing
+    all HTTP calls.
+    """
+    responses.start()
+
+    # while request mocking is running, ensure GLOBUS_SDK_ENVIRONMENT is set to
+    # production
+    monkeypatch.setitem(os.environ, "GLOBUS_SDK_ENVIRONMENT", "production")
+
+    yield
+
+    responses.stop()
+    responses.reset()
 
 
 @pytest.fixture
-def ac():
-    with patch_config():
-        return get_auth_client()
+def register_api_route(mocked_responses):
+    # copied almost verbatim from the SDK testsuite
+    def func(
+        service,
+        path,
+        method=responses.GET,
+        adding_headers=None,
+        replace=False,
+        match_querystring=False,
+        **kwargs
+    ):
+        base_url_map = {
+            "auth": "https://auth.globus.org/",
+            "nexus": "https://nexus.api.globusonline.org/",
+            "transfer": "https://transfer.api.globus.org/v0.10",
+            "search": "https://search.api.globus.org/",
+        }
+        assert service in base_url_map
+        base_url = base_url_map.get(service)
+        full_url = slash_join(base_url, path)
+
+        # can set it to `{}` explicitly to clear the default
+        if adding_headers is None:
+            adding_headers = {"Content-Type": "application/json"}
+
+        if replace:
+            responses.replace(
+                method,
+                full_url,
+                headers=adding_headers,
+                match_querystring=match_querystring,
+                **kwargs
+            )
+        else:
+            responses.add(
+                method,
+                full_url,
+                headers=adding_headers,
+                match_querystring=match_querystring,
+                **kwargs
+            )
+
+    return func
 
 
-# magical cleanup collections
-# each of these fixtures records data to pass through the autocleaner
+def _iter_fixture_routes(routes):
+    # walk a fixture file either as a list of routes
+    for x in routes:
+        # copy and remove elements
+        params = dict(x)
+        path = params.pop("path")
+        method = params.pop("method", "get")
+        yield path, method, params
+
+
 @pytest.fixture
-def created_endpoints():
-    return []
+def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id):
+    def func(filename):
+        filename = os.path.join(test_file_dir, "api_fixtures", filename)
+        with open(filename) as fp:
+            data = yaml.load(fp.read())
+        for service, routes in data.items():
+            # allow use of the key "metadata" to expose extra data from a fixture file
+            # to the user of it
+            if service == "metadata":
+                continue
 
+            for path, method, params in _iter_fixture_routes(routes):
+                # allow /endpoint/{GO_EP1_ID} as a path
+                use_path = path.format(GO_EP1_ID=go_ep1_id, GO_EP2_ID=go_ep2_id)
+                if "query_params" in params:
+                    # copy and set match_querystring=True
+                    params = dict(match_querystring=True, **params)
+                    # remove and encode query params
+                    query_params = six.moves.urllib.parse.urlencode(
+                        params.pop("query_params")
+                    )
+                    # modify path (assume no prior params)
+                    use_path = use_path + "?" + query_params
+                register_api_route(service, use_path, method=method.upper(), **params)
 
-@pytest.fixture
-def created_bookmark_names():
-    return []
+        # after registration, return the raw fixture data
+        return data
+
+    return func
 
 
 @pytest.fixture(autouse=True)
-def autoclean(request, created_endpoints, created_bookmark_names, tc):
-    def clean_endpoints():
-        for x in created_endpoints:
-            tc.delete_endpoint(x)
-
-    def clean_bookmarks():
-        if not created_bookmark_names:
-            return
-
-        for bm in tc.bookmark_list():
-            if bm["name"] in created_bookmark_names:
-                try:
-                    tc.delete_bookmark(bm["id"])
-                except globus_sdk.GlobusAPIError:
-                    log.exception("API error on bookmark tests cleanup")
-                except globus_sdk.NetworkError:
-                    log.exception("Network error on bookmark tests cleanup")
-
-    def clean():
-        clean_endpoints()
-        clean_bookmarks()
-
-    request.addfinalizer(clean)
+def _reduce_transfer_client_retries(monkeypatch):
+    """to make tests fail faster on network errors"""
+    monkeypatch.setattr(RetryingTransferClient, "default_retries", 1)

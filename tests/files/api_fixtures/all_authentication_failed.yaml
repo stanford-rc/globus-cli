@@ -1,0 +1,25 @@
+transfer:
+  - path: /endpoint/{GO_EP1_ID}/autoactivate
+    method: post
+    status: 401
+    json:
+      {
+        "code": "ClientError.AuthenticationFailed",
+        "message": "foo bar",
+        "request_id": "abc123"
+      }
+auth:
+  - path: /v2/oauth2/userinfo
+    status: 401
+    json:
+      {
+        "code": "UNAUTHORIZED",
+        "message": "foo bar"
+      }
+  - path: /v2/api/identities
+    status: 401
+    json:
+      {
+        "code": "UNAUTHORIZED",
+        "message": "foo bar"
+      }
