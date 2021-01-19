@@ -169,6 +169,7 @@ def endpoint_create_and_update_params(*args, **kwargs):
         )(f)
         f = click.option(
             "--disable-verify/--no-disable-verify",
+            default=None,
             is_flag=True,
             help="(Un)Set the endpoint to ignore checksum verification",
         )(f)
