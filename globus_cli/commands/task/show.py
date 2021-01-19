@@ -21,6 +21,7 @@ COMMON_FIELDS = [
     ("Subtasks Failed", "subtasks_failed"),
     ("Subtasks Canceled", "subtasks_canceled"),
     ("Subtasks Expired", "subtasks_expired"),
+    ("Subtasks with Skipped Errors", "subtasks_skipped_errors"),
 ]
 
 ACTIVE_FIELDS = [("Deadline", "deadline"), ("Details", "nice_status")]
@@ -66,7 +67,7 @@ def print_skipped_errors(client, task_id):
     res = client.task_skipped_errors(task_id, num_results=None)
     formatted_print(
         res,
-        fields=SUCCESSFULL_TRANSFER_FIELDS,
+        fields=SKIPPED_PATHS_FIELDS,
         json_converter=iterable_response_to_dict,
     )
 
@@ -140,17 +141,20 @@ $ globus task show TASK_ID
     "-t",
     is_flag=True,
     default=False,
-    help=("Show files that were transferred as result of this task. "
-          "Mutually exclusive with --skipped-errors"),
+    help=(
+        "Show files that were transferred as result of this task. "
+        "Mutually exclusive with --skipped-errors"
+    ),
 )
 @click.option(
     "--skipped-errors",
     is_flag=True,
     default=False,
-    help=("Show paths that were skipped due to errors during this task. "
-          "Mutually exclusive with --successful-transfers"),
+    help=(
+        "Show paths that were skipped due to errors during this task. "
+        "Mutually exclusive with --successful-transfers"
+    ),
 )
-
 def show_task(successful_transfers, skipped_errors, task_id):
     """
     Print information detailing the status and other info about a task.
