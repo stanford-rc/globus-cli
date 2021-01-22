@@ -1,5 +1,17 @@
 = CLI Changelog
 
+== 1.15.0
+
+Bugfixes:
+
+* The `disable_verify` option will no longer be set to `False` when left
+  unspecified in `globus endpoint update`
+
+Enhancements:
+
+* `globus update` now restricts updates to python2-compatible versions when
+  running under python2
+
 == 1.14.0
 
 Bugfixes:
