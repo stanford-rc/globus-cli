@@ -50,7 +50,7 @@ def _check_pip_installed():
 )
 @click.option("--yes", is_flag=True, help='Automatically say "yes" to all prompts')
 # hidden options to fetch branches or tags from GitHub. One turns this mode
-# on or off, and the other is used to set a non-master target
+# on or off, and the other is used to set a non-main target
 # --development-version implies --development
 @click.option("--development", is_flag=True, hidden=True)
 @click.option("--development-version", hidden=True, default=None)
@@ -97,8 +97,8 @@ def update_command(yes, development, development_version):
     # if we're running with `--development`, then the target version is a
     # tarball from GitHub, and we can skip out on the safety checks
     if development:
-        # default to master
-        development_version = development_version or "master"
+        # default to main
+        development_version = development_version or "main"
         target_version = (
             "https://github.com/globus/globus-cli/archive/{}.tar.gz#egg=globus-cli"
         ).format(development_version)

@@ -13,7 +13,7 @@ github-issue-title () {
 	echo "$api_out" | grep '"title"' | cut -d':' -f2- | sed -e 's/^ "//' -e 's/",$//'
 }
 
-git log "${last_tag}..master" --oneline | grep 'Merge pull' | egrep -o '#[[:digit:]]+' | tr -d '#' | \
+git log "${last_tag}..main" --oneline | grep 'Merge pull' | egrep -o '#[[:digit:]]+' | tr -d '#' | \
     while read line; do
         echo "* $(github-issue-title "$line")"
         echo "(https://github.com/globus/globus-cli/pull/${line}[${line}])"
