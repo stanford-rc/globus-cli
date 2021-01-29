@@ -1,0 +1,35 @@
+transfer:
+  - path: /task/{TASK_ID}/skipped_errors
+    method: get
+    status: 200
+    json:
+      {
+  "DATA": [
+    {
+      "DATA_TYPE": "skipped_error",
+      "checksum_algorithm": null,
+      "destination_path": "/~/no-such-file",
+      "error_code": "FILE_NOT_FOUND",
+      "error_details": "550-GlobusError: v=1 c=PATH_NOT_FOUND%0D%0A550-GridFTP-Errno: 2%0D%0A550-GridFTP-Reason: System error in stat%0D%0A550-GridFTP-Error-String: No such file or directory%0D%0A550 End.%0D%0A",
+      "error_time": "2021-01-29T18:50:37+00:00",
+      "external_checksum": null,
+      "is_delete_destination_extra": false,
+      "is_directory": false,
+      "is_symlink": false,
+      "source_path": "/~/no-such-file"
+    },
+    {
+      "DATA_TYPE": "skipped_error",
+      "checksum_algorithm": null,
+      "destination_path": "/~/restricted-file",
+      "error_code": "PERMISSION_DENIED",
+      "error_details": "Error (transfer)\nEndpoint: Dev GCP (15f47c5e-648e-11ea-aa9b-0afa7b051b85)\nServer: 172.31.20.254:40964\nFile: /~/restricted-file\nCommand: RETR ~/restricted-file\nMessage: Fatal FTP response\nTest-Unicode: \u24ca\u24c3\u24be\u24b8\u24c4\u24b9\u24ba \u2764 \u2605 \u262f\n---\nDetails: 500-GlobusError: v=1 c=INTERNAL_ERROR\\r\\n500-GridFTP-Error: globus_xio_register_open\\r\\n500-globus_xio: Unable to open file /home/aaron/restricted-file\\r\\n500-globus_xio: System error in open: Permission denied\\r\\n500-globus_xio: A system call failed: Permission denied\\r\\n500 End.\\r\\n\n",
+      "error_time": "2021-01-29T18:50:44+00:00",
+      "external_checksum": null,
+      "is_delete_destination_extra": false,
+      "is_directory": false,
+      "is_symlink": false,
+      "source_path": "/~/restricted-file"
+    }
+  ]
+}

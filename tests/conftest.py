@@ -28,6 +28,11 @@ def go_ep2_id():
     return "ddb59af0-6d04-11e5-ba46-22000b92c6ec"
 
 
+@pytest.fixture(scope="session")
+def task_id():
+    return "549ef13c-600f-11eb-9608-0afa7b051b85"
+
+
 @pytest.fixture
 def default_test_config():
     """
@@ -213,7 +218,7 @@ def _iter_fixture_routes(routes):
 
 
 @pytest.fixture
-def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id):
+def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id, task_id):
     def func(filename):
         filename = os.path.join(test_file_dir, "api_fixtures", filename)
         with open(filename) as fp:
@@ -226,7 +231,9 @@ def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id):
 
             for path, method, params in _iter_fixture_routes(routes):
                 # allow /endpoint/{GO_EP1_ID} as a path
-                use_path = path.format(GO_EP1_ID=go_ep1_id, GO_EP2_ID=go_ep2_id)
+                use_path = path.format(
+                    GO_EP1_ID=go_ep1_id, GO_EP2_ID=go_ep2_id, TASK_ID=task_id
+                )
                 if "query_params" in params:
                     # copy and set match_querystring=True
                     params = dict(match_querystring=True, **params)

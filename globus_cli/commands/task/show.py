@@ -21,6 +21,7 @@ COMMON_FIELDS = [
     ("Subtasks Failed", "subtasks_failed"),
     ("Subtasks Canceled", "subtasks_canceled"),
     ("Subtasks Expired", "subtasks_expired"),
+    ("Subtasks with Skipped Errors", "subtasks_skipped_errors"),
 ]
 
 ACTIVE_FIELDS = [("Deadline", "deadline"), ("Details", "nice_status")]
@@ -46,12 +47,27 @@ SUCCESSFULL_TRANSFER_FIELDS = [
     ("Destination Path", "destination_path"),
 ]
 
+SKIPPED_PATHS_FIELDS = [
+    ("Source Path", "source_path"),
+    ("Destination Path", "destination_path"),
+    ("Error Code", "error_code"),
+]
+
 
 def print_successful_transfers(client, task_id):
     res = client.task_successful_transfers(task_id, num_results=None)
     formatted_print(
         res,
         fields=SUCCESSFULL_TRANSFER_FIELDS,
+        json_converter=iterable_response_to_dict,
+    )
+
+
+def print_skipped_errors(client, task_id):
+    res = client.task_skipped_errors(task_id, num_results=None)
+    formatted_print(
+        res,
+        fields=SKIPPED_PATHS_FIELDS,
         json_converter=iterable_response_to_dict,
     )
 
@@ -125,17 +141,35 @@ $ globus task show TASK_ID
     "-t",
     is_flag=True,
     default=False,
-    help="Show files that were transferred as result of this task.",
+    help=(
+        "Show files that were transferred as result of this task. "
+        "Mutually exclusive with --skipped-errors"
+    ),
 )
-def show_task(successful_transfers, task_id):
+@click.option(
+    "--skipped-errors",
+    is_flag=True,
+    default=False,
+    help=(
+        "Show paths that were skipped due to errors during this task. "
+        "Mutually exclusive with --successful-transfers"
+    ),
+)
+def show_task(successful_transfers, skipped_errors, task_id):
     """
     Print information detailing the status and other info about a task.
 
     The task may be pending, completed, or in progress.
     """
+    if successful_transfers and skipped_errors:
+        raise click.UsageError(
+            "--successful-transfers and --skipped-errors are mutually exclusive"
+        )
     client = get_client()
 
     if successful_transfers:
         print_successful_transfers(client, task_id)
+    elif skipped_errors:
+        print_skipped_errors(client, task_id)
     else:
         print_task_detail(client, task_id)

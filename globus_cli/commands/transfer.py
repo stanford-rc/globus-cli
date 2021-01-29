@@ -173,6 +173,26 @@ fi
     show_default=True,
     help=("Specify an algorithm for --external-checksum or --verify-checksum"),
 )
+@click.option(
+    "--skip-source-errors",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help=(
+        "Skip over source paths that hit permission denied or file not "
+        "found errors during the transfer."
+    ),
+)
+@click.option(
+    "--fail-on-quota-errors",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help=(
+        "Cause the task to fail if any quota exceeded errors are hit "
+        "during the transfer."
+    ),
+)
 @click.argument(
     "source", metavar="SOURCE_ENDPOINT_ID[:SOURCE_PATH]", type=ENDPOINT_PLUS_OPTPATH
 )
@@ -191,6 +211,8 @@ def transfer_command(
     source,
     checksum_algorithm,
     external_checksum,
+    skip_source_errors,
+    fail_on_quota_errors,
     label,
     preserve_mtime,
     verify_checksum,
@@ -335,6 +357,8 @@ def transfer_command(
         delete_destination_extra=delete,
         deadline=deadline,
         skip_activation_check=skip_activation_check,
+        skip_source_errors=skip_source_errors,
+        fail_on_quota_errors=fail_on_quota_errors,
         **kwargs
     )
 
