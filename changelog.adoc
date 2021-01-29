@@ -1,5 +1,15 @@
 = CLI Changelog
 
+== 1.16.0
+
+Enhancements:
+
+* `globus transfer` now supports two new flags, `--skip-source-errors` and
+  `--fail-on-quota-errors`, which allow you to better control error behaviors
+
+* `globus task show --skipped-errors` is a new flag which will show skipped
+  transfer errors (for transfers which support them)
+
 == 1.15.0
 
 Bugfixes:
