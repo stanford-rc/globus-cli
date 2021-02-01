@@ -24,7 +24,6 @@ def _get_package_data():
         "globus_sdk",
         "jmespath",
         "requests",
-        "six",
     )
     if verbosity() < 2:
         modlist = ("globus_cli", "globus_sdk", "requests")

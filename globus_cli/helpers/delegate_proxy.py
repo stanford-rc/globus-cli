@@ -3,7 +3,6 @@ import os
 import re
 import struct
 
-import six
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
@@ -114,13 +113,15 @@ def parse_issuer_cred(issuer_cred):
     # then validate that each section of data can be decoded as expected
     try:
         loaded_cert = x509.load_pem_x509_certificate(
-            six.b(issuer_cert), default_backend()
+            issuer_cert.encode("utf-8"), default_backend()
         )
         loaded_private_key = serialization.load_pem_private_key(
-            six.b(issuer_private_key), password=None, backend=default_backend()
+            issuer_private_key.encode("utf-8"), password=None, backend=default_backend()
         )
         for chain_cert in issuer_chain_certs:
-            x509.load_pem_x509_certificate(six.b(chain_cert), default_backend())
+            x509.load_pem_x509_certificate(
+                chain_cert.encode("utf-8"), default_backend()
+            )
         issuer_chain = "".join(issuer_chain_certs)
     except ValueError:
         raise ValueError(

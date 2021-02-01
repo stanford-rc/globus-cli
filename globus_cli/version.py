@@ -26,10 +26,9 @@ def get_versions():
     regardless of runtime.
     """
     # import in the func (rather than top-level scope) so that at setup time,
-    # `requests` and `six` aren't required -- otherwise, setuptools will fail to run
-    # because they aren't installed yet.
+    # `requests` isn't required -- otherwise, setuptools will fail to run
+    # because it isn't installed yet.
     import requests
-    import six
 
     try:
         version_data = requests.get(
@@ -37,11 +36,6 @@ def get_versions():
         ).json()
         parsed_versions = [LooseVersion(v) for v in version_data["releases"]]
         upgrade_target = latest = max(parsed_versions)
-        # python2 only; limit the upgrade to only the latest v1
-        if six.PY2:
-            upgrade_target = max(
-                v for v in parsed_versions if v < LooseVersion("2.0.0")
-            )
         return upgrade_target, latest, LooseVersion(__version__)
     # if the fetch from pypi fails
     except requests.RequestException:

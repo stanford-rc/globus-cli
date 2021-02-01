@@ -6,7 +6,6 @@ from contextlib import contextmanager
 from string import Template
 
 import click
-import six
 
 try:
     import http.client as http_client
@@ -105,22 +104,18 @@ class RedirectHandler(BaseHTTPRequestHandler):
         code = query_params.get("code")
         if code:
             self.wfile.write(
-                six.b(
-                    HTML_TEMPLATE.substitute(
-                        post_login_message=DOC_URL, login_result="Login successful"
-                    )
-                )
+                HTML_TEMPLATE.substitute(
+                    post_login_message=DOC_URL, login_result="Login successful"
+                ).encode("utf-8")
             )
             self.server.return_code(code)
         else:
             msg = query_params.get("error_description", query_params.get("error"))
 
             self.wfile.write(
-                six.b(
-                    HTML_TEMPLATE.substitute(
-                        post_login_message=msg, login_result="Login failed"
-                    )
-                )
+                HTML_TEMPLATE.substitute(
+                    post_login_message=msg, login_result="Login failed"
+                ).encode("utf-8")
             )
 
             self.server.return_code(LocalServerError(msg))

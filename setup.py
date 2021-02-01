@@ -18,7 +18,6 @@ setup(
         "jmespath==0.10.0",
         "configobj>=5.0.6,<6.0.0",
         "requests>=2.0.0,<3.0.0",
-        "six>=1.10.0,<2.0.0",
         # cryptography has unusual versioning and compatibility rules:
         # https://cryptography.io/en/latest/api-stability/
         # we trust the two next major versions, per the Deprecation policy
@@ -28,9 +27,6 @@ setup(
         "cryptography>=1.8.1,<3.4.0",
     ],
     extras_require={
-        # deprecated, but do not remove -- doing so would break installs which
-        # are already using this extra
-        "delegate-proxy": [],
         # the development extra is for CLI developers only
         "development": [
             # testing

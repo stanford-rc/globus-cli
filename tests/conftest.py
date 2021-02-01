@@ -2,10 +2,10 @@ import logging
 import os
 import shlex
 import time
+import urllib.parse
 
 import pytest
 import responses
-import six
 from click.testing import CliRunner
 from configobj import ConfigObj
 from globus_sdk.base import slash_join
@@ -103,11 +103,7 @@ def run_line(cli_runner, request, patch_config):
         patch_config(config)
 
         # split line into args and confirm line starts with "globus"
-        # python2 shlex can't handle non ascii unicode
-        if six.PY2 and isinstance(line, str):
-            args = [a for a in shlex.split(line.encode("utf-8"))]
-        else:
-            args = shlex.split(line)
+        args = shlex.split(line)
         assert args[0] == "globus"
 
         # run the line. globus_cli.main is the "globus" part of the line
@@ -236,9 +232,7 @@ def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id, t
                     # copy and set match_querystring=True
                     params = dict(match_querystring=True, **params)
                     # remove and encode query params
-                    query_params = six.moves.urllib.parse.urlencode(
-                        params.pop("query_params")
-                    )
+                    query_params = urllib.parse.urlencode(params.pop("query_params"))
                     # modify path (assume no prior params)
                     use_path = use_path + "?" + query_params
                 register_api_route(service, use_path, method=method.upper(), **params)
