@@ -51,43 +51,18 @@ def _get_package_data():
     return moddata
 
 
-def _get_versionblock_message(current, latest, upgrade_target):
-    if latest == upgrade_target:
-        return f"""\
+def _get_versionblock_message(current, latest):
+    return f"""\
 Installed version:  {current}
 Latest version:     {latest}"""
-    # latest != upgrade_target means it's a py2 environment where we're capped at <2.0
-    else:
-        return f"""\
-You are running the Globus CLI on python2
-
-Installed version:           {current}
-Latest version for python2:  {upgrade_target}
-Latest version for python3:  {latest}"""
 
 
-def _get_post_message(current, latest, upgrade_target):
+def _get_post_message(current, latest):
     if current == latest:
         return "You are running the latest version of the Globus CLI"
     if current > latest:
         return "You are running a preview version of the Globus CLI"
-    if upgrade_target == latest:
-        return "You should update your version of the Globus CLI with\n  globus update"
-    if current == upgrade_target:
-        return f"""\
-You are running the latest version of the Globus CLI supported by python2.
-
-To upgrade to the latest version of the CLI ({latest}), you will need to
-uninstall and reinstall the CLI using python3."""
-    if current < upgrade_target:
-        return """\
-You should update your version of the Globus CLI.
-However, your python2 runtime does not support the latest version.
-
-You may update with the 'globus update' command, but we recommend that
-you uninstall and reinstall the CLI using python3."""
-    # should be unreachable
-    return "Unrecognized status. You may be on a development version."
+    return "You should update your version of the Globus CLI with\n  globus update"
 
 
 def print_version():
@@ -98,14 +73,14 @@ def print_version():
     It may seem odd that this isn't in globus_cli.version , but it's done this
     way to separate concerns over printing the version from looking it up.
     """
-    upgrade_target, latest, current = get_versions()
+    latest, current = get_versions()
     if latest is None:
         click.echo(f"Installed Version: {current}\nFailed to lookup latest version.")
     else:
         click.echo(
-            _get_versionblock_message(current, latest, upgrade_target)
+            _get_versionblock_message(current, latest)
             + "\n\n"
-            + _get_post_message(current, latest, upgrade_target)
+            + _get_post_message(current, latest)
         )
 
     # verbose shows more platform and python info
