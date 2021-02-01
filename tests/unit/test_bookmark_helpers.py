@@ -1,14 +1,10 @@
 import uuid
+from unittest import mock
 
 import pytest
 from globus_sdk.exc import TransferAPIError
 
 from globus_cli.commands.bookmark.helpers import resolve_id_or_name
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 
 
 def test_resolve_bookmarkid_not_found_does_name_match():
