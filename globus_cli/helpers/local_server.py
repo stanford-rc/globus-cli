@@ -1,35 +1,99 @@
+import http.client
 import logging
 import os
+import queue
 import sys
 import threading
 from contextlib import contextmanager
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from string import Template
+from urllib.parse import parse_qsl, urlparse
 
 import click
-
-try:
-    import http.client as http_client
-except ImportError:
-    import httplib as http_client
-
-try:
-    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-except ImportError:
-    from http.server import BaseHTTPRequestHandler, HTTPServer
-
-try:
-    import Queue
-except ImportError:
-    import queue as Queue
-
-try:
-    from urlparse import parse_qsl, urlparse
-except ImportError:
-    from urllib.parse import parse_qsl, urlparse
 
 
 class LocalServerError(Exception):
     pass
+
+
+def enable_requests_logging():
+    http.client.HTTPConnection.debuglevel = 4
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.DEBUG)
+    requests_log = logging.getLogger("requests.packages.urllib3")
+    requests_log.setLevel(logging.DEBUG)
+    requests_log.propagate = True
+
+
+def is_remote_session():
+    return os.environ.get("SSH_TTY", os.environ.get("SSH_CONNECTION"))
+
+
+class RedirectHandler(BaseHTTPRequestHandler):
+    def do_GET(self):  # noqa
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+
+        query_params = dict(parse_qsl(urlparse(self.path).query))
+        code = query_params.get("code")
+        if code:
+            self.wfile.write(
+                HTML_TEMPLATE.substitute(
+                    post_login_message=DOC_URL, login_result="Login successful"
+                ).encode("utf-8")
+            )
+            self.server.return_code(code)
+        else:
+            msg = query_params.get("error_description", query_params.get("error"))
+
+            self.wfile.write(
+                HTML_TEMPLATE.substitute(
+                    post_login_message=msg, login_result="Login failed"
+                ).encode("utf-8")
+            )
+
+            self.server.return_code(LocalServerError(msg))
+
+    def log_message(self, format, *args):
+        return
+
+
+class RedirectHTTPServer(HTTPServer):
+    def __init__(self, listen, handler_class):
+        super().__init__(listen, handler_class)
+
+        self._auth_code_queue = queue.Queue()
+
+    def handle_error(self, request, client_address):
+        exctype, excval, exctb = sys.exc_info()
+        self._auth_code_queue.put(excval)
+
+    def return_code(self, code):
+        self._auth_code_queue.put_nowait(code)
+
+    def wait_for_code(self):
+        # workaround for handling control-c interrupt.
+        # relevant Python issue discussing this behavior:
+        # https://bugs.python.org/issue1360
+        try:
+            return self._auth_code_queue.get(block=True, timeout=3600)
+        except queue.Empty:
+            click.echo("Login timed out. Please try again.", err=True)
+            sys.exit(1)
+
+
+@contextmanager
+def start_local_server(listen=("", 0)):
+    server = RedirectHTTPServer(listen, RedirectHandler)
+    thread = threading.Thread(target=server.serve_forever)
+    thread.daemon = True
+    thread.start()
+
+    yield server
+
+    server.shutdown()
 
 
 HTML_TEMPLATE = Template(
@@ -78,83 +142,3 @@ HTML_TEMPLATE = Template(
 DOC_URL = """
 <a href="https://globus.github.io/globus-cli/">CLI Documentation</a>
 """
-
-
-def enable_requests_logging():
-    http_client.HTTPConnection.debuglevel = 4
-
-    logging.basicConfig()
-    logging.getLogger().setLevel(logging.DEBUG)
-    requests_log = logging.getLogger("requests.packages.urllib3")
-    requests_log.setLevel(logging.DEBUG)
-    requests_log.propagate = True
-
-
-def is_remote_session():
-    return os.environ.get("SSH_TTY", os.environ.get("SSH_CONNECTION"))
-
-
-class RedirectHandler(BaseHTTPRequestHandler):
-    def do_GET(self):  # noqa
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-
-        query_params = dict(parse_qsl(urlparse(self.path).query))
-        code = query_params.get("code")
-        if code:
-            self.wfile.write(
-                HTML_TEMPLATE.substitute(
-                    post_login_message=DOC_URL, login_result="Login successful"
-                ).encode("utf-8")
-            )
-            self.server.return_code(code)
-        else:
-            msg = query_params.get("error_description", query_params.get("error"))
-
-            self.wfile.write(
-                HTML_TEMPLATE.substitute(
-                    post_login_message=msg, login_result="Login failed"
-                ).encode("utf-8")
-            )
-
-            self.server.return_code(LocalServerError(msg))
-
-    def log_message(self, format, *args):
-        return
-
-
-class RedirectHTTPServer(HTTPServer):
-    def __init__(self, listen, handler_class):
-        super().__init__(listen, handler_class)
-
-        self._auth_code_queue = Queue.Queue()
-
-    def handle_error(self, request, client_address):
-        exctype, excval, exctb = sys.exc_info()
-        self._auth_code_queue.put(excval)
-
-    def return_code(self, code):
-        self._auth_code_queue.put_nowait(code)
-
-    def wait_for_code(self):
-        # workaround for handling control-c interrupt.
-        # relevant Python issue discussing this behavior:
-        # https://bugs.python.org/issue1360
-        try:
-            return self._auth_code_queue.get(block=True, timeout=3600)
-        except Queue.Empty:
-            click.echo("Login timed out. Please try again.", err=True)
-            sys.exit(1)
-
-
-@contextmanager
-def start_local_server(listen=("", 0)):
-    server = RedirectHTTPServer(listen, RedirectHandler)
-    thread = threading.Thread(target=server.serve_forever)
-    thread.daemon = True
-    thread.start()
-
-    yield server
-
-    server.shutdown()
