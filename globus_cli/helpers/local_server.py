@@ -129,9 +129,9 @@ class RedirectHandler(BaseHTTPRequestHandler):
         return
 
 
-class RedirectHTTPServer(HTTPServer, object):
+class RedirectHTTPServer(HTTPServer):
     def __init__(self, listen, handler_class):
-        super(RedirectHTTPServer, self).__init__(listen, handler_class)
+        super().__init__(listen, handler_class)
 
         self._auth_code_queue = Queue.Queue()
 

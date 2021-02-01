@@ -111,7 +111,7 @@ def update_command(yes, development, development_version):
 
         # in the case where we're already up to date, do nothing and exit
         if current == latest:
-            click.echo("You are already running the latest version: {}".format(current))
+            click.echo(f"You are already running the latest version: {current}")
             return
 
         # we are not all the way up to date (did not match `latest`) but we match the
@@ -134,7 +134,7 @@ def update_command(yes, development, development_version):
             return
 
         # show the version(s) and prompt to continue
-        explain_upgrade = "The latest version is {}".format(latest)
+        explain_upgrade = f"The latest version is {latest}"
         if upgrade_target != latest:
             explain_upgrade = """\
 The latest version for python2 is {0}
@@ -152,7 +152,7 @@ If you would like to install version {1}, you must reinstall globus-cli using py
         # if we make it through to here, it means we didn't hit any safe (or
         # unsafe) abort conditions, so set the target version for upgrade to
         # the latest
-        target_version = "globus-cli=={}".format(upgrade_target)
+        target_version = f"globus-cli=={upgrade_target}"
 
     # print verbose warning/help message, to guide less fortunate souls who hit
     # Ctrl+C at a foolish time, lose connectivity, or don't invoke with `sudo`

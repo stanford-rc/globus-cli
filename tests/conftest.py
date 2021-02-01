@@ -104,7 +104,7 @@ def run_line(cli_runner, request, patch_config):
 
         # split line into args and confirm line starts with "globus"
         # python2 shlex can't handle non ascii unicode
-        if six.PY2 and isinstance(line, six.text_type):
+        if six.PY2 and isinstance(line, str):
             args = [a for a in shlex.split(line.encode("utf-8"))]
         else:
             args = shlex.split(line)
@@ -119,22 +119,20 @@ def run_line(cli_runner, request, patch_config):
             raise (
                 Exception(
                     (
+                        "CliTest run_line exit_code assertion failed!\n"
+                        "Line:\n{}\nexited with {} when expecting {}\n"
+                        "stdout:\n{}\nstderr:\n{}\nnetwork calls recorded:"
+                        "\n  {}"
+                    ).format(
+                        line,
+                        result.exit_code,
+                        assert_exit_code,
+                        result.stdout,
+                        result.stderr,
                         (
-                            "CliTest run_line exit_code assertion failed!\n"
-                            "Line:\n{}\nexited with {} when expecting {}\n"
-                            "stdout:\n{}\nstderr:\n{}\nnetwork calls recorded:"
-                            "\n  {}"
-                        ).format(
-                            line,
-                            result.exit_code,
-                            assert_exit_code,
-                            result.stdout,
-                            result.stderr,
-                            (
-                                "\n  ".join(r.request.url for r in responses.calls)
-                                or "  <none>"
-                            ),
-                        )
+                            "\n  ".join(r.request.url for r in responses.calls)
+                            or "  <none>"
+                        ),
                     )
                 )
             )

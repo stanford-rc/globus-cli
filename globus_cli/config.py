@@ -52,16 +52,16 @@ GLOBUS_ENV = os.environ.get("GLOBUS_SDK_ENVIRONMENT")
 
 # if the env is set, rewrite the option names to have it as a prefix
 if GLOBUS_ENV:
-    AUTH_RT_OPTNAME = "{0}_auth_refresh_token".format(GLOBUS_ENV)
-    AUTH_AT_OPTNAME = "{0}_auth_access_token".format(GLOBUS_ENV)
-    AUTH_AT_EXPIRES_OPTNAME = "{0}_auth_access_token_expires".format(GLOBUS_ENV)
-    TRANSFER_RT_OPTNAME = "{0}_transfer_refresh_token".format(GLOBUS_ENV)
-    TRANSFER_AT_OPTNAME = "{0}_transfer_access_token".format(GLOBUS_ENV)
-    TRANSFER_AT_EXPIRES_OPTNAME = "{0}_transfer_access_token_expires".format(GLOBUS_ENV)
+    AUTH_RT_OPTNAME = f"{GLOBUS_ENV}_auth_refresh_token"
+    AUTH_AT_OPTNAME = f"{GLOBUS_ENV}_auth_access_token"
+    AUTH_AT_EXPIRES_OPTNAME = f"{GLOBUS_ENV}_auth_access_token_expires"
+    TRANSFER_RT_OPTNAME = f"{GLOBUS_ENV}_transfer_refresh_token"
+    TRANSFER_AT_OPTNAME = f"{GLOBUS_ENV}_transfer_access_token"
+    TRANSFER_AT_EXPIRES_OPTNAME = f"{GLOBUS_ENV}_transfer_access_token_expires"
 
-    CLIENT_ID_OPTNAME = "{0}_client_id".format(GLOBUS_ENV)
-    CLIENT_SECRET_OPTNAME = "{0}_client_secret".format(GLOBUS_ENV)
-    TEMPLATE_ID_OPTNAME = "{0}_template_id".format(GLOBUS_ENV)
+    CLIENT_ID_OPTNAME = f"{GLOBUS_ENV}_client_id"
+    CLIENT_SECRET_OPTNAME = f"{GLOBUS_ENV}_client_secret"
+    TEMPLATE_ID_OPTNAME = f"{GLOBUS_ENV}_template_id"
     DEFAULT_TEMPLATE_ID = {
         "sandbox": "33b6a241-bce4-4359-9c6d-09f88b3c9eef",
         "integration": "e0c31fd1-663b-44e1-840f-f4304bb9ee7a",
@@ -208,7 +208,7 @@ def internal_auth_client(requires_instance=False, force_new_client=False):
     if force_new_client and existing:
         existing_client = globus_sdk.ConfidentialAppAuthClient(client_id, client_secret)
         try:
-            existing_client.delete("/v2/api/clients/{}".format(client_id))
+            existing_client.delete(f"/v2/api/clients/{client_id}")
 
         # if the client secret has been invalidated or the client has
         # already been removed, we continue on

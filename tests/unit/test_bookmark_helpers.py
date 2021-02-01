@@ -59,4 +59,4 @@ def test_resolve_bookmark_no_match_in_list():
         resolve_id_or_name(client, bookmark_name)
 
         fakectx.exit.assert_called_once_with(1)
-        m.echo.assert_called_once_with(u'No bookmark found for "foo"', err=True)
+        m.echo.assert_called_once_with('No bookmark found for "foo"', err=True)

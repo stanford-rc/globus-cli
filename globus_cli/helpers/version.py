@@ -54,21 +54,17 @@ def _get_package_data():
 
 def _get_versionblock_message(current, latest, upgrade_target):
     if latest == upgrade_target:
-        return """\
-Installed version:  {}
-Latest version:     {}""".format(
-            current, latest
-        )
+        return f"""\
+Installed version:  {current}
+Latest version:     {latest}"""
     # latest != upgrade_target means it's a py2 environment where we're capped at <2.0
     else:
-        return """\
+        return f"""\
 You are running the Globus CLI on python2
 
-Installed version:           {}
-Latest version for python2:  {}
-Latest version for python3:  {}""".format(
-            current, upgrade_target, latest
-        )
+Installed version:           {current}
+Latest version for python2:  {upgrade_target}
+Latest version for python3:  {latest}"""
 
 
 def _get_post_message(current, latest, upgrade_target):
@@ -79,13 +75,11 @@ def _get_post_message(current, latest, upgrade_target):
     if upgrade_target == latest:
         return "You should update your version of the Globus CLI with\n  globus update"
     if current == upgrade_target:
-        return """\
+        return f"""\
 You are running the latest version of the Globus CLI supported by python2.
 
-To upgrade to the latest version of the CLI ({}), you will need to
-uninstall and reinstall the CLI using python3.""".format(
-            latest
-        )
+To upgrade to the latest version of the CLI ({latest}), you will need to
+uninstall and reinstall the CLI using python3."""
     if current < upgrade_target:
         return """\
 You should update your version of the Globus CLI.
@@ -107,9 +101,7 @@ def print_version():
     """
     upgrade_target, latest, current = get_versions()
     if latest is None:
-        click.echo(
-            ("Installed Version: {0}\nFailed to lookup latest version.").format(current)
-        )
+        click.echo(f"Installed Version: {current}\nFailed to lookup latest version.")
     else:
         click.echo(
             _get_versionblock_message(current, latest, upgrade_target)
@@ -125,15 +117,15 @@ def print_version():
         click.echo("\nVerbose Data\n---")
 
         click.echo("platform:")
-        click.echo("  platform: {}".format(platform.platform()))
-        click.echo("  py_implementation: {}".format(platform.python_implementation()))
-        click.echo("  py_version: {}".format(platform.python_version()))
-        click.echo("  sys.executable: {}".format(sys.executable))
-        click.echo("  site.USER_BASE: {}".format(site.USER_BASE))
+        click.echo(f"  platform: {platform.platform()}")
+        click.echo(f"  py_implementation: {platform.python_implementation()}")
+        click.echo(f"  py_version: {platform.python_version()}")
+        click.echo(f"  sys.executable: {sys.executable}")
+        click.echo(f"  site.USER_BASE: {site.USER_BASE}")
 
         click.echo("modules:")
         for mod, modversion, modfile, modpath in moddata:
-            click.echo("  {}:".format(mod))
-            click.echo("    __version__: {}".format(modversion))
-            click.echo("    __file__: {}".format(modfile))
-            click.echo("    __path__: {}".format(modpath))
+            click.echo(f"  {mod}:")
+            click.echo(f"    __version__: {modversion}")
+            click.echo(f"    __file__: {modfile}")
+            click.echo(f"    __path__: {modpath}")

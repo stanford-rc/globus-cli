@@ -12,7 +12,6 @@ import sys
 import click
 import click.exceptions
 from globus_sdk import exc
-from six import reraise
 
 from globus_cli.parsing.command_state import CommandState
 from globus_cli.safeio import PrintableErrorField, write_error_info
@@ -45,7 +44,7 @@ def session_hook(exception):
     params = exception.raw_json["authorization_parameters"]
     message = params.get("session_message")
     if message:
-        click.echo("message: {}".format(message))
+        click.echo(f"message: {message}")
 
     identities = params.get("session_required_identities")
     if identities:
@@ -90,12 +89,12 @@ def consent_required_hook(exception):
         )
         sys.exit(255)
     if message:
-        click.echo("message: {}".format(message))
+        click.echo(f"message: {message}")
 
     click.echo(
         "\nPlease run\n\n"
         "  globus session consent {}\n\n".format(
-            " ".join("'{}'".format(x) for x in required_scopes)
+            " ".join(f"'{x}'" for x in required_scopes)
         )
         + "to login with the required scopes"
     )
@@ -247,14 +246,14 @@ def custom_except_hook(exc_info):
     elif isinstance(
         exception, (click.ClickException, click.exceptions.Abort, click.exceptions.Exit)
     ):
-        reraise(exception_type, exception, traceback)
+        raise exception.with_traceback(traceback)
 
     # not a GlobusError, not a ClickException -- something like ValueError
     # or NotImplementedError bubbled all the way up here: just print it
     # out, basically
     else:
         click.echo(
-            u"{}: {}".format(
+            "{}: {}".format(
                 click.style(exception_type.__name__, bold=True, fg="red"), exception
             )
         )

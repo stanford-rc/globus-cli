@@ -69,14 +69,12 @@ def logout_command():
         username = get_auth_client().oauth2_userinfo()["preferred_username"]
     except AuthAPIError:
         click.echo(
-            (
-                "Unable to lookup username. You may not be logged in. "
-                "Attempting logout anyway...\n"
-            )
+            "Unable to lookup username. You may not be logged in. "
+            "Attempting logout anyway...\n"
         )
         username = None
     click.echo(
-        u"Logging out of Globus{}\n".format(u" as " + username if username else "")
+        "Logging out of Globus{}\n".format(" as " + username if username else "")
     )
 
     # we use a Native Client to prevent an invalid instance client
@@ -110,11 +108,8 @@ def logout_command():
         # that we can revoke later when the network is working
         except globus_sdk.NetworkError:
             click.echo(
-                (
-                    "Failed to reach Globus to revoke tokens. "
-                    "Because we cannot revoke these tokens, cancelling "
-                    "logout"
-                )
+                "Failed to reach Globus to revoke tokens. "
+                "Because we cannot revoke these tokens, cancelling logout"
             )
             click.get_current_context().exit(1)
         # finally, we revoked, so it's safe to remove the token
@@ -126,7 +121,7 @@ def logout_command():
     if client_id:
         instance_client = internal_auth_client()
         try:
-            instance_client.delete("/v2/api/clients/{}".format(client_id))
+            instance_client.delete(f"/v2/api/clients/{client_id}")
 
         # if the client secret has been invalidated or the client has
         # already been removed, we continue on

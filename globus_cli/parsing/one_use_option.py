@@ -11,7 +11,7 @@ class OneUseOption(click.Option):
     def type_cast_value(self, ctx, value):
 
         # get the result of a normal type_cast
-        converted_val = super(OneUseOption, self).type_cast_value(ctx, value)
+        converted_val = super().type_cast_value(ctx, value)
 
         # if the option takes arguments (multiple was set to true)
         # assert no more than one argument was gotten, and if an argument
@@ -33,10 +33,8 @@ class OneUseOption(click.Option):
 
         else:
             raise ValueError(
-                (
-                    "Internal error, OneUseOption expected either "
-                    "multiple or count, but got neither."
-                )
+                "Internal error, OneUseOption expected either "
+                "multiple or count, but got neither."
             )
 
 

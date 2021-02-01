@@ -5,7 +5,7 @@ def test_skipped_errors(run_line, load_api_fixtures, task_id):
     """
     load_api_fixtures("skipped_error_list.yaml")
 
-    result = run_line("globus task show --skipped-errors {}".format(task_id))
+    result = run_line(f"globus task show --skipped-errors {task_id}")
     assert "/~/no-such-file" in result.output
     assert "FILE_NOT_FOUND" in result.output
     assert "/~/restricted-file" in result.output

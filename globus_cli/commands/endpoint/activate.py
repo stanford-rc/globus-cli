@@ -276,9 +276,9 @@ def endpoint_activate(
 
     # web activation
     elif web:
-        url = "https://app.globus.org/file-manager?origin_id={}".format(endpoint_id)
+        url = f"https://app.globus.org/file-manager?origin_id={endpoint_id}"
         if no_browser or is_remote_session():
-            res = {"message": "Web activation url: {}".format(url), "url": url}
+            res = {"message": f"Web activation url: {url}", "url": url}
         else:
             webbrowser.open(url, new=1)
             res = {"message": "Browser opened to web activation page", "url": url}

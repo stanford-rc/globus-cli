@@ -5,7 +5,7 @@ from distutils.version import LooseVersion
 __version__ = "1.16.0"
 
 # app name to send as part of SDK requests
-app_name = "Globus CLI v{}".format(__version__)
+app_name = f"Globus CLI v{__version__}"
 
 
 # pull down version data from PyPi

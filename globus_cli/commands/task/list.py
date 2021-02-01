@@ -1,5 +1,4 @@
 import click
-import six
 
 from globus_cli.parsing import command
 from globus_cli.safeio import formatted_print
@@ -164,8 +163,8 @@ def task_list(
 
     def _process_filterval(prefix, value, default=None):
         if value:
-            if isinstance(value, six.string_types):
-                return "{}:{}/".format(prefix, value)
+            if isinstance(value, str):
+                return f"{prefix}:{value}/"
             return "{}:{}/".format(prefix, ",".join(str(x) for x in value))
         else:
             return default or ""

@@ -16,11 +16,12 @@ def shlex_process_stdin(process_command, helptext):
     # if input is interactive, print help to stderr
     if sys.stdin.isatty():
         click.echo(
-            (
-                "{}\n".format(helptext) + "Lines are split with shlex in POSIX mode: "
-                "https://docs.python.org/library/shlex.html#parsing-rules\n"
-                "Terminate input with Ctrl+D or <EOF>\n"
-            ),
+            f"""\
+{helptext}
+Lines are split with shlex in POSIX mode:
+  https://docs.python.org/library/shlex.html#parsing-rules
+Terminate input with Ctrl+D or <EOF>
+""",
             err=True,
         )
 

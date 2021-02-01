@@ -10,7 +10,7 @@ def _shared_with_keyfunc(rule):
     if rule["principal_type"] == "identity":
         return lookup_identity_name(rule["principal"])
     elif rule["principal_type"] == "group":
-        return u"https://app.globus.org/groups/{}".format(rule["principal"])
+        return "https://app.globus.org/groups/{}".format(rule["principal"])
     else:
         return rule["principal_type"]
 

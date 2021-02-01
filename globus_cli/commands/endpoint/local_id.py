@@ -55,7 +55,7 @@ def local_id(personal):
     if personal:
         try:
             ep_id = LocalGlobusConnectPersonal().endpoint_id
-        except IOError as e:
+        except OSError as e:
             click.echo(e, err=True)
             click.get_current_context().exit(1)
 

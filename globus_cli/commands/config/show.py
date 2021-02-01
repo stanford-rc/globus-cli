@@ -15,6 +15,6 @@ def show_command(parameter):
     value = lookup_option(parameter, section=section)
 
     if value is None:
-        click.echo("{} not set".format(parameter))
+        click.echo(f"{parameter} not set")
     else:
-        click.echo("{} = {}".format(parameter, value))
+        click.echo(f"{parameter} = {value}")

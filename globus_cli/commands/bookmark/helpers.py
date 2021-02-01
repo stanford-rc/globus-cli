@@ -32,9 +32,7 @@ def resolve_id_or_name(client, bookmark_id_or_name):
             )
 
         except StopIteration:
-            click.echo(
-                u'No bookmark found for "{}"'.format(bookmark_id_or_name), err=True
-            )
+            click.echo(f'No bookmark found for "{bookmark_id_or_name}"', err=True)
             click.get_current_context().exit(1)
 
     return res

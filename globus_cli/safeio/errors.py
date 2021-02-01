@@ -6,7 +6,7 @@ from globus_sdk.base import safe_stringify
 from globus_cli.safeio.get_option_vals import outformat_is_json
 
 
-class PrintableErrorField(object):
+class PrintableErrorField:
     """
     A glorified tuple with a kwarg in its constructor.
     Coerces name and value fields to unicode for output consistency
@@ -31,10 +31,10 @@ class PrintableErrorField(object):
         """
         name = self.name + ":"
         if not self.multiline or "\n" not in val:
-            val = u"{0} {1}".format(name.ljust(self._text_prefix_len), val)
+            val = "{} {}".format(name.ljust(self._text_prefix_len), val)
         else:
             spacer = "\n" + " " * (self._text_prefix_len + 1)
-            val = u"{0}{1}{2}".format(name, spacer, spacer.join(val.split("\n")))
+            val = "{}{}{}".format(name, spacer, spacer.join(val.split("\n")))
 
         return val
 
@@ -56,11 +56,11 @@ def write_error_info(error_name, fields, message=None):
             fg="yellow",
         )
     if not message:
-        message = u"A{0} {1} Occurred.\n{2}".format(
+        message = "A{} {} Occurred.\n{}".format(
             "n" if error_name[0] in "aeiouAEIOU" else "",
             click.style(error_name, bold=True, fg="red"),
             click.style("\n".join(f.value for f in fields), fg="yellow"),
         )
-        message = u"{0} {1}".format(PrintableErrorField.TEXT_PREFIX, message)
+        message = f"{PrintableErrorField.TEXT_PREFIX} {message}"
 
     click.echo(message, err=True)

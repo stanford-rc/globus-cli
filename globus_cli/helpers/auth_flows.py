@@ -71,7 +71,7 @@ def do_local_server_auth_flow(session_params=None, force_new_client=False):
     # start local server and create matching redirect_uri
     with start_local_server(listen=("127.0.0.1", 0)) as server:
         _, port = server.socket.getsockname()
-        redirect_uri = "http://localhost:{}".format(port)
+        redirect_uri = f"http://localhost:{port}"
 
         # get the ConfidentialApp client object and start a flow
         auth_client = internal_auth_client(
@@ -89,11 +89,11 @@ def do_local_server_auth_flow(session_params=None, force_new_client=False):
         auth_code = server.wait_for_code()
 
     if isinstance(auth_code, LocalServerError):
-        click.echo("Authorization failed: {}".format(auth_code), err=True)
+        click.echo(f"Authorization failed: {auth_code}", err=True)
         click.get_current_context().exit(1)
     elif isinstance(auth_code, Exception):
         click.echo(
-            "Authorization failed with unexpected error:\n{}".format(auth_code),
+            f"Authorization failed with unexpected error:\n{auth_code}",
             err=True,
         )
         click.get_current_context().exit(1)

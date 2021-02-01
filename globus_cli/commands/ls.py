@@ -169,7 +169,7 @@ def ls_command(
         if "/" in filter_val:
             raise click.UsageError('--filter cannot contain "/"')
         # format into a simple filter clause which operates on filenames
-        ls_params["filter"] = "name:{}".format(filter_val)
+        ls_params["filter"] = f"name:{filter_val}"
 
     # get the `ls` result
     if recursive:

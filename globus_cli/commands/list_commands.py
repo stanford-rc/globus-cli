@@ -51,7 +51,7 @@ def list_commands():
         parents = " ".join(parent_names)
         if parents:
             parents = parents + " "
-        click.echo("\n=== {}{} ===\n".format(parents, command.name))
+        click.echo(f"\n=== {parents}{command.name} ===\n")
 
     def _recursive_list_commands(command, parent_names=None):
         if parent_names is None:

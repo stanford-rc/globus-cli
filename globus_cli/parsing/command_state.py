@@ -12,7 +12,7 @@ TEXT_FORMAT = "text"
 UNIX_FORMAT = "unix"
 
 
-class CommandState(object):
+class CommandState:
     def __init__(self):
         # default is config value, or TEXT if it's not set
         self.output_format = config.get_output_format() or TEXT_FORMAT

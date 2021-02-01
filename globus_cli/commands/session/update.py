@@ -74,7 +74,7 @@ def session_update(identities, no_local_server, all):
                         identity_ids.append(identity["id"])
                         break
                 else:
-                    click.echo("No such identity {}".format(val), err=True)
+                    click.echo(f"No such identity {val}", err=True)
                     click.get_current_context().exit(1)
 
     # create session params once we have all identity ids

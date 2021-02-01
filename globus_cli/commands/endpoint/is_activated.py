@@ -92,7 +92,7 @@ def endpoint_is_activated(endpoint_id, until, absolute_time):
     def fail(deadline=None):
         exp_string = ""
         if deadline is not None:
-            exp_string = " or will expire within {} seconds".format(deadline)
+            exp_string = f" or will expire within {deadline} seconds"
 
         message = "The endpoint is not activated{}.\n\n".format(
             exp_string

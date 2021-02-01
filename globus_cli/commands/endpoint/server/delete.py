@@ -93,7 +93,7 @@ def server_delete(endpoint_id, server):
     if mode != "id":
         matches = _spec_to_matches(server_list, server, mode)
         if not matches:
-            raise click.UsageError('No server was found matching "{}"'.format(server))
+            raise click.UsageError(f'No server was found matching "{server}"')
         elif len(matches) > 1:
             raise click.UsageError(
                 dedent(

@@ -25,10 +25,8 @@ def fill_delegate_proxy_activation_requirements(
             break
     else:
         raise ValueError(
-            (
-                "No public_key found in activation requirements, this endpoint "
-                "does not support Delegate Proxy activation."
-            )
+            "No public_key found in activation requirements, this endpoint "
+            "does not support Delegate Proxy activation."
         )
 
     # get user credentials from user credential file"
@@ -45,10 +43,8 @@ def fill_delegate_proxy_activation_requirements(
             return requirements_data
     else:
         raise ValueError(
-            (
-                "No proxy_chain found in activation requirements, this endpoint "
-                "does not support Delegate Proxy activation."
-            )
+            "No proxy_chain found in activation requirements, this endpoint "
+            "does not support Delegate Proxy activation."
         )
 
 
@@ -78,9 +74,10 @@ def create_proxy_credentials(issuer_cred, public_key, lifetime_hours):
     )
 
     # extend the proxy chain as a unicode string
-    extended_chain = loaded_cert.public_bytes(serialization.Encoding.PEM).decode(
-        "ascii"
-    ) + six.u(issuer_chain)
+    extended_chain = (
+        loaded_cert.public_bytes(serialization.Encoding.PEM).decode("ascii")
+        + issuer_chain
+    )
 
     # return in PEM format as a unicode string
     return (
@@ -170,7 +167,7 @@ def create_proxy_cert(
     # set the new proxy's subject
     # append a CommonName to the new proxy's subject
     # with the serial as the value of the CN
-    new_atribute = x509.NameAttribute(x509.oid.NameOID.COMMON_NAME, six.u(str(serial)))
+    new_atribute = x509.NameAttribute(x509.oid.NameOID.COMMON_NAME, str(serial))
     subject_attributes = list(loaded_cert.subject)
     subject_attributes.append(new_atribute)
     builder = builder.subject_name(x509.Name(subject_attributes))

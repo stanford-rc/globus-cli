@@ -51,7 +51,7 @@ def role_list(endpoint_id):
             except KeyError:
                 return principal
         if role["principal_type"] == "group":
-            return (u"https://app.globus.org/groups/{}").format(principal)
+            return f"https://app.globus.org/groups/{principal}"
         return principal
 
     formatted_print(

@@ -67,7 +67,7 @@ def test_text_ouptut(run_line, load_api_fixtures, ep_type):
         ep_id = data["metadata"]["endpoint_id"]
         setup_key = None
 
-    result = run_line("globus endpoint create gcp_text {}".format(opt))
+    result = run_line(f"globus endpoint create gcp_text {opt}")
     got_ep_id = re.search(r"Endpoint ID:\s*(\S*)", result.output).group(1)
     assert got_ep_id == ep_id
 
@@ -204,7 +204,7 @@ def test_invalid_managed_only_options(run_line):
     ]
     for opt in options:
         result = run_line(
-            "globus endpoint create invalid_managed --server {}".format(opt),
+            f"globus endpoint create invalid_managed --server {opt}",
             assert_exit_code=2,
         )
         assert "managed endpoints" in result.stderr
