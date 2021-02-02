@@ -4,23 +4,21 @@ import pytest
 def test_gcs_server_add(run_line, load_api_fixtures):
     data = load_api_fixtures("endpoint_servers.yaml")
     epid = data["metadata"]["endpoint_id"]
-    result = run_line(
-        "globus endpoint server add {} --hostname example.org".format(epid)
-    )
+    result = run_line(f"globus endpoint server add {epid} --hostname example.org")
     assert "Server added to endpoint successfully" in result.output
 
 
 def test_gcs_server_list(run_line, load_api_fixtures):
     data = load_api_fixtures("endpoint_servers.yaml")
     epid = data["metadata"]["endpoint_id"]
-    result = run_line("globus endpoint server list {}".format(epid))
+    result = run_line(f"globus endpoint server list {epid}")
     assert "gsiftp://example.org:2811" in result.output
 
 
 def test_gcp_server_list(run_line, load_api_fixtures):
     data = load_api_fixtures("endpoint_servers.yaml")
     epid = data["metadata"]["gcp_endpoint_id"]
-    result = run_line("globus endpoint server list {}".format(epid))
+    result = run_line(f"globus endpoint server list {epid}")
     assert "none (Globus Connect Personal)" in result.output
 
 
@@ -40,7 +38,7 @@ def test_server_delete_various(run_line, load_api_fixtures, mode):
     else:
         raise NotImplementedError
 
-    result = run_line("globus endpoint server delete {} {}".format(epid, server))
+    result = run_line(f"globus endpoint server delete {epid} {server}")
     assert "Server deleted successfully" in result.output
 
 
@@ -52,7 +50,7 @@ def test_server_delete_by_hostname_many_matches(run_line, load_api_fixtures):
     dotcom_servers = server_ids["example.com"]
 
     result = run_line(
-        "globus endpoint server delete {} example.org".format(epid), assert_exit_code=2
+        f"globus endpoint server delete {epid} example.org", assert_exit_code=2
     )
     assert "Multiple servers matched" in result.stderr
     assert "example.com" not in result.stderr
@@ -66,7 +64,7 @@ def test_server_delete_on_gcp(run_line, load_api_fixtures):
     data = load_api_fixtures("endpoint_servers.yaml")
     epid = data["metadata"]["gcp_endpoint_id"]
     result = run_line(
-        "globus endpoint server delete {} example.com".format(epid), assert_exit_code=2
+        f"globus endpoint server delete {epid} example.com", assert_exit_code=2
     )
     assert (
         "You cannot delete servers from Globus Connect Personal endpoints"

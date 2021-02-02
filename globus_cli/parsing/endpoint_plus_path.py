@@ -15,7 +15,7 @@ class EndpointPlusPath(click.ParamType):
         # path requirement defaults to True, but can be tweaked by a kwarg
         self.path_required = kwargs.pop("path_required", True)
 
-        super(EndpointPlusPath, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_metavar(self, param):
         """

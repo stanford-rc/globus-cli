@@ -104,55 +104,25 @@ def update_command(yes, development, development_version):
         ).format(development_version)
     else:
         # lookup version from PyPi, abort if we can't get it
-        upgrade_target, latest, current = get_versions()
+        latest, current = get_versions()
         if latest is None:
             click.echo("Failed to lookup latest version. Aborting.")
             click.get_current_context().exit(1)
 
         # in the case where we're already up to date, do nothing and exit
         if current == latest:
-            click.echo("You are already running the latest version: {}".format(current))
-            return
-
-        # we are not all the way up to date (did not match `latest`) but we match the
-        # latest version supported by the current platform/runtime . So exit 0 with a
-        # warning
-        if current == upgrade_target:
-            if upgrade_target != latest:
-                click.echo(
-                    click.style(
-                        (
-                            "You are running the latest version ({}) supported by "
-                            "python2.\n"
-                            "However, a newer version ({}) is available.\n"
-                            "If you would like to update to the latest version, you "
-                            "need to reinstall globus-cli using python3."
-                        ).format(upgrade_target, latest),
-                        fg="yellow",
-                    )
-                )
+            click.echo(f"You are already running the latest version: {current}")
             return
 
         # show the version(s) and prompt to continue
-        explain_upgrade = "The latest version is {}".format(latest)
-        if upgrade_target != latest:
-            explain_upgrade = """\
-The latest version for python2 is {0}
-The latest version for python3 is {1}.
-If you would like to install version {1}, you must reinstall globus-cli using python3.
-""".format(
-                upgrade_target, latest
-            )
-        click.echo(
-            "You are already running version {}\n" "{}".format(current, explain_upgrade)
-        )
+        click.echo(f"You are running version {current}\nThe latest version is {latest}")
         if not yes and (not click.confirm("Continue with the upgrade?", default=True)):
             click.get_current_context().exit(1)
 
         # if we make it through to here, it means we didn't hit any safe (or
         # unsafe) abort conditions, so set the target version for upgrade to
         # the latest
-        target_version = "globus-cli=={}".format(upgrade_target)
+        target_version = f"globus-cli=={latest}"
 
     # print verbose warning/help message, to guide less fortunate souls who hit
     # Ctrl+C at a foolish time, lose connectivity, or don't invoke with `sudo`

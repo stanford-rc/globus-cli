@@ -86,20 +86,15 @@ class RecursiveLsResponse(PaginatedResource):
         # BFS is not done until the queue is empty
         while self.queue:
             logger.debug(
-                (
-                    "recursive_operation_ls BFS queue not empty, "
-                    "getting next path now."
-                )
+                "recursive_operation_ls BFS queue not empty, getting next path now."
             )
 
             # rate limit based on number of ls calls we have made
             self.ls_count += 1
             if self.ls_count % SLEEP_FREQUENCY == 0:
                 logger.debug(
-                    (
-                        "recursive_operation_ls sleeping {} seconds to "
-                        "rate limit itself.".format(SLEEP_LEN)
-                    )
+                    f"recursive_operation_ls sleeping {SLEEP_LEN} seconds to "
+                    "rate limit itself."
                 )
                 time.sleep(SLEEP_LEN)
 

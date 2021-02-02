@@ -100,7 +100,7 @@ class TaskPath(click.ParamType):
             self.path.startswith("/") or self.path.startswith("~")
         ):
             self.fail(
-                "{} is not absolute (abspath required)".format(self.path),
+                f"{self.path} is not absolute (abspath required)",
                 param=param,
                 ctx=ctx,
             )

@@ -22,5 +22,5 @@ def set_command(value, parameter):
     conf[section][parameter] = value
 
     # write to disk
-    click.echo("Writing updated config to {}".format(conf.filename))
+    click.echo(f"Writing updated config to {conf.filename}")
     conf.write()

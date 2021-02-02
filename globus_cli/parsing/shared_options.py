@@ -324,10 +324,8 @@ def validate_endpoint_create_and_update_params(endpoint_type, managed, params):
         ]:
             if params[option] is not None:
                 raise click.UsageError(
-                    (
-                        "Option --{} can only be used with Globus Connect Server "
-                        "endpoints".format(option.replace("_", "-"))
-                    )
+                    f"Option --{option.replace('_', '-')} can only be used with "
+                    "Globus Connect Server endpoints"
                 )
 
     # if the endpoint was not previously managed, and is not being passed
@@ -342,10 +340,8 @@ def validate_endpoint_create_and_update_params(endpoint_type, managed, params):
         ]:
             if params[option] is not None:
                 raise click.UsageError(
-                    (
-                        "Option --{} can only be used with managed "
-                        "endpoints".format(option.replace("_", "-"))
-                    )
+                    f"Option --{option.replace('_', '-')} can only be used with "
+                    "managed endpoints"
                 )
 
     # because the Transfer service doesn't do network use level updates in a
@@ -464,12 +460,12 @@ def task_submission_options(f):
         off = "off" in value
         on = "on" in value
         # set-ize it -- duplicates are fine
-        vals = set([x for x in value if x not in ("off", "on")])
+        vals = {x for x in value if x not in ("off", "on")}
 
         if (vals or on) and off:
             raise click.UsageError('--notify cannot accept "off" and another value')
 
-        allowed_vals = set(("on", "succeeded", "failed", "inactive"))
+        allowed_vals = {"on", "succeeded", "failed", "inactive"}
         if not vals <= allowed_vals:
             raise click.UsageError(
                 "--notify received at least one invalid value among {}".format(
@@ -600,7 +596,7 @@ def synchronous_task_wait_options(f):
 
         if value < 1:
             raise click.UsageError(
-                "--polling-interval={0} was less than minimum of {1}".format(value, 1)
+                f"--polling-interval={value} was less than minimum of 1"
             )
 
         return value
@@ -747,7 +743,7 @@ def server_add_and_update_opts(*args, **kwargs):
             ("outgoing", "from", "to"),
         ]:
             f = click.option(
-                "--{}-data-ports".format(adjective),
+                f"--{adjective}-data-ports",
                 callback=port_range_callback,
                 help="Indicate to firewall administrators at other sites how to "
                 "allow {} traffic {} this server {} their own. Specify as "
@@ -783,17 +779,13 @@ def security_principal_opts(*args, **kwargs):
             else:
                 if has_identity and group:
                     raise click.UsageError(
-                        (
-                            "You have passed both an identity and a group. "
-                            "Please only pass one principal type"
-                        )
+                        "You have passed both an identity and a group. "
+                        "Please only pass one principal type"
                     )
                 elif not has_identity and not group:
                     raise click.UsageError(
-                        (
-                            "You must provide at least one principal "
-                            "(identity, group, etc.)"
-                        )
+                        "You must provide at least one principal "
+                        "(identity, group, etc.)"
                     )
 
                 if identity:

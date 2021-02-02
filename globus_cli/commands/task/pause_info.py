@@ -86,7 +86,7 @@ def task_pause_info(task_id):
         effective_pause_rules = res["pause_rules"]
 
         if not explicit_pauses and not effective_pause_rules:
-            click.echo("Task {} is not paused.".format(task_id))
+            click.echo(f"Task {task_id} is not paused.")
             click.get_current_context().exit(0)
 
         if explicit_pauses:

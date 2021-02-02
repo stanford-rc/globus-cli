@@ -8,7 +8,7 @@ def test_default_one_id(run_line, load_api_fixtures):
     data = load_api_fixtures("foo_user_info.yaml")
     user_id = data["metadata"]["user_id"]
     username = data["metadata"]["username"]
-    result = run_line("globus get-identities {}".format(user_id))
+    result = run_line(f"globus get-identities {user_id}")
     assert username + "\n" == result.output
 
 

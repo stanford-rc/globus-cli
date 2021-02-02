@@ -46,7 +46,7 @@ def server_show(endpoint_id, server_id):
                     if not start and not end
                     else "unrestricted"
                     if start == 1024 and end == 65535
-                    else "{}-{}".format(start, end)
+                    else f"{start}-{end}"
                 )
 
             return "incoming {}, outgoing {}".format(

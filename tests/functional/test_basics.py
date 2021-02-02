@@ -111,7 +111,7 @@ def test_transfer_call(run_line, load_api_fixtures, register_api_route, go_ep1_i
     load_api_fixtures("transfer_activate_success.yaml")
     register_api_route(
         "transfer",
-        "/operation/endpoint/{}/ls".format(go_ep1_id),
+        f"/operation/endpoint/{go_ep1_id}/ls",
         json={
             # not *quite* verbatim data from the API, but very similar and in the right
             # format with all fields populated
@@ -147,14 +147,14 @@ def test_transfer_batchmode_dryrun(run_line, load_api_fixtures, go_ep1_id, go_ep
     load_api_fixtures("get_submission_id.yaml")
     load_api_fixtures("transfer_activate_success.yaml")
 
-    batch_input = u"abc /def\n/xyz p/q/r\n"
+    batch_input = "abc /def\n/xyz p/q/r\n"
     result = run_line(
         "globus transfer -F json --batch --dry-run " + go_ep1_id + " " + go_ep2_id,
         stdin=batch_input,
     )
     for src, dst in [("abc", "/def"), ("/xyz", "p/q/r")]:
-        assert '"source_path": "{}"'.format(src) in result.output
-        assert '"destination_path": "{}"'.format(dst) in result.output
+        assert f'"source_path": "{src}"' in result.output
+        assert f'"destination_path": "{dst}"' in result.output
 
 
 def test_delete_batchmode_dryrun(run_line, load_api_fixtures, go_ep1_id):
@@ -165,7 +165,7 @@ def test_delete_batchmode_dryrun(run_line, load_api_fixtures, go_ep1_id):
     load_api_fixtures("get_submission_id.yaml")
     load_api_fixtures("transfer_activate_success.yaml")
 
-    batch_input = u"abc/def\n/xyz\nabcdef\nabc/def/../xyz\n"
+    batch_input = "abc/def\n/xyz\nabcdef\nabc/def/../xyz\n"
     result = run_line("globus delete --batch --dry-run " + go_ep1_id, stdin=batch_input)
     assert (
         "\n".join(
@@ -174,9 +174,9 @@ def test_delete_batchmode_dryrun(run_line, load_api_fixtures, go_ep1_id):
         == result.output
     )
 
-    batch_input = u"abc/def\n/xyz\n../foo\n"
+    batch_input = "abc/def\n/xyz\n../foo\n"
     result = run_line(
-        "globus delete --batch --dry-run {}:foo/bar/./baz".format(go_ep1_id),
+        f"globus delete --batch --dry-run {go_ep1_id}:foo/bar/./baz",
         stdin=batch_input,
     )
     assert (

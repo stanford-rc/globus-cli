@@ -74,7 +74,7 @@ def init_command(default_output_format, default_myproxy_username):
 
     # write to disk
     click.echo(
-        "\n\nWriting updated config to {0}".format(os.path.expanduser("~/.globus.cfg"))
+        "\n\nWriting updated config to {}".format(os.path.expanduser("~/.globus.cfg"))
     )
     write_option(OUTPUT_FORMAT_OPTNAME, default_output_format)
     write_option(MYPROXY_USERNAME_OPTNAME, default_myproxy_username)

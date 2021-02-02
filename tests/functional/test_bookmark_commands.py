@@ -7,14 +7,12 @@ def test_bookmark_create(run_line, load_api_fixtures, go_ep1_id):
     """
     data = load_api_fixtures("bookmark_operations.yaml")
     bookmark_id = data["metadata"]["bookmark_id"]
-    result = run_line("globus bookmark create {}:/share/ sharebm".format(go_ep1_id))
-    assert "Bookmark ID: {}".format(bookmark_id) in result.output
+    result = run_line(f"globus bookmark create {go_ep1_id}:/share/ sharebm")
+    assert f"Bookmark ID: {bookmark_id}" in result.output
 
     # repeat, but with JSON output
     json_output = json.loads(
-        run_line(
-            "globus bookmark create -Fjson {}:/share/ sharebm".format(go_ep1_id)
-        ).output
+        run_line(f"globus bookmark create -Fjson {go_ep1_id}:/share/ sharebm").output
     )
     assert json_output["id"] == bookmark_id
     assert json_output["name"] == "sharebm"
@@ -32,16 +30,16 @@ def test_bookmark_show(run_line, load_api_fixtures, go_ep1_id):
     bookmark_name = data["metadata"]["bookmark_name"]
 
     # id
-    result = run_line('globus bookmark show "{}"'.format(bookmark_id))
-    assert "{}:/share/\n".format(go_ep1_id) == result.output
+    result = run_line(f'globus bookmark show "{bookmark_id}"')
+    assert f"{go_ep1_id}:/share/\n" == result.output
 
     # name
-    result = run_line('globus bookmark show "{}"'.format(bookmark_name))
-    assert "{}:/share/\n".format(go_ep1_id) == result.output
+    result = run_line(f'globus bookmark show "{bookmark_name}"')
+    assert f"{go_ep1_id}:/share/\n" == result.output
 
     # verbose
-    result = run_line("globus bookmark show -v {}".format(bookmark_id))
-    assert "Endpoint ID: {}".format(go_ep1_id) in result.output
+    result = run_line(f"globus bookmark show -v {bookmark_id}")
+    assert f"Endpoint ID: {go_ep1_id}" in result.output
 
 
 def test_bookmark_rename_by_id(run_line, load_api_fixtures):
@@ -53,7 +51,7 @@ def test_bookmark_rename_by_id(run_line, load_api_fixtures):
     updated_bookmark_name = data["metadata"]["bookmark_name_after_update"]
 
     result = run_line(
-        'globus bookmark rename "{}" "{}"'.format(bookmark_id, updated_bookmark_name)
+        f'globus bookmark rename "{bookmark_id}" "{updated_bookmark_name}"'
     )
     assert "Success" in result.output
 
@@ -67,7 +65,7 @@ def test_bookmark_rename_by_name(run_line, load_api_fixtures):
     updated_bookmark_name = data["metadata"]["bookmark_name_after_update"]
 
     result = run_line(
-        'globus bookmark rename "{}" "{}"'.format(bookmark_name, updated_bookmark_name)
+        f'globus bookmark rename "{bookmark_name}" "{updated_bookmark_name}"'
     )
     assert "Success" in result.output
 
@@ -78,7 +76,7 @@ def test_bookmark_delete_by_id(run_line, load_api_fixtures):
     """
     data = load_api_fixtures("bookmark_operations.yaml")
     bookmark_id = data["metadata"]["bookmark_id"]
-    result = run_line('globus bookmark delete "{}"'.format(bookmark_id))
+    result = run_line(f'globus bookmark delete "{bookmark_id}"')
     assert "deleted successfully" in result.output
 
 
@@ -88,5 +86,5 @@ def test_bookmark_delete_by_name(run_line, load_api_fixtures):
     """
     data = load_api_fixtures("bookmark_operations.yaml")
     bookmark_name = data["metadata"]["bookmark_name"]
-    result = run_line('globus bookmark delete "{}"'.format(bookmark_name))
+    result = run_line(f'globus bookmark delete "{bookmark_name}"')
     assert "deleted successfully" in result.output

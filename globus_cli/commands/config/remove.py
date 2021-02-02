@@ -21,5 +21,5 @@ def remove_command(parameter):
     del conf[section][parameter]
 
     # write to disk
-    click.echo("Writing updated config to {}".format(conf.filename))
+    click.echo(f"Writing updated config to {conf.filename}")
     conf.write()

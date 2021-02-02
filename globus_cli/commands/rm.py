@@ -83,7 +83,7 @@ def rm_command(
         deadline=deadline,
         skip_activation_check=skip_activation_check,
         interpret_globs=enable_globs,
-        **notify
+        **notify,
     )
 
     if not star_silent and enable_globs and path.endswith("*"):
@@ -94,7 +94,7 @@ def rm_command(
             err_is_terminal()
             and term_is_interactive()
             and not click.confirm(
-                'Are you sure you want to delete all files matching "{}"?'.format(path),
+                f'Are you sure you want to delete all files matching "{path}"?',
                 err=True,
             )
         ):
@@ -111,7 +111,7 @@ def rm_command(
     # respected, as it will be by `task wait`
     res = client.submit_delete(delete_data)
     task_id = res["task_id"]
-    click.echo('Delete task submitted under ID "{}"'.format(task_id), err=True)
+    click.echo(f'Delete task submitted under ID "{task_id}"', err=True)
 
     # do a `task wait` equivalent, including printing and correct exit status
     task_wait_with_io(

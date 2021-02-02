@@ -92,9 +92,7 @@ def cancel_task(all, task_id):
 
         def _custom_text(res):
             for (i, (task_id, data)) in enumerate(cancellation_iterator(), start=1):
-                click.echo(
-                    u"{} ({} of {}): {}".format(task_id, i, task_count, data["message"])
-                )
+                click.echo(f"{task_id} ({i} of {task_count}): {data['message']}")
 
         # FIXME: this is kind of an abuse of formatted_print because the
         # text format and json converter are doing their own thing, not really

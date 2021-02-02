@@ -36,7 +36,7 @@ def list_command(endpoint_id):
             except KeyError:
                 return principal
         if rule["principal_type"] == "group":
-            return (u"https://app.globus.org/groups/{}").format(principal)
+            return ("https://app.globus.org/groups/{}").format(principal)
         return rule["principal_type"]
 
     formatted_print(

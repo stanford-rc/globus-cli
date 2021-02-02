@@ -1,9 +1,6 @@
-from __future__ import unicode_literals
-
 import json
 
 import click
-import six
 from globus_sdk import GlobusResponse
 
 from globus_cli.safeio.awscli_text import unix_formatted_print
@@ -46,7 +43,7 @@ def _key_to_keyfunc(k):
     """
     # if the key is a string, then the "keyfunc" is just a basic lookup
     # operation -- return that
-    if isinstance(k, six.string_types):
+    if isinstance(k, str):
 
         def lookup(x):
             return x[k]
@@ -63,7 +60,7 @@ def _jmespath_preprocess(res):
     if isinstance(res, GlobusResponse):
         res = res.data
 
-    if not isinstance(res, six.string_types):
+    if not isinstance(res, str):
         if jmespath_expr is not None:
             res = jmespath_expr.search(res)
 
@@ -240,7 +237,7 @@ def formatted_print(
         if text_epilog is not None:
             click.echo(text_epilog)
 
-    if isinstance(text_format, six.string_types):
+    if isinstance(text_format, str):
         text_format = text_format
         _custom_text_formatter = None
     else:

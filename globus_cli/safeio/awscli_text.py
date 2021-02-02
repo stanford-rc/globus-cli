@@ -1,27 +1,24 @@
 # pulled from the AWSCLI and modified by Globus
+# note that this file has also been modified by auotfixers (e.g. black, pyupgrade)
 
 # Copyright 2012-2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
+#
 # Licensed under the Apache License, Version 2.0 (the "License"). You
 # may not use this file except in compliance with the License. A copy of
 # the License is located at
-
+#
 #     http://aws.amazon.com/apache2.0/
-
+#
 # or in the "license" file accompanying this file. This file is
 # distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
 # START Globus changes
+
 import errno
 import json
 import sys
-
-# AWSCLI defines a vendored version of 'six'
-# we're going to use the stock/standard one and it should have all of the
-# same/correct behaviors
-import six
 
 # END Globus changes
 
@@ -38,7 +35,7 @@ def _format_text(item, stream, identifier=None, scalar_keys=None):
     else:
         # If it's not a list or a dict, we just write the scalar
         # value out directly.
-        stream.write(six.text_type(item))
+        stream.write(str(item))
         stream.write("\n")
 
 
@@ -75,10 +72,10 @@ def _partition_list(item):
 def _format_scalar_list(elements, identifier, stream):
     if identifier is not None:
         for item in elements:
-            stream.write("%s\t%s\n" % (identifier.upper(), item))
+            stream.write(f"{identifier.upper()}\t{item}\n")
     else:
         # For a bare list, just print the contents.
-        stream.write("\t".join([six.text_type(item) for item in elements]))
+        stream.write("\t".join([str(item) for item in elements]))
         stream.write("\n")
 
 
@@ -118,10 +115,10 @@ def _partition_dict(item_dict, scalar_keys):
             if isinstance(value, (dict, list)):
                 non_scalar.append((key, value))
             else:
-                scalar.append(six.text_type(value))
+                scalar.append(str(value))
     else:
         for key in scalar_keys:
-            scalar.append(six.text_type(item_dict.get(key, "")))
+            scalar.append(str(item_dict.get(key, "")))
         remaining_keys = sorted(set(item_dict.keys()) - set(scalar_keys))
         for remaining_key in remaining_keys:
             non_scalar.append((remaining_key, item_dict[remaining_key]))
@@ -133,7 +130,7 @@ def unix_formatted_print(data):
     format_text(data, sys.stdout)
     try:
         sys.stdout.flush()
-    except IOError as err:
+    except OSError as err:
         if err.errno is errno.EPIPE:
             pass
         else:

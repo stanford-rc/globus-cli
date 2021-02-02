@@ -8,10 +8,8 @@ def test_jmespath_noop(run_line, load_api_fixtures):
     """
     data = load_api_fixtures("endpoint_operations.yaml")
     epid = data["metadata"]["endpoint_id"]
-    result = run_line("globus endpoint show {} -Fjson".format(epid))
-    jmespathresult = run_line(
-        "globus endpoint show {} -Ftext --jmespath '@'".format(epid)
-    )
+    result = run_line(f"globus endpoint show {epid} -Fjson")
+    jmespathresult = run_line(f"globus endpoint show {epid} -Ftext --jmespath '@'")
 
     assert result.output == jmespathresult.output
 
@@ -34,7 +32,7 @@ def test_jmespath_extract_from_list(run_line, load_api_fixtures, go_ep2_id):
     )
     outputdict = json.loads(result.output)
 
-    show_result = run_line("globus endpoint show {} -Fjson".format(go_ep2_id))
+    show_result = run_line(f"globus endpoint show {go_ep2_id} -Fjson")
     showdict = json.loads(show_result.output)
 
     # check specific keys because search includes `_rank` and doesn't

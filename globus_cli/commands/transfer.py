@@ -299,20 +299,16 @@ def transfer_command(
 
     if recursive and batch:
         raise click.UsageError(
-            (
-                "You cannot use --recursive in addition to --batch. "
-                "Instead, use --recursive on lines of --batch input "
-                "which need it"
-            )
+            "You cannot use --recursive in addition to --batch. "
+            "Instead, use --recursive on lines of --batch input "
+            "which need it"
         )
 
     if external_checksum and batch:
         raise click.UsageError(
-            (
-                "You cannot use --external-checksum in addition to --batch. "
-                "Instead, use --external-checksum on lines of --batch input "
-                "which need it"
-            )
+            "You cannot use --external-checksum in addition to --batch. "
+            "Instead, use --external-checksum on lines of --batch input "
+            "which need it"
         )
 
     if recursive and external_checksum:
@@ -333,13 +329,13 @@ def transfer_command(
     # notify comes to us clean, perf opts need more care
     # put them together into a dict before passing to TransferData
     kwargs = {}
-    perf_opts = dict(
-        (k, v)
+    perf_opts = {
+        k: v
         for (k, v) in dict(
             perf_cc=perf_cc, perf_p=perf_p, perf_pp=perf_pp, perf_udt=perf_udt
         ).items()
         if v is not None
-    )
+    }
     kwargs.update(perf_opts)
     kwargs.update(notify)
 

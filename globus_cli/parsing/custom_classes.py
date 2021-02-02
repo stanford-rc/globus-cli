@@ -35,7 +35,7 @@ for more details."""
             kwargs["help"] = helptext.format(
                 AUTOMATIC_ACTIVATION=self.AUTOMATIC_ACTIVATION_HELPTEXT
             )
-        super(GlobusCommand, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class GlobusCommandGroup(click.Group):
@@ -60,7 +60,7 @@ class GlobusCommandGroup(click.Group):
         if self.no_args_is_help and not ctx.protected_args:
             click.echo(ctx.get_help())
             ctx.exit()
-        return super(GlobusCommandGroup, self).invoke(ctx)
+        return super().invoke(ctx)
 
 
 class TopLevelGroup(GlobusCommandGroup):
@@ -73,6 +73,6 @@ class TopLevelGroup(GlobusCommandGroup):
 
     def invoke(self, ctx):
         try:
-            return super(TopLevelGroup, self).invoke(ctx)
+            return super().invoke(ctx)
         except Exception:
             custom_except_hook(sys.exc_info())

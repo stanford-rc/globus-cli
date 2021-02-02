@@ -3,7 +3,6 @@ import os
 import re
 import struct
 
-import six
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
@@ -25,10 +24,8 @@ def fill_delegate_proxy_activation_requirements(
             break
     else:
         raise ValueError(
-            (
-                "No public_key found in activation requirements, this endpoint "
-                "does not support Delegate Proxy activation."
-            )
+            "No public_key found in activation requirements, this endpoint "
+            "does not support Delegate Proxy activation."
         )
 
     # get user credentials from user credential file"
@@ -45,10 +42,8 @@ def fill_delegate_proxy_activation_requirements(
             return requirements_data
     else:
         raise ValueError(
-            (
-                "No proxy_chain found in activation requirements, this endpoint "
-                "does not support Delegate Proxy activation."
-            )
+            "No proxy_chain found in activation requirements, this endpoint "
+            "does not support Delegate Proxy activation."
         )
 
 
@@ -78,9 +73,10 @@ def create_proxy_credentials(issuer_cred, public_key, lifetime_hours):
     )
 
     # extend the proxy chain as a unicode string
-    extended_chain = loaded_cert.public_bytes(serialization.Encoding.PEM).decode(
-        "ascii"
-    ) + six.u(issuer_chain)
+    extended_chain = (
+        loaded_cert.public_bytes(serialization.Encoding.PEM).decode("ascii")
+        + issuer_chain
+    )
 
     # return in PEM format as a unicode string
     return (
@@ -117,13 +113,15 @@ def parse_issuer_cred(issuer_cred):
     # then validate that each section of data can be decoded as expected
     try:
         loaded_cert = x509.load_pem_x509_certificate(
-            six.b(issuer_cert), default_backend()
+            issuer_cert.encode("utf-8"), default_backend()
         )
         loaded_private_key = serialization.load_pem_private_key(
-            six.b(issuer_private_key), password=None, backend=default_backend()
+            issuer_private_key.encode("utf-8"), password=None, backend=default_backend()
         )
         for chain_cert in issuer_chain_certs:
-            x509.load_pem_x509_certificate(six.b(chain_cert), default_backend())
+            x509.load_pem_x509_certificate(
+                chain_cert.encode("utf-8"), default_backend()
+            )
         issuer_chain = "".join(issuer_chain_certs)
     except ValueError:
         raise ValueError(
@@ -170,7 +168,7 @@ def create_proxy_cert(
     # set the new proxy's subject
     # append a CommonName to the new proxy's subject
     # with the serial as the value of the CN
-    new_atribute = x509.NameAttribute(x509.oid.NameOID.COMMON_NAME, six.u(str(serial)))
+    new_atribute = x509.NameAttribute(x509.oid.NameOID.COMMON_NAME, str(serial))
     subject_attributes = list(loaded_cert.subject)
     subject_attributes.append(new_atribute)
     builder = builder.subject_name(x509.Name(subject_attributes))

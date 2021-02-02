@@ -28,7 +28,7 @@ class RetryingTransferClient(TransferClient):
     default_retries = 10
 
     def __init__(self, tries=None, *args, **kwargs):
-        super(RetryingTransferClient, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.tries = tries or self.default_retries
 
     def retry(self, f, *args, **kwargs):
@@ -46,21 +46,17 @@ class RetryingTransferClient(TransferClient):
 
     # get and put should always be safe to retry
     def get(self, *args, **kwargs):
-        return self.retry(super(RetryingTransferClient, self).get, *args, **kwargs)
+        return self.retry(super().get, *args, **kwargs)
 
     def put(self, *args, **kwargs):
-        return self.retry(super(RetryingTransferClient, self).put, *args, **kwargs)
+        return self.retry(super().put, *args, **kwargs)
 
     # task submission is safe, as the data contains a unique submission-id
     def submit_transfer(self, *args, **kwargs):
-        return self.retry(
-            super(RetryingTransferClient, self).submit_transfer, *args, **kwargs
-        )
+        return self.retry(super().submit_transfer, *args, **kwargs)
 
     def submit_delete(self, *args, **kwargs):
-        return self.retry(
-            super(RetryingTransferClient, self).submit_delete, *args, **kwargs
-        )
+        return self.retry(super().submit_delete, *args, **kwargs)
 
     # TDOD: Remove this function when endpoints natively support recursive ls
     def recursive_operation_ls(
@@ -277,7 +273,7 @@ def get_endpoint_w_server_list(endpoint_id):
     if endpoint["host_endpoint_id"]:  # not GCS -- this is a share endpoint
         raise click.UsageError(
             dedent(
-                u"""\
+                """\
             {id} ({0}) is a share and does not have servers.
 
             To see details of the share, use
@@ -373,9 +369,7 @@ def task_wait_with_io(
 
     exit_code = 1
     if timed_out(waited_time):
-        click.echo(
-            "Task has yet to complete after {} seconds".format(timeout), err=True
-        )
+        click.echo(f"Task has yet to complete after {timeout} seconds", err=True)
         exit_code = timeout_exit_code
 
     # output json if requested, but nothing for text mode

@@ -49,7 +49,7 @@ def test_recursive(run_line, load_api_fixtures, go_ep1_id):
     load_api_fixtures("get_submission_id.yaml")
     load_api_fixtures("submit_delete_success.yaml")
 
-    result = run_line("globus rm -r -F json {}:/foo".format(go_ep1_id))
+    result = run_line(f"globus rm -r -F json {go_ep1_id}:/foo")
     res = _load_probably_json_substring(result.output)
     assert res["status"] == "SUCCEEDED"
 
@@ -62,7 +62,7 @@ def test_no_file(run_line, load_api_fixtures, go_ep1_id):
     load_api_fixtures("get_submission_id.yaml")
     load_api_fixtures("submit_delete_failed.yaml")
 
-    run_line("globus rm {}:/nosuchfile.txt".format(go_ep1_id), assert_exit_code=1)
+    run_line(f"globus rm {go_ep1_id}:/nosuchfile.txt", assert_exit_code=1)
 
     # confirm that we sent `ignore_missing=False`
     # makes sense in context with the ignore-missing test below
@@ -80,7 +80,7 @@ def test_ignore_missing(run_line, load_api_fixtures, go_ep1_id):
     load_api_fixtures("submit_delete_success.yaml")
 
     path = "/~/nofilehere.txt"
-    result = run_line("globus rm -f {}:{}".format(go_ep1_id, path))
+    result = run_line(f"globus rm -f {go_ep1_id}:{path}")
     assert "Delete task submitted under ID " in result.stderr
 
     # confirm that we sent `ignore_missing=True`
@@ -97,7 +97,7 @@ def test_timeout(run_line, load_api_fixtures, patch_sleep, go_ep1_id):
     load_api_fixtures("submit_delete_queued.yaml")
 
     result = run_line(
-        "globus rm -r --timeout 2 {}:/foo/bar.txt".format(go_ep1_id),
+        f"globus rm -r --timeout 2 {go_ep1_id}:/foo/bar.txt",
         assert_exit_code=1,
     )
     assert "Task has yet to complete after 2 seconds" in result.stderr

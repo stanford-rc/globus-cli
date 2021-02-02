@@ -4,7 +4,7 @@ def test_path(run_line, load_api_fixtures, go_ep1_id):
     """
     load_api_fixtures("transfer_activate_success.yaml")
     load_api_fixtures("ls_results.yaml")
-    result = run_line("globus ls {}:/".format(go_ep1_id))
+    result = run_line(f"globus ls {go_ep1_id}:/")
 
     expected = ["home/", "mnt/", "not shareable/", "share/"]
     for item in expected:
@@ -17,7 +17,7 @@ def test_recursive(run_line, load_api_fixtures, go_ep1_id):
     """
     load_api_fixtures("transfer_activate_success.yaml")
     load_api_fixtures("ls_results.yaml")
-    result = run_line("globus ls -r {}:/share".format(go_ep1_id))
+    result = run_line(f"globus ls -r {go_ep1_id}:/share")
     assert "file1.txt" in result.output
 
 
@@ -28,7 +28,7 @@ def test_depth(run_line, load_api_fixtures, go_ep1_id):
     """
     load_api_fixtures("transfer_activate_success.yaml")
     load_api_fixtures("ls_results.yaml")
-    result = run_line(("globus ls -r --recursive-depth-limit 1 {}:/".format(go_ep1_id)))
+    result = run_line(f"globus ls -r --recursive-depth-limit 1 {go_ep1_id}:/")
     assert "file1.txt" not in result.output
 
 
@@ -38,6 +38,6 @@ def test_recursive_json(run_line, load_api_fixtures, go_ep1_id):
     """
     load_api_fixtures("transfer_activate_success.yaml")
     load_api_fixtures("ls_results.yaml")
-    result = run_line("globus ls -r -F json {}:/share".format(go_ep1_id))
+    result = run_line(f"globus ls -r -F json {go_ep1_id}:/share")
     assert '"DATA":' in result.output
     assert '"name": "godata/file1.txt"' in result.output

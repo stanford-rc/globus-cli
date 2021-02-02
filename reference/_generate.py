@@ -69,11 +69,9 @@ def walk_contexts(name="globus", cmd=CLI, parent_ctx=None):
 
 def iter_all_commands(tree=None):
     ctx, subcmds, subgroups = tree or walk_contexts()
-    for cmd in subcmds:
-        yield cmd
+    yield from subcmds
     for g in subgroups:
-        for cmd in iter_all_commands(g):
-            yield cmd
+        yield from iter_all_commands(g)
 
 
 def _format_option(optstr):
@@ -156,8 +154,7 @@ def commands_with_headings(heading, tree=None):
         yield heading, subcmds
     for subgrouptree in subgroups:
         heading = f"== {subgrouptree[0].command_path} commands"
-        for subheading, subcommands in commands_with_headings(heading, subgrouptree):
-            yield subheading, subcommands
+        yield from commands_with_headings(heading, subgrouptree)
 
 
 def generate_index():

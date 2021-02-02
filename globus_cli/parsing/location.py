@@ -18,8 +18,6 @@ class LocationType(click.ParamType):
             return value
         except (ValueError, AttributeError):
             self.fail(
-                (
-                    "location {} is not two comma separated floats "
-                    "for lattitude and longitude".format(value)
-                )
+                f"location {value} is not two comma separated floats "
+                "for lattitude and longitude"
             )

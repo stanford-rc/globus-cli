@@ -17,7 +17,7 @@ class SubscriptionIdType(click.ParamType):
             uuid.UUID(value)
             return value
         except ValueError:
-            self.fail("{} is not a valid Subscription ID".format(value), param, ctx)
+            self.fail(f"{value} is not a valid Subscription ID", param, ctx)
 
 
 @command("set-subscription-id", short_help="Set an endpoint's subscription")
@@ -42,7 +42,7 @@ def set_endpoint_subscription_id(**kwargs):
 
     # make the update
     res = client.put(
-        "/endpoint/{}/subscription".format(endpoint_id),
+        f"/endpoint/{endpoint_id}/subscription",
         {"subscription_id": subscription_id},
     )
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")
