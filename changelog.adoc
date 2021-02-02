@@ -1,5 +1,9 @@
 = CLI Changelog
 
+== 2.0.0
+
+* Drop support for python2
+
 == 1.16.0
 
 Enhancements:
