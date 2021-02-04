@@ -5,6 +5,7 @@ from globus_cli.parsing import (
     ENDPOINT_PLUS_OPTPATH,
     TaskPath,
     command,
+    mutex_option_group,
     shlex_process_stdin,
     task_submission_options,
 )
@@ -203,6 +204,7 @@ fi
 @click.option("--perf-p", type=int, hidden=True)
 @click.option("--perf-pp", type=int, hidden=True)
 @click.option("--perf-udt", is_flag=True, default=None, hidden=True)
+@mutex_option_group("--recursive", "--external-checksum")
 def transfer_command(
     batch,
     sync_level,
@@ -311,11 +313,6 @@ def transfer_command(
             "which need it"
         )
 
-    if recursive and external_checksum:
-        raise click.UsageError(
-            "--recursive and --external-checksum are mutually exclusive"
-        )
-
     if (cmd_source_path is None or cmd_dest_path is None) and (not batch):
         raise click.UsageError(
             "transfer requires either SOURCE_PATH and DEST_PATH or --batch"
@@ -365,15 +362,12 @@ def transfer_command(
         @click.option("--recursive", "-r", is_flag=True)
         @click.argument("source_path", type=TaskPath(base_dir=cmd_source_path))
         @click.argument("dest_path", type=TaskPath(base_dir=cmd_dest_path))
+        @mutex_option_group("--recursive", "--external-checksum")
         def process_batch_line(dest_path, source_path, recursive, external_checksum):
             """
             Parse a line of batch input and turn it into a transfer submission
             item.
             """
-            if recursive and external_checksum:
-                raise click.UsageError(
-                    "--recursive and --external-checksum are mutually exclusive"
-                )
             transfer_data.add_item(
                 str(source_path),
                 str(dest_path),

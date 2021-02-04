@@ -7,7 +7,7 @@ from globus_cli.helpers import (
     fill_delegate_proxy_activation_requirements,
     is_remote_session,
 )
-from globus_cli.parsing import command, endpoint_id_arg
+from globus_cli.parsing import command, endpoint_id_arg, mutex_option_group
 from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import activation_requirements_help_text, get_client
 
@@ -115,6 +115,7 @@ $ globus endpoint activate $ep_id --myproxy -U username
     default=False,
     help="Force activation even if endpoint is already activated.",
 )
+@mutex_option_group("--web", "--myproxy", "--delegate-proxy")
 def endpoint_activate(
     endpoint_id,
     myproxy,
@@ -176,10 +177,6 @@ def endpoint_activate(
     client = get_client()
 
     # validate options
-    if web + myproxy + bool(delegate_proxy) > 1:
-        raise click.UsageError(
-            "--web, --myproxy, and --delegate-proxy are mutually exclusive."
-        )
     if no_autoactivate and not (myproxy or web or delegate_proxy):
         raise click.UsageError(
             "--no-autoactivate requires another activation method be given."
