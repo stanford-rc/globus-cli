@@ -3,7 +3,7 @@ import os
 from setuptools import find_packages, setup
 
 # single source of truth for package version
-version_ns = {}
+version_ns = {}  # type: ignore
 with open(os.path.join("globus_cli", "version.py")) as f:
     exec(f.read(), version_ns)
 version = version_ns["__version__"]
@@ -42,6 +42,7 @@ setup(
             "isort>=5.6.4,<6.0",
             "flake8>=3.8.4,<4.0",
             "flake8-bugbear==20.11.1",
+            "mypy==0.800",
         ],
     },
     entry_points={"console_scripts": ["globus = globus_cli:main"]},

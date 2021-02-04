@@ -10,8 +10,8 @@ from globus_cli.version import get_versions
 
 # check if the source for this is inside of the USER_BASE
 # if so, a `pip install --user` was used
-# https://docs.python.org/2/library/site.html#site.USER_BASE
-IS_USER_INSTALL = __file__.startswith(site.USER_BASE)
+# https://docs.python.org/3/library/site.html#site.getuserbase
+IS_USER_INSTALL = __file__.startswith(site.getuserbase())
 
 
 def _call_pip(*args):

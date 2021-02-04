@@ -18,11 +18,13 @@ try:
     last_release = requests.get(
         "https://api.github.com/repos/globus/globus-cli/releases/latest"
     )
-    REV_DATE = time.strptime(last_release.json()["published_at"], "%Y-%m-%dT%H:%M:%SZ")
+    REV_DATE_T = time.strptime(
+        last_release.json()["published_at"], "%Y-%m-%dT%H:%M:%SZ"
+    )
 except Exception:
     # fallback to current time
-    REV_DATE = time.gmtime()
-REV_DATE = time.strftime("%B %d, %Y", REV_DATE)
+    REV_DATE_T = time.gmtime()
+REV_DATE = time.strftime("%B %d, %Y", REV_DATE_T)
 
 EXIT_STATUS_TEXT = """0 on success.
 
