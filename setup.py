@@ -3,7 +3,7 @@ import os
 from setuptools import find_packages, setup
 
 # single source of truth for package version
-version_ns = {}
+version_ns = {}  # type: ignore
 with open(os.path.join("globus_cli", "version.py")) as f:
     exec(f.read(), version_ns)
 version = version_ns["__version__"]
