@@ -42,6 +42,7 @@ setup(
             "isort>=5.6.4,<6.0",
             "flake8>=3.8.4,<4.0",
             "flake8-bugbear==20.11.1",
+            "mypy==0.800",
         ],
     },
     entry_points={"console_scripts": ["globus = globus_cli:main"]},
