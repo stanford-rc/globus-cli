@@ -126,7 +126,10 @@ def run_line(cli_runner, request, patch_config):
                         result.stdout,
                         result.stderr,
                         (
-                            "\n  ".join(r.request.url for r in responses.calls)
+                            "\n  ".join(
+                                f"{r.request.method} {r.request.url}"
+                                for r in responses.calls
+                            )
                             or "  <none>"
                         ),
                     )
@@ -165,7 +168,7 @@ def register_api_route(mocked_responses):
         adding_headers=None,
         replace=False,
         match_querystring=False,
-        **kwargs
+        **kwargs,
     ):
         base_url_map = {
             "auth": "https://auth.globus.org/",
@@ -187,7 +190,7 @@ def register_api_route(mocked_responses):
                 full_url,
                 headers=adding_headers,
                 match_querystring=match_querystring,
-                **kwargs
+                **kwargs,
             )
         else:
             responses.add(
@@ -195,7 +198,7 @@ def register_api_route(mocked_responses):
                 full_url,
                 headers=adding_headers,
                 match_querystring=match_querystring,
-                **kwargs
+                **kwargs,
             )
 
     return func
@@ -235,6 +238,9 @@ def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id, t
                     query_params = urllib.parse.urlencode(params.pop("query_params"))
                     # modify path (assume no prior params)
                     use_path = use_path + "?" + query_params
+                print(
+                    f"debug: register_api_route({service}, {use_path}, {method}, ...)"
+                )
                 register_api_route(service, use_path, method=method.upper(), **params)
 
         # after registration, return the raw fixture data
