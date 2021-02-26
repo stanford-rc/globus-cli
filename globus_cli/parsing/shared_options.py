@@ -710,7 +710,10 @@ def server_add_and_update_opts(*args, **kwargs):
         return (lower, upper) if lower <= upper else (upper, lower)
 
     def inner_decorator(f, add=False):
-        f = click.option("--hostname", required=add, help="Server Hostname.")(f)
+        if add:
+            f = click.argument("HOSTNAME")(f)
+        else:
+            f = click.option("--hostname", help="Server Hostname.")(f)
 
         default_scheme = "gsiftp" if add else None
         f = click.option(

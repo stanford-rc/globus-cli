@@ -4,7 +4,7 @@ import pytest
 def test_gcs_server_add(run_line, load_api_fixtures):
     data = load_api_fixtures("endpoint_servers.yaml")
     epid = data["metadata"]["endpoint_id"]
-    result = run_line(f"globus endpoint server add {epid} --hostname example.org")
+    result = run_line(f"globus endpoint server add {epid} example.org")
     assert "Server added to endpoint successfully" in result.output
 
 

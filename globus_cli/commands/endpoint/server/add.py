@@ -15,8 +15,8 @@ $ globus endpoint server add $ep_id --hostname gridftp.example.org
 ----
 """,
 )
-@server_add_and_update_opts(add=True)
 @endpoint_id_arg
+@server_add_and_update_opts(add=True)
 def server_add(
     endpoint_id,
     subject,
