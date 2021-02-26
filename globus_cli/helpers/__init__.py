@@ -7,7 +7,6 @@ from globus_cli.helpers.local_server import (
     is_remote_session,
     start_local_server,
 )
-from globus_cli.helpers.version import print_version
 
 __all__ = [
     "print_version",

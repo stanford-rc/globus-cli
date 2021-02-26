@@ -11,7 +11,6 @@ from globus_cli.parsing.command_state import (
 from globus_cli.parsing.detect_and_decorate import detect_and_decorate
 from globus_cli.parsing.explicit_null import EXPLICIT_NULL
 from globus_cli.parsing.location import LocationType
-from globus_cli.parsing.version_option import version_option
 
 
 def common_options(*args, **kwargs):
@@ -42,7 +41,6 @@ def common_options(*args, **kwargs):
         Work of actually decorating a function -- wrapped in here because we
         want to dispatch depending on how `common_options` is invoked
         """
-        f = version_option(f)
         f = debug_option(f)
         f = verbose_option(f)
         f = click.help_option("-h", "--help")(f)
