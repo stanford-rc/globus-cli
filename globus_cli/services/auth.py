@@ -1,4 +1,4 @@
-import re
+import uuid
 
 from globus_sdk import AuthClient, RefreshTokenAuthorizer
 
@@ -16,16 +16,12 @@ def _update_tokens(token_response):
     )
 
 
-def is_valid_identity_name(identity_name):
-    """
-    Check if a string is a valid identity name.
-    Does not do any preprocessing of the identity name, so you must do so
-    before invocation.
-    """
-    if re.match(_IDENTITY_NAME_REGEX, identity_name) is None:
-        return False
-    else:
+def _is_uuid(s):
+    try:
+        uuid.UUID(s)
         return True
+    except ValueError:
+        return False
 
 
 def get_auth_client():
@@ -65,10 +61,10 @@ def _lookup_identity_field(id_name=None, id_id=None, field="id", provision=False
 
 
 def maybe_lookup_identity_id(identity_name, provision=False):
-    if is_valid_identity_name(identity_name):
-        return _lookup_identity_field(id_name=identity_name, provision=provision)
-    else:
+    if _is_uuid(identity_name):
         return identity_name
+    else:
+        return _lookup_identity_field(id_name=identity_name, provision=provision)
 
 
 def lookup_identity_name(identity_id):
