@@ -1,0 +1,11 @@
+transfer:
+  - path: /operation/endpoint/{GO_EP1_ID}/rename
+    method: post
+    json:
+      {
+        "DATA_TYPE": "result",
+        "code": "FileRenamed",
+        "message": "File or directory renamed successfully",
+        "request_id": "PL6I0Gsll",
+        "resource": "/operation/endpoint/ddb59aef-6d04-11e5-ba46-22000b92c6ec/rename"
+      }
