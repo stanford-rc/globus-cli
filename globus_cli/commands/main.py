@@ -1,5 +1,4 @@
 from globus_cli.commands.bookmark import bookmark_command
-from globus_cli.commands.config import config_command
 from globus_cli.commands.delete import delete_command
 from globus_cli.commands.endpoint import endpoint_command
 from globus_cli.commands.get_identities import get_identities_command
@@ -35,7 +34,6 @@ def main():
 main.add_command(list_commands)
 main.add_command(version_command)
 main.add_command(update_command)
-main.add_command(config_command)
 
 main.add_command(login_command)
 main.add_command(logout_command)
