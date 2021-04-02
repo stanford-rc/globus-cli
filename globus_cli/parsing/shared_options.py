@@ -633,7 +633,7 @@ def synchronous_task_wait_options(f):
         is_flag=True,
         help=(
             'Every polling interval, print "." to stdout to '
-            "indicate that task wait is till active"
+            "indicate that task wait is still active"
         ),
     )(f)
     f = click.option(

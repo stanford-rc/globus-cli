@@ -35,7 +35,7 @@ def task_wait(meow, heartbeat, polling_interval, timeout, task_id, timeout_exit_
     """
     Wait for a task to complete.
 
-    THis command waits until the timeout is reached, checking every 'M' seconds
+    This command waits until the timeout is reached, checking every 'M' seconds
     (where 'M' is the polling interval).
 
     If the task succeeds by then, it exits with status 0. Otherwise, it exits with
