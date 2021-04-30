@@ -12,7 +12,7 @@ def test_show_works(run_line, load_api_fixtures, ep_type):
     else:
         epid = data["metadata"]["endpoint_id"]
 
-    result = run_line("globus endpoint show {}".format(epid))
+    result = run_line(f"globus endpoint show {epid}")
 
     assert "Display Name:" in result.output
     assert epid in result.output
@@ -22,7 +22,7 @@ def test_show_long_description(run_line, load_api_fixtures):
     data = load_api_fixtures("endpoint_with_long_description.yaml")
     epid = data["metadata"]["endpoint_id"]
 
-    result = run_line("globus endpoint show {}".format(epid))
+    result = run_line(f"globus endpoint show {epid}")
 
     assert "Description:" in result.output
     # first few lines are there

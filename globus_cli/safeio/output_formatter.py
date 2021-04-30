@@ -35,7 +35,7 @@ FORMAT_TEXT_RAW = "text_raw"
 FORMAT_TEXT_CUSTOM = "text_custom"
 
 
-class FormatField(object):
+class FormatField:
     """A field which will be shown in record or table output.
     When fields are provided as tuples, they are converted into this.
 
