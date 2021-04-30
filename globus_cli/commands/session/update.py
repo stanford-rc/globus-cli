@@ -9,28 +9,14 @@ from globus_cli.parsing import IdentityType, command, no_local_server_option
 from globus_cli.services.auth import get_auth_client
 
 
-def _identity_set(auth_client):
-    res = auth_client.oauth2_userinfo()
-    try:
-        return res["identity_set"]
-    except KeyError:
-        click.echo(
-            "Your current login does not have the consents required "
-            "to view your full identity set. Please log in again "
-            "to agree to the required consents.",
-            err=True,
-        )
-        click.get_current_context().exit(1)
-
-
-def _update_session_params_all_case(auth_client, session_params):
+def _update_session_params_all_case(identity_set, session_params):
     """if --all use every identity id in the user's identity set"""
-    identity_ids = [x["sub"] for x in _identity_set(auth_client)]
+    identity_ids = [x["sub"] for x in identity_set]
     # set session params once we have all identity ids
     session_params["session_required_identities"] = ",".join(identity_ids)
 
 
-def _update_session_params_identities_case(auth_client, session_params, identities):
+def _update_session_params_identities_case(identity_set, session_params, identities):
     """
     given a set of identities (which must be either a mix of usernames and IDs or a list
     of domains), use that to update the session as appropriate
@@ -44,20 +30,31 @@ def _update_session_params_identities_case(auth_client, session_params, identiti
             "domain-type identities and user-type identities are mutually exclusive"
         )
 
+    # track if we find any identity IDs not in the user's identity set
+    any_ids_not_in_set = False
+    id_set_ids = {x["sub"] for x in identity_set}
+    id_set_mapping = {x["username"]: x["sub"] for x in identity_set}
+
+    # check Identity IDs first, since we'll expand this list with names next
+    # we don't wnat to check usernames twice
+    for identity_id in identity_ids:
+        if identity_id not in id_set_ids:
+            click.echo(f"'{identity_id}' is not in your identity set", err=True)
+            any_ids_not_in_set = True
+
     # if usernames were used, fetch the identity set and pull identity IDs from there
     # do not use 'get_identities' as it will easily return identities which are not in
     # your identity set
     if identity_usernames:
-        identity_set = _identity_set(auth_client)
-
         for name in identity_usernames:
-            for identity in identity_set:
-                if identity["username"] == name:
-                    identity_ids.append(identity["sub"])
-                    break
-            else:
-                click.echo("'{}' is not in your identity set".format(name), err=True)
-                click.get_current_context().exit(1)
+            try:
+                identity_ids.append(id_set_mapping[name])
+            except KeyError:
+                click.echo(f"'{name}' is not in your identity set", err=True)
+                any_ids_not_in_set = True
+
+    if any_ids_not_in_set:
+        click.get_current_context().exit(1)
 
     # update session params once we have resolved usernames (if necessary)
     if identity_ids:
@@ -103,11 +100,12 @@ def session_update(identities, no_local_server, all):
 
     auth_client = get_auth_client()
     session_params = {"session_message": "Authenticate to update your CLI session."}
+    identity_set = auth_client.oauth2_userinfo()["identity_set"]
 
     if all:
-        _update_session_params_all_case(auth_client, session_params)
+        _update_session_params_all_case(identity_set, session_params)
     else:
-        _update_session_params_identities_case(auth_client, session_params, identities)
+        _update_session_params_identities_case(identity_set, session_params, identities)
 
     # use a link login if remote session or user requested
     if no_local_server or is_remote_session():

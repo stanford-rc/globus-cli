@@ -76,9 +76,7 @@ class IdentityType(click.ParamType):
         if self.allow_domains:
             return ParsedIdentity(value, "domain")
 
-        self.fail(
-            "'{}' does not appear to be a valid identity".format(value), param=param
-        )
+        self.fail(f"'{value}' does not appear to be a valid identity", param=param)
 
     def get_metavar(self, param):
         return self.metavar

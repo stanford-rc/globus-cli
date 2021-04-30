@@ -1,7 +1,4 @@
-try:
-    import mock
-except ImportError:
-    from unittest import mock
+from unittest import mock
 
 import pytest
 
@@ -37,9 +34,10 @@ def test_username_not_in_idset(run_line, load_api_fixtures):
 @pytest.mark.parametrize(
     "userparam", ["sirosen@globusid.org", "f4ee724c-b27c-4ccc-8237-989aa4085af4"]
 )
-def test_mix_user_and_domains(run_line, userparam):
+def test_mix_user_and_domains(run_line, load_api_fixtures, userparam):
+    load_api_fixtures("foo_user_info.yaml")
     result = run_line(
-        "globus session update uchicago.edu {}".format(userparam), assert_exit_code=2
+        f"globus session update uchicago.edu {userparam}", assert_exit_code=2
     )
     assert (
         "domain-type identities and user-type identities are mutually exclusive"
@@ -51,10 +49,9 @@ def test_mix_user_and_domains(run_line, userparam):
     "idparam",
     ["sirosen@globusid.org", "f4ee724c-b27c-4ccc-8237-989aa4085af4", "uchicago.edu"],
 )
-def test_all_mutex(run_line, idparam):
-    result = run_line(
-        "globus session update --all {}".format(idparam), assert_exit_code=2
-    )
+def test_all_mutex(run_line, load_api_fixtures, idparam):
+    load_api_fixtures("foo_user_info.yaml")
+    result = run_line(f"globus session update --all {idparam}", assert_exit_code=2)
     assert "IDENTITY values and --all are mutually exclusive" in result.stderr
 
 
@@ -67,7 +64,7 @@ def test_username_flow(
     username = data["metadata"]["username"]
     user_id = data["metadata"]["user_id"]
 
-    result = run_line("globus session update {}".format(username))
+    result = run_line(f"globus session update {username}")
 
     assert "You have successfully updated your CLI session." in result.output
 
