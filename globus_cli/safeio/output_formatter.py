@@ -142,7 +142,7 @@ def colon_formatted_print(data, fields):
         # 88 char wrap based on the same rationale that `black` and `flake8-bugbear`
         # use 88 chars (or if there's a newline)
         # only wrap if it's enabled and detected
-        shouldwrap = field.wrap_enabled and len(value) + maxlen > 88 or "\n" in value
+        shouldwrap = field.wrap_enabled and (len(value) + maxlen > 88 or "\n" in value)
         if shouldwrap:
             # TextWrapper will discard existing whitespace, including newlines
             # so split, wrap each resulting line, then rejoin
