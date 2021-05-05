@@ -11,6 +11,7 @@ from globus_cli.parsing.command_state import (
 from globus_cli.parsing.detect_and_decorate import detect_and_decorate
 from globus_cli.parsing.explicit_null import EXPLICIT_NULL
 from globus_cli.parsing.location import LocationType
+from globus_cli.parsing.mutex_group import MutexInfo, mutex_option_group
 
 
 def common_options(*args, **kwargs):
@@ -160,6 +161,8 @@ def endpoint_create_and_update_params(*args, **kwargs):
             default=None,
             help=("Unset any default directory on the endpoint"),
         )(f)
+        f = mutex_option_group("--default-directory", "--no-default-directory")(f)
+
         f = click.option(
             "--force-encryption/--no-force-encryption",
             default=None,
@@ -238,6 +241,15 @@ def endpoint_create_and_update_params(*args, **kwargs):
                 "--no-managed"
             ),
         )(f)
+        f = mutex_option_group(
+            "--subscription-id",
+            MutexInfo(
+                "--no-managed",
+                param="managed",
+                present=lambda d: d.get("managed") is False,
+            ),
+        )(f)
+
         f = click.option(
             "--network-use",
             default=None,
@@ -368,34 +380,21 @@ def validate_endpoint_create_and_update_params(endpoint_type, managed, params):
                     )
                 )
 
-    # make sure --(no-)managed and --subscription-id are mutually exclusive
-    # if --managed given pass DEFAULT as the subscription_id
-    # if --no-managed given, pass None
+    # resolve the subscription_id value if "managed" was set
+    # if --managed given pass --subscription-id or DEFAULT
+    # if --no-managed given, pass explicit null
     managed_flag = params.get("managed")
     if managed_flag is not None:
         params.pop("managed")
         if managed_flag:
             params["subscription_id"] = params.get("subscription_id") or "DEFAULT"
         else:
-            if params.get("subscription_id"):
-                raise click.UsageError(
-                    "Cannot specify --subscription-id and "
-                    "use the --no-managed option."
-                )
             params["subscription_id"] = EXPLICIT_NULL
 
-    # make sure --no-default-directory are mutually exclusive
-    # if --no-managed given, pass an EXPLICIT_NULL as the default directory
+    # if --no-default-directory given, pass an EXPLICIT_NULL
     if params.get("no_default_directory"):
-
-        if params.get("default_directory"):
-            raise click.UsageError(
-                "--no-default-directory and --default-directory are mutually "
-                "exclusive."
-            )
-        else:
-            params["default_directory"] = EXPLICIT_NULL
-            params.pop("no_default_directory")
+        params["default_directory"] = EXPLICIT_NULL
+        params.pop("no_default_directory")
 
 
 def task_id_arg(*args, **kwargs):

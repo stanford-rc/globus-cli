@@ -4,6 +4,7 @@ from globus_cli.parsing.endpoint_plus_path import (
     ENDPOINT_PLUS_REQPATH,
 )
 from globus_cli.parsing.explicit_null import EXPLICIT_NULL
+from globus_cli.parsing.mutex_group import mutex_option_group
 from globus_cli.parsing.one_use_option import one_use_option
 from globus_cli.parsing.process_stdin import shlex_process_stdin
 from globus_cli.parsing.shared_options import (
@@ -30,6 +31,7 @@ __all__ = [
     "ENDPOINT_PLUS_REQPATH",
     "TaskPath",
     "one_use_option",
+    "mutex_option_group",
     "EXPLICIT_NULL",
     # Transfer options
     "endpoint_id_arg",

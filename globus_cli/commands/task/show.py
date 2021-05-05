@@ -1,6 +1,6 @@
 import click
 
-from globus_cli.parsing import command, task_id_arg
+from globus_cli.parsing import command, mutex_option_group, task_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
 from globus_cli.services.transfer import get_client, iterable_response_to_dict
 
@@ -155,16 +155,13 @@ $ globus task show TASK_ID
         "Mutually exclusive with --successful-transfers"
     ),
 )
+@mutex_option_group("--successful-transfers", "--skipped-errors")
 def show_task(successful_transfers, skipped_errors, task_id):
     """
     Print information detailing the status and other info about a task.
 
     The task may be pending, completed, or in progress.
     """
-    if successful_transfers and skipped_errors:
-        raise click.UsageError(
-            "--successful-transfers and --skipped-errors are mutually exclusive"
-        )
     client = get_client()
 
     if successful_transfers:
