@@ -12,7 +12,6 @@ from globus_sdk.base import slash_join
 from ruamel.yaml import YAML
 
 import globus_cli.config
-from globus_cli.services.transfer import RetryingTransferClient
 
 yaml = YAML()
 log = logging.getLogger(__name__)
@@ -247,9 +246,3 @@ def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id, t
         return data
 
     return func
-
-
-@pytest.fixture(autouse=True)
-def _reduce_transfer_client_retries(monkeypatch):
-    """to make tests fail faster on network errors"""
-    monkeypatch.setattr(RetryingTransferClient, "default_retries", 1)

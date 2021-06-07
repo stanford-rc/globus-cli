@@ -1,13 +1,9 @@
-import random
 import sys
-import time
 import uuid
 from textwrap import dedent
 
 import click
 from globus_sdk import RefreshTokenAuthorizer, TransferClient
-from globus_sdk.base import safe_stringify
-from globus_sdk.exc import NetworkError
 
 from globus_cli import version
 from globus_cli.config import (
@@ -20,44 +16,7 @@ from globus_cli.safeio import FORMAT_SILENT, formatted_print
 from globus_cli.services.recursive_ls import RecursiveLsResponse
 
 
-class RetryingTransferClient(TransferClient):
-    """
-    Wrapper around TransferClient that retries safe resources on NetworkErrors
-    """
-
-    default_retries = 10
-
-    def __init__(self, tries=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.tries = tries or self.default_retries
-
-    def retry(self, f, *args, **kwargs):
-        """
-        Retries the given function self.tries times on NetworkErros
-        """
-        backoff = random.random() / 100  # 5ms on average
-        for _ in range(self.tries - 1):
-            try:
-                return f(*args, **kwargs)
-            except NetworkError:
-                time.sleep(backoff)
-                backoff *= 2
-        return f(*args, **kwargs)
-
-    # get and put should always be safe to retry
-    def get(self, *args, **kwargs):
-        return self.retry(super().get, *args, **kwargs)
-
-    def put(self, *args, **kwargs):
-        return self.retry(super().put, *args, **kwargs)
-
-    # task submission is safe, as the data contains a unique submission-id
-    def submit_transfer(self, *args, **kwargs):
-        return self.retry(super().submit_transfer, *args, **kwargs)
-
-    def submit_delete(self, *args, **kwargs):
-        return self.retry(super().submit_delete, *args, **kwargs)
-
+class CustomTransferClient(TransferClient):
     # TDOD: Remove this function when endpoints natively support recursive ls
     def recursive_operation_ls(
         self, endpoint_id, depth=3, filter_after_first=True, **params
@@ -92,7 +51,7 @@ class RetryingTransferClient(TransferClient):
         fields are no longer available and an additional per item
         "path" field is added.
         """
-        endpoint_id = safe_stringify(endpoint_id)
+        endpoint_id = str(endpoint_id)
         self.logger.info(
             "TransferClient.recursive_operation_ls({}, {}, {})".format(
                 endpoint_id, depth, params
@@ -122,7 +81,7 @@ def get_client():
             on_refresh=_update_tokens,
         )
 
-    return RetryingTransferClient(authorizer=authorizer, app_name=version.app_name)
+    return CustomTransferClient(authorizer=authorizer, app_name=version.app_name)
 
 
 def display_name_or_cname(ep_doc):

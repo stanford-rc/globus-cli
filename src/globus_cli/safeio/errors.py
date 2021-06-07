@@ -1,7 +1,6 @@
 import json
 
 import click
-from globus_sdk.base import safe_stringify
 
 from globus_cli.safeio.get_option_vals import outformat_is_json
 
@@ -16,8 +15,8 @@ class PrintableErrorField:
 
     def __init__(self, name, value, multiline=False):
         self.multiline = multiline
-        self.name = safe_stringify(name)
-        self.raw_value = safe_stringify(value)
+        self.name = str(name)
+        self.raw_value = str(value)
         self.value = self._format_value(self.raw_value)
 
     @property
