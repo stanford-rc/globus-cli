@@ -1,5 +1,11 @@
 = CLI Changelog
 
+== 2.1.0
+
+* `globus transfer` now supports an option, `--exclude`, which can be used to
+  skip files matching a pattern or set of patterns when submitting a recursive
+  directory transfer
+
 == 2.0.0
 
 * Drop support for python2
