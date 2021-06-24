@@ -2,10 +2,10 @@ import time
 
 import globus_sdk
 
-from globus_cli.config import AUTH_AT_OPTNAME, internal_auth_client, lookup_option
 from globus_cli.parsing import command
 from globus_cli.safeio import formatted_print, print_command_hint
 from globus_cli.services.auth import get_auth_client
+from globus_cli.tokenstore import internal_auth_client, token_storage_adapter
 
 
 @command(
@@ -38,28 +38,34 @@ def session_show():
     Lists identities that are in the session tied to the CLI's access tokens along with
     the time the user authenticated with that identity.
     """
+    auth_client = get_auth_client()
+    adapter = token_storage_adapter()
+
     # get a token to introspect, refreshing if neccecary
-    auth_client = internal_auth_client()
     try:
-        auth_client.authorizer._check_expiration_time()
+        # may force a refresh if the token is expired
+        auth_client.authorizer.get_authorization_header()
     except AttributeError:  # if we have no RefreshTokenAuthorizor
         pass
-    access_token = lookup_option(AUTH_AT_OPTNAME)
 
-    # only instance clients can introspect tokens
-    if isinstance(auth_client, globus_sdk.ConfidentialAppAuthClient):
-        res = auth_client.oauth2_token_introspect(access_token, include="session_info")
+    tokendata = adapter.get_token_data("auth.globus.org")
+    # if there's no token (e.g. not logged in), stub with empty data
+    if not tokendata:
+        session_info = {}
+        authentications = {}
+    else:
+        internal_client = internal_auth_client()
+
+        access_token = tokendata["access_token"]
+        res = internal_client.oauth2_token_introspect(
+            access_token, include="session_info"
+        )
 
         session_info = res.get("session_info", {})
         authentications = session_info.get("authentications") or {}
 
-    # empty session if still using Native App Client
-    else:
-        session_info = {}
-        authentications = {}
-
     # resolve ids to human readable usernames
-    resolved_ids = globus_sdk.IdentityMap(get_auth_client(), list(authentications))
+    resolved_ids = globus_sdk.IdentityMap(auth_client, list(authentications))
 
     # put the nested dicts in a format table output can work with
     # while also converting vals into human readable formats

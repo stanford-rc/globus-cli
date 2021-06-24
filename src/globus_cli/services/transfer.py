@@ -1,3 +1,4 @@
+import logging
 import sys
 import uuid
 from textwrap import dedent
@@ -6,14 +7,12 @@ import click
 from globus_sdk import RefreshTokenAuthorizer, TransferClient
 
 from globus_cli import version
-from globus_cli.config import (
-    get_transfer_tokens,
-    internal_auth_client,
-    set_transfer_tokens,
-)
 from globus_cli.parsing import EXPLICIT_NULL
 from globus_cli.safeio import FORMAT_SILENT, formatted_print
 from globus_cli.services.recursive_ls import RecursiveLsResponse
+from globus_cli.tokenstore import internal_auth_client, token_storage_adapter
+
+log = logging.getLogger(__name__)
 
 
 class CustomTransferClient(TransferClient):
@@ -52,7 +51,7 @@ class CustomTransferClient(TransferClient):
         "path" field is added.
         """
         endpoint_id = str(endpoint_id)
-        self.logger.info(
+        log.info(
             "TransferClient.recursive_operation_ls({}, {}, {})".format(
                 endpoint_id, depth, params
             )
@@ -60,25 +59,19 @@ class CustomTransferClient(TransferClient):
         return RecursiveLsResponse(self, endpoint_id, depth, filter_after_first, params)
 
 
-def _update_tokens(token_response):
-    tokens = token_response.by_resource_server["transfer.api.globus.org"]
-    set_transfer_tokens(
-        tokens["access_token"], tokens["refresh_token"], tokens["expires_at_seconds"]
-    )
-
-
 def get_client():
-    tokens = get_transfer_tokens()
+    adapter = token_storage_adapter()
+    tokens = adapter.get_token_data("transfer.api.globus.org")
     authorizer = None
 
-    # if there's a refresh token, use it to build the authorizer
-    if tokens["refresh_token"] is not None:
+    # if there are tokens, build the authorizer
+    if tokens is not None:
         authorizer = RefreshTokenAuthorizer(
             tokens["refresh_token"],
             internal_auth_client(),
             tokens["access_token"],
-            tokens["access_token_expires"],
-            on_refresh=_update_tokens,
+            tokens["expires_at_seconds"],
+            on_refresh=adapter.on_refresh,
         )
 
     return CustomTransferClient(authorizer=authorizer, app_name=version.app_name)

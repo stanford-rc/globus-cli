@@ -1,34 +1,18 @@
 import click
 import globus_sdk
-from globus_sdk.exc import AuthAPIError
+from globus_sdk import AuthAPIError
 
-from globus_cli.config import (
-    AUTH_AT_EXPIRES_OPTNAME,
-    AUTH_AT_OPTNAME,
-    AUTH_RT_OPTNAME,
-    CLIENT_ID_OPTNAME,
-    CLIENT_SECRET_OPTNAME,
-    TRANSFER_AT_EXPIRES_OPTNAME,
-    TRANSFER_AT_OPTNAME,
-    TRANSFER_RT_OPTNAME,
-    internal_auth_client,
-    internal_native_client,
-    lookup_option,
-    remove_option,
-)
 from globus_cli.parsing import command
 from globus_cli.services.auth import get_auth_client
+from globus_cli.tokenstore import (
+    delete_templated_client,
+    internal_native_client,
+    token_storage_adapter,
+)
 
-_RESCIND_HELP = """\
-Rescinding Consents
--------------------
-The logout command only revokes tokens that it can see in its storage.
-If you are concerned that logout may have failed to revoke a token,
-you may want to manually rescind the Globus CLI consent on the
-Manage Consents Page:
 
-    https://auth.globus.org/consents
-"""
+def warnecho(msg):
+    click.echo(click.style(msg, fg="yellow"), err=True)
 
 
 _LOGOUT_EPILOG = """\
@@ -52,7 +36,13 @@ Before attempting any further CLI commands, you will have to login again using
     prompt="Are you sure you want to logout?",
     help='Automatically say "yes" to all prompts',
 )
-def logout_command():
+@click.option(
+    "--ignore-errors",
+    help="Ignore any errors encountered during logout",
+    is_flag=True,
+    default=False,
+)
+def logout_command(ignore_errors):
     """
     Logout of the Globus CLI
 
@@ -68,7 +58,7 @@ def logout_command():
     try:
         username = get_auth_client().oauth2_userinfo()["preferred_username"]
     except AuthAPIError:
-        click.echo(
+        warnecho(
             "Unable to lookup username. You may not be logged in. "
             "Attempting logout anyway...\n"
         )
@@ -77,73 +67,53 @@ def logout_command():
         "Logging out of Globus{}\n".format(" as " + username if username else "")
     )
 
-    # we use a Native Client to prevent an invalid instance client
-    # from preventing token revocation
-    native_client = internal_native_client()
-
-    # remove tokens from config and revoke them
-    # also, track whether or not we should print the rescind help
-    print_rescind_help = False
-    for token_opt in (
-        TRANSFER_RT_OPTNAME,
-        TRANSFER_AT_OPTNAME,
-        AUTH_RT_OPTNAME,
-        AUTH_AT_OPTNAME,
-    ):
-        # first lookup the token -- if not found we'll continue
-        token = lookup_option(token_opt)
-        if not token:
-            click.echo(
-                (
-                    'Warning: Found no token named "{}"! '
-                    "Recommend rescinding consent"
-                ).format(token_opt)
-            )
-            print_rescind_help = True
-            continue
-        # token was found, so try to revoke it
-        try:
-            native_client.oauth2_revoke_token(token)
-        # if we network error, revocation failed -- print message and abort so
-        # that we can revoke later when the network is working
-        except globus_sdk.NetworkError:
-            click.echo(
-                "Failed to reach Globus to revoke tokens. "
-                "Because we cannot revoke these tokens, cancelling logout"
+    # first, try to delete the templated credentialed client
+    # ignore failure (maybe creds are already invalidated or the client was deleted)
+    try:
+        delete_templated_client()
+    except AuthAPIError:
+        if not ignore_errors:
+            warnecho(
+                "Failure while deleting internal client. "
+                "Please try logging out again",
             )
             click.get_current_context().exit(1)
-        # finally, we revoked, so it's safe to remove the token
-        remove_option(token_opt)
+        else:
+            warnecho(
+                "Warning: Failed to delete internal client. "
+                "Continuing... (--ignore-errors)",
+            )
 
-    # delete the instance client if one exists
-    client_id = lookup_option(CLIENT_ID_OPTNAME)
+    # because the client was deleted above, the tokens should all be revoked
+    # but it could have been the `--ignore-errors` case, so take a shot at revoking
+    # tokens
+    # use the native client for this purpose so that we definitely have a valid API
+    # client in this case
+    native_client = internal_native_client()
 
-    if client_id:
-        instance_client = internal_auth_client()
-        try:
-            instance_client.delete(f"/v2/api/clients/{client_id}")
+    adapter = token_storage_adapter()
 
-        # if the client secret has been invalidated or the client has
-        # already been removed, we continue on
-        except AuthAPIError:
-            pass
+    for rs, tokendata in adapter.get_by_resource_server().items():
+        for tok_key in ("access_token", "refresh_token"):
+            token = tokendata[tok_key]
 
-    # remove deleted client values and expiration times
-    for opt in (
-        CLIENT_ID_OPTNAME,
-        CLIENT_SECRET_OPTNAME,
-        TRANSFER_AT_EXPIRES_OPTNAME,
-        AUTH_AT_EXPIRES_OPTNAME,
-    ):
-        remove_option(opt)
+            try:
+                native_client.oauth2_revoke_token(token)
+            # if we network error, revocation failed -- print message and abort so
+            # that the user can try again when the network is working
+            except globus_sdk.NetworkError:
+                if not ignore_errors:
+                    warnecho(
+                        "Failed to reach Globus to revoke tokens. "
+                        "Because we cannot revoke these tokens, cancelling logout",
+                    )
+                    click.get_current_context().exit(1)
+                else:
+                    warnecho(
+                        "Warning: Failed to reach Globus to revoke tokens. "
+                        "Continuing... (--ignore-errors)",
+                    )
 
-    # if print_rescind_help is true, we printed warnings above
-    # so, jam out an extra newline as a separator
-    click.echo(("\n" if print_rescind_help else "") + _LOGOUT_EPILOG)
+        adapter.remove_tokens_for_resource_server(rs)
 
-    # if some token wasn't found in the config, it means its possible that the
-    # config file was removed without logout
-    # in that case, the user should rescind the CLI consent to invalidate any
-    # potentially leaked refresh tokens, so print the help on that
-    if print_rescind_help:
-        click.echo(_RESCIND_HELP)
+    click.echo(_LOGOUT_EPILOG)

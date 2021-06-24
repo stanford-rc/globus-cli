@@ -47,10 +47,9 @@ setup(
     package_dir={"": "src"},
     python_requires=">=3.6",
     install_requires=[
-        "globus-sdk==3.0.0a1",
+        "globus-sdk==3.0.0a2",
         "click>=7.1.1,<8.0",
         "jmespath==0.10.0",
-        "configobj>=5.0.6,<6.0.0",
         "requests>=2.0.0,<3.0.0",
         # cryptography has unusual versioning and compatibility rules:
         # https://cryptography.io/en/latest/api-stability/

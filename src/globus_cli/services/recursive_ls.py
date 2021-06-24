@@ -4,8 +4,7 @@ import logging
 import time
 from collections import deque
 
-from globus_sdk.response import GlobusResponse
-from globus_sdk.transfer.paging import PaginatedResource
+from globus_sdk.services.transfer.paging import PaginatedResource
 
 logger = logging.getLogger(__name__)
 
@@ -141,4 +140,4 @@ class RecursiveLsResponse(PaginatedResource):
             # the relative path popped from the queue, and yield the item
             for item in res_data:
                 item["name"] = (rel_path + "/" if rel_path else "") + item["name"]
-                yield GlobusResponse(item)
+                yield item

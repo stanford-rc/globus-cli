@@ -1,9 +1,9 @@
 import click
-from globus_sdk import GlobusResponse
 
 from globus_cli.parsing import IdentityType, command
 from globus_cli.safeio import FORMAT_TEXT_TABLE, formatted_print, is_verbose
 from globus_cli.services.auth import get_auth_client
+from globus_cli.stub_response import CLIStubResponse
 
 
 @command(
@@ -65,7 +65,7 @@ def get_identities_command(values, provision):
         results += client.get_identities(usernames=usernames, provision=provision)[
             "identities"
         ]
-    res = GlobusResponse({"identities": results})
+    res = CLIStubResponse({"identities": results})
 
     def _custom_text_format(identities):
         """

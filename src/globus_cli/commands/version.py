@@ -19,7 +19,6 @@ def _get_package_data():
     moddata = []
     modlist = (
         "click",
-        "configobj",
         "cryptography",
         "globus_cli",
         "globus_sdk",

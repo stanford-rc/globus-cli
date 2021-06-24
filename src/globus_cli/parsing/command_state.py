@@ -14,8 +14,8 @@ UNIX_FORMAT = "unix"
 
 class CommandState:
     def __init__(self):
-        # default is config value, or TEXT if it's not set
-        self.output_format = config.get_output_format() or TEXT_FORMAT
+        # default is TEXT
+        self.output_format = TEXT_FORMAT
         # a jmespath expression to process on the json output
         self.jmespath_expr = None
         # default is always False

@@ -3,8 +3,6 @@ import json
 import pytest
 import responses
 
-import globus_cli.services.transfer
-
 
 @pytest.fixture
 def patch_sleep(monkeypatch):
@@ -13,7 +11,7 @@ def patch_sleep(monkeypatch):
     def mock_sleep(*args, **kwargs):
         sleep_calls.append((args, kwargs))
 
-    monkeypatch.setattr(globus_cli.services.transfer.time, "sleep", mock_sleep)
+    monkeypatch.setattr("time.sleep", mock_sleep)
 
     return sleep_calls
 
