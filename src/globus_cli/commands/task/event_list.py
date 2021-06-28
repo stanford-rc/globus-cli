@@ -2,6 +2,7 @@ import json
 
 import click
 
+from globus_cli.paging_wrapper import PagingWrapper
 from globus_cli.parsing import command, task_id_arg
 from globus_cli.safeio import formatted_print
 from globus_cli.services.transfer import get_client, iterable_response_to_dict
@@ -65,8 +66,9 @@ def task_event_list(task_id, limit, filter_errors, filter_non_errors):
     else:
         filter_string = ""
 
-    event_iterator = client.task_event_list(
-        task_id, num_results=limit, filter=filter_string
+    event_iterator = PagingWrapper(
+        client.paginated.task_event_list(task_id, filter=filter_string).items(),
+        limit=limit,
     )
 
     def squashed_json_details(x):

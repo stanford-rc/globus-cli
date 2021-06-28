@@ -1,5 +1,6 @@
 import click
 
+from globus_cli.paging_wrapper import PagingWrapper
 from globus_cli.parsing import command
 from globus_cli.safeio import formatted_print
 from globus_cli.services.transfer import get_client, iterable_response_to_dict
@@ -196,9 +197,12 @@ def task_list(
     )
 
     client = get_client()
-    task_iterator = client.task_list(
-        num_results=limit, filter=filter_string[:-1]
-    )  # ignore trailing /
+    task_iterator = PagingWrapper(
+        client.paginated.task_list(
+            filter=filter_string[:-1]  # remove trailing /
+        ).items(),
+        limit=limit,
+    )
 
     fields = [
         ("Task ID", "task_id"),
