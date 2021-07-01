@@ -56,7 +56,8 @@ def _get_data_dir():
             home = os.path.expanduser("~")
             datadir = os.path.join(home, "AppData", "Local")
         return os.path.join(datadir, "globus", "cli")
-    return os.path.expanduser("~/.globus/cli/")
+    else:
+        return os.path.expanduser("~/.globus/cli/")
 
 
 def _ensure_data_dir():
