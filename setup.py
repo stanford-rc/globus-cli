@@ -47,7 +47,7 @@ setup(
     package_dir={"": "src"},
     python_requires=">=3.6",
     install_requires=[
-        "globus-sdk==3.0.0a4",
+        "globus-sdk==3.0.0b1",
         "click>=7.1.1,<8.0",
         "jmespath==0.10.0",
         "requests>=2.0.0,<3.0.0",

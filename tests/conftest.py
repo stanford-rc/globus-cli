@@ -10,7 +10,7 @@ import pytest
 import responses
 from click.testing import CliRunner
 from globus_sdk.tokenstorage import SQLiteAdapter
-from globus_sdk.transport import RetryPolicy
+from globus_sdk.transport import RequestsTransport
 from globus_sdk.utils import slash_join
 from ruamel.yaml import YAML
 
@@ -258,13 +258,14 @@ def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id, t
 
 @pytest.fixture(autouse=True)
 def disable_client_retries(monkeypatch):
-    class NoRetryPolicy(RetryPolicy):
-        def register_default_checks(self):
-            pass
+    class NoRetryTransport(RequestsTransport):
+        DEFAULT_MAX_RETRIES = 0
 
-    monkeypatch.setattr(globus_sdk.TransferClient, "retry_policy", NoRetryPolicy())
-    monkeypatch.setattr(globus_sdk.AuthClient, "retry_policy", NoRetryPolicy())
-    monkeypatch.setattr(globus_sdk.NativeAppAuthClient, "retry_policy", NoRetryPolicy())
+    monkeypatch.setattr(globus_sdk.TransferClient, "transport_class", NoRetryTransport)
+    monkeypatch.setattr(globus_sdk.AuthClient, "transport_class", NoRetryTransport)
     monkeypatch.setattr(
-        globus_sdk.ConfidentialAppAuthClient, "retry_policy", NoRetryPolicy()
+        globus_sdk.NativeAppAuthClient, "transport_class", NoRetryTransport
+    )
+    monkeypatch.setattr(
+        globus_sdk.ConfidentialAppAuthClient, "transport_class", NoRetryTransport
     )
