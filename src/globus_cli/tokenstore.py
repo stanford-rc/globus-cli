@@ -75,10 +75,16 @@ def _get_storage_filename():
 
 
 def _resolve_namespace():
-    env = GLOBUS_ENV if GLOBUS_ENV else "DEFAULT"
-    if GLOBUS_PROFILE:
-        return f"{env}/{GLOBUS_PROFILE}"
-    return env
+    env = GLOBUS_ENV if GLOBUS_ENV else "production"
+    # namespace any user profile so that non-user namespaces may be used in the future
+    # e.g. for client-credentials authenticated use of the CLI
+    #
+    # expected namespaces are
+    #
+    #     userprofile/production     (default)
+    #     userprofile/sandbox        (env is set to sandbox, profile is unset)
+    #     userprofile/test/myprofile (env is set to test, profile is set to myprofile)
+    return "userprofile/" + (f"{env}/{GLOBUS_PROFILE}" if GLOBUS_PROFILE else env)
 
 
 def token_storage_adapter():
