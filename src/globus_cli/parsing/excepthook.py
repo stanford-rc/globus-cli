@@ -11,7 +11,7 @@ import sys
 
 import click
 import click.exceptions
-from globus_sdk import exc
+import globus_sdk
 
 from globus_cli.parsing.command_state import CommandState
 from globus_cli.safeio import PrintableErrorField, write_error_info
@@ -204,7 +204,7 @@ def custom_except_hook(exc_info):
     # catch any session errors to give helpful instructions
     # on how to use globus session update
     if (
-        isinstance(exception, exc.GlobusAPIError)
+        isinstance(exception, globus_sdk.GlobusAPIError)
         and exception.raw_json
         and "authorization_parameters" in exception.raw_json
     ):
@@ -213,7 +213,7 @@ def custom_except_hook(exc_info):
     # catch any consent required errors to give helpful instructions
     # on how to use `globus session update --consents`
     if (
-        isinstance(exception, exc.GlobusAPIError)
+        isinstance(exception, globus_sdk.GlobusAPIError)
         and exception.raw_json
         and exception.raw_json.get("code") == "ConsentRequired"
     ):
@@ -221,13 +221,13 @@ def custom_except_hook(exc_info):
 
     # handle the Globus-raised errors with our special hooks
     # these will present the output (on stderr) as JSON
-    elif isinstance(exception, exc.TransferAPIError):
+    elif isinstance(exception, globus_sdk.TransferAPIError):
         if exception.code == "ClientError.AuthenticationFailed":
             authentication_hook(exception)
         else:
             transferapi_hook(exception)
 
-    elif isinstance(exception, exc.AuthAPIError):
+    elif isinstance(exception, globus_sdk.AuthAPIError):
         if exception.code == "UNAUTHORIZED":
             authentication_hook(exception)
         # invalid_grant occurs when the users refresh tokens are not valid
@@ -236,12 +236,12 @@ def custom_except_hook(exc_info):
         else:
             authapi_hook(exception)
 
-    elif isinstance(exception, exc.GlobusAPIError):
+    elif isinstance(exception, globus_sdk.GlobusAPIError):
         globusapi_hook(exception)
 
     # specific checks fell through -- now check if it's any kind of
     # GlobusError
-    elif isinstance(exception, exc.GlobusError):
+    elif isinstance(exception, globus_sdk.GlobusError):
         globus_generic_hook(exception)
 
     # if it's a click exception, re-raise as original -- Click's main

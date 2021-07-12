@@ -1,5 +1,6 @@
 import click
 
+from globus_cli.paging_wrapper import PagingWrapper
 from globus_cli.parsing import command
 from globus_cli.safeio import formatted_print
 from globus_cli.services.auth import maybe_lookup_identity_id
@@ -91,11 +92,13 @@ def endpoint_search(filter_fulltext, limit, filter_owner_id, filter_scope):
     if owner_id:
         owner_id = maybe_lookup_identity_id(owner_id)
 
-    search_iterator = client.endpoint_search(
-        filter_fulltext=filter_fulltext,
-        filter_scope=filter_scope,
-        filter_owner_id=owner_id,
-        num_results=limit,
+    search_iterator = PagingWrapper(
+        client.paginated.endpoint_search(
+            filter_fulltext=filter_fulltext,
+            filter_scope=filter_scope,
+            filter_owner_id=owner_id,
+        ).items(),
+        limit=limit,
     )
 
     formatted_print(
@@ -104,7 +107,7 @@ def endpoint_search(filter_fulltext, limit, filter_owner_id, filter_scope):
         json_converter=iterable_response_to_dict,
     )
 
-    if search_iterator.limit_less_than_available_results:
+    if search_iterator.has_next():
         click.echo(
             click.style(
                 """

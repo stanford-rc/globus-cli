@@ -3,17 +3,10 @@ import uuid
 from globus_sdk import AuthClient, RefreshTokenAuthorizer
 
 from globus_cli import version
-from globus_cli.config import get_auth_tokens, internal_auth_client, set_auth_tokens
+from globus_cli.tokenstore import internal_auth_client, token_storage_adapter
 
 # what qualifies as a valid Identity Name?
 _IDENTITY_NAME_REGEX = r"^[a-zA-Z0-9]+.*@[a-zA-z0-9-]+\..*[a-zA-Z]+$"
-
-
-def _update_tokens(token_response):
-    tokens = token_response.by_resource_server["auth.globus.org"]
-    set_auth_tokens(
-        tokens["access_token"], tokens["refresh_token"], tokens["expires_at_seconds"]
-    )
 
 
 def _is_uuid(s):
@@ -25,17 +18,18 @@ def _is_uuid(s):
 
 
 def get_auth_client():
-    tokens = get_auth_tokens()
+    adapter = token_storage_adapter()
+    tokens = adapter.get_token_data("auth.globus.org")
     authorizer = None
 
-    # if there's a refresh token, use it to build the authorizer
-    if tokens["refresh_token"] is not None:
+    # if there are tokens, build the authorizer
+    if tokens is not None:
         authorizer = RefreshTokenAuthorizer(
             tokens["refresh_token"],
             internal_auth_client(),
             tokens["access_token"],
-            tokens["access_token_expires"],
-            on_refresh=_update_tokens,
+            tokens["expires_at_seconds"],
+            on_refresh=adapter.on_refresh,
         )
 
     client = AuthClient(authorizer=authorizer, app_name=version.app_name)

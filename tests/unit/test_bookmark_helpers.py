@@ -2,7 +2,7 @@ import uuid
 from unittest import mock
 
 import pytest
-from globus_sdk.exc import TransferAPIError
+from globus_sdk import TransferAPIError
 
 from globus_cli.commands.bookmark.helpers import resolve_id_or_name
 

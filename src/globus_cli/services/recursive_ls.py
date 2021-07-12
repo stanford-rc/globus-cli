@@ -4,9 +4,6 @@ import logging
 import time
 from collections import deque
 
-from globus_sdk.response import GlobusResponse
-from globus_sdk.transfer.paging import PaginatedResource
-
 logger = logging.getLogger(__name__)
 
 # constants for controlling rate limiting
@@ -14,14 +11,16 @@ SLEEP_FREQUENCY = 25
 SLEEP_LEN = 1
 
 
-class RecursiveLsResponse(PaginatedResource):
+class RecursiveLsResponse:
     """
     Response class for recursive_operation_ls
-    Uses PaginatedResource logic for iterating over potentially very
-    large file systems without keeping the whole filesystem in memory,
-    but rather than using Globus paging uses an internal queue
-    for BFS of the filesystem.
-    Rate limits calls to prevent getting back connection errors.
+
+    Used for iterating over potentially very large file systems without keeping the
+    whole filesystem tree in memory.
+
+    Uses an internal queue for BFS of the filesystem.
+
+    Rate limits calls to reduce the changes of connection errors.
     """
 
     def __init__(self, client, endpoint_id, max_depth, filter_after_first, ls_params):
@@ -73,6 +72,10 @@ class RecursiveLsResponse(PaginatedResource):
             # express this internally as "generator is null" -- just need some
             # way of making sure that it's clear
             self.generator = None
+
+    def __iter__(self):
+        yield self.first_elem
+        yield from self.generator
 
     def iterable_func(self):
         """
@@ -141,4 +144,4 @@ class RecursiveLsResponse(PaginatedResource):
             # the relative path popped from the queue, and yield the item
             for item in res_data:
                 item["name"] = (rel_path + "/" if rel_path else "") + item["name"]
-                yield GlobusResponse(item)
+                yield item

@@ -331,14 +331,9 @@ def transfer_command(
             "transfer requires either SOURCE_PATH and DEST_PATH or --batch"
         )
 
-    # because python can't handle multiple **kwargs expansions in a single
-    # call, we need to get a little bit clever
-    # both the performance options (of which there are a few), and the
-    # notification options (also there are a few) have elements which should be
+    # the performance options (of which there are a few), have elements which should be
     # omitted in some cases
-    # notify comes to us clean, perf opts need more care
-    # put them together into a dict before passing to TransferData
-    kwargs = {}
+    # put them together before passing to TransferData
     perf_opts = {
         k: v
         for (k, v) in dict(
@@ -346,8 +341,6 @@ def transfer_command(
         ).items()
         if v is not None
     }
-    kwargs.update(perf_opts)
-    kwargs.update(notify)
 
     def _make_exclude_rule(name_pattern):
         return {"DATA_TYPE": "filter_rule", "method": "exclude", "name": name_pattern}
@@ -368,13 +361,16 @@ def transfer_command(
         preserve_timestamp=preserve_mtime,
         encrypt_data=encrypt,
         submission_id=submission_id,
-        delete_destination_extra=delete,
         deadline=deadline,
-        skip_activation_check=skip_activation_check,
         skip_source_errors=skip_source_errors,
         fail_on_quota_errors=fail_on_quota_errors,
-        filter_rules=filter_rules,
-        **kwargs
+        additional_fields={
+            "delete_destination_extra": delete,
+            "skip_activation_check": skip_activation_check,
+            "filter_rules": filter_rules,
+            **notify,
+            **perf_opts,
+        },
     )
 
     if batch:

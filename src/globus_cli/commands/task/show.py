@@ -55,7 +55,7 @@ SKIPPED_PATHS_FIELDS = [
 
 
 def print_successful_transfers(client, task_id):
-    res = client.task_successful_transfers(task_id, num_results=None)
+    res = client.paginated.task_successful_transfers(task_id).items()
     formatted_print(
         res,
         fields=SUCCESSFULL_TRANSFER_FIELDS,
@@ -64,7 +64,7 @@ def print_successful_transfers(client, task_id):
 
 
 def print_skipped_errors(client, task_id):
-    res = client.task_skipped_errors(task_id, num_results=None)
+    res = client.paginated.task_skipped_errors(task_id).items()
     formatted_print(
         res,
         fields=SKIPPED_PATHS_FIELDS,

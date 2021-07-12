@@ -78,12 +78,14 @@ def rm_command(
         endpoint_id,
         label=label,
         recursive=recursive,
-        ignore_missing=ignore_missing,
         submission_id=submission_id,
         deadline=deadline,
-        skip_activation_check=skip_activation_check,
-        interpret_globs=enable_globs,
-        **notify,
+        additional_fields={
+            "ignore_missing": ignore_missing,
+            "skip_activation_check": skip_activation_check,
+            "interpret_globs": enable_globs,
+            **notify,
+        },
     )
 
     if not star_silent and enable_globs and path.endswith("*"):

@@ -1,5 +1,5 @@
 import click
-from globus_sdk.exc import AuthAPIError
+from globus_sdk import AuthAPIError
 
 from globus_cli.parsing import command
 from globus_cli.safeio import (

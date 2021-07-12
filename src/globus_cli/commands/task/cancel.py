@@ -64,15 +64,12 @@ def cancel_task(all, task_id):
     client = get_client()
 
     if all:
-        from sys import maxsize
-
         task_ids = [
             task_row["task_id"]
-            for task_row in client.task_list(
+            for task_row in client.paginated.task_list(
                 filter="type:TRANSFER,DELETE/status:ACTIVE,INACTIVE",
                 fields="task_id",
-                num_results=maxsize,  # FIXME want to ask for "unlimited" set
-            )
+            ).items()
         ]
 
         task_count = len(task_ids)

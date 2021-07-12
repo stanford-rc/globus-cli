@@ -1,18 +1,13 @@
 import click
-from globus_sdk.exc import AuthAPIError
+from globus_sdk import AuthAPIError
 
-from globus_cli.config import (
-    AUTH_RT_OPTNAME,
-    TRANSFER_RT_OPTNAME,
-    internal_auth_client,
-    lookup_option,
-)
 from globus_cli.helpers import (
     do_link_auth_flow,
     do_local_server_auth_flow,
     is_remote_session,
 )
 from globus_cli.parsing import command, no_local_server_option
+from globus_cli.tokenstore import internal_auth_client, token_storage_adapter
 
 _SHARED_EPILOG = """\
 
@@ -86,7 +81,7 @@ def login_command(no_local_server, force):
 
     # use a link login if remote session or user requested
     if no_local_server or is_remote_session():
-        do_link_auth_flow(force_new_client=True)
+        do_link_auth_flow()
 
     # otherwise default to a local server login flow
     else:
@@ -97,35 +92,34 @@ def login_command(no_local_server, force):
             "'globus login --no-local-server'"
             "\n---"
         )
-        do_local_server_auth_flow(force_new_client=True)
+        do_local_server_auth_flow()
 
     # print epilog
     click.echo(_LOGIN_EPILOG)
 
 
 def check_logged_in():
-    # first, try to get the refresh tokens from config
-    # we can skip the access tokens and their expiration times as those are not
-    # strictly necessary
-    transfer_rt = lookup_option(TRANSFER_RT_OPTNAME)
-    auth_rt = lookup_option(AUTH_RT_OPTNAME)
+    adapter = token_storage_adapter()
 
-    # if either of the refresh tokens are null return False
-    if transfer_rt is None or auth_rt is None:
+    # first, try to get the tokens from storage
+    transfer_tkn = adapter.get_token_data("transfer.api.globus.org")
+    auth_tkn = adapter.get_token_data("auth.globus.org")
+
+    # if either of the token dicts are null return False
+    if transfer_tkn is None or auth_tkn is None:
         return False
 
-    # get or create the instance client
-    auth_client = internal_auth_client(requires_instance=True)
+    # get the instance client
+    auth_client = internal_auth_client()
 
-    # check that tokens and client are valid
+    # check that refresh tokens and client are valid
     try:
-        for tok in (transfer_rt, auth_rt):
-            res = auth_client.oauth2_validate_token(tok)
+        for token_data in (transfer_tkn, auth_tkn):
+            token = token_data["refresh_token"]
+            res = auth_client.oauth2_validate_token(token)
             if not res["active"]:
                 return False
-
     # if the instance client is invalid, an AuthAPIError will be raised
-    # we then force a new client to be created before continuing
     except AuthAPIError:
         return False
 

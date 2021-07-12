@@ -2,7 +2,6 @@ import webbrowser
 
 import click
 
-from globus_cli.config import MYPROXY_USERNAME_OPTNAME, lookup_option
 from globus_cli.helpers import (
     fill_delegate_proxy_activation_requirements,
     is_remote_session,
@@ -66,10 +65,7 @@ $ globus endpoint activate $ep_id --myproxy -U username
 @click.option(
     "--myproxy-username",
     "-U",
-    help=(
-        "Give a username to use with --myproxy. "
-        "Overrides any default myproxy username set in config."
-    ),
+    help=("Give a username to use with --myproxy"),
 )
 @click.option("--myproxy-password", "-P", hidden=True)
 @click.option(
@@ -153,9 +149,8 @@ def endpoint_activate(
     server the endpoint is using for authentication. e.g. for default
     Globus Connect Server endpoints this will be your login credentials for the
     server the endpoint is hosted on.
-    You can enter your username when prompted, give your username with the
-    --myproxy-username option, or set a default myproxy username in config with
-    "globus config init" or "globus config set cli.default_myproxy_username".
+    You can enter your username when prompted or give your username with the
+    --myproxy-username option.
     For security it is recommended that you only enter your password when
     prompted to hide your inputs and keep your password out of your
     command history, but you may pass your password with the hidden
@@ -173,7 +168,6 @@ def endpoint_activate(
     user the error will not be detected until the user attempts to perform an
     operation on the endpoint.
     """
-    default_myproxy_username = lookup_option(MYPROXY_USERNAME_OPTNAME)
     client = get_client()
 
     # validate options
@@ -247,7 +241,7 @@ def endpoint_activate(
             )
 
         # get username and password
-        if not (myproxy_username or default_myproxy_username):
+        if not myproxy_username:
             myproxy_username = click.prompt("Myproxy username")
         if not myproxy_password:
             myproxy_password = click.prompt("Myproxy password", hide_input=True)
@@ -259,7 +253,7 @@ def endpoint_activate(
             if data["name"] == "passphrase":
                 data["value"] = myproxy_password
             if data["name"] == "username":
-                data["value"] = myproxy_username or default_myproxy_username
+                data["value"] = myproxy_username
             if data["name"] == "hostname" and data["value"] is None:
                 raise click.ClickException(
                     "This endpoint has no myproxy server "

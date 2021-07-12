@@ -2,7 +2,7 @@ import json
 import textwrap
 
 import click
-from globus_sdk import GlobusResponse
+from globus_sdk import GlobusHTTPResponse
 
 from globus_cli.safeio.awscli_text import unix_formatted_print
 from globus_cli.safeio.get_option_vals import (
@@ -10,6 +10,7 @@ from globus_cli.safeio.get_option_vals import (
     outformat_is_json,
     outformat_is_unix,
 )
+from globus_cli.stub_response import CLIStubResponse
 
 # make sure this is a tuple
 # if it's a list, pylint will freak out
@@ -94,7 +95,7 @@ def _key_to_keyfunc(k):
 def _jmespath_preprocess(res):
     jmespath_expr = get_jmespath_expression()
 
-    if isinstance(res, GlobusResponse):
+    if isinstance(res, (CLIStubResponse, GlobusHTTPResponse)):
         res = res.data
 
     if not isinstance(res, str):

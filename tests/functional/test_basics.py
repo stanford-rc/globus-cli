@@ -55,7 +55,7 @@ def test_whoami_no_auth(run_line, load_api_fixtures):
     Runs whoami with config set to be empty, confirms no login seen.
     """
     load_api_fixtures("all_authentication_failed.yaml")
-    result = run_line("globus whoami", config={}, assert_exit_code=1)
+    result = run_line("globus whoami", assert_exit_code=1)
     assert "Unable to get user information" in result.stderr
 
 
@@ -76,7 +76,6 @@ def test_auth_call_no_auth(run_line, load_api_fixtures):
     load_api_fixtures("all_authentication_failed.yaml")
     result = run_line(
         "globus get-identities foo@globusid.org",
-        config={},
         assert_exit_code=1,
     )
     assert "No Authentication provided." in result.stderr
@@ -99,7 +98,7 @@ def test_transfer_call_no_auth(run_line, load_api_fixtures, go_ep1_id):
     confirms No Authentication CLI error.
     """
     load_api_fixtures("all_authentication_failed.yaml")
-    result = run_line("globus ls " + go_ep1_id, config={}, assert_exit_code=1)
+    result = run_line("globus ls " + go_ep1_id, assert_exit_code=1)
     assert "No Authentication provided." in result.stderr
 
 

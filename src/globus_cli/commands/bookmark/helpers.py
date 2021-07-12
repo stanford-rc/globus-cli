@@ -1,7 +1,7 @@
 from uuid import UUID
 
 import click
-from globus_sdk.exc import TransferAPIError
+from globus_sdk import TransferAPIError
 
 
 def resolve_id_or_name(client, bookmark_id_or_name):

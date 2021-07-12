@@ -1,63 +1,21 @@
-import random
+import logging
 import sys
-import time
 import uuid
 from textwrap import dedent
 
 import click
 from globus_sdk import RefreshTokenAuthorizer, TransferClient
-from globus_sdk.base import safe_stringify
-from globus_sdk.exc import NetworkError
 
 from globus_cli import version
-from globus_cli.config import (
-    get_transfer_tokens,
-    internal_auth_client,
-    set_transfer_tokens,
-)
 from globus_cli.parsing import EXPLICIT_NULL
 from globus_cli.safeio import FORMAT_SILENT, formatted_print
 from globus_cli.services.recursive_ls import RecursiveLsResponse
+from globus_cli.tokenstore import internal_auth_client, token_storage_adapter
+
+log = logging.getLogger(__name__)
 
 
-class RetryingTransferClient(TransferClient):
-    """
-    Wrapper around TransferClient that retries safe resources on NetworkErrors
-    """
-
-    default_retries = 10
-
-    def __init__(self, tries=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.tries = tries or self.default_retries
-
-    def retry(self, f, *args, **kwargs):
-        """
-        Retries the given function self.tries times on NetworkErros
-        """
-        backoff = random.random() / 100  # 5ms on average
-        for _ in range(self.tries - 1):
-            try:
-                return f(*args, **kwargs)
-            except NetworkError:
-                time.sleep(backoff)
-                backoff *= 2
-        return f(*args, **kwargs)
-
-    # get and put should always be safe to retry
-    def get(self, *args, **kwargs):
-        return self.retry(super().get, *args, **kwargs)
-
-    def put(self, *args, **kwargs):
-        return self.retry(super().put, *args, **kwargs)
-
-    # task submission is safe, as the data contains a unique submission-id
-    def submit_transfer(self, *args, **kwargs):
-        return self.retry(super().submit_transfer, *args, **kwargs)
-
-    def submit_delete(self, *args, **kwargs):
-        return self.retry(super().submit_delete, *args, **kwargs)
-
+class CustomTransferClient(TransferClient):
     # TDOD: Remove this function when endpoints natively support recursive ls
     def recursive_operation_ls(
         self, endpoint_id, depth=3, filter_after_first=True, **params
@@ -92,8 +50,8 @@ class RetryingTransferClient(TransferClient):
         fields are no longer available and an additional per item
         "path" field is added.
         """
-        endpoint_id = safe_stringify(endpoint_id)
-        self.logger.info(
+        endpoint_id = str(endpoint_id)
+        log.info(
             "TransferClient.recursive_operation_ls({}, {}, {})".format(
                 endpoint_id, depth, params
             )
@@ -101,28 +59,22 @@ class RetryingTransferClient(TransferClient):
         return RecursiveLsResponse(self, endpoint_id, depth, filter_after_first, params)
 
 
-def _update_tokens(token_response):
-    tokens = token_response.by_resource_server["transfer.api.globus.org"]
-    set_transfer_tokens(
-        tokens["access_token"], tokens["refresh_token"], tokens["expires_at_seconds"]
-    )
-
-
 def get_client():
-    tokens = get_transfer_tokens()
+    adapter = token_storage_adapter()
+    tokens = adapter.get_token_data("transfer.api.globus.org")
     authorizer = None
 
-    # if there's a refresh token, use it to build the authorizer
-    if tokens["refresh_token"] is not None:
+    # if there are tokens, build the authorizer
+    if tokens is not None:
         authorizer = RefreshTokenAuthorizer(
             tokens["refresh_token"],
             internal_auth_client(),
             tokens["access_token"],
-            tokens["access_token_expires"],
-            on_refresh=_update_tokens,
+            tokens["expires_at_seconds"],
+            on_refresh=adapter.on_refresh,
         )
 
-    return RetryingTransferClient(authorizer=authorizer, app_name=version.app_name)
+    return CustomTransferClient(authorizer=authorizer, app_name=version.app_name)
 
 
 def display_name_or_cname(ep_doc):
