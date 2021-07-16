@@ -174,7 +174,9 @@ def delete_command(
         delete_data.add_item(path)
 
     if dry_run:
-        formatted_print(delete_data, response_key="DATA", fields=[("Path", "path")])
+        formatted_print(
+            delete_data.data, response_key="DATA", fields=[("Path", "path")]
+        )
         # exit safely
         return
 
