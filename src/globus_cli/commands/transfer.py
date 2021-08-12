@@ -422,7 +422,7 @@ def transfer_command(
 
     if dry_run:
         formatted_print(
-            transfer_data,
+            transfer_data.data,
             response_key="DATA",
             fields=(
                 ("Source Path", "source_path"),
