@@ -6,9 +6,14 @@ from globus_cli.helpers import (
     fill_delegate_proxy_activation_requirements,
     is_remote_session,
 )
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import command, endpoint_id_arg, mutex_option_group
 from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
-from globus_cli.services.transfer import activation_requirements_help_text, get_client
+from globus_cli.services.transfer import (
+    TRANSFER_RESOURCE_SERVER,
+    activation_requirements_help_text,
+    get_client,
+)
 
 
 @command(
@@ -112,6 +117,7 @@ $ globus endpoint activate $ep_id --myproxy -U username
     help="Force activation even if endpoint is already activated.",
 )
 @mutex_option_group("--web", "--myproxy", "--delegate-proxy")
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def endpoint_activate(
     endpoint_id,
     myproxy,

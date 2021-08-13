@@ -14,6 +14,9 @@ from globus_cli.tokenstore import internal_auth_client, token_storage_adapter
 
 log = logging.getLogger(__name__)
 
+# constant for token and login management
+TRANSFER_RESOURCE_SERVER = "transfer.api.globus.org"
+
 
 class CustomTransferClient(TransferClient):
     # TDOD: Remove this function when endpoints natively support recursive ls

@@ -2,10 +2,15 @@ import json
 
 import click
 
+from globus_cli.login_manager import requires_login
 from globus_cli.paging_wrapper import PagingWrapper
 from globus_cli.parsing import command, task_id_arg
 from globus_cli.safeio import formatted_print
-from globus_cli.services.transfer import get_client, iterable_response_to_dict
+from globus_cli.services.transfer import (
+    TRANSFER_RESOURCE_SERVER,
+    get_client,
+    iterable_response_to_dict,
+)
 
 
 @command(
@@ -37,6 +42,7 @@ $ globus task pause-info TASK_ID --format JSON
 @click.option("--limit", default=10, show_default=True, help="Limit number of results.")
 @click.option("--filter-errors", is_flag=True, help="Filter results to errors")
 @click.option("--filter-non-errors", is_flag=True, help="Filter results to non errors")
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def task_event_list(task_id, limit, filter_errors, filter_non_errors):
     """
     This command shows the recent events for a running task.

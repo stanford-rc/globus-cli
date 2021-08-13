@@ -1,6 +1,7 @@
 import click
 from globus_sdk import DeleteData
 
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import (
     ENDPOINT_PLUS_OPTPATH,
     TaskPath,
@@ -15,7 +16,11 @@ from globus_cli.safeio import (
     formatted_print,
     term_is_interactive,
 )
-from globus_cli.services.transfer import autoactivate, get_client
+from globus_cli.services.transfer import (
+    TRANSFER_RESOURCE_SERVER,
+    autoactivate,
+    get_client,
+)
 
 
 @command(
@@ -65,6 +70,7 @@ $ globus task wait "$task_id"
 @task_submission_options
 @delete_and_rm_options
 @click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_OPTPATH)
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def delete_command(
     batch,
     ignore_missing,

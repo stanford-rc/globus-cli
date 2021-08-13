@@ -1,6 +1,10 @@
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import command, endpoint_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RECORD, FORMAT_TEXT_TABLE, formatted_print
-from globus_cli.services.transfer import get_endpoint_w_server_list
+from globus_cli.services.transfer import (
+    TRANSFER_RESOURCE_SERVER,
+    get_endpoint_w_server_list,
+)
 
 
 @command(
@@ -14,6 +18,7 @@ $ globus endpoint server list $ep_id
 """,
 )
 @endpoint_id_arg
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def server_list(endpoint_id):
     """List all servers belonging to an endpoint."""
     # raises usage error on shares for us

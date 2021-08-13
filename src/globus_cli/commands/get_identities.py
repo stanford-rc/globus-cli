@@ -1,8 +1,9 @@
 import click
 
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import IdentityType, command
 from globus_cli.safeio import FORMAT_TEXT_TABLE, formatted_print, is_verbose
-from globus_cli.services.auth import get_auth_client
+from globus_cli.services.auth import AUTH_RESOURCE_SERVER, get_auth_client
 from globus_cli.stub_response import CLIStubResponse
 
 
@@ -36,6 +37,9 @@ $ globus get-identities --verbose go@globusid.org clitester1a@globusid.org \
     "values", type=IdentityType(allow_b32_usernames=True), required=True, nargs=-1
 )
 @click.option("--provision", hidden=True, is_flag=True)
+@requires_login(
+    AUTH_RESOURCE_SERVER,
+)
 def get_identities_command(values, provision):
     """
     Lookup Globus Auth Identities given one or more uuids

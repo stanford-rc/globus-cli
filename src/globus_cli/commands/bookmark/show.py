@@ -1,9 +1,10 @@
 import click
 
 from globus_cli.commands.bookmark.helpers import resolve_id_or_name
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import command
 from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print, is_verbose
-from globus_cli.services.transfer import get_client
+from globus_cli.services.transfer import TRANSFER_RESOURCE_SERVER, get_client
 
 
 @command(
@@ -30,6 +31,7 @@ $ globus ls "$(globus bookmark show BOOKMARK_NAME)"
     short_help="Resolve a bookmark name or ID to an endpoint:path",
 )
 @click.argument("bookmark_id_or_name")
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def bookmark_show(bookmark_id_or_name):
     """
     Given a single bookmark ID or bookmark name, show the bookmark details. By default,

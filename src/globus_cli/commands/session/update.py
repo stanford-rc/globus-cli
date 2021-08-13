@@ -5,8 +5,9 @@ from globus_cli.helpers import (
     do_local_server_auth_flow,
     is_remote_session,
 )
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import IdentityType, command, no_local_server_option
-from globus_cli.services.auth import get_auth_client
+from globus_cli.services.auth import AUTH_RESOURCE_SERVER, get_auth_client
 
 
 def _update_session_params_all_case(identity_set, session_params):
@@ -79,6 +80,7 @@ def _update_session_params_identities_case(identity_set, session_params, identit
     is_flag=True,
     help="Add every identity in your identity set to your session",
 )
+@requires_login(AUTH_RESOURCE_SERVER)
 def session_update(identities, no_local_server, all):
     """
     Update your current CLI auth session by authenticating

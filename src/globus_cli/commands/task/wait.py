@@ -1,5 +1,6 @@
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import command, synchronous_task_wait_options, task_id_arg
-from globus_cli.services.transfer import task_wait_with_io
+from globus_cli.services.transfer import TRANSFER_RESOURCE_SERVER, task_wait_with_io
 
 
 @command(
@@ -31,6 +32,7 @@ $ globus task wait --polling-interval 300 TASK_ID
 )
 @task_id_arg
 @synchronous_task_wait_options
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def task_wait(meow, heartbeat, polling_interval, timeout, task_id, timeout_exit_code):
     """
     Wait for a task to complete.
