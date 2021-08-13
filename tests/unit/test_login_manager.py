@@ -113,4 +113,4 @@ def test_requires_login_pass_manager(mock_get_adapter):
 
         return True
 
-    assert dummy_command
+    assert dummy_command()
