@@ -47,10 +47,7 @@ def requires_login(*args: str, pass_manager: bool = False):
             manager = LoginManager()
 
             # determine the set of resource servers missing logins
-            missing_servers = set()
-            for server_name in resource_servers:
-                if not manager.has_login(server_name):
-                    missing_servers.add(server_name)
+            missing_servers = {s for s in resource_servers if not manager.has_login(s)}
 
             # if we are missing logins, assemble error text
             # text is slightly different for 1, 2, or 3+ missing servers
