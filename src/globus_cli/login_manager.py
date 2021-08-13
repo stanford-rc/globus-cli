@@ -15,10 +15,7 @@ class LoginManager:
         resource server
         """
         tokens = self._token_storage.get_token_data(resource_server)
-        if tokens is None or "refresh_token" not in tokens:
-            return False
-
-        return True
+        return tokens is not None and "refresh_token" in tokens
 
 
 def requires_login(*args: str, pass_manager: bool = False):
