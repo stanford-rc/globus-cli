@@ -50,11 +50,11 @@ def test_jmespath_no_expression_error(run_line):
     result = run_line(
         "globus endpoint search 'Tutorial' --jmespath", assert_exit_code=2
     )
-    assert "Error: --jmespath option requires an argument" in result.stderr
+    assert "Error: Option '--jmespath' requires an argument" in result.stderr
 
     # and the error says `--jq` if you use the `--jq` form
     result = run_line("globus endpoint search 'Tutorial' --jq", assert_exit_code=2)
-    assert "Error: --jq option requires an argument" in result.stderr
+    assert "Error: Option '--jq' requires an argument" in result.stderr
 
 
 def test_jmespath_invalid_expression_error(run_line):

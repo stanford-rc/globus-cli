@@ -48,7 +48,7 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         "globus-sdk==3.0.0b2",
-        "click>=7.1.1,<8.0",
+        "click>=8.0.0,<9",
         "jmespath==0.10.0",
         "requests>=2.0.0,<3.0.0",
         # cryptography has unusual versioning and compatibility rules:
