@@ -18,7 +18,7 @@ class LoginManager:
         return tokens is not None and "refresh_token" in tokens
 
 
-def requires_login(*args: str, pass_manager: bool = False):
+def requires_login(*resource_servers: str, pass_manager: bool = False):
     """
     Command decorator for specifying a resource server that the user must have
     tokens for in order to run the command.
@@ -39,7 +39,6 @@ def requires_login(*args: str, pass_manager: bool = False):
         login_manager.<do the thing>(endpoint_id)
 
     """
-    resource_servers = args
 
     def inner(func):
         @functools.wraps(func)
