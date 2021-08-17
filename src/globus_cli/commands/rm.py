@@ -1,6 +1,7 @@
 import click
 from globus_sdk import DeleteData
 
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import (
     ENDPOINT_PLUS_REQPATH,
     command,
@@ -9,7 +10,12 @@ from globus_cli.parsing import (
     task_submission_options,
 )
 from globus_cli.safeio import err_is_terminal, formatted_print, term_is_interactive
-from globus_cli.services.transfer import autoactivate, get_client, task_wait_with_io
+from globus_cli.services.transfer import (
+    TRANSFER_RESOURCE_SERVER,
+    autoactivate,
+    get_client,
+    task_wait_with_io,
+)
 
 
 @command(
@@ -36,6 +42,7 @@ $ globus rm $ep_id:~/mydir --recursive
 @delete_and_rm_options(supports_batch=False, default_enable_globs=True)
 @synchronous_task_wait_options
 @click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_REQPATH)
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def rm_command(
     ignore_missing,
     star_silent,

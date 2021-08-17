@@ -1,9 +1,14 @@
 import click
 
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import command, endpoint_id_arg, security_principal_opts
 from globus_cli.safeio import formatted_print
-from globus_cli.services.auth import maybe_lookup_identity_id
-from globus_cli.services.transfer import assemble_generic_doc, get_client
+from globus_cli.services.auth import AUTH_RESOURCE_SERVER, maybe_lookup_identity_id
+from globus_cli.services.transfer import (
+    TRANSFER_RESOURCE_SERVER,
+    assemble_generic_doc,
+    get_client,
+)
 
 
 @command(
@@ -34,6 +39,7 @@ $ globus endpoint role create 'ddb59aef-6d04-11e5-ba46-22000b92c6ec' \
     ),
     help="A role to assign.",
 )
+@requires_login(AUTH_RESOURCE_SERVER, TRANSFER_RESOURCE_SERVER)
 def role_create(role, principal, endpoint_id):
     """
     Create a role on an endpoint.

@@ -1,8 +1,9 @@
 import click
 
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import command, task_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
-from globus_cli.services.transfer import get_client
+from globus_cli.services.transfer import TRANSFER_RESOURCE_SERVER, get_client
 
 
 @command(
@@ -44,6 +45,7 @@ $ globus task cancel --all
 @click.option(
     "--all", "-a", is_flag=True, help="Cancel all in-progress tasks that you own"
 )
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def cancel_task(all, task_id):
     """
     Cancel a task you own or all tasks which you own.

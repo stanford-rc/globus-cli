@@ -2,9 +2,14 @@ from textwrap import dedent
 
 import click
 
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import command, endpoint_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
-from globus_cli.services.transfer import get_client, get_endpoint_w_server_list
+from globus_cli.services.transfer import (
+    TRANSFER_RESOURCE_SERVER,
+    get_client,
+    get_endpoint_w_server_list,
+)
 
 
 def _spec_to_matches(server_list, server_spec, mode):
@@ -62,6 +67,7 @@ $ globus endpoint server delete $ep_id $server_id
 )
 @endpoint_id_arg
 @click.argument("server")
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def server_delete(endpoint_id, server):
     """
     Delete a server belonging to an endpoint.

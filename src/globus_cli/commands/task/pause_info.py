@@ -1,8 +1,9 @@
 import click
 
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import command, task_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
-from globus_cli.services.transfer import get_client
+from globus_cli.services.transfer import TRANSFER_RESOURCE_SERVER, get_client
 
 EXPLICIT_PAUSE_MSG_FIELDS = [
     ("Source Endpoint", "source_pause_message"),
@@ -66,6 +67,7 @@ $ globus task pause-info TASK_ID --format JSON
 """,
 )
 @task_id_arg
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def task_pause_info(task_id):
     """
     Show messages from activity managers who have explicitly paused the given

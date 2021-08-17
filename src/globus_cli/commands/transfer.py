@@ -1,6 +1,7 @@
 import click
 from globus_sdk import TransferData
 
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import (
     ENDPOINT_PLUS_OPTPATH,
     TaskPath,
@@ -10,7 +11,11 @@ from globus_cli.parsing import (
     task_submission_options,
 )
 from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
-from globus_cli.services.transfer import autoactivate, get_client
+from globus_cli.services.transfer import (
+    TRANSFER_RESOURCE_SERVER,
+    autoactivate,
+    get_client,
+)
 
 
 @command(
@@ -217,6 +222,7 @@ fi
 @click.option("--perf-pp", type=int, hidden=True)
 @click.option("--perf-udt", is_flag=True, default=None, hidden=True)
 @mutex_option_group("--recursive", "--external-checksum")
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def transfer_command(
     batch,
     sync_level,

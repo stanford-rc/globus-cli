@@ -2,9 +2,10 @@ import time
 
 import globus_sdk
 
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import command
 from globus_cli.safeio import formatted_print, print_command_hint
-from globus_cli.services.auth import get_auth_client
+from globus_cli.services.auth import AUTH_RESOURCE_SERVER, get_auth_client
 from globus_cli.tokenstore import internal_auth_client, token_storage_adapter
 
 
@@ -32,6 +33,7 @@ $ globus session show --format json
 ----
 """,
 )
+@requires_login(AUTH_RESOURCE_SERVER)
 def session_show():
     """List all identities in your current CLI auth session.
 

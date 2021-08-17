@@ -1,8 +1,9 @@
 from textwrap import dedent
 
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import command, endpoint_id_arg, server_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
-from globus_cli.services.transfer import get_client
+from globus_cli.services.transfer import TRANSFER_RESOURCE_SERVER, get_client
 
 
 @command(
@@ -18,6 +19,7 @@ $ globus endpoint server show $ep_id $server_id
 )
 @endpoint_id_arg
 @server_id_arg
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def server_show(endpoint_id, server_id):
     """
     Display inofrmation about a server belonging to an endpoint.

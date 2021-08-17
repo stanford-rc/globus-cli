@@ -1,9 +1,14 @@
 import click
 
+from globus_cli.login_manager import requires_login
 from globus_cli.paging_wrapper import PagingWrapper
 from globus_cli.parsing import command
 from globus_cli.safeio import formatted_print
-from globus_cli.services.transfer import get_client, iterable_response_to_dict
+from globus_cli.services.transfer import (
+    TRANSFER_RESOURCE_SERVER,
+    get_client,
+    iterable_response_to_dict,
+)
 
 
 def _format_date_callback(ctx, param, value):
@@ -142,6 +147,7 @@ globus task list --format=unix --jmespath='DATA[*].[task_id, status]' | \
     callback=_format_date_callback,
     help="Filter results to tasks that were completed before given time.",
 )
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def task_list(
     limit,
     filter_task_id,

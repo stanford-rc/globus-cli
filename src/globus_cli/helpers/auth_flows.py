@@ -66,9 +66,9 @@ def do_local_server_auth_flow(session_params=None):
         auth_client.oauth2_start_flow(
             refresh_tokens=True, redirect_uri=redirect_uri, requested_scopes=SCOPES
         )
-        additional_params = {"prompt": "login"}
-        additional_params.update(session_params)
-        url = auth_client.oauth2_get_authorize_url(additional_params=additional_params)
+        query_params = {"prompt": "login"}
+        query_params.update(session_params)
+        url = auth_client.oauth2_get_authorize_url(query_params=query_params)
 
         # open web-browser for user to log in, get auth code
         webbrowser.open(url, new=1)

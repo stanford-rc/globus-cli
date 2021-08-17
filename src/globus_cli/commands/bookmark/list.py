@@ -1,8 +1,10 @@
 from globus_sdk import TransferAPIError
 
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import command
 from globus_cli.safeio import formatted_print
 from globus_cli.services.transfer import (
+    TRANSFER_RESOURCE_SERVER,
     display_name_or_cname,
     get_client,
     iterable_response_to_dict,
@@ -34,6 +36,7 @@ $ globus bookmark list --jmespath='DATA[*].[name, endpoint_id]' --format=unix
 """,
     short_help="List your bookmarks",
 )
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def bookmark_list():
     """List all bookmarks for the current user"""
     client = get_client()

@@ -1,8 +1,13 @@
 import click
 
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import command, mutex_option_group, task_id_arg
 from globus_cli.safeio import FORMAT_TEXT_RECORD, formatted_print
-from globus_cli.services.transfer import get_client, iterable_response_to_dict
+from globus_cli.services.transfer import (
+    TRANSFER_RESOURCE_SERVER,
+    get_client,
+    iterable_response_to_dict,
+)
 
 COMMON_FIELDS = [
     ("Label", "label"),
@@ -156,6 +161,7 @@ $ globus task show TASK_ID
     ),
 )
 @mutex_option_group("--successful-transfers", "--skipped-errors")
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def show_task(successful_transfers, skipped_errors, task_id):
     """
     Print information detailing the status and other info about a task.

@@ -1,9 +1,10 @@
 import click
 
 from globus_cli.commands.bookmark.helpers import resolve_id_or_name
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import command
 from globus_cli.safeio import formatted_print
-from globus_cli.services.transfer import get_client
+from globus_cli.services.transfer import TRANSFER_RESOURCE_SERVER, get_client
 
 
 @command(
@@ -23,6 +24,7 @@ $ globus bookmark rename oldname newname
 )
 @click.argument("bookmark_id_or_name")
 @click.argument("new_bookmark_name")
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def bookmark_rename(bookmark_id_or_name, new_bookmark_name):
     """Change a bookmark's name"""
     client = get_client()

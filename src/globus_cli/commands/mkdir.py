@@ -1,8 +1,13 @@
 import click
 
+from globus_cli.login_manager import requires_login
 from globus_cli.parsing import ENDPOINT_PLUS_REQPATH, command
 from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
-from globus_cli.services.transfer import autoactivate, get_client
+from globus_cli.services.transfer import (
+    TRANSFER_RESOURCE_SERVER,
+    autoactivate,
+    get_client,
+)
 
 
 @command(
@@ -18,6 +23,7 @@ $ mkdir ep_id:~/testfolder
 """,
 )
 @click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_REQPATH)
+@requires_login(TRANSFER_RESOURCE_SERVER)
 def mkdir_command(endpoint_plus_path):
     """Make a directory on an endpoint at the given path.
 
