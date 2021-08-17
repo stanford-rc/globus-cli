@@ -3,6 +3,8 @@ import typing
 
 import click
 
+from ..utils import format_list_of_words
+
 
 class MutexInfo:
     def __init__(self, opt, param=None, present=None):
@@ -61,10 +63,7 @@ def mutex_option_group(*options: typing.Union[str, MutexInfo]):
                 if opt.is_present(kwargs):
                     found_opts.append(opt)
             if len(found_opts) > 1:
-                if len(opt_infos) == 2:
-                    option_str = "{} and {}".format(*opt_infos)
-                else:
-                    option_str = ", ".join(opt_infos[:-1]) + f", and {opt_infos[-1]}"
+                option_str = format_list_of_words(*opt_infos)
                 raise click.UsageError(f"{option_str} are mutually exclusive")
             return func(*args, **kwargs)
 

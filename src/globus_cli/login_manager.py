@@ -3,6 +3,7 @@ import functools
 import click
 
 from .tokenstore import token_storage_adapter
+from .utils import format_list_of_words, format_plural_str
 
 
 class LoginManager:
@@ -52,28 +53,13 @@ def requires_login(*args: str, pass_manager: bool = False):
             # if we are missing logins, assemble error text
             # text is slightly different for 1, 2, or 3+ missing servers
             if missing_servers:
-
-                if len(missing_servers) == 1:
-                    plural_string = ""
-                    server_string = missing_servers.pop()
-
-                elif len(missing_servers) == 2:
-                    plural_string = "s"
-                    server_string = "{} and {}".format(
-                        missing_servers.pop(), missing_servers.pop()
-                    )
-
-                else:
-                    plural_string = "s"
-                    single_server = missing_servers.pop()
-                    server_string = ", ".join(missing_servers) + ", and {}".format(
-                        single_server
-                    )
+                server_string = format_list_of_words(*missing_servers)
+                message_prefix = format_plural_str(
+                    "Missing {login}", {"login": "logins"}, len(missing_servers) != 1
+                )
 
                 raise click.ClickException(
-                    "Missing login{} for {}, please run 'globus login'".format(
-                        plural_string, server_string
-                    )
+                    message_prefix + f" for {server_string}, please run 'globus login'"
                 )
 
             # if pass_manager is True, pass it as an additional positional arg
