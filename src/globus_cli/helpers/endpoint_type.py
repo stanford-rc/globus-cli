@@ -16,15 +16,15 @@ class EndpointType(Enum):
         Given an endpoint document from transfer, determine what type of
         endpoint or collection it is for
         """
-        if ep_doc["is_globus_connect"] is True:
+        if ep_doc.get("is_globus_connect") is True:
             return EndpointType.GCP
 
-        if ep_doc["non_functional"] is True:
+        if ep_doc.get("non_functional") is True:
             return EndpointType.GCSV5_ENDPOINT
 
-        shared = ep_doc["host_endpoint_id"] is not None
+        shared = ep_doc.get("host_endpoint_id") is not None
 
-        if ep_doc["gcs_version"]:
+        if ep_doc.get("gcs_version"):
             major, minor, patch = ep_doc["gcs_version"].split(".")
             gcsv5 = major == "5"
         else:
