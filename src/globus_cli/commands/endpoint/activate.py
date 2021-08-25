@@ -35,7 +35,7 @@ $ ep_id=ddb59aef-6d04-11e5-ba46-22000b92c6ec
 $ globus endpoint activate $ep_id --web
 ----
 
-Activate an endpoiont using Myproxy activation, skipping the username prompt.
+Activate an endpoint using Myproxy activation, skipping the username prompt.
 
 [source,bash]
 ----
