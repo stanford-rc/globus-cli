@@ -54,7 +54,7 @@ class EndpointPlusPath(click.ParamType):
         except IndexError:
             path = None
         # coerce path="" to path=None
-        # means that we treat "enpdoint_id" and "endpoint_id:" equivalently
+        # means that we treat "endpoint_id" and "endpoint_id:" equivalently
         path = path or None
 
         if path is None and self.path_required:
