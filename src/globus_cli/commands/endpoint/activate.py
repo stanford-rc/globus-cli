@@ -2,18 +2,15 @@ import webbrowser
 
 import click
 
-from globus_cli.helpers import (
-    fill_delegate_proxy_activation_requirements,
-    is_remote_session,
-)
-from globus_cli.login_manager import requires_login
+from globus_cli.login_manager import is_remote_session, requires_login
 from globus_cli.parsing import command, endpoint_id_arg, mutex_option_group
-from globus_cli.safeio import FORMAT_TEXT_RAW, formatted_print
 from globus_cli.services.transfer import (
     TRANSFER_RESOURCE_SERVER,
     activation_requirements_help_text,
+    fill_delegate_proxy_activation_requirements,
     get_client,
 )
+from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 
 @command(
