@@ -1,5 +1,6 @@
 import os
 import sys
+from distutils.util import strtobool
 
 import click
 
@@ -68,5 +69,11 @@ def err_is_terminal():
     return sys.stderr.isatty()
 
 
-def term_is_interactive():
+def term_is_interactive() -> bool:
+    explicit_val = os.getenv("GLOBUS_CLI_INTERACTIVE")
+    if explicit_val is not None:
+        try:
+            return strtobool(explicit_val.lower())
+        except ValueError:
+            pass
     return os.getenv("PS1") is not None
