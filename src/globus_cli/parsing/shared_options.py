@@ -53,6 +53,12 @@ def common_options(
     return f
 
 
+def collection_id_arg(f: Optional[Callable] = None, *, metavar: str = "COLLECTION_ID"):
+    if f is None:
+        return functools.partial(collection_id_arg, metavar=metavar)
+    return click.argument("collection_id", metavar=metavar, type=click.UUID)(f)
+
+
 def endpoint_id_arg(f: Optional[Callable] = None, *, metavar: str = "ENDPOINT_ID"):
     """
     This is the `ENDPOINT_ID` argument consumed by many Transfer endpoint
