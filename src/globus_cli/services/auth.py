@@ -27,8 +27,8 @@ def get_auth_client():
         authorizer = RefreshTokenAuthorizer(
             tokens["refresh_token"],
             internal_auth_client(),
-            tokens["access_token"],
-            tokens["expires_at_seconds"],
+            access_token=tokens["access_token"],
+            expires_at=tokens["expires_at_seconds"],
             on_refresh=adapter.on_refresh,
         )
 
