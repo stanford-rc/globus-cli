@@ -24,14 +24,14 @@ def do_link_auth_flow(scopes, *, session_params=None):
     )
 
     # prompt
-    additional_params = {"prompt": "login"}
-    additional_params.update(session_params)
+    query_params = {"prompt": "login"}
+    query_params.update(session_params)
     linkprompt = "Please authenticate with Globus here"
     click.echo(
         "{0}:\n{1}\n{2}\n{1}\n".format(
             linkprompt,
             "-" * len(linkprompt),
-            auth_client.oauth2_get_authorize_url(additional_params=additional_params),
+            auth_client.oauth2_get_authorize_url(query_params=query_params),
         )
     )
 
