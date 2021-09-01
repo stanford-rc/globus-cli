@@ -51,13 +51,9 @@ setup(
         "click>=8.0.0,<9",
         "jmespath==0.10.0",
         "requests>=2.0.0,<3.0.0",
-        # cryptography has unusual versioning and compatibility rules:
+        # cryptography versioning info:
         # https://cryptography.io/en/latest/api-stability/
-        # we trust the two next major versions, per the Deprecation policy
-        #
-        # as new versions of cryptography are released, we may need to update
-        # this requirement
-        "cryptography>=1.8.1,<3.4.0",
+        "cryptography>=1.8.1,<35.0.0",
     ],
     extras_require={"development": DEV_REQUIREMENTS},
     entry_points={"console_scripts": ["globus = globus_cli:main"]},
