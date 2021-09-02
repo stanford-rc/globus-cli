@@ -1,0 +1,99 @@
+metadata:
+  mapped_collection_id: "1405823f-0597-4a16-b296-46d4f0ae4b15"
+  guest_collection_id: "0e4a77f8-b778-4d5c-abaa-e1254e71427f"
+  endpoint_id: "cf37806c-572c-47ff-88e2-511c646ef1a4"
+  gcp_endpoint_id: "06e2c959-d311-4bab-b2ea-25ad77d9fc12"
+
+transfer:
+  - path: /endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15
+    json:
+      {
+        "DATA": [],
+        "DATA_TYPE": "endpoint",
+        "gcs_version": "5.4.10",
+        "host_endpoint_id": null,
+        "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+        "is_globus_connect": false,
+        "non_functional": false,
+        "owner_id": "cf37806c-572c-47ff-88e2-511c646ef1a4"
+      }
+  - path: /endpoint/0e4a77f8-b778-4d5c-abaa-e1254e71427f
+    json:
+      {
+        "DATA": [],
+        "DATA_TYPE": "endpoint",
+        "gcs_version": "5.4.10",
+        "host_endpoint_id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+        "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+        "is_globus_connect": false,
+        "non_functional": false,
+        "owner_id": "cf37806c-572c-47ff-88e2-511c646ef1a4"
+      }
+  - path: /endpoint/cf37806c-572c-47ff-88e2-511c646ef1a4
+    json:
+     {
+        "DATA": [
+          {
+            "DATA_TYPE": "server",
+            "hostname": "abc.xyz.data.globus.org"
+          }
+        ],
+        "DATA_TYPE": "endpoint",
+        "gcs_version": "5.4.10",
+        "host_endpoint_id": null,
+        "id": "cf37806c-572c-47ff-88e2-511c646ef1a4",
+        "is_globus_connect": false,
+        "non_functional": true,
+        "owner_id": "cf37806c-572c-47ff-88e2-511c646ef1a4"
+      }
+  - path: /endpoint/cf37806c-572c-47ff-88e2-511c646ef1a4/server_list
+    json:
+     {
+        "DATA": [
+          {
+            "DATA_TYPE": "server",
+            "hostname": "abc.xyz.data.globus.org"
+          }
+        ],
+        "DATA_TYPE": "endpoint_server_list"
+      }
+  # GCP endpoint
+  - path: /endpoint/06e2c959-d311-4bab-b2ea-25ad77d9fc12
+    json:
+      {
+        "DATA": [
+          {
+            "DATA_TYPE": "server",
+            "hostname": null,
+          }
+        ],
+        "DATA_TYPE": "endpoint",
+        "gcs_version": null,
+        "host_endpoint_id": null,
+        "id": "06e2c959-d311-4bab-b2ea-25ad77d9fc12",
+        "is_globus_connect": true,
+        "non_functional": false,
+        "owner_id": "c699d42e-d274-11e5-bf75-1fc5bf53bb24"
+      }
+
+gcs:
+  - path: /collections/0e4a77f8-b778-4d5c-abaa-e1254e71427f
+    method: delete
+    json:
+      {
+        "DATA_TYPE": "result#1.0.0",
+        "code": "success",
+        "data": [],
+        "detail": "success",
+        "http_response_code": 200
+      }
+  - path: /collections/1405823f-0597-4a16-b296-46d4f0ae4b15
+    method: delete
+    json:
+      {
+        "DATA_TYPE": "result#1.0.0",
+        "code": "success",
+        "data": [],
+        "detail": "success",
+        "http_response_code": 200
+      }

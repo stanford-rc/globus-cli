@@ -1,6 +1,7 @@
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import collection_id_arg, command
 from globus_cli.services.gcs import get_collection_endpoint_id, get_gcs_client
+from globus_cli.services.transfer import EndpointType
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 
@@ -12,9 +13,16 @@ def collection_delete(login_manager, *, collection_id):
     Delete an existing Collection. This requires the administrator role on the
     Endpoint.
     """
-    endpoint_id = get_collection_endpoint_id(collection_id)
-    login_manager.assert_logins(endpoint_id)
+    endpoint_id = get_collection_endpoint_id(
+        collection_id,
+        {
+            EndpointType.GCP: "globus endpoint delete",
+            EndpointType.SHARE: "globus endpoint delete",
+            EndpointType.NON_GCSV5_ENDPOINT: "globus endpoint delete",
+        },
+    )
+    login_manager.assert_logins(endpoint_id, assume_gcs=True)
 
     client = get_gcs_client(endpoint_id)
     res = client.delete_collection(collection_id)
-    formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")
+    formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="code")

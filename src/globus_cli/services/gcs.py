@@ -1,5 +1,6 @@
-from typing import cast
+from typing import Dict, cast
 
+import click
 from globus_sdk import GCSClient, RefreshTokenAuthorizer
 
 from globus_cli import version
@@ -35,12 +36,30 @@ def get_gcs_client(gcs_id: str, *, require_auth=True) -> GCSClient:
     return GCSClient(gcs_address, authorizer=authorizer, app_name=version.app_name)
 
 
-def get_collection_endpoint_id(collection_id: str) -> str:
+def get_collection_endpoint_id(
+    collection_id: str, command_remap: Dict[EndpointType, str]
+) -> str:
     tc = get_transfer_client()
     endpoint_record = tc.get_endpoint(collection_id)
-    if EndpointType.determine_endpoint_type(endpoint_record) not in (
+    ep_type = EndpointType.determine_endpoint_type(endpoint_record)
+    if ep_type not in (
         EndpointType.MAPPED_COLLECTION,
         EndpointType.GUEST_COLLECTION,
     ):
-        raise ValueError(f"Excpected {collection_id} to be a collection ID.")
+        nice_type_name = EndpointType.nice_name(ep_type)
+        err_msg_common = (
+            f"Expected {collection_id} to be a collection ID.\n"
+            f"Instead, found it was of type '{nice_type_name}'.\n\n"
+        )
+        if ep_type not in command_remap:
+            raise click.ClickException(
+                err_msg_common
+                + "This operation is not supported on objects of this type."
+            )
+        else:
+            raise click.ClickException(
+                err_msg_common + "Please run the following command instead:\n\n"
+                f"    {command_remap[ep_type]} {collection_id}\n"
+            )
+
     return cast(str, endpoint_record["owner_id"])

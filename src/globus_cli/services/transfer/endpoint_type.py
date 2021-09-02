@@ -11,6 +11,17 @@ class EndpointType(Enum):
     NON_GCSV5_ENDPOINT = auto()  # most likely GCSv4, but not necessarily
 
     @classmethod
+    def nice_name(cls, eptype: "EndpointType") -> str:
+        return {
+            cls.GCP: "Globus Connect Personal",
+            cls.GCSV5_ENDPOINT: "Globus Connect Server v5 Endpoint",
+            cls.GUEST_COLLECTION: "Guest Collection",
+            cls.MAPPED_COLLECTION: "Mapped Collection",
+            cls.SHARE: "Shared Endpoint",
+            cls.NON_GCSV5_ENDPOINT: "GCSv4 Endpoint",
+        }.get(eptype, "UNKNOWN")
+
+    @classmethod
     def determine_endpoint_type(cls, ep_doc: dict) -> "EndpointType":
         """
         Given an endpoint document from transfer, determine what type of
@@ -25,7 +36,11 @@ class EndpointType(Enum):
         shared = ep_doc.get("host_endpoint_id") is not None
 
         if ep_doc.get("gcs_version"):
-            major, minor, patch = ep_doc["gcs_version"].split(".")
+            try:
+                major, _minor, _patch = ep_doc["gcs_version"].split(".")
+            except ValueError:  # split -> unpack didn't give 3 values
+                major = None
+
             gcsv5 = major == "5"
         else:
             gcsv5 = False

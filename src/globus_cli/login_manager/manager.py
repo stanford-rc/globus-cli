@@ -97,7 +97,7 @@ class LoginManager:
         if epilog is not None:
             click.echo(epilog)
 
-    def assert_logins(self, *resource_servers):
+    def assert_logins(self, *resource_servers, assume_gcs=False):
         # determine the set of resource servers missing logins
         missing_servers = {s for s in resource_servers if not self.has_login(s)}
 
@@ -111,8 +111,14 @@ class LoginManager:
                 len(missing_servers) != 1,
             )
 
+            login_cmd = "globus login"
+            if assume_gcs:
+                login_cmd = "globus login " + " ".join(
+                    [f"--gcs {s}" for s in missing_servers]
+                )
+
             raise click.ClickException(
-                message_prefix + f" for {server_string}, please run 'globus login'"
+                message_prefix + f" for {server_string}, please run\n  {login_cmd}"
             )
 
     @classmethod

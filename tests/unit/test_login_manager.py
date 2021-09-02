@@ -1,4 +1,5 @@
 import re
+import uuid
 from unittest.mock import patch
 
 import click
@@ -57,7 +58,7 @@ def test_requires_login_single_server_fail(mock_get_adapter):
         dummy_command()
 
     assert str(ex.value) == (
-        "Missing login for c.globus.org, please run 'globus login'"
+        "Missing login for c.globus.org, please run\n  globus login"
     )
 
 
@@ -74,7 +75,7 @@ def test_requires_login_fail_two_servers(mock_get_adapter):
 
     assert re.match(
         "Missing logins for ..globus.org and ..globus.org, "
-        "please run 'globus login'",
+        "please run\n  globus login",
         str(ex.value),
     )
     for server in ("c.globus.org", "d.globus.org"):
@@ -94,7 +95,7 @@ def test_requires_login_fail_multi_server(mock_get_adapter):
 
     assert re.match(
         "Missing logins for ..globus.org, ..globus.org, "
-        "and ..globus.org, please run 'globus login'",
+        "and ..globus.org, please run\n  globus login",
         str(ex.value),
     )
     for server in ("c.globus.org", "d.globus.org", "e.globus.org"):
@@ -114,3 +115,18 @@ def test_requires_login_pass_manager(mock_get_adapter):
         return True
 
     assert dummy_command()
+
+
+@patch("globus_cli.login_manager.tokenstore.token_storage_adapter")
+def test_gcs_error_message(mock_get_adapter):
+    mock_get_adapter._instance.get_token_data = mock_get_tokens
+    dummy_id = str(uuid.uuid1())
+
+    @LoginManager.requires_login(pass_manager=True)
+    def dummy_command(manager):
+        manager.assert_logins(dummy_id, assume_gcs=True)
+
+    with pytest.raises(click.ClickException) as excinfo:
+        dummy_command()
+
+    assert f"globus login --gcs {dummy_id}" in str(excinfo.value)

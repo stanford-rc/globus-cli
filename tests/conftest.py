@@ -40,27 +40,32 @@ def task_id():
     return "549ef13c-600f-11eb-9608-0afa7b051b85"
 
 
+def _mock_token_response_data(rs_name, scope, token_blob=None):
+    if token_blob is None:
+        token_blob = rs_name.split(".")[0]
+    return {
+        "scope": scope,
+        "refresh_token": f"{token_blob}RT",
+        "access_token": f"{token_blob}AT",
+        "token_type": "bearer",
+        "expires_at_seconds": int(time.time()) + 120,
+        "resource_server": rs_name,
+    }
+
+
 @pytest.fixture
 def mock_login_token_response():
     mock_token_res = mock.Mock()
     mock_token_res.by_resource_server = {
-        "auth.globus.org": {
-            "scope": "openid profile email "
+        "auth.globus.org": _mock_token_response_data(
+            "auth.globus.org",
+            "openid profile email "
             "urn:globus:auth:scope:auth.globus.org:view_identity_set",
-            "refresh_token": "AuthRT",
-            "access_token": "AuthAT",
-            "token_type": "bearer",
-            "expires_at_seconds": int(time.time()) + 120,
-            "resource_server": "auth.globus.org",
-        },
-        "transfer.api.globus.org": {
-            "scope": "urn:globus:auth:scope:transfer.api.globus.org:all",
-            "refresh_token": "TransferRT",
-            "access_token": "TransferAT",
-            "token_type": "bearer",
-            "expires_at_seconds": int(time.time()) + 120,
-            "resource_server": "transfer.api.globus.org",
-        },
+        ),
+        "transfer.api.globus.org": _mock_token_response_data(
+            "transfer.api.globus.org",
+            "urn:globus:auth:scope:transfer.api.globus.org:all",
+        ),
     }
     return mock_token_res
 
@@ -85,6 +90,20 @@ def patch_tokenstorage(monkeypatch, test_token_storage):
         test_token_storage,
         raising=False,
     )
+
+
+@pytest.fixture
+def add_gcs_login(test_token_storage):
+    def func(gcs_id):
+        mock_token_res = mock.Mock()
+        mock_token_res.by_resource_server = {
+            gcs_id: _mock_token_response_data(
+                gcs_id, f"urn:globus:auth:scopes:{gcs_id}:manage_collections"
+            )
+        }
+        test_token_storage.store(mock_token_res)
+
+    return func
 
 
 @pytest.fixture(scope="session")
@@ -183,6 +202,7 @@ def register_api_route(mocked_responses):
             "nexus": "https://nexus.api.globusonline.org/",
             "transfer": "https://transfer.api.globus.org/v0.10",
             "search": "https://search.api.globus.org/",
+            "gcs": "https://abc.xyz.data.globus.org/api",
         }
         assert service in base_url_map
         base_url = base_url_map.get(service)
