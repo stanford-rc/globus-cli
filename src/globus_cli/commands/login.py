@@ -1,4 +1,5 @@
 import click
+from globus_sdk.scopes import GCSEndpointScopeBuilder
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, no_local_server_option
@@ -49,7 +50,17 @@ You may force a new login with
     is_flag=True,
     help=("Do a fresh login, ignoring any existing credentials"),
 )
-def login_command(no_local_server, force):
+@click.option(
+    "gcs_servers",
+    "--gcs",
+    type=click.UUID,
+    help=(
+        "A GCS Endpoint ID, for which manage_collections permissions "
+        "will be requested. This option may be given multiple times"
+    ),
+    multiple=True,
+)
+def login_command(no_local_server, force, gcs_servers):
     """
     Get credentials for the Globus CLI
 
@@ -70,8 +81,16 @@ def login_command(no_local_server, force):
     """
     manager = LoginManager()
 
+    # add GCS servers to LoginManager requirements so that the login check and login
+    # flow will make use of the requested GCS servers
+    if gcs_servers:
+        for server_id in gcs_servers:
+            rs_name = str(server_id)
+            scopes = [GCSEndpointScopeBuilder(rs_name).manage_collections]
+            manager.add_requirement(rs_name, scopes)
+
     # if not forcing, stop if user already logged in
-    if not force and manager.is_logged_in_static():
+    if not force and manager.is_logged_in():
         click.echo(_LOGGED_IN_RESPONSE)
         return
 

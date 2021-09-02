@@ -3,6 +3,7 @@ parallel = True
 
 [report]
 show_missing = True
+skip_covered = True
 
 exclude_lines =
     # the pragma to disable coverage

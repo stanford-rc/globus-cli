@@ -14,6 +14,7 @@ DEV_REQUIREMENTS = [
     "pytest<7",
     "pytest-cov<3",
     "pytest-xdist<3",
+    "pytest-timeout<2",
     "responses==0.13.3",
     # loading test fixture data
     "ruamel.yaml==0.16.12",

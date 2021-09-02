@@ -4,6 +4,7 @@ from globus_cli.parsing.mutex_group import MutexInfo, mutex_option_group
 from globus_cli.parsing.one_use_option import one_use_option
 from globus_cli.parsing.process_stdin import shlex_process_stdin
 from globus_cli.parsing.shared_options import (
+    collection_id_arg,
     delete_and_rm_options,
     endpoint_id_arg,
     no_local_server_option,
@@ -38,6 +39,7 @@ __all__ = [
     # other helpers
     "EXPLICIT_NULL",
     # Transfer options
+    "collection_id_arg",
     "endpoint_id_arg",
     "task_submission_options",
     "delete_and_rm_options",

@@ -1,5 +1,5 @@
 import functools
-from typing import Dict, List, Optional
+from typing import Dict, Generator, List, Optional, Tuple
 
 import click
 import globus_sdk
@@ -31,12 +31,21 @@ class LoginManager:
         ],
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._token_storage = token_storage_adapter()
+        self._nonstatic_requirements: Dict[str, List[str]] = {}
 
-    def is_logged_in_static(self) -> bool:
+    def add_requirement(self, rs_name: str, scopes: List[str]) -> None:
+        self._nonstatic_requirements[rs_name] = scopes
+
+    @property
+    def login_requirements(self) -> Generator[Tuple[str, List[str]], None, None]:
+        yield from self.STATIC_SCOPES.items()
+        yield from self._nonstatic_requirements.items()
+
+    def is_logged_in(self) -> bool:
         res = []
-        for rs_name in self.STATIC_SCOPES.keys():
+        for rs_name, _scopes in self.login_requirements:
             res.append(self.has_login(rs_name))
         return all(res)
 
@@ -73,7 +82,9 @@ class LoginManager:
         scopes: Optional[List[str]] = None,
     ):
         if scopes is None:  # flatten scopes to list of strings if none provided
-            scopes = [s for rs_scopes in self.STATIC_SCOPES.values() for s in rs_scopes]
+            scopes = [
+                s for _rs_name, rs_scopes in self.login_requirements for s in rs_scopes
+            ]
         # use a link login if remote session or user requested
         if no_local_server or is_remote_session():
             do_link_auth_flow(scopes, session_params=session_params)
@@ -85,6 +96,30 @@ class LoginManager:
 
         if epilog is not None:
             click.echo(epilog)
+
+    def assert_logins(self, *resource_servers, assume_gcs=False):
+        # determine the set of resource servers missing logins
+        missing_servers = {s for s in resource_servers if not self.has_login(s)}
+
+        # if we are missing logins, assemble error text
+        # text is slightly different for 1, 2, or 3+ missing servers
+        if missing_servers:
+            server_string = format_list_of_words(*missing_servers)
+            message_prefix = format_plural_str(
+                "Missing {login}",
+                {"login": "logins"},
+                len(missing_servers) != 1,
+            )
+
+            login_cmd = "globus login"
+            if assume_gcs:
+                login_cmd = "globus login " + " ".join(
+                    [f"--gcs {s}" for s in missing_servers]
+                )
+
+            raise click.ClickException(
+                message_prefix + f" for {server_string}, please run\n  {login_cmd}"
+            )
 
     @classmethod
     def requires_login(cls, *resource_servers: str, pass_manager: bool = False):
@@ -117,27 +152,7 @@ class LoginManager:
             @functools.wraps(func)
             def wrapper(*args, **kwargs):
                 manager = cls()
-
-                # determine the set of resource servers missing logins
-                missing_servers = {
-                    s for s in resource_servers if not manager.has_login(s)
-                }
-
-                # if we are missing logins, assemble error text
-                # text is slightly different for 1, 2, or 3+ missing servers
-                if missing_servers:
-                    server_string = format_list_of_words(*missing_servers)
-                    message_prefix = format_plural_str(
-                        "Missing {login}",
-                        {"login": "logins"},
-                        len(missing_servers) != 1,
-                    )
-
-                    raise click.ClickException(
-                        message_prefix
-                        + f" for {server_string}, please run 'globus login'"
-                    )
-
+                manager.assert_logins(*resource_servers)
                 # if pass_manager is True, pass it as an additional positional arg
                 if pass_manager:
                     return func(*args, manager, **kwargs)
