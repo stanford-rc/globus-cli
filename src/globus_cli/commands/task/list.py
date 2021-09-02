@@ -166,6 +166,8 @@ def task_list(
 
     def _process_filterval(prefix, value, default=None):
         if value:
+            if isinstance(value, list) and not any(value):
+                return default or ""
             if isinstance(value, str):
                 return f"{prefix}:{value}/"
             return "{}:{}/".format(prefix, ",".join(str(x) for x in value))
