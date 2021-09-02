@@ -201,7 +201,7 @@ def task_list(
     client = get_client()
     task_iterator = PagingWrapper(
         client.paginated.task_list(
-            filter=filter_string[:-1]  # remove trailing /
+            query_params={"filter": filter_string[:-1]},  # remove trailing /
         ).items(),
         limit=limit,
     )
