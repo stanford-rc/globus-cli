@@ -4,7 +4,7 @@ import sys
 import click
 
 
-def shlex_process_stdin(process_command, helptext):
+def shlex_process_stream(process_command, stream, helptext):
     """
     Use shlex to process stdin line-by-line.
     Also prints help text.
@@ -28,7 +28,7 @@ Terminate input with Ctrl+D or <EOF>
     # use readlines() rather than implicit file read line looping to force
     # python to properly capture EOF (otherwise, EOF acts as a flush and
     # things get weird)
-    for line in sys.stdin.readlines():
+    for line in stream.readlines():
         # get the argument vector:
         # do a shlex split to handle quoted paths with spaces in them
         # also lets us have comments with #

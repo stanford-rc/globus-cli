@@ -1,3 +1,7 @@
+import os
+import tempfile
+
+
 def test_parsing(run_line):
     """
     Runs --help and confirms the option is parsed
@@ -148,9 +152,30 @@ def test_transfer_batchmode_dryrun(run_line, load_api_fixtures, go_ep1_id, go_ep
 
     batch_input = "abc /def\n/xyz p/q/r\n"
     result = run_line(
-        "globus transfer -F json --batch --dry-run " + go_ep1_id + " " + go_ep2_id,
+        "globus transfer -F json --batch - --dry-run " + go_ep1_id + " " + go_ep2_id,
         stdin=batch_input,
     )
+    for src, dst in [("abc", "/def"), ("/xyz", "p/q/r")]:
+        assert f'"source_path": "{src}"' in result.output
+        assert f'"destination_path": "{dst}"' in result.output
+
+    with tempfile.NamedTemporaryFile(mode="r+b", buffering=0, delete=False) as temp:
+        temp_name = temp.name
+        temp.write(bytes(batch_input, "utf-8"))
+        result = run_line(
+            [
+                "globus",
+                "transfer",
+                "-F",
+                "json",
+                "--batch",
+                temp.name,
+                "--dry-run",
+                go_ep1_id,
+                go_ep2_id,
+            ]
+        )
+    os.unlink(temp_name)
     for src, dst in [("abc", "/def"), ("/xyz", "p/q/r")]:
         assert f'"source_path": "{src}"' in result.output
         assert f'"destination_path": "{dst}"' in result.output
@@ -165,7 +190,9 @@ def test_delete_batchmode_dryrun(run_line, load_api_fixtures, go_ep1_id):
     load_api_fixtures("transfer_activate_success.yaml")
 
     batch_input = "abc/def\n/xyz\nabcdef\nabc/def/../xyz\n"
-    result = run_line("globus delete --batch --dry-run " + go_ep1_id, stdin=batch_input)
+    result = run_line(
+        "globus delete --batch - --dry-run " + go_ep1_id, stdin=batch_input
+    )
     assert (
         "\n".join(
             ("Path   ", "-------", "abc/def", "/xyz   ", "abcdef ", "abc/xyz", "")
@@ -175,7 +202,7 @@ def test_delete_batchmode_dryrun(run_line, load_api_fixtures, go_ep1_id):
 
     batch_input = "abc/def\n/xyz\n../foo\n"
     result = run_line(
-        f"globus delete --batch --dry-run {go_ep1_id}:foo/bar/./baz",
+        f"globus delete --batch - --dry-run {go_ep1_id}:foo/bar/./baz",
         stdin=batch_input,
     )
     assert (

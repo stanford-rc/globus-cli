@@ -7,7 +7,7 @@ from globus_cli.parsing import (
     TaskPath,
     command,
     mutex_option_group,
-    shlex_process_stdin,
+    shlex_process_stream,
     task_submission_options,
 )
 from globus_cli.services.transfer import autoactivate, get_client
@@ -41,7 +41,7 @@ Use the batch input method to transfer multiple files and directories:
 ----
 $ source_ep=ddb59aef-6d04-11e5-ba46-22000b92c6ec
 $ dest_ep=ddb59af0-6d04-11e5-ba46-22000b92c6ec
-$ globus transfer $source_ep $dest_ep --batch
+$ globus transfer $source_ep $dest_ep --batch -
 # lines starting with '#' are comments
 # and blank lines (for spacing) are allowed
 
@@ -64,7 +64,7 @@ above, but much more concise):
 ----
 $ source_ep=ddb59aef-6d04-11e5-ba46-22000b92c6ec
 $ dest_ep=ddb59af0-6d04-11e5-ba46-22000b92c6ec
-$ globus transfer $source_ep:/share/ $dest_ep:~/ --batch
+$ globus transfer $source_ep:/share/ $dest_ep:~/ --batch -
 godata/file1.txt myfile1.txt
 godata/file2.txt myfile2.txt
 godata/file3.txt myfile3.txt
@@ -93,7 +93,7 @@ dest_ep=ddb59af0-6d04-11e5-ba46-22000b92c6ec
 
 task_id="$(globus transfer $source_ep $dest_ep \
     --jmespath 'task_id' --format=UNIX \
-    --batch < my_file_batch.txt)"
+    --batch my_file_batch.txt)"
 
 echo "Waiting on 'globus transfer' task '$task_id'"
 globus task wait "$task_id" --timeout 30
@@ -152,13 +152,13 @@ fi
 )
 @click.option(
     "--batch",
-    is_flag=True,
+    type=click.File("r"),
     help=(
-        "Accept a batch of source/dest path pairs on stdin (i.e. "
-        "run in batchmode). "
-        "Uses SOURCE_ENDPOINT_ID and DEST_ENDPOINT_ID as passed "
-        "on the commandline. Commandline paths are still allowed "
-        "and are used as prefixes to the batchmode inputs."
+        "Accept a batch of source/dest path pairs from a file. Use the special `-` "
+        "value to read from stdin; otherwise opens the file from the argument and "
+        "passes through lines from that file. Uses SOURCE_ENDPOINT_ID and "
+        "DEST_ENDPOINT_ID as passed on the commandline. Commandline paths are still "
+        "allowed and are used as prefixes to the batchmode inputs."
     ),
 )
 @click.option(
@@ -271,10 +271,10 @@ def transfer_command(
     will submit a single-file or single-directory transfer task.
     This has behavior similar to `cp` and `cp -r` across endpoints.
 
-    Using `--batch`, `globus transfer` can submit a task which transfers
-    multiple files or directories. Paths to transfer are taken from stdin.
-    Lines are split on spaces, respecting quotes, and every line is treated as
-    a file or directory to transfer.
+    Using `--batch`, `globus transfer` can submit a task which transfers multiple files
+    or directories. The value for `--batch` can be a file to read from, or the
+    character `-` which will read from stdin. From either the file or stdin, each line
+    is treated as a path to a file or directory to delete, respecting quotes.
 
     \b
     Lines are of the form
@@ -284,7 +284,7 @@ def transfer_command(
 
     \b
     If you use `--batch` and a commandline SOURCE_PATH and/or DEST_PATH, these
-    paths will be used as dir prefixes to any paths on stdin.
+    paths will be used as dir prefixes to any paths read from the batch source.
 
     \b
     === Sync Levels
@@ -396,13 +396,15 @@ def transfer_command(
                 recursive=recursive,
             )
 
-        shlex_process_stdin(
+        shlex_process_stream(
             process_batch_line,
+            batch,
             (
                 "Enter transfers, line by line, as\n\n"
                 "    [--recursive] [--external-checksum TEXT] SOURCE_PATH DEST_PATH\n"
             ),
         )
+
     else:
         transfer_data.add_item(
             cmd_source_path,

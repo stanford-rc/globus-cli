@@ -1,4 +1,6 @@
 import json
+import os
+import tempfile
 
 
 def test_exclude(run_line, load_api_fixtures, go_ep1_id, go_ep2_id):
@@ -45,9 +47,26 @@ def test_exlude_recursive(run_line, load_api_fixtures, go_ep1_id, go_ep2_id):
     # batch
     batch_input = "abc /def\n"
     result = run_line(
-        "globus transfer --exclude *.txt --batch "
+        "globus transfer --exclude *.txt --batch - "
         "{}:/ {}:/".format(go_ep1_id, go_ep1_id),
         stdin=batch_input,
         assert_exit_code=2,
     )
-    assert expected_error in result.stderr
+
+    with tempfile.NamedTemporaryFile(mode="r+b", buffering=0, delete=False) as temp:
+        temp_name = temp.name
+        temp.write(bytes(batch_input, "utf-8"))
+        result = run_line(
+            [
+                "globus",
+                "transfer",
+                "--exclude",
+                "*.txt",
+                "--batch",
+                temp_name,
+                f"{go_ep1_id}:/",
+                "{go_ep1_id}:/",
+            ],
+            assert_exit_code=2,
+        )
+    os.unlink(temp_name)

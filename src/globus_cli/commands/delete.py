@@ -7,7 +7,7 @@ from globus_cli.parsing import (
     TaskPath,
     command,
     delete_and_rm_options,
-    shlex_process_stdin,
+    shlex_process_stream,
     task_submission_options,
 )
 from globus_cli.services.transfer import autoactivate, get_client
@@ -43,7 +43,7 @@ Use the batch input method to transfer multiple files and or dirs.
 [source,bash]
 ----
 $ ep_id=ddb59af0-6d04-11e5-ba46-22000b92c6ec
-$ globus delete $ep_id --batch --recursive
+$ globus delete $ep_id --batch - --recursive
 ~/myfile1.txt
 ~/myfile2.txt
 ~/myfile3.txt
@@ -97,9 +97,10 @@ def delete_command(
     single-file or single-directory delete task. This has
     behavior similar to `rm` and `rm -r`, across endpoints.
 
-    Using `--batch`, *globus delete* can submit a task which deletes
-    multiple files or directories. Lines are taken from stdin, respecting quotes,
-    and every line is treated as a path to a file or directory to delete.
+    Using `--batch`, *globus delete* can submit a task which deletes multiple files or
+    directories. The value for `--batch` can be a file to read from, or the character
+    `-` which will read from stdin. From either the file or stdin, each line is treated
+    as a path to a file or directory to delete, respecting quotes.
 
     \b
     Lines are of the form
@@ -111,9 +112,8 @@ def delete_command(
 
     Empty lines and comments beginning with '#' are ignored.
 
-    Batch only requires an ENDPOINT before passing lines, on stdin, but if you pass
-    an ENPDOINT:PATH on the original command, this path will be used as a prefixes
-    to all paths on stdin.
+    Batch only requires an ENDPOINT on the "base" command, but you may pass an
+    ENPDOINT:PATH to prefix all the paths read in the batch with that path.
 
     {AUTOMATIC_ACTIVATION}
     """
@@ -155,7 +155,9 @@ def delete_command(
             """
             delete_data.add_item(str(path))
 
-        shlex_process_stdin(process_batch_line, "Enter paths to delete, line by line.")
+        shlex_process_stream(
+            process_batch_line, batch, "Enter paths to delete, line by line."
+        )
     else:
         if not star_silent and enable_globs and path.endswith("*"):
             # not intuitive, but `click.confirm(abort=True)` prints to stdout
