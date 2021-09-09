@@ -240,12 +240,14 @@ def delete_and_rm_options(
     if supports_batch:
         f = click.option(
             "--batch",
-            is_flag=True,
+            type=click.File("r"),
             help=(
-                "Accept a batch of paths on stdin (i.e. run in "
-                "batchmode). Uses ENDPOINT_ID as passed on the "
-                "commandline. Any commandline PATH given will be used "
-                "as a prefix to all paths given"
+                "Accept a batch of source/dest path pairs from a file. Use the "
+                " special `-` value to read from stdin; otherwise opens the file from "
+                "the argument and passes through lines from that file. Uses "
+                "SOURCE_ENDPOINT_ID and DEST_ENDPOINT_ID as passed on the commandline. "
+                "Commandline paths are still allowed and are used as prefixes to the "
+                "batchmode inputs. "
             ),
         )(f)
     return f

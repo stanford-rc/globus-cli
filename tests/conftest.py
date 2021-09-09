@@ -130,7 +130,7 @@ def run_line(cli_runner, request, patch_tokenstorage):
         from globus_cli import main
 
         # split line into args and confirm line starts with "globus"
-        args = shlex.split(line)
+        args = shlex.split(line) if isinstance(line, str) else line
         assert args[0] == "globus"
 
         # run the line. globus_cli.main is the "globus" part of the line
