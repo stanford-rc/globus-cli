@@ -1,7 +1,3 @@
-import os
-import tempfile
-
-
 def test_parsing(run_line):
     """
     Runs --help and confirms the option is parsed
@@ -142,7 +138,7 @@ def test_transfer_call(run_line, load_api_fixtures, register_api_route, go_ep1_i
     assert "home/" in result.output
 
 
-def test_transfer_batchmode_dryrun(run_line, load_api_fixtures, go_ep1_id, go_ep2_id):
+def test_transfer_batch_stdin_dryrun(run_line, load_api_fixtures, go_ep1_id, go_ep2_id):
     """
     Dry-runs a transfer in batchmode, confirms batchmode inputs received
     """
@@ -159,23 +155,28 @@ def test_transfer_batchmode_dryrun(run_line, load_api_fixtures, go_ep1_id, go_ep
         assert f'"source_path": "{src}"' in result.output
         assert f'"destination_path": "{dst}"' in result.output
 
-    with tempfile.NamedTemporaryFile(mode="r+b", buffering=0, delete=False) as temp:
-        temp_name = temp.name
-        temp.write(bytes(batch_input, "utf-8"))
-        result = run_line(
-            [
-                "globus",
-                "transfer",
-                "-F",
-                "json",
-                "--batch",
-                temp.name,
-                "--dry-run",
-                go_ep1_id,
-                go_ep2_id,
-            ]
-        )
-    os.unlink(temp_name)
+
+def test_transfer_batch_file_dryrun(
+    run_line, load_api_fixtures, go_ep1_id, go_ep2_id, tmp_path
+):
+    # put a submission ID and autoactivate response in place
+    load_api_fixtures("get_submission_id.yaml")
+    load_api_fixtures("transfer_activate_success.yaml")
+    temp = tmp_path / "batch"
+    temp.write_text("abc /def\n/xyz p/q/r\n")
+    result = run_line(
+        [
+            "globus",
+            "transfer",
+            "-F",
+            "json",
+            "--batch",
+            temp,
+            "--dry-run",
+            go_ep1_id,
+            go_ep2_id,
+        ]
+    )
     for src, dst in [("abc", "/def"), ("/xyz", "p/q/r")]:
         assert f'"source_path": "{src}"' in result.output
         assert f'"destination_path": "{dst}"' in result.output
