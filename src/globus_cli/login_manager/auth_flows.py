@@ -5,6 +5,8 @@ import click
 from .local_server import LocalServerError, start_local_server
 from .tokenstore import internal_auth_client, token_storage_adapter
 
+_STORE_CONFIG_USERINFO = "auth_user_data"
+
 
 def do_link_auth_flow(scopes, *, session_params=None):
     """
@@ -87,7 +89,28 @@ def exchange_code_and_store(auth_client, auth_code):
     """
     Finishes auth flow after code is gotten from command line or local server.
     Exchanges code for tokens and stores them.
+
+    A user may have a different identity this time than what they previously logged in
+    as, so to secure incremental auth flows, if the new tokens don't match the previous
+    identity we revoke them and instruct the user to logout before continuing.
     """
     adapter = token_storage_adapter()
     tkn = auth_client.oauth2_exchange_code_for_tokens(auth_code)
+    sub_new = tkn.decode_id_token()["sub"]
+    auth_user_data = adapter.read_config(_STORE_CONFIG_USERINFO)
+    if auth_user_data and sub_new != auth_user_data.get("sub"):
+        try:
+            for tokens in tkn.by_resource_server.values():
+                auth_client.oauth2_revoke_token(tokens["access_token"])
+                auth_client.oauth2_revoke_token(tokens["refresh_token"])
+        finally:
+            click.echo(
+                "Authorization failed: tried to login with an account that didn't "
+                "match existing credentials. If you meant to do this, first `globus "
+                "logout`, then try again. ",
+                err=True,
+            )
+        click.get_current_context().exit(1)
+    if not auth_user_data:
+        adapter.store_config(_STORE_CONFIG_USERINFO, {"sub": sub_new})
     adapter.store(tkn)
