@@ -66,6 +66,9 @@ def mock_login_token_response():
             "transfer.api.globus.org",
             "urn:globus:auth:scope:transfer.api.globus.org:all",
         ),
+        "groups.api.globus.org": _mock_token_response_data(
+            "groups.api.globus.org",
+            "urn:globus:auth:scope:groups.api.globus.org:all")
     }
     return mock_token_res
 
