@@ -1,0 +1,45 @@
+metadata:
+  group1_id: "8b7d57bc-1666-11ec-88b2-f50515619d57"
+  group1_name: "Group 1"
+  group2_id: "93fca046-1666-11ec-88b2-f50515619d57"
+  group2_name: "Group 2"
+
+groups:
+  - path: /groups/my_groups
+    method: get
+    json:
+      [
+        {
+          "id": "8b7d57bc-1666-11ec-88b2-f50515619d57",
+          "name": "Group 1",
+          "group_type": "regular",
+          "enforce_session": false,
+          "my_memberships": [
+              {
+                  "group_id": "8b7d57bc-1666-11ec-88b2-f50515619d57",
+                  "identity_id": "a24d6e82-1666-11ec-88b2-f50515619d57",
+                  "username": "alice@example.com",
+                  "role": "admin"
+              }
+          ]
+        },
+        {
+          "id": "93fca046-1666-11ec-88b2-f50515619d57",
+          "name": "Group 2",
+          "group_type": "plus",
+          "enforce_session": true,
+          "my_memberships": [
+              {
+                  "group_id": "93fca046-1666-11ec-88b2-f50515619d57",
+                  "identity_id": "a79cd648-1666-11ec-88b2-f50515619d57",
+                  "username": "alice@university.edu",
+                  "role": "member"
+              }, {
+                  "group_id": "93fca046-1666-11ec-88b2-f50515619d57",
+                  "identity_id": "aea27e5c-1666-11ec-88b2-f50515619d57",
+                  "username": "alice@nationallab.gov",
+                  "role": "manager"
+              }
+          ]
+        }
+    ]

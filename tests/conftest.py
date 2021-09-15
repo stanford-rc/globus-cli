@@ -67,8 +67,8 @@ def mock_login_token_response():
             "urn:globus:auth:scope:transfer.api.globus.org:all",
         ),
         "groups.api.globus.org": _mock_token_response_data(
-            "groups.api.globus.org",
-            "urn:globus:auth:scope:groups.api.globus.org:all")
+            "groups.api.globus.org", "urn:globus:auth:scope:groups.api.globus.org:all"
+        ),
     }
     return mock_token_res
 
@@ -206,6 +206,7 @@ def register_api_route(mocked_responses):
             "transfer": "https://transfer.api.globus.org/v0.10",
             "search": "https://search.api.globus.org/",
             "gcs": "https://abc.xyz.data.globus.org/api",
+            "groups": "https://groups.api.globus.org/v2/",
         }
         assert service in base_url_map
         base_url = base_url_map.get(service)
