@@ -3,6 +3,7 @@ from globus_cli.commands.collection import collection_command
 from globus_cli.commands.delete import delete_command
 from globus_cli.commands.endpoint import endpoint_command
 from globus_cli.commands.get_identities import get_identities_command
+from globus_cli.commands.group import group_command
 from globus_cli.commands.list_commands import list_commands
 from globus_cli.commands.login import login_command
 from globus_cli.commands.logout import logout_command
@@ -53,3 +54,5 @@ main.add_command(collection_command)
 main.add_command(bookmark_command)
 main.add_command(task_command)
 main.add_command(session_command)
+
+main.add_command(group_command)
