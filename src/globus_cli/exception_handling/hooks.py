@@ -1,52 +1,16 @@
-"""
-Setup a custom except hook which formats exceptions that are uncaught.
-In "DEBUGMODE", we'll just use the typical sys.excepthook behavior and print a
-stacktrace. It's really for debugging problems with the CLI itself, but it
-might also come in handy if we have issues with the way that we're trying to
-format an exception.
-Define an except hook per exception type that we want to treat specially,
-generally types of SDK errors, and dispatch onto tht set of hooks.
-"""
-import functools
-import sys
-
 import click
-import click.exceptions
 import globus_sdk
 
-from globus_cli.parsing.command_state import CommandState
+from globus_cli.endpointish import WrongEndpointTypeError
 from globus_cli.termio import PrintableErrorField, write_error_info
 
-_REGISTERED_HOOKS = []
+from .registry import error_handler
 
 
-def globusapi_excepthook(condition):
-    """decorator for excepthooks
-
-    register each one, in order, with any relevant "condition"
-    """
-
-    def inner_decorator(fn):
-        @functools.wraps(fn)
-        def wrapped(exception):
-            fn(exception)
-            # get the mapping by looking up the state and getting the mapping attr
-            mapping = (
-                click.get_current_context().ensure_object(CommandState).http_status_map
-            )
-
-            # if there is a mapped exit code, exit with that. Otherwise, exit 1
-            if exception.http_status in mapping:
-                sys.exit(mapping[exception.http_status])
-            sys.exit(1)
-
-        _REGISTERED_HOOKS.append((wrapped, condition))
-        return wrapped
-
-    return inner_decorator
-
-
-@globusapi_excepthook(lambda err: err.info.authorization_parameters)
+@error_handler(
+    error_class=globus_sdk.GlobusAPIError,
+    condition=lambda err: err.info.authorization_parameters,
+)
 def session_hook(exception):
     """
     Expects an exception with a valid authorization_paramaters info field
@@ -77,7 +41,10 @@ def session_hook(exception):
         )
 
 
-@globusapi_excepthook(lambda err: err.info.consent_required)
+@error_handler(
+    error_class=globus_sdk.GlobusAPIError,
+    condition=lambda err: err.info.consent_required,
+)
 def consent_required_hook(exception):
     """
     Expects an exception with a required_scopes field in its raw_json
@@ -101,7 +68,7 @@ def consent_required_hook(exception):
         click.secho(
             "Fatal Error: ConsentRequired but no required_scopes!", bold=True, fg="red"
         )
-        sys.exit(255)
+        click.get_current_context().exit(255)
 
     click.echo(
         "\nPlease run\n\n"
@@ -112,8 +79,8 @@ def consent_required_hook(exception):
     )
 
 
-@globusapi_excepthook(
-    lambda err: (
+@error_handler(
+    condition=lambda err: (
         (
             isinstance(err, globus_sdk.TransferAPIError)
             and err.code == "ClientError.AuthenticationFailed"
@@ -136,7 +103,7 @@ def authentication_hook(exception):
     )
 
 
-@globusapi_excepthook(lambda err: isinstance(err, globus_sdk.TransferAPIError))
+@error_handler(error_class=globus_sdk.TransferAPIError)
 def transferapi_hook(exception):
     write_error_info(
         "Transfer API Error",
@@ -149,9 +116,9 @@ def transferapi_hook(exception):
     )
 
 
-@globusapi_excepthook(
-    lambda err: isinstance(err, globus_sdk.AuthAPIError)
-    and err.message == "invalid_grant"
+@error_handler(
+    error_class=globus_sdk.AuthAPIError,
+    condition=lambda err: err.message == "invalid_grant",
 )
 def invalidrefresh_hook(exception):
     write_error_info(
@@ -168,7 +135,7 @@ def invalidrefresh_hook(exception):
     )
 
 
-@globusapi_excepthook(lambda err: isinstance(err, globus_sdk.AuthAPIError))
+@error_handler(error_class=globus_sdk.AuthAPIError)
 def authapi_hook(exception):
     write_error_info(
         "Auth API Error",
@@ -180,7 +147,7 @@ def authapi_hook(exception):
     )
 
 
-@globusapi_excepthook(lambda err: True)  # catch-all
+@error_handler(error_class=globus_sdk.GlobusAPIError)  # catch-all
 def globusapi_hook(exception):
     write_error_info(
         "Globus API Error",
@@ -192,52 +159,53 @@ def globusapi_hook(exception):
     )
 
 
-def custom_except_hook(exc_info):
-    """
-    A custom excepthook to present python errors produced by the CLI.
-    We don't want to show end users big scary stacktraces if they aren't python
-    programmers, so slim it down to some basic info. We keep a "DEBUGMODE" env
-    variable kicking around to let us turn on stacktraces if we ever need them.
-    """
-    exception_type, exception, traceback = exc_info
-
-    # check if we're in debug mode, and run the real excepthook if we are
-    ctx = click.get_current_context()
-    state = ctx.ensure_object(CommandState)
-    if state.debug:
-        sys.excepthook(exception_type, exception, traceback)
-
-    # we're not in debug mode, do custom handling
-
-    if isinstance(exception, globus_sdk.GlobusAPIError):
-        for (handler, condition) in _REGISTERED_HOOKS:
-            if not condition(exception):
-                continue
-            handler(exception)
-
-    # specific checks fell through -- now check if it's any kind of GlobusError
-    if isinstance(exception, globus_sdk.GlobusError):
-        write_error_info(
-            "Globus Error",
-            [
-                PrintableErrorField("error_type", exception.__class__.__name__),
-                PrintableErrorField("message", str(exception), multiline=True),
-            ],
-        )
-        sys.exit(1)
-
-    # if it's a click exception, re-raise as original -- Click's main
-    # execution context will handle pretty-printing
-    if isinstance(
-        exception, (click.ClickException, click.exceptions.Abort, click.exceptions.Exit)
-    ):
-        raise exception.with_traceback(traceback)
-
-    # not a GlobusError, not a ClickException -- something like ValueError
-    # or NotImplementedError bubbled all the way up here: just print it out
-    click.echo(
-        "{}: {}".format(
-            click.style(exception_type.__name__, bold=True, fg="red"), exception
-        )
+@error_handler(error_class=globus_sdk.GlobusError)
+def globus_error_hook(exception):
+    write_error_info(
+        "Globus Error",
+        [
+            PrintableErrorField("error_type", exception.__class__.__name__),
+            PrintableErrorField("message", str(exception), multiline=True),
+        ],
     )
-    sys.exit(1)
+
+
+@error_handler(error_class=WrongEndpointTypeError)
+def wrong_endpoint_type_error_hook(exception):
+    ctx = click.get_current_context()
+
+    click.echo(
+        click.style(
+            exception.messages["expect"] + "\n" + exception.messages["actual"],
+            fg="yellow",
+        )
+        + "\n\n",
+        err=True,
+    )
+
+    should_use = exception.should_use_command()
+    if should_use:
+        click.echo(
+            "Please run the following command instead:\n\n"
+            f"    {should_use} {exception.endpoint_id}\n",
+            err=True,
+        )
+    else:
+        click.echo(
+            click.style(
+                "This operation is not supported on objects of this type.",
+                fg="red",
+                bold=True,
+            ),
+            err=True,
+        )
+    ctx.exit(2)
+
+
+def register_all_hooks():
+    """
+    This is a stub method which does nothing.
+
+    Importing and running it serves to ensure that the various hooks were imported,
+    however. It therefore "looks imperative" and ensures that the hooks are loaded.
+    """
