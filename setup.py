@@ -7,17 +7,17 @@ DEV_REQUIREMENTS = [
     # lint
     "flake8<4",
     "isort<6",
-    "black==21.5b1",
-    "flake8-bugbear==21.4.3",
-    "mypy==0.812",
+    "black==21.9b0",
+    "flake8-bugbear==21.9.1",
+    "mypy==0.910",
     # tests
     "pytest<7",
     "pytest-cov<3",
     "pytest-xdist<3",
     "pytest-timeout<2",
-    "responses==0.13.3",
+    "responses==0.14.0",
     # loading test fixture data
-    "ruamel.yaml==0.16.12",
+    "ruamel.yaml==0.17.16",
 ]
 
 
@@ -48,7 +48,7 @@ setup(
     package_dir={"": "src"},
     python_requires=">=3.6",
     install_requires=[
-        "globus-sdk==3.0.0b4",
+        "globus-sdk==3.0.1",
         "click>=8.0.0,<9",
         "jmespath==0.10.0",
         "requests>=2.0.0,<3.0.0",

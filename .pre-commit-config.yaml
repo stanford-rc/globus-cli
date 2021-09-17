@@ -6,33 +6,24 @@ repos:
     - id: trailing-whitespace
     - id: end-of-file-fixer
 - repo: https://github.com/sirosen/check-jsonschema
-  rev: 0.3.2
+  rev: 0.4.1
   hooks:
     - id: check-github-workflows
 - repo: https://github.com/python/black
-  rev: 21.6b0
+  rev: 21.9b0
   hooks:
     - id: black
-      name: "Autoformat python files"
-      types: [python]
-      language_version: python3
 - repo: https://gitlab.com/pycqa/flake8
   rev: 3.9.2
   hooks:
     - id: flake8
-      name: "Lint python files"
-      types: [python]
-      language_version: python3
-      additional_dependencies: ['flake8-bugbear==20.11.1']
+      additional_dependencies: ['flake8-bugbear==21.9.1']
 - repo: https://github.com/timothycrosley/isort
-  rev: 5.9.1
+  rev: 5.9.3
   hooks:
     - id: isort
-      name: "Sort python imports"
-      types: [python]
-      language_version: python3
 - repo: https://github.com/asottile/pyupgrade
-  rev: v2.19.4
+  rev: v2.26.0
   hooks:
     - id: pyupgrade
       args: ["--py36-plus"]
@@ -43,3 +34,4 @@ repos:
       additional_dependencies:
         - types-setuptools
         - types-requests
+        - 'globus-sdk==3.0.1'
