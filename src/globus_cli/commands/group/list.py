@@ -12,12 +12,26 @@ def group_list():
 
     groups = client.get_my_groups()
 
+    def _format_session_enforcement(res):
+        if res.get("enforce_session"):
+            return "strict"
+        else:
+            return "not strict"
+
+    def _parse_roles(res):
+        roles = set()
+        for membership in res["my_memberships"]:
+            roles.add(membership["role"])
+
+        return ",".join(sorted(roles))
+
     formatted_print(
         groups,
         fields=[
             ("Group ID", "id"),
             ("Name", "name"),
             ("Type", "group_type"),
-            ("High Assurance", "enforce_session"),
+            ("Session Enforcement", _format_session_enforcement),
+            ("Roles", _parse_roles),
         ],
     )
