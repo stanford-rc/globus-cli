@@ -1,5 +1,4 @@
 from globus_cli.parsing.commands import command, group, main_group
-from globus_cli.parsing.explicit_null import EXPLICIT_NULL
 from globus_cli.parsing.mutex_group import MutexInfo, mutex_option_group
 from globus_cli.parsing.one_use_option import one_use_option
 from globus_cli.parsing.process_stdin import shlex_process_stream
@@ -36,8 +35,6 @@ __all__ = [
     "mutex_option_group",
     "IdentityType",
     "LocationType",
-    # other helpers
-    "EXPLICIT_NULL",
     # Transfer options
     "collection_id_arg",
     "endpoint_id_arg",

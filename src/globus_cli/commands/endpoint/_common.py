@@ -3,12 +3,8 @@ from typing import Callable, Optional
 
 import click
 
-from globus_cli.parsing import (
-    EXPLICIT_NULL,
-    LocationType,
-    MutexInfo,
-    mutex_option_group,
-)
+from globus_cli.constants import EXPLICIT_NULL
+from globus_cli.parsing import LocationType, MutexInfo, mutex_option_group
 
 
 def endpoint_create_and_update_params(f: Optional[Callable] = None, *, create=False):

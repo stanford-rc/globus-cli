@@ -10,6 +10,7 @@ import sys
 
 import click
 
+from globus_cli.exception_handling import custom_except_hook
 from globus_cli.termio import env_interactive
 
 from .shared_options import common_options
@@ -96,18 +97,6 @@ class TopLevelGroup(GlobusCommandGroup):
     """
 
     def invoke(self, ctx):
-        # defer this import to avoid circular dependency of
-        #  globus_cli.parsing
-        #  ->
-        #  globus_cli.exception_handling
-        #  ->
-        #  globus_cli.endpointish
-        #  ->
-        #  globus_cli.services.transfer
-        #  ->
-        #  globus_cli.parsing
-        from globus_cli.exception_handling import custom_except_hook
-
         try:
             return super().invoke(ctx)
         except Exception:

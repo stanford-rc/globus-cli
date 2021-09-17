@@ -1,6 +1,6 @@
 import uuid
 
-from globus_cli.parsing import EXPLICIT_NULL
+from globus_cli.constants import EXPLICIT_NULL
 
 
 def display_name_or_cname(ep_doc):
