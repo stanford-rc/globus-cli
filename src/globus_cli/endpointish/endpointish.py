@@ -6,15 +6,16 @@ import click
 from globus_cli.services.transfer import get_client
 
 from .endpoint_type import EndpointType
-from .errors import ExpectedCollectionError, WrongEndpointTypeError
+from .errors import (
+    ExpectedCollectionError,
+    ExpectedEndpointError,
+    WrongEndpointTypeError,
+)
 
 
 class Endpointish:
-    def __init__(
-        self,
-        endpoint_id: Union[str, uuid.UUID],
-    ):
-        self._client = get_client()
+    def __init__(self, endpoint_id: Union[str, uuid.UUID], *, transfer_client=None):
+        self._client = transfer_client if transfer_client is not None else get_client()
         self.endpoint_id = endpoint_id
 
         res = self._client.get_endpoint(endpoint_id)
@@ -37,9 +38,12 @@ class Endpointish:
 
     def assert_is_gcsv5_collection(self):
         self.assert_ep_type(
-            EndpointType.GUEST_COLLECTION,
-            EndpointType.MAPPED_COLLECTION,
-            error_class=ExpectedCollectionError,
+            *EndpointType.collections(), error_class=ExpectedCollectionError
+        )
+
+    def assert_is_traditional_endpoint(self):
+        self.assert_ep_type(
+            *EndpointType.traditional_endpoints(), error_class=ExpectedEndpointError
         )
 
     def get_collection_endpoint_id(self) -> str:

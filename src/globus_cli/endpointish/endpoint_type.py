@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from typing import Tuple
 
 
 class EndpointType(Enum):
@@ -9,6 +10,14 @@ class EndpointType(Enum):
     MAPPED_COLLECTION = auto()
     SHARE = auto()
     NON_GCSV5_ENDPOINT = auto()  # most likely GCSv4, but not necessarily
+
+    @classmethod
+    def collections(cls) -> Tuple["EndpointType", ...]:
+        return (cls.GUEST_COLLECTION, cls.MAPPED_COLLECTION)
+
+    @classmethod
+    def traditional_endpoints(cls) -> Tuple["EndpointType", ...]:
+        return (cls.GCP, cls.SHARE, cls.NON_GCSV5_ENDPOINT)
 
     @classmethod
     def nice_name(cls, eptype: "EndpointType") -> str:

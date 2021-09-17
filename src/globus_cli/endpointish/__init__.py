@@ -14,11 +14,16 @@ decoration we might want for this.
 """
 from .endpoint_type import EndpointType
 from .endpointish import Endpointish
-from .errors import ExpectedCollectionError, WrongEndpointTypeError
+from .errors import (
+    ExpectedCollectionError,
+    ExpectedEndpointError,
+    WrongEndpointTypeError,
+)
 
 __all__ = [
     "Endpointish",
     "WrongEndpointTypeError",
     "ExpectedCollectionError",
+    "ExpectedEndpointError",
     "EndpointType",
 ]

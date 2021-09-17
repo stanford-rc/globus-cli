@@ -514,3 +514,13 @@ transfer:
           }
         ]
       }
+  - path: /endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15
+    method: delete
+    json:
+      {
+        "DATA_TYPE": "result",
+        "code": "Deleted",
+        "message": "Endpoint deleted successfully",
+        "request_id": "X8AlP9Ned",
+        "resource": "/endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15"
+      }
