@@ -3,7 +3,7 @@ from typing import Dict, Generator, List, Optional, Tuple
 
 import click
 import globus_sdk
-from globus_sdk.scopes import AuthScopes, TransferScopes
+from globus_sdk.scopes import AuthScopes, GroupsScopes, TransferScopes
 
 from globus_cli.utils import format_list_of_words, format_plural_str
 
@@ -18,6 +18,7 @@ class LoginManager:
 
     AUTH_RS = "auth.globus.org"
     TRANSFER_RS = "transfer.api.globus.org"
+    GROUPS_RS = "groups.api.globus.org"
 
     STATIC_SCOPES: Dict[str, List[str]] = {
         AUTH_RS: [
@@ -28,6 +29,9 @@ class LoginManager:
         ],
         TRANSFER_RS: [
             TransferScopes.all,
+        ],
+        GROUPS_RS: [
+            GroupsScopes.all,
         ],
     }
 
