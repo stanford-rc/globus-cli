@@ -62,9 +62,6 @@ def create_command(
     '--anonymous', '--group', or '--identity' is required to know to whom permissions
     are being granted.
     """
-    if not principal:
-        raise click.UsageError("A security principal is required for this command")
-
     endpoint_id, path = endpoint_plus_path
     principal_type, principal_val = principal
 
