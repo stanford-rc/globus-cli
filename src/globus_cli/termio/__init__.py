@@ -1,6 +1,7 @@
 import click
 
 from .context import (
+    env_interactive,
     err_is_terminal,
     get_jmespath_expression,
     is_verbose,
@@ -44,6 +45,7 @@ __all__ = [
     "FORMAT_TEXT_RECORD",
     "FORMAT_TEXT_RAW",
     "out_is_terminal",
+    "env_interactive",
     "err_is_terminal",
     "term_is_interactive",
     "outformat_is_json",
