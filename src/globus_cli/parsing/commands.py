@@ -10,6 +10,8 @@ import sys
 
 import click
 
+from globus_cli.termio import env_interactive
+
 from .excepthook import custom_except_hook
 from .shared_options import common_options
 from .shell_completion import print_completer_option
@@ -46,6 +48,19 @@ for more details."""
                 AUTOMATIC_ACTIVATION=self.AUTOMATIC_ACTIVATION_HELPTEXT
             )
         super().__init__(*args, **kwargs)
+
+
+class GlobusCommandEnvChecks(GlobusCommand):
+    def invoke(self, ctx):
+        try:
+            env_interactive()
+        except ValueError as e:
+            click.echo(
+                f"couldn't parse GLOBUS_CLI_INTERACTIVE environment variable: {e}",
+                err=True,
+            )
+            click.get_current_context().exit(1)
+        return super().invoke(ctx)
 
 
 class GlobusCommandGroup(click.Group):
@@ -102,15 +117,20 @@ def command(*args, **kwargs):
 
     Also allows the use of custom arguments, which are stored on the command, as in
     "adoc_examples".
+
+    `skip_env_checks` is used to disable environment variable validation prior to
+    running a command, but is ignored when a specific `cls` argument is passed.
     """
     disable_opts = kwargs.pop("disable_options", [])
 
     def _inner_decorator(func):
         if "help" not in kwargs:
             kwargs["help"] = func.__doc__
-
         if "cls" not in kwargs:
-            kwargs["cls"] = GlobusCommand
+            if kwargs.get("skip_env_checks", False) is True:
+                kwargs["cls"] = GlobusCommand
+            else:
+                kwargs["cls"] = GlobusCommandEnvChecks
 
         kwargs["globus_disable_opts"] = disable_opts
 

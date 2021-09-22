@@ -1,6 +1,7 @@
 import os
 import sys
 from distutils.util import strtobool
+from typing import Optional
 
 import click
 
@@ -69,11 +70,22 @@ def err_is_terminal():
     return sys.stderr.isatty()
 
 
-def term_is_interactive() -> bool:
+def env_interactive() -> Optional[bool]:
+    """
+    Check the `GLOBUS_CLI_INTERACTIVE` environment variable for a boolean, and *let*
+    `strtobool` raise a `ValueError` if it doesn't parse.
+    """
     explicit_val = os.getenv("GLOBUS_CLI_INTERACTIVE")
-    if explicit_val is not None:
-        try:
-            return strtobool(explicit_val.lower())
-        except ValueError:
-            pass
+    if explicit_val is None:
+        return None
+    return bool(strtobool(explicit_val.lower()))
+
+
+def term_is_interactive() -> bool:
+    try:
+        env = env_interactive()
+        if env is not None:
+            return env
+    except ValueError:
+        pass
     return os.getenv("PS1") is not None

@@ -1,3 +1,8 @@
+import os
+
+import pytest
+
+
 def test_parsing(run_line):
     """
     Runs --help and confirms the option is parsed
@@ -219,3 +224,15 @@ def test_delete_batchmode_dryrun(run_line, load_api_fixtures, go_ep1_id):
         )
         == result.output
     )
+
+
+@pytest.mark.parametrize("cmd", ["list-commands", "version", "whoami"])
+def test_env_checks(monkeypatch, run_line, cmd):
+    """
+    Test that passing garbage values for specific environment variables causes an error
+    with a specific message. (This test just parametrizes over a few example commands
+    that don't require extra input to run.)
+    """
+    monkeypatch.setitem(os.environ, "GLOBUS_CLI_INTERACTIVE", "Whoops")
+    result = run_line(f"globus {cmd}", assert_exit_code=1)
+    assert "GLOBUS_CLI_INTERACTIVE" in result.stderr
