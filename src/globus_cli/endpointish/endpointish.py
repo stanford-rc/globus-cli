@@ -1,5 +1,5 @@
 import uuid
-from typing import Type, Union, cast
+from typing import Tuple, Type, Union, cast
 
 import click
 
@@ -25,7 +25,7 @@ class Endpointish:
 
     def assert_ep_type(
         self,
-        *expect_types: EndpointType,
+        expect_types: Tuple[EndpointType, ...],
         error_class: Type[WrongEndpointTypeError] = WrongEndpointTypeError,
     ):
         if self.ep_type not in expect_types:
@@ -38,12 +38,12 @@ class Endpointish:
 
     def assert_is_gcsv5_collection(self):
         self.assert_ep_type(
-            *EndpointType.collections(), error_class=ExpectedCollectionError
+            EndpointType.collections(), error_class=ExpectedCollectionError
         )
 
     def assert_is_traditional_endpoint(self):
         self.assert_ep_type(
-            *EndpointType.traditional_endpoints(), error_class=ExpectedEndpointError
+            EndpointType.traditional_endpoints(), error_class=ExpectedEndpointError
         )
 
     def get_collection_endpoint_id(self) -> str:

@@ -176,7 +176,7 @@ def wrong_endpoint_type_error_hook(exception):
 
     click.echo(
         click.style(
-            exception.messages["expect"] + "\n" + exception.messages["actual"],
+            exception.expected_message + "\n" + exception.actual_message,
             fg="yellow",
         )
         + "\n\n",
