@@ -1,5 +1,6 @@
 import logging.config
 import warnings
+from typing import Callable
 
 import click
 import jmespath
@@ -56,7 +57,7 @@ class CommandState:
         return self.verbosity > 0
 
 
-def format_option(f):
+def format_option(f: Callable) -> Callable:
     def callback(ctx, param, value):
         if not value:
             return
@@ -103,7 +104,7 @@ def format_option(f):
     return f
 
 
-def debug_option(f):
+def debug_option(f: Callable) -> Callable:
     def callback(ctx, param, value):
         if not value or ctx.resilient_parsing:
             # turn off warnings altogether
@@ -125,7 +126,7 @@ def debug_option(f):
     )(f)
 
 
-def verbose_option(f):
+def verbose_option(f: Callable) -> Callable:
     def callback(ctx, param, value):
         # set state verbosity value from option
         state = ctx.ensure_object(CommandState)
@@ -171,7 +172,7 @@ def verbose_option(f):
     )(f)
 
 
-def map_http_status_option(f):
+def map_http_status_option(f: Callable) -> Callable:
     exit_stat_set = [0, 1] + list(range(50, 100))
 
     def per_val_callback(ctx, value):

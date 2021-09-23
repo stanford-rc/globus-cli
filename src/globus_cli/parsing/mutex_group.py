@@ -1,9 +1,11 @@
 import functools
-import typing
+from typing import Callable, List, TypeVar, Union
 
 import click
 
 from ..utils import format_list_of_words
+
+C = TypeVar("C", bound=Callable)
 
 
 class MutexInfo:
@@ -27,7 +29,7 @@ class MutexInfo:
         return self.option_name
 
 
-def mutex_option_group(*options: typing.Union[str, MutexInfo]):
+def mutex_option_group(*options: Union[str, MutexInfo]) -> Callable[[C], C]:
     """
     Given a mapping of param name to option string, decorate a command function to check
     for the exclusivity of those options.
@@ -48,7 +50,7 @@ def mutex_option_group(*options: typing.Union[str, MutexInfo]):
     MutexInfo allows you to customize how an option is detected as present in a
     dict of parameters by setting `present=...`.
     """
-    opt_infos: typing.List[MutexInfo] = []
+    opt_infos: List[MutexInfo] = []
     for opt in options:
         if isinstance(opt, str):
             opt_infos.append(MutexInfo(opt))
