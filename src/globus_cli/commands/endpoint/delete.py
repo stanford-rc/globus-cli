@@ -24,8 +24,7 @@ def endpoint_delete(endpoint_id):
     endpoints that are hosted on it.
     """
     client = get_client()
-    epish = Endpointish(endpoint_id, transfer_client=client)
-    epish.assert_is_traditional_endpoint()
+    Endpointish(endpoint_id, transfer_client=client).assert_is_traditional_endpoint()
 
     res = client.delete_endpoint(endpoint_id)
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")
