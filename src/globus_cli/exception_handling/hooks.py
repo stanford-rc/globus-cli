@@ -1,3 +1,5 @@
+from typing import List, Union, cast
+
 import click
 import globus_sdk
 
@@ -11,7 +13,7 @@ from .registry import error_handler
     error_class=globus_sdk.GlobusAPIError,
     condition=lambda err: err.info.authorization_parameters,
 )
-def session_hook(exception):
+def session_hook(exception: globus_sdk.GlobusAPIError) -> None:
     """
     Expects an exception with a valid authorization_paramaters info field
     """
@@ -27,12 +29,16 @@ def session_hook(exception):
     identities = exception.info.authorization_parameters.session_required_identities
     domains = exception.info.authorization_parameters.session_required_single_domain
     if identities or domains:
+        # cast: mypy can't deduce that `domains` is not None if `identities` is None
+        update_target = (
+            " ".join(identities)
+            if identities is not None
+            else " ".join(cast(List[str], domains))
+        )
         click.echo(
-            (
-                "Please run\n\n"
-                "    globus session update {}\n\n"
-                "to re-authenticate with the required identities"
-            ).format(" ".join(identities) if identities else " ".join(domains))
+            "Please run\n\n"
+            f"    globus session update {update_target}\n\n"
+            "to re-authenticate with the required identities"
         )
     else:
         click.echo(
@@ -45,7 +51,7 @@ def session_hook(exception):
     error_class=globus_sdk.GlobusAPIError,
     condition=lambda err: err.info.consent_required,
 )
-def consent_required_hook(exception):
+def consent_required_hook(exception: globus_sdk.GlobusAPIError) -> None:
     """
     Expects an exception with a required_scopes field in its raw_json
     """
@@ -69,14 +75,14 @@ def consent_required_hook(exception):
             "Fatal Error: ConsentRequired but no required_scopes!", bold=True, fg="red"
         )
         click.get_current_context().exit(255)
-
-    click.echo(
-        "\nPlease run\n\n"
-        "  globus session consent {}\n\n".format(
-            " ".join(f"'{x}'" for x in required_scopes)
+    else:
+        click.echo(
+            "\nPlease run\n\n"
+            "  globus session consent {}\n\n".format(
+                " ".join(f"'{x}'" for x in required_scopes)
+            )
+            + "to login with the required scopes"
         )
-        + "to login with the required scopes"
-    )
 
 
 @error_handler(
@@ -88,7 +94,9 @@ def consent_required_hook(exception):
         or (isinstance(err, globus_sdk.AuthAPIError) and err.code == "UNAUTHORIZED")
     )
 )
-def authentication_hook(exception):
+def authentication_hook(
+    exception: Union[globus_sdk.TransferAPIError, globus_sdk.AuthAPIError]
+) -> None:
     write_error_info(
         "No Authentication Error",
         [
@@ -104,7 +112,7 @@ def authentication_hook(exception):
 
 
 @error_handler(error_class=globus_sdk.TransferAPIError)
-def transferapi_hook(exception):
+def transferapi_hook(exception: globus_sdk.TransferAPIError) -> None:
     write_error_info(
         "Transfer API Error",
         [
@@ -120,7 +128,7 @@ def transferapi_hook(exception):
     error_class=globus_sdk.AuthAPIError,
     condition=lambda err: err.message == "invalid_grant",
 )
-def invalidrefresh_hook(exception):
+def invalidrefresh_hook(exception: globus_sdk.AuthAPIError) -> None:
     write_error_info(
         "Invalid Refresh Token",
         [
@@ -136,7 +144,7 @@ def invalidrefresh_hook(exception):
 
 
 @error_handler(error_class=globus_sdk.AuthAPIError)
-def authapi_hook(exception):
+def authapi_hook(exception: globus_sdk.AuthAPIError) -> None:
     write_error_info(
         "Auth API Error",
         [
@@ -148,7 +156,7 @@ def authapi_hook(exception):
 
 
 @error_handler(error_class=globus_sdk.GlobusAPIError)  # catch-all
-def globusapi_hook(exception):
+def globusapi_hook(exception: globus_sdk.GlobusAPIError) -> None:
     write_error_info(
         "Globus API Error",
         [
@@ -160,7 +168,7 @@ def globusapi_hook(exception):
 
 
 @error_handler(error_class=globus_sdk.GlobusError)
-def globus_error_hook(exception):
+def globus_error_hook(exception: globus_sdk.GlobusError) -> None:
     write_error_info(
         "Globus Error",
         [
@@ -171,7 +179,7 @@ def globus_error_hook(exception):
 
 
 @error_handler(error_class=WrongEndpointTypeError)
-def wrong_endpoint_type_error_hook(exception):
+def wrong_endpoint_type_error_hook(exception: WrongEndpointTypeError) -> None:
     ctx = click.get_current_context()
 
     click.echo(
@@ -202,7 +210,7 @@ def wrong_endpoint_type_error_hook(exception):
     ctx.exit(2)
 
 
-def register_all_hooks():
+def register_all_hooks() -> None:
     """
     This is a stub method which does nothing.
 

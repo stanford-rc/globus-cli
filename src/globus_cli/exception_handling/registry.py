@@ -1,14 +1,26 @@
 import functools
+from typing import Callable, List, NoReturn, Optional, Tuple, Type, TypeVar, cast
 
 import click
 import globus_sdk
 
 from globus_cli.parsing.command_state import CommandState
 
-_REGISTERED_HOOKS = []
+E = TypeVar("E", bound=Exception)
+
+HOOK_TYPE = Callable[[E], NoReturn]
+# something which can be decorated to become a hook
+_HOOK_SRC_TYPE = Callable[[E], None]
+CONDITION_TYPE = Callable[[E], bool]
+
+# must cast the registry to avoid type errors around List[<nothing>]
+_HOOKLIST_TYPE = List[Tuple[HOOK_TYPE, Type[Exception], CONDITION_TYPE]]
+_REGISTERED_HOOKS: _HOOKLIST_TYPE = cast(_HOOKLIST_TYPE, [])
 
 
-def error_handler(*, error_class=None, condition=None):
+def error_handler(
+    *, error_class=None, condition=None
+) -> Callable[[_HOOK_SRC_TYPE], HOOK_TYPE]:
     """decorator for excepthooks
 
     register each one, in order, with any relevant "condition"
@@ -34,7 +46,7 @@ def error_handler(*, error_class=None, condition=None):
     return inner_decorator
 
 
-def find_handler(exception):
+def find_handler(exception: Exception) -> Optional[HOOK_TYPE]:
     for handler, error_class, condition in _REGISTERED_HOOKS:
         if error_class is not None and not isinstance(exception, error_class):
             continue
