@@ -13,7 +13,7 @@ from globus_cli.parsing.command_state import (
 
 def common_options(
     f: Optional[Callable] = None, *, disable_options: Optional[List[str]] = None
-):
+) -> Callable:
     """
     This is a multi-purpose decorator for applying a "base" set of options
     shared by all commands.

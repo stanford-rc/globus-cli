@@ -12,7 +12,7 @@ localdev: .venv
 
 .PHONY: lint test reference
 lint:
-	tox -e lint
+	tox -e lint,mypy
 reference:
 	tox -e reference
 test:
