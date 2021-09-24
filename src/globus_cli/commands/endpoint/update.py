@@ -1,3 +1,4 @@
+from globus_cli.endpointish import Endpointish
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
 from globus_cli.services.transfer import assemble_generic_doc, get_client
@@ -18,18 +19,20 @@ def endpoint_update(**kwargs):
     # validate params. Requires a get call to check the endpoint type
     client = get_client()
     endpoint_id = kwargs.pop("endpoint_id")
-    get_res = client.get_endpoint(endpoint_id)
 
-    if get_res["host_endpoint_id"]:
+    epish = Endpointish(endpoint_id, transfer_client=client)
+    epish.assert_is_traditional_endpoint()
+
+    if epish.data["host_endpoint_id"]:
         endpoint_type = "shared"
-    elif get_res["is_globus_connect"]:
+    elif epish.data["is_globus_connect"]:
         endpoint_type = "personal"
-    elif get_res["s3_url"]:
+    elif epish.data["s3_url"]:
         endpoint_type = "s3"
     else:
         endpoint_type = "server"
     validate_endpoint_create_and_update_params(
-        endpoint_type, get_res["subscription_id"], kwargs
+        endpoint_type, epish.data["subscription_id"], kwargs
     )
 
     # make the update
