@@ -126,9 +126,8 @@ class OutputMatcher:
     groups against expected strings. This can be attached to run_line by passing
     "matcher=True".
 
-    Runs regex matches on a per-line basis until a match is found. On the first regex
-    match, it will test expected values and fail if they do not match.
-    If no match is found for the regex, it will raise an error.
+    Runs regex matches in multiline mode, operating on the first match.
+    If no match is found, it will raise an error.
 
     Usage:
 
@@ -140,17 +139,15 @@ class OutputMatcher:
         self._result = result
 
     def check(self, regex, groups=None, err=False) -> None:
-        pattern = re.compile(regex)
+        pattern = re.compile(regex, flags=re.MULTILINE)
         groups = groups or []
         data = self._result.stderr if err else self._result.output
-        for line in data.split("\n"):
-            m = pattern.match(line)
-            if not m:
-                continue
-            for i, x in enumerate(groups, 1):
-                assert m.group(i) == x
-            return
-        raise ValueError(f"Did not find a match for '{regex}' in {data}")
+
+        m = pattern.search(data)
+        if not m:
+            raise ValueError(f"Did not find a match for '{regex}' in {data}")
+        for i, x in enumerate(groups, 1):
+            assert m.group(i) == x
 
 
 @pytest.fixture
