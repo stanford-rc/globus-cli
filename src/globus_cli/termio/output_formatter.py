@@ -63,9 +63,13 @@ def _key_to_keyfunc(k):
     # if the key is a string, then the "keyfunc" is just a basic lookup
     # operation -- return that
     if isinstance(k, str):
+        subkeys = k.split(".")
 
         def lookup(x):
-            return x[k]
+            current = x
+            for sub in subkeys:
+                current = x[sub]
+            return current
 
         return lookup
     # otherwise, the key must be a function which is executed on the item

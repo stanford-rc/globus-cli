@@ -32,7 +32,6 @@ STANDARD_FIELDS = [
     ("Contact E-mail", "contact_email"),
     ("Contact Info", "contact_info"),
     ("Collection Info Link", "info_link"),
-    ("Google Cloud Storage Project", "policies.project"),
 ]
 
 PRIVATE_FIELDS = [
