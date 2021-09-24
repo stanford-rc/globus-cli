@@ -8,7 +8,18 @@ It should not depend on any other part of the globus-cli codebase.
 __all__ = ["EXPLICIT_NULL"]
 
 
-# this object is a sentinel value used to disambiguate values which are being
-# intentionally nulled from values which are incidentally `None` because no
-# argument was provided
-EXPLICIT_NULL = object()
+class _ExplicitNullClass:
+    """
+    Magic sentinel value used to disambiguate values which are being
+    intentionally nulled from values which are `None` because no argument was
+    provided
+    """
+
+    def __bool__(self):
+        return False
+
+    def __repr__(self):
+        return "null"
+
+
+EXPLICIT_NULL = _ExplicitNullClass()

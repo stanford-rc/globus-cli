@@ -15,9 +15,14 @@ from globus_cli.parsing.shared_options import (
 from .param_types import (
     ENDPOINT_PLUS_OPTPATH,
     ENDPOINT_PLUS_REQPATH,
+    CommaDelimitedList,
     IdentityType,
+    JSONStringOrFile,
     LocationType,
+    StringOrNull,
     TaskPath,
+    UrlOrNull,
+    nullable_multi_callback,
 )
 
 __all__ = [
@@ -29,12 +34,17 @@ __all__ = [
     # param types
     "ENDPOINT_PLUS_OPTPATH",
     "ENDPOINT_PLUS_REQPATH",
-    "TaskPath",
-    "one_use_option",
-    "MutexInfo",
-    "mutex_option_group",
+    "CommaDelimitedList",
     "IdentityType",
+    "JSONStringOrFile",
     "LocationType",
+    "MutexInfo",
+    "StringOrNull",
+    "TaskPath",
+    "UrlOrNull",
+    "mutex_option_group",
+    "nullable_multi_callback",
+    "one_use_option",
     # Transfer options
     "collection_id_arg",
     "endpoint_id_arg",

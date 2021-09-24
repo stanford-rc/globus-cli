@@ -60,7 +60,7 @@ PRIVATE_FIELDS = [
 )
 def collection_show(login_manager, *, include_private_policies, collection_id):
     """
-    Show a Collection on the current Endpoint
+    Display a Mapped or Guest Collection
     """
     endpoint_id = Endpointish(collection_id).get_collection_endpoint_id()
     login_manager.assert_logins(endpoint_id, assume_gcs=True)
