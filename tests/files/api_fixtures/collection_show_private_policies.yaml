@@ -1,0 +1,94 @@
+metadata:
+  collection_id: "1405823f-0597-4a16-b296-46d4f0ae4b15"
+  endpoint_id: "cf37806c-572c-47ff-88e2-511c646ef1a4"
+  username: "sirosen@globusid.org"
+
+transfer:
+  - path: /endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15
+    json:
+      {
+        "DATA": [],
+        "DATA_TYPE": "endpoint",
+        "display_name": "Happy Fun Collection Name",
+        "gcs_version": "5.4.10",
+        "host_endpoint_id": null,
+        "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+        "is_globus_connect": false,
+        "non_functional": false,
+        "owner_id": "cf37806c-572c-47ff-88e2-511c646ef1a4"
+      }
+  - path: /endpoint/cf37806c-572c-47ff-88e2-511c646ef1a4
+    json:
+     {
+        "DATA": [
+          {
+            "DATA_TYPE": "server",
+            "hostname": "abc.xyz.data.globus.org"
+          }
+        ],
+        "DATA_TYPE": "endpoint",
+        "gcs_version": "5.4.10",
+        "host_endpoint_id": null,
+        "id": "cf37806c-572c-47ff-88e2-511c646ef1a4",
+        "is_globus_connect": false,
+        "non_functional": true,
+        "owner_id": "cf37806c-572c-47ff-88e2-511c646ef1a4"
+      }
+  - path: /endpoint/cf37806c-572c-47ff-88e2-511c646ef1a4/server_list
+    json:
+     {
+        "DATA": [
+          {
+            "DATA_TYPE": "server",
+            "hostname": "abc.xyz.data.globus.org"
+          }
+        ],
+        "DATA_TYPE": "endpoint_server_list"
+      }
+
+auth:
+  - path: /v2/api/identities
+    json:
+      {
+        "identities": [
+          {
+            "email": "sirosen@uchicago.edu",
+            "id": "e926d510-cb98-11e5-a6ac-0b0216052512",
+            "identity_provider": "41143743-f3c8-4d60-bbdb-eeecaba85bd9",
+            "name": "Stephen Rosen",
+            "organization": "University of Chicago",
+            "status": "used",
+            "username": "sirosen@globusid.org"
+          }
+        ]
+      }
+
+gcs:
+  - path: /collections/1405823f-0597-4a16-b296-46d4f0ae4b15
+    json:
+      {
+        "DATA_TYPE": "result#1.0.0",
+        "code": "success",
+        "detail": "success",
+        "http_response_code": 200,
+        "data": [
+          {
+            "DATA_TYPE": "collection#1.0.0",
+            "public": true,
+            "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+            "display_name": "Happy Fun Collection Name",
+            "identity_id": "e926d510-cb98-11e5-a6ac-0b0216052512",
+            "collection_type": "mapped",
+            "root_path": "/",
+            "collection_base_path": "/",
+            "storage_gateway_id": "6ebdbaa3-9c60-4637-9d26-1bcfa3921f6b",
+            "connector_id": "145812c8-decc-41f1-83cf-bb2a85a2a70b",
+            "sharing_restrict_paths": {
+                "DATA_TYPE": "path_restrictions#1.0.0",
+                "read": ["/projects"],
+                "read_write": ["$HOME"],
+                "none": ["/"]
+            }
+          }
+        ]
+      }

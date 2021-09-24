@@ -30,3 +30,29 @@ def test_show_long_description(run_line, load_api_fixtures):
     assert "== 1.14.0\n" in result.output
     # much later lines should have been truncated out
     assert "== 1.13.0\n" not in result.output
+
+
+# confirm that this *does not* error:
+# showing a GCSv5 host needs to be supported for show (unlike update, delete, etc)
+def test_show_on_gcsv5_endpoint(run_line, load_api_fixtures):
+    data = load_api_fixtures("collection_operations.yaml")
+    epid = data["metadata"]["endpoint_id"]
+
+    result = run_line(f"globus endpoint show {epid}")
+    assert "Display Name:" in result.output
+    assert epid in result.output
+
+
+def test_show_on_gcsv5_collection(run_line, load_api_fixtures):
+    data = load_api_fixtures("collection_operations.yaml")
+    epid = data["metadata"]["mapped_collection_id"]
+
+    result = run_line(f"globus endpoint show {epid}", assert_exit_code=2)
+    assert (
+        f"Expected {epid} to be an endpoint ID.\n"
+        "Instead, found it was of type 'Mapped Collection'."
+    ) in result.stderr
+    assert (
+        "Please run the following command instead:\n\n"
+        f"    globus collection show {epid}"
+    ) in result.stderr
