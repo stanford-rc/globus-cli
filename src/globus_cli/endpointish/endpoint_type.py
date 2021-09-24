@@ -20,6 +20,10 @@ class EndpointType(Enum):
         return (cls.GCP, cls.SHARE, cls.NON_GCSV5_ENDPOINT)
 
     @classmethod
+    def non_collection_types(cls) -> Tuple["EndpointType", ...]:
+        return tuple(x for x in cls if x not in cls.collections())
+
+    @classmethod
     def nice_name(cls, eptype: "EndpointType") -> str:
         return {
             cls.GCP: "Globus Connect Personal",

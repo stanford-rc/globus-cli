@@ -1,3 +1,4 @@
+from globus_cli.endpointish import Endpointish
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
 from globus_cli.services.transfer import get_client
@@ -10,6 +11,7 @@ from globus_cli.termio import FORMAT_TEXT_RECORD, FormatField, formatted_print
 def endpoint_show(endpoint_id):
     """Display a detailed endpoint definition"""
     client = get_client()
+    Endpointish(endpoint_id, transfer_client=client).assert_is_not_collection()
 
     res = client.get_endpoint(endpoint_id)
 

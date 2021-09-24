@@ -9,6 +9,12 @@ SHOULD_USE_MAP = {
     "globus endpoint delete": [
         ("globus collection delete", EndpointType.collections()),
     ],
+    "globus collection show": [
+        ("globus endpoint show", EndpointType.non_collection_types()),
+    ],
+    "globus endpoint show": [
+        ("globus collection show", EndpointType.collections()),
+    ],
 }
 
 

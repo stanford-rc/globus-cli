@@ -41,6 +41,11 @@ class Endpointish:
             EndpointType.collections(), error_class=ExpectedCollectionError
         )
 
+    def assert_is_not_collection(self):
+        self.assert_ep_type(
+            EndpointType.non_collection_types(), error_class=ExpectedEndpointError
+        )
+
     def assert_is_traditional_endpoint(self):
         self.assert_ep_type(
             EndpointType.traditional_endpoints(), error_class=ExpectedEndpointError
