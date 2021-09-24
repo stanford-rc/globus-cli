@@ -10,9 +10,9 @@ import sys
 
 import click
 
+from globus_cli.exception_handling import custom_except_hook
 from globus_cli.termio import env_interactive
 
-from .excepthook import custom_except_hook
 from .shared_options import common_options
 from .shell_completion import print_completer_option
 

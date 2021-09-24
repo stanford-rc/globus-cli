@@ -6,7 +6,6 @@ from .activation import (
 from .client import CustomTransferClient, get_client
 from .data import assemble_generic_doc, display_name_or_cname, iterable_response_to_dict
 from .delegate_proxy import fill_delegate_proxy_activation_requirements
-from .endpoint_type import EndpointType
 
 ENDPOINT_LIST_FIELDS = (
     ("ID", "id"),
@@ -26,5 +25,4 @@ __all__ = (
     "display_name_or_cname",
     "iterable_response_to_dict",
     "assemble_generic_doc",
-    "EndpointType",
 )

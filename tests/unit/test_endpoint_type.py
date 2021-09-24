@@ -2,7 +2,7 @@ import uuid
 
 import pytest
 
-from globus_cli.services.transfer import EndpointType
+from globus_cli.endpointish import EndpointType
 
 
 @pytest.mark.parametrize(

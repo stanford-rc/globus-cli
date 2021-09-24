@@ -65,5 +65,4 @@ def test_jmespath_invalid_expression_error(run_line):
     result = run_line(
         ("globus endpoint search 'Tutorial' --jmespath '{}'"), assert_exit_code=1
     )
-    #  FIXME? why is this printed to stdout?
-    assert "ParseError:" in result.output
+    assert "ParseError:" in result.stderr
