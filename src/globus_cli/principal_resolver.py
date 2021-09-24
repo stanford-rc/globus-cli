@@ -26,6 +26,11 @@ from globus_cli.services.auth import get_auth_client
 IDENTITY_URN_PREFIX = "urn:globus:auth:identity:"
 
 
+class InvalidPrincipalError(ValueError):
+    def __init__(self, value):
+        self.value = value
+
+
 class PrincipalResolver:
     """
     Everything is done lazily via properties so that nothing happens during
@@ -59,27 +64,29 @@ class PrincipalResolver:
 
     def _raw_id_from_object(self, obj):
         """
-        returns a 3-tuple, (resolved?, original, value)
-        so that callers know if this helper thinks it got a good result or not
+        returns a pair, (original, value)
+
+        can raise InvalidPrincipalError if the input is malformed
         """
         value = obj[self.key]
         # if not using URNs, the "raw ID" is just the value and it "always works"
         if not self.use_urns:
-            return (True, value, value)
+            return (value, value)
 
         # otherwise, check
         # if it doesn't have the URN prefix, it is not a valid URN, so this lookup
         # failed -- the result is (False, ...) to indicate failure
         if not value.startswith(IDENTITY_URN_PREFIX):
-            return (False, value, value)
+            raise InvalidPrincipalError(value)
         # if it has the right prefix, left-strip the prefix as the new value, return the
         # original and the success indicator
-        return (True, value, value[len(IDENTITY_URN_PREFIX) :])
+        return (value, value[len(IDENTITY_URN_PREFIX) :])
 
     def field(self, data):
-        resolved, original, value = self._raw_id_from_object(data)
-        if not resolved:
-            return value
+        try:
+            original, value = self._raw_id_from_object(data)
+        except InvalidPrincipalError as err:
+            return err.value
         # try to do the lookup and get the "username" property
         # but default to the original value if this doesn't resolve
         return self.idmap.get(value, {}).get("username", original)
@@ -89,9 +96,12 @@ class PrincipalResolver:
     # populated on a per-page basis.
     def page_callback(self, data_page):
         for item in data_page:
-            resolved, _original, value = self._raw_id_from_object(item)
-            if resolved:
-                self.idmap.add(value)
+            try:
+                _original, value = self._raw_id_from_object(item)
+            except InvalidPrincipalError:
+                continue
+
+            self.idmap.add(value)
 
 
 default_principal_resolver = PrincipalResolver("principal")
