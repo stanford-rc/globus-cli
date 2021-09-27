@@ -36,5 +36,9 @@ jobs:
         # because that's the build environment used (i.e. the one which really matters)
         if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' }}
         run: python -m tox -e reference
+      - name: Test package build
+        # only on linux 3.9 for faster runs
+        if: ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' }}
+        run: python -m tox -e twine-check
       - name: Run Tests
         run: python -m tox -e py
