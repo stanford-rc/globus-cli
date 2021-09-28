@@ -15,6 +15,12 @@ SHOULD_USE_MAP = {
     "globus endpoint show": [
         ("globus collection show", EndpointType.collections()),
     ],
+    "globus collection update": [
+        ("globus endpoint update", EndpointType.traditional_endpoints()),
+    ],
+    "globus endpoint update": [
+        ("globus collection update", EndpointType.collections()),
+    ],
 }
 
 

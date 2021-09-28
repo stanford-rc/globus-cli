@@ -26,7 +26,7 @@ transfer:
         "DATA_TYPE": "endpoint",
         "gcs_version": "5.4.10",
         "host_endpoint_id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
-        "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+        "id": "0e4a77f8-b778-4d5c-abaa-e1254e71427f",
         "is_globus_connect": false,
         "non_functional": false,
         "owner_id": "cf37806c-572c-47ff-88e2-511c646ef1a4"
@@ -150,6 +150,82 @@ gcs:
             "collection_type": "mapped",
             "storage_gateway_id": "6ebdbaa3-9c60-4637-9d26-1bcfa3921f6b",
             "connector_id": "145812c8-decc-41f1-83cf-bb2a85a2a70b"
+          }
+        ]
+      }
+  - path: /collections/1405823f-0597-4a16-b296-46d4f0ae4b15
+    method: patch
+    json:
+      {
+        "DATA_TYPE": "result#1.0.0",
+        "code": "success",
+        "detail": "success",
+        "http_response_code": 200,
+        "data": [
+          {
+            "DATA_TYPE": "collection#1.0.0",
+            "authentication_assurance_timeout": 30,
+            "authentication_timeout_mins": 30,
+            "collection_type": "mapped",
+            "connector_id": "145812c8-decc-41f1-83cf-bb2a85a2a70b",
+            "contact_email": "user@example.com",
+            "contact_info": "string",
+            "default_directory": "/",
+            "department": "globus",
+            "description": "example collection",
+            "display_name": "Happy Fun Collection Name",
+            "force_encryption": true,
+            "https_url": "http://example.com",
+            "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+            "identity_id": "e926d510-cb98-11e5-a6ac-0b0216052512",
+            "info_link": "http://example.com",
+            "keywords": "example",
+            "manager_url": "https://gcs.data.globus.org/",
+            "organization": "uchicago",
+            "policies": {},
+            "public": true,
+            "root_path": "/",
+            "storage_gateway_id": "6ebdbaa3-9c60-4637-9d26-1bcfa3921f6b",
+            "tlsftp_url": "http://example.com"
+          }
+        ]
+      }
+  - path: /collections/0e4a77f8-b778-4d5c-abaa-e1254e71427f
+    method: patch
+    json:
+      {
+        "DATA_TYPE": "result#1.0.0",
+        "code": "success",
+        "detail": "success",
+        "http_response_code": 200,
+        "data": [
+          {
+            "DATA_TYPE": "collection#1.0.0",
+            "authentication_assurance_timeout": 30,
+            "authentication_timeout_mins": 30,
+            "collection_type": "guest",
+            "contact_email": "user@example.com",
+            "default_directory": "/",
+            "department": "globus",
+            "description": "example collection",
+            "display_name": "Happy Fun Guest Collection Name",
+            "force_encryption": true,
+            "gcs_version": "5.4.10",
+            "host_endpoint_id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
+            "https_url": "http://example.com",
+            "id": "0e4a77f8-b778-4d5c-abaa-e1254e71427f",
+            "identity_id": "e926d510-cb98-11e5-a6ac-0b0216052512",
+            "info_link": "http://example.com",
+            "is_globus_connect": false,
+            "keywords": "example",
+            "manager_url": "https://gcs.data.globus.org/",
+            "non_functional": false,
+            "organization": "uchicago",
+            "owner_id": "cf37806c-572c-47ff-88e2-511c646ef1a4",
+            "policies": {},
+            "public": true,
+            "root_path": "/",
+            "tlsftp_url": "http://example.com"
           }
         ]
       }
