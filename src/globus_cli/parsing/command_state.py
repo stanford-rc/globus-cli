@@ -16,7 +16,12 @@ def _setup_logging(level="DEBUG"):
     conf = {
         "version": 1,
         "formatters": {
-            "basic": {"format": "[%(levelname)s] %(name)s::%(funcName)s() %(message)s"}
+            "basic": {
+                "format": (
+                    "[%(levelname)s] [%(asctime)s] "
+                    "%(name)s::%(funcName)s() %(message)s"
+                )
+            }
         },
         "handlers": {
             "console": {
@@ -25,7 +30,10 @@ def _setup_logging(level="DEBUG"):
                 "formatter": "basic",
             }
         },
-        "loggers": {"globus_sdk": {"level": level, "handlers": ["console"]}},
+        "loggers": {
+            "globus_sdk": {"level": level, "handlers": ["console"]},
+            "globus_cli": {"level": level, "handlers": ["console"]},
+        },
     }
 
     logging.config.dictConfig(conf)

@@ -6,6 +6,7 @@ Ultimately, `globus_cli.parsing` will export only the decorators defined here,
 and all other components will be hidden internals.
 """
 
+import logging
 import sys
 
 import click
@@ -15,6 +16,8 @@ from globus_cli.termio import env_interactive
 
 from .shared_options import common_options
 from .shell_completion import print_completer_option
+
+log = logging.getLogger(__name__)
 
 
 class GlobusCommand(click.Command):
@@ -48,6 +51,13 @@ for more details."""
                 AUTOMATIC_ACTIVATION=self.AUTOMATIC_ACTIVATION_HELPTEXT
             )
         super().__init__(*args, **kwargs)
+
+    def invoke(self, ctx):
+        log.debug("command invoke start")
+        try:
+            return super().invoke(ctx)
+        finally:
+            log.debug("command invoke exit")
 
 
 class GlobusCommandEnvChecks(GlobusCommand):

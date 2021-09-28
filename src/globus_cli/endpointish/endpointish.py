@@ -1,3 +1,4 @@
+import logging
 import uuid
 from typing import Tuple, Type, Union, cast
 
@@ -12,16 +13,22 @@ from .errors import (
     WrongEndpointTypeError,
 )
 
+log = logging.getLogger(__name__)
+
 
 class Endpointish:
     def __init__(self, endpoint_id: Union[str, uuid.UUID], *, transfer_client=None):
         self._client = transfer_client if transfer_client is not None else get_client()
         self.endpoint_id = endpoint_id
 
+        log.debug("Endpointish getting ep data")
         res = self._client.get_endpoint(endpoint_id)
         self.data = res.data
+        log.debug("Endpointish.data=%s", self.data)
 
+        log.debug("Endpointish determine ep type")
         self.ep_type = EndpointType.determine_endpoint_type(self.data)
+        log.debug("Endpointish.ep_type=%s", self.ep_type)
 
     @property
     def nice_type_name(self) -> str:
