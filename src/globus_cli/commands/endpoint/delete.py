@@ -17,7 +17,7 @@ $ globus endpoint delete $ep_id
 )
 @endpoint_id_arg
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def endpoint_delete(endpoint_id):
+def endpoint_delete(endpoint_id: str) -> None:
     """Delete a given endpoint.
 
     WARNING: Deleting an endpoint will permanently disable any existing shared

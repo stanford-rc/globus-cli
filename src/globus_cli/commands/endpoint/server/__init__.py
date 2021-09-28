@@ -7,7 +7,7 @@ from globus_cli.parsing import group
 
 
 @group("server", short_help="Manage servers for a Globus endpoint")
-def server_command():
+def server_command() -> None:
     """
     Manage the servers which back a Globus endpoint
 

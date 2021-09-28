@@ -7,7 +7,7 @@ from globus_cli.parsing import group
 
 
 @group("permission")
-def permission_command():
+def permission_command() -> None:
     """Manage endpoint permissions (Access Control Lists)"""
 
 

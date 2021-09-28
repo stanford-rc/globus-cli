@@ -5,7 +5,7 @@ from globus_cli.parsing import group
 
 
 @group("session")
-def session_command():
+def session_command() -> None:
     """Manage your CLI auth session"""
 
 

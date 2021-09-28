@@ -1,3 +1,5 @@
+from typing import Optional
+
 import click
 
 from globus_cli.login_manager import LoginManager
@@ -71,7 +73,12 @@ $ globus endpoint search --filter-scope my-endpoints
 )
 @click.argument("filter_fulltext", required=False)
 @LoginManager.requires_login(LoginManager.AUTH_RS, LoginManager.TRANSFER_RS)
-def endpoint_search(filter_fulltext, limit, filter_owner_id, filter_scope):
+def endpoint_search(
+    filter_fulltext: Optional[str],
+    limit: int,
+    filter_owner_id: Optional[str],
+    filter_scope: Optional[str],
+) -> None:
     """
     Search for Globus endpoints with search filters. If --filter-scope is set to the
     default of 'all', then FILTER_FULLTEXT is required.

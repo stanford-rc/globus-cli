@@ -1,3 +1,5 @@
+from typing import Optional
+
 import click
 
 from globus_cli.login_manager import LoginManager
@@ -79,7 +81,9 @@ fi
     ),
 )
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def endpoint_is_activated(endpoint_id, until, absolute_time):
+def endpoint_is_activated(
+    endpoint_id: str, until: Optional[int], absolute_time: bool
+) -> None:
     """
     Check if an endpoint is activated or requires activation.
 

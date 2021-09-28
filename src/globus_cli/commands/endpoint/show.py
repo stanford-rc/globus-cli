@@ -11,7 +11,7 @@ from globus_cli.termio import FORMAT_TEXT_RECORD, FormatField, formatted_print
 @endpoint_id_arg
 @click.option("--skip-endpoint-type-check", is_flag=True, hidden=True)
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def endpoint_show(endpoint_id, skip_endpoint_type_check):
+def endpoint_show(endpoint_id: str, skip_endpoint_type_check: bool) -> None:
     """Display a detailed endpoint definition"""
     client = get_client()
     if not skip_endpoint_type_check:

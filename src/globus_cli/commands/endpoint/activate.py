@@ -1,4 +1,5 @@
 import webbrowser
+from typing import Optional
 
 import click
 
@@ -115,18 +116,18 @@ $ globus endpoint activate $ep_id --myproxy -U username
 @mutex_option_group("--web", "--myproxy", "--delegate-proxy")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
 def endpoint_activate(
-    endpoint_id,
-    myproxy,
-    myproxy_username,
-    myproxy_password,
-    myproxy_lifetime,
-    web,
-    no_browser,
-    delegate_proxy,
-    proxy_lifetime,
-    no_autoactivate,
-    force,
-):
+    endpoint_id: str,
+    myproxy: bool,
+    myproxy_username: Optional[str],
+    myproxy_password: Optional[str],
+    myproxy_lifetime: Optional[int],
+    web: bool,
+    no_browser: bool,
+    delegate_proxy: bool,
+    proxy_lifetime: Optional[int],
+    no_autoactivate: bool,
+    force: bool,
+) -> None:
     """
     Activate an endpoint using Autoactivation, Myproxy, Delegate Proxy,
     or Web activation.

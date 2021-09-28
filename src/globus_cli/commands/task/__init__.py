@@ -10,7 +10,7 @@ from globus_cli.parsing import group
 
 
 @group("task")
-def task_command():
+def task_command() -> None:
     """Manage asynchronous tasks"""
 
 

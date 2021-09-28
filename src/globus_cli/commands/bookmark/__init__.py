@@ -7,7 +7,7 @@ from globus_cli.parsing import group
 
 
 @group("bookmark")
-def bookmark_command():
+def bookmark_command() -> None:
     """Manage endpoint bookmarks"""
 
 
