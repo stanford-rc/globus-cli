@@ -88,3 +88,31 @@ def test_bookmark_delete_by_name(run_line, load_api_fixtures):
     bookmark_name = data["metadata"]["bookmark_name"]
     result = run_line(f'globus bookmark delete "{bookmark_name}"')
     assert "deleted successfully" in result.output
+
+
+def test_bookmark_list(run_line, load_api_fixtures):
+    data = load_api_fixtures("bookmark_list.yaml")
+    bookmarks = data["metadata"]["bookmarks"]
+
+    result = run_line("globus bookmark list")
+    for bm_id in bookmarks.keys():
+        assert bm_id in result.output
+
+    lines = result.output.split("\n")
+    for bm_id, data in bookmarks.items():
+        for line in lines:
+            if bm_id not in line:
+                continue
+            assert data["name"] in line
+            assert data["path"] in line
+            if data["ep_name"] is not None:
+                assert data["ep_name"] in line
+            else:
+                assert "[DELETED ENDPOINT]" in line
+            break
+
+
+def test_bookmark_list_failure(run_line, load_api_fixtures):
+    load_api_fixtures("bookmark_list_failure.yaml")
+    result = run_line("globus bookmark list", assert_exit_code=1)
+    assert "InternalError" in result.stderr
