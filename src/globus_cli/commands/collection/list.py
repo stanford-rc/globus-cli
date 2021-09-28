@@ -24,7 +24,7 @@ class ChoiceSlugified(click.Choice):
     def convert(self, value, param, ctx):
         if value is None:
             return None
-        return super().convert(value, param, ctx).replace("_", "-")
+        return super().convert(value.replace("_", "-"), param, ctx).replace("-", "_")
 
 
 @command("list", short_help="List all Collections on an Endpoint")
