@@ -1,6 +1,69 @@
 = CLI Changelog
 
+== 3.0.0
+
+This is a major release of the CLI and has several backwards incompatible
+changes. See the Backwards Incompatible Changes list below.
+
+Bugfixes:
+
+* Fix a bug in which some error outputs could be sent to stdout
+
+Enhancements:
+
+* `globus endpoint show` now includes the description field. Formatting of the
+  description may wrap
+* `globus session update` now supports domains for
+  `session_required_single_domain` requirements
+* globus-cli now uses more advanced token storage, and does not use
+  `~/.globus.cfg`. A `globus login` with this version will invalidate any CLI
+  tokens found in `~/.globus.cfg`
+** Note: this version of the CLI will not modify the `~/.globus.cfg` file, only
+   invalidate CLI version 2 tokens. After the upgrade, you may remove this file
+   if you are not using it for other purposes.
+* globus-cli now supports use of the `GLOBUS_PROFILE` environment variable,
+  which lets users name sets of credentials and switch between accounts
+* globus-cli commands can now direct the user to login to a specific Globus
+  Connect Server v5 Endpoint. When the requirements for running a command are
+  not met, a message with the correct login command will be shown.
+* A new environment variable, `GLOBUS_CLI_INTERACTIVE` can be used to instruct the
+  CLI to behave as though it is or is not in an interactive shell. Set
+  `GLOBUS_CLI_INTERACTIVE=0` to force non-interactive behavior, and
+  `GLOBUS_CLI_INTERACTIVE=1` to force interactive behavior
+* Add new collection-related commands for Mapped and Guest Collections
+** `globus collection list`
+** `globus collection show`
+** `globus collection update`
+** `globus collection delete`
+* `globus endpoint ...` and `globus collection ...` commands may exit with an
+  error instructing the user to use a corresponding command when
+  `globus endpoint` commands are used on collections or `globus collection`
+  commands are used on non-collection endpoint types
+* Add new `globus group list` command for listing your group memberships
+
+Backwards Incompatible Changes:
+
+* Remove the `--version` flag. Use `globus version` instead
+* `globus endpoint server add` now takes the server as a positional argument, not
+  a required option
+* `globus rename` has changed to take the endpoint ID once and two separate paths,
+  instead of two `endpoint:path` arguments which require the endpoint ID to match
+* Remove the `globus config` commands
+* `globus transfer --batch` and `globus delete --batch` now accept filenames to
+  specify batches. To use stdin (as in v2), pass a single dash for the filename,
+  as in `--batch -`
+* Two new exit statuses, in addition to 0, 1, and 2, are now used by the CLI to
+  indicate specific error conditions
+** An `exit(3)` is used whenever the type of an object does not match the
+   expectations of a command. For example, `globus collection list` on a
+   Collection is incorrect -- that command should be used on Endpoints
+** An `exit(4)` is used whenever the authentication or authorization
+   requirements of a command are not met. For example, if your session does not
+   satisfy the `authentication_timeout` for an HA endpoint.
+
 == 2.1.0
+
+Enhancements:
 
 * `globus transfer` now supports an option, `--exclude`, which can be used to
   skip files matching a pattern or set of patterns when submitting a recursive
