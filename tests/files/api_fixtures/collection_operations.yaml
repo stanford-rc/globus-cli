@@ -11,25 +11,58 @@ transfer:
       {
         "DATA": [],
         "DATA_TYPE": "endpoint",
-        "display_name": "Happy Fun Collection Name",
+        "activated": false,
+        "canonical_name": "cf37806c-572c-47ff-88e2-511c646ef1a4#1405823f-0597-4a16-b296-46d4f0ae4b15",
+        "contact_email": null,
+        "contact_info": null,
+        "default_directory": null,
+        "description": "example gcsv5 mapped collection",
+        "department": null,
+        "display_name": "Happy Fun Mapped Collection Name",
+        "force_encryption": false,
         "gcs_version": "5.4.10",
         "host_endpoint_id": null,
         "id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
         "is_globus_connect": false,
+        "info_link": null,
+        "keywords": null,
+        "local_user_info_available": false,
         "non_functional": false,
-        "owner_id": "cf37806c-572c-47ff-88e2-511c646ef1a4"
+        "organization": "My Org",
+        "owner_id": "cf37806c-572c-47ff-88e2-511c646ef1a4",
+        "owner_string": "cf37806c-572c-47ff-88e2-511c646ef1a4@clients.auth.globus.org",
+        "public": false,
+        "shareable": false,
+        "subscription_id": null
       }
   - path: /endpoint/0e4a77f8-b778-4d5c-abaa-e1254e71427f
     json:
       {
         "DATA": [],
         "DATA_TYPE": "endpoint",
+        "activated": false,
+        "canonical_name": "cf37806c-572c-47ff-88e2-511c646ef1a4#0e4a77f8-b778-4d5c-abaa-e1254e71427f",
+        "contact_email": null,
+        "contact_info": null,
+        "default_directory": null,
+        "description": "example gcsv5 guest collection",
+        "department": null,
+        "display_name": "Happy Fun Guest Collection Name",
+        "force_encryption": false,
         "gcs_version": "5.4.10",
         "host_endpoint_id": "1405823f-0597-4a16-b296-46d4f0ae4b15",
         "id": "0e4a77f8-b778-4d5c-abaa-e1254e71427f",
         "is_globus_connect": false,
+        "info_link": null,
+        "keywords": null,
+        "local_user_info_available": false,
         "non_functional": false,
-        "owner_id": "cf37806c-572c-47ff-88e2-511c646ef1a4"
+        "organization": "My Org",
+        "owner_id": "cf37806c-572c-47ff-88e2-511c646ef1a4",
+        "owner_string": "cf37806c-572c-47ff-88e2-511c646ef1a4@clients.auth.globus.org",
+        "public": false,
+        "shareable": false,
+        "subscription_id": null
       }
   - path: /endpoint/cf37806c-572c-47ff-88e2-511c646ef1a4
     json:
@@ -59,11 +92,11 @@ transfer:
         "local_user_info_available": false,
         "non_functional": true,
         "organization": "My Org",
-        "owner_string": "cf37806c-572c-47ff-88e2-511c646ef1a4@clients.auth.globus.org",
         "owner_id": "cf37806c-572c-47ff-88e2-511c646ef1a4",
+        "owner_string": "cf37806c-572c-47ff-88e2-511c646ef1a4@clients.auth.globus.org",
         "public": false,
         "shareable": false,
-        "subscription_id": null,
+        "subscription_id": null
       }
   - path: /endpoint/cf37806c-572c-47ff-88e2-511c646ef1a4/server_list
     json:

@@ -56,3 +56,12 @@ def test_show_on_gcsv5_collection(run_line, load_api_fixtures):
         "Please run the following command instead:\n\n"
         f"    globus collection show {epid}"
     ) in result.stderr
+
+
+def test_show_on_gcsv5_collection_skip_check(run_line, load_api_fixtures):
+    data = load_api_fixtures("collection_operations.yaml")
+    epid = data["metadata"]["mapped_collection_id"]
+
+    result = run_line(f"globus endpoint show --skip-endpoint-type-check {epid}")
+    assert "Display Name:" in result.output
+    assert epid in result.output

@@ -1,3 +1,5 @@
+import click
+
 from globus_cli.endpointish import Endpointish
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
@@ -7,11 +9,13 @@ from globus_cli.termio import FORMAT_TEXT_RECORD, FormatField, formatted_print
 
 @command("show")
 @endpoint_id_arg
+@click.option("--skip-endpoint-type-check", is_flag=True, hidden=True)
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def endpoint_show(endpoint_id):
+def endpoint_show(endpoint_id, skip_endpoint_type_check):
     """Display a detailed endpoint definition"""
     client = get_client()
-    Endpointish(endpoint_id, transfer_client=client).assert_is_not_collection()
+    if not skip_endpoint_type_check:
+        Endpointish(endpoint_id, transfer_client=client).assert_is_not_collection()
 
     res = client.get_endpoint(endpoint_id)
 
