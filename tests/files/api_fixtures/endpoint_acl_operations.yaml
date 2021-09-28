@@ -1,0 +1,34 @@
+metadata:
+  user_id: "25de0aed-aa83-4600-a1be-a62a910af116"
+  username: "foo@globusid.org"
+  endpoint_id: "1405823f-0597-4a16-b296-46d4f0ae4b15"
+
+auth:
+  - path: /v2/api/identities
+    json:
+      {
+        "identities": [
+          {
+            "username": "foo@globusid.org",
+            "name": "Foo McUser",
+            "id": "25de0aed-aa83-4600-a1be-a62a910af116",
+            "identity_provider": "c8abac57-560c-46c8-b386-f116ed8793d5",
+            "organization": "McUser Group",
+            "status": "used",
+            "email": "foo.mcuser@globus.org"
+          }
+        ]
+      }
+
+transfer:
+  - path: /endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15/access
+    method: post
+    json:
+      {
+        "code": "Created",
+        "resource": "/endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15/access",
+        "DATA_TYPE": "access_create_result",
+        "request_id": "abc123",
+        "access_id": 12345,
+        "message": "Access rule created successfully."
+      }
