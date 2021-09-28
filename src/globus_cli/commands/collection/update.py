@@ -1,6 +1,7 @@
 import click
 from globus_sdk import GuestCollectionDocument, MappedCollectionDocument
 
+from globus_cli import utils
 from globus_cli.constants import EXPLICIT_NULL
 from globus_cli.endpointish import Endpointish, EndpointType
 from globus_cli.login_manager import LoginManager
@@ -212,23 +213,9 @@ def collection_update(
     epish = Endpointish(collection_id)
     endpoint_id = epish.get_collection_endpoint_id()
     login_manager.assert_logins(endpoint_id, assume_gcs=True)
-    client = get_gcs_client(endpoint_id)
 
     if epish.ep_type == EndpointType.GUEST_COLLECTION:
         doc_class = GuestCollectionDocument
-
-        if any(
-            kwargs.get(k) is not None
-            for k in (
-                "sharing_restrict_paths",
-                "sharing_users_allow",
-                "sharing_users_deny",
-                "allow_guest_collections",
-                "disable_anonymous_writes",
-                "domain_name",
-            )
-        ):
-            raise click.UsageError("Use of incompatible options with Guest Collection.")
     else:
         doc_class = MappedCollectionDocument
 
@@ -257,7 +244,22 @@ def collection_update(
             converted_kwargs["force_verify"] = False
             converted_kwargs["disable_verify"] = False
 
+    # now that any conversions are done, check params against what is (or is not)
+    # supported by the document type in use
+    doc_params = utils.supported_parameters(doc_class)
+    unsupported_params = {
+        k for k, v in converted_kwargs.items() if v is not None and k not in doc_params
+    }
+    if unsupported_params:
+        opt_strs = utils.get_current_option_help(filter_names=unsupported_params)
+        raise click.UsageError(
+            f"Use of incompatible options with {epish.nice_type_name}.\n"
+            "The following options are not supported on this collection type:\n  "
+            + "\n  ".join(opt_strs)
+        )
+
     doc = doc_class(**converted_kwargs)
+    client = get_gcs_client(endpoint_id)
     res = client.update_collection(collection_id, doc)
     formatted_print(
         res,

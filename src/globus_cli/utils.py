@@ -1,5 +1,24 @@
+import inspect
 import json
-from typing import Dict, Iterator, Optional
+from typing import Callable, Dict, Iterable, Iterator, List, Optional
+
+import click
+
+
+def get_current_option_help(
+    *, filter_names: Optional[Iterable[str]] = None
+) -> List[str]:
+    ctx = click.get_current_context()
+    cmd = ctx.command
+    opts = [x for x in cmd.params if isinstance(x, click.Option)]
+    if filter_names is not None:
+        opts = [o for o in opts if o.name is not None and o.name in filter_names]
+    return [o.get_error_hint(ctx) for o in opts]
+
+
+def supported_parameters(c: Callable) -> List[str]:
+    sig = inspect.signature(c)
+    return list(sig.parameters.keys())
 
 
 def format_list_of_words(first: str, *rest: str):

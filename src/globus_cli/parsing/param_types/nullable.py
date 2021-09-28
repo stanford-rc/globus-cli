@@ -70,6 +70,6 @@ class UrlOrNull(StringOrNull):
                 assert url[0] in ["http", "https"]
             except Exception:
                 raise click.UsageError(
-                    f"{value} did not contain a well-formed http or https URL"
+                    f"'{value}' is not a well-formed http or https URL"
                 )
             return value

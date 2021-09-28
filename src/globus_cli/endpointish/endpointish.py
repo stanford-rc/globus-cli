@@ -23,6 +23,10 @@ class Endpointish:
 
         self.ep_type = EndpointType.determine_endpoint_type(self.data)
 
+    @property
+    def nice_type_name(self) -> str:
+        return EndpointType.nice_name(self.ep_type)
+
     def assert_ep_type(
         self,
         expect_types: Tuple[EndpointType, ...],
