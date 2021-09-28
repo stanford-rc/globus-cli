@@ -24,14 +24,7 @@ class ChoiceSlugified(click.Choice):
     def convert(self, value, param, ctx):
         if value is None:
             return None
-        value = value.replace("_", "-")
-        return super().convert(value, param, ctx)
-
-
-def hyphen_to_underscore(ctx, param, value):
-    if not value:
-        return None
-    return [x.replace("-", "_") for x in value]
+        return super().convert(value, param, ctx).replace("_", "-")
 
 
 @command("list", short_help="List all Collections on an Endpoint")
@@ -45,9 +38,9 @@ def hyphen_to_underscore(ctx, param, value):
     multiple=True,
     # choices are shown with hyphens, but the command will receive them with underscores
     type=ChoiceSlugified(
-        ["mapped-collections", "guest-collections", "managed-by-me", "created-by-me"]
+        ["mapped-collections", "guest-collections", "managed-by-me", "created-by-me"],
+        case_sensitive=False,
     ),
-    callback=hyphen_to_underscore,
     help="""\
 Filter results to one of the specified categories of collections. Can be applied
 multiple times. Note that mutually exclusive filters are allowed and will find no
