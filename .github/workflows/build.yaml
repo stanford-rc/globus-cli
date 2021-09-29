@@ -42,3 +42,7 @@ jobs:
         run: python -m tox -e twine-check
       - name: Run Tests
         run: python -m tox -e py
+      - name: Mindeps Test
+        # mindeps runs on py36, as "the oldest everything"
+        if: ${{ matrix.python-version == '3.6' && matrix.os == 'ubuntu-latest' }}
+        run: python -m tox -e py-mindeps
