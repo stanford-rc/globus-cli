@@ -1,5 +1,5 @@
 PYTHON_VERSION=python3
-CLI_VERSION=$(shell grep '^__version__' globus_cli/version.py | cut -d '"' -f2)
+CLI_VERSION=$(shell grep '^__version__' src/globus_cli/version.py | cut -d '"' -f2)
 
 .venv:
 	virtualenv --python=$(PYTHON_VERSION) .venv
