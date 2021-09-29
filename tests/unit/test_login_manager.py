@@ -2,10 +2,9 @@ import re
 import uuid
 from unittest.mock import patch
 
-import click
 import pytest
 
-from globus_cli.login_manager import LoginManager
+from globus_cli.login_manager import LoginManager, MissingLoginError
 
 
 def mock_get_tokens(resource_server):
@@ -54,11 +53,11 @@ def test_requires_login_single_server_fail(mock_get_adapter):
     def dummy_command():
         return True
 
-    with pytest.raises(click.ClickException) as ex:
+    with pytest.raises(MissingLoginError) as ex:
         dummy_command()
 
     assert str(ex.value) == (
-        "Missing login for c.globus.org, please run\n  globus login"
+        "Missing login for c.globus.org, please run\n\n  globus login\n"
     )
 
 
@@ -70,12 +69,12 @@ def test_requires_login_fail_two_servers(mock_get_adapter):
     def dummy_command():
         return True
 
-    with pytest.raises(click.ClickException) as ex:
+    with pytest.raises(MissingLoginError) as ex:
         dummy_command()
 
     assert re.match(
         "Missing logins for ..globus.org and ..globus.org, "
-        "please run\n  globus login",
+        "please run\n\n  globus login\n",
         str(ex.value),
     )
     for server in ("c.globus.org", "d.globus.org"):
@@ -90,14 +89,13 @@ def test_requires_login_fail_multi_server(mock_get_adapter):
     def dummy_command():
         return True
 
-    with pytest.raises(click.ClickException) as ex:
+    with pytest.raises(MissingLoginError) as ex:
         dummy_command()
 
-    assert re.match(
-        "Missing logins for ..globus.org, ..globus.org, "
-        "and ..globus.org, please run\n  globus login",
-        str(ex.value),
+    assert re.search(
+        "Missing logins for ..globus.org, ..globus.org, and ..globus.org", str(ex.value)
     )
+    assert "globus login\n" in str(ex.value)
     for server in ("c.globus.org", "d.globus.org", "e.globus.org"):
         assert server in str(ex.value)
 
@@ -126,7 +124,7 @@ def test_gcs_error_message(mock_get_adapter):
     def dummy_command(manager):
         manager.assert_logins(dummy_id, assume_gcs=True)
 
-    with pytest.raises(click.ClickException) as excinfo:
+    with pytest.raises(MissingLoginError) as excinfo:
         dummy_command()
 
     assert f"globus login --gcs {dummy_id}" in str(excinfo.value)

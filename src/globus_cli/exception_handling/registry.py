@@ -19,7 +19,7 @@ _REGISTERED_HOOKS: _HOOKLIST_TYPE = cast(_HOOKLIST_TYPE, [])
 
 
 def error_handler(
-    *, error_class=None, condition=None
+    *, error_class=None, condition=None, exit_status: int = 1
 ) -> Callable[[_HOOK_SRC_TYPE], HOOK_TYPE]:
     """decorator for excepthooks
 
@@ -35,10 +35,10 @@ def error_handler(
                 # get the mapping by looking up the state and getting the mapping attr
                 mapping = ctx.ensure_object(CommandState).http_status_map
 
-                # if there is a mapped exit code, exit with that. Otherwise, exit 1
+                # if there is a mapped exit code, exit with that. Otherwise, exit below
                 if exception.http_status in mapping:
                     ctx.exit(mapping[exception.http_status])
-            ctx.exit(1)
+            ctx.exit(exit_status)
 
         _REGISTERED_HOOKS.append((wrapped, error_class, condition))
         return wrapped

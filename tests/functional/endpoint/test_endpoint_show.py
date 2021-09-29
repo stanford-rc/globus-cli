@@ -47,7 +47,7 @@ def test_show_on_gcsv5_collection(run_line, load_api_fixtures):
     data = load_api_fixtures("collection_operations.yaml")
     epid = data["metadata"]["mapped_collection_id"]
 
-    result = run_line(f"globus endpoint show {epid}", assert_exit_code=2)
+    result = run_line(f"globus endpoint show {epid}", assert_exit_code=3)
     assert (
         f"Expected {epid} to be an endpoint ID.\n"
         "Instead, found it was of type 'Mapped Collection'."

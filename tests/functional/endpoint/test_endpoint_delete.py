@@ -15,7 +15,7 @@ def test_simple_deletion(run_line, load_api_fixtures):
 def test_delete_gcs_guest_collection(run_line, load_api_fixtures):
     data = load_api_fixtures("collection_operations.yaml")
     epid = data["metadata"]["guest_collection_id"]
-    result = run_line(f"globus endpoint delete {epid}", assert_exit_code=2)
+    result = run_line(f"globus endpoint delete {epid}", assert_exit_code=3)
 
     assert "success" not in result.output
     assert (
@@ -31,7 +31,7 @@ def test_delete_gcs_guest_collection(run_line, load_api_fixtures):
 def test_delete_gcs_mapped_collection(run_line, load_api_fixtures):
     data = load_api_fixtures("collection_operations.yaml")
     epid = data["metadata"]["mapped_collection_id"]
-    result = run_line(f"globus endpoint delete {epid}", assert_exit_code=2)
+    result = run_line(f"globus endpoint delete {epid}", assert_exit_code=3)
 
     assert "success" not in result.output
     assert (
@@ -47,7 +47,7 @@ def test_delete_gcs_mapped_collection(run_line, load_api_fixtures):
 def test_delete_gcsv5_endpoint(run_line, load_api_fixtures):
     data = load_api_fixtures("collection_operations.yaml")
     epid = data["metadata"]["endpoint_id"]
-    result = run_line(f"globus endpoint delete {epid}", assert_exit_code=2)
+    result = run_line(f"globus endpoint delete {epid}", assert_exit_code=3)
 
     assert "success" not in result.output
     assert (

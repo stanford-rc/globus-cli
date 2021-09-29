@@ -5,9 +5,8 @@ import click
 import globus_sdk
 from globus_sdk.scopes import AuthScopes, GroupsScopes, TransferScopes
 
-from globus_cli.utils import format_list_of_words, format_plural_str
-
 from .auth_flows import do_link_auth_flow, do_local_server_auth_flow
+from .errors import MissingLoginError
 from .local_server import is_remote_session
 from .tokenstore import internal_auth_client, token_storage_adapter
 
@@ -108,22 +107,7 @@ class LoginManager:
         # if we are missing logins, assemble error text
         # text is slightly different for 1, 2, or 3+ missing servers
         if missing_servers:
-            server_string = format_list_of_words(*missing_servers)
-            message_prefix = format_plural_str(
-                "Missing {login}",
-                {"login": "logins"},
-                len(missing_servers) != 1,
-            )
-
-            login_cmd = "globus login"
-            if assume_gcs:
-                login_cmd = "globus login " + " ".join(
-                    [f"--gcs {s}" for s in missing_servers]
-                )
-
-            raise click.ClickException(
-                message_prefix + f" for {server_string}, please run\n\n  {login_cmd}\n"
-            )
+            raise MissingLoginError(missing_servers, assume_gcs=assume_gcs)
 
     @classmethod
     def requires_login(cls, *resource_servers: str, pass_manager: bool = False):

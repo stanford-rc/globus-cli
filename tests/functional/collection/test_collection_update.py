@@ -73,7 +73,7 @@ def test_collection_update_on_gcp(run_line, load_api_fixtures):
     epid = data["metadata"]["gcp_endpoint_id"]
 
     result = run_line(
-        f"globus collection update {epid} --description foo", assert_exit_code=2
+        f"globus collection update {epid} --description foo", assert_exit_code=3
     )
     assert (
         f"Expected {epid} to be a collection ID.\n"
@@ -90,7 +90,7 @@ def test_collection_update_on_gcsv5_host(run_line, load_api_fixtures):
     epid = data["metadata"]["endpoint_id"]
 
     result = run_line(
-        f"globus collection update {epid} --description foo", assert_exit_code=2
+        f"globus collection update {epid} --description foo", assert_exit_code=3
     )
     assert "success" not in result.output
     assert (

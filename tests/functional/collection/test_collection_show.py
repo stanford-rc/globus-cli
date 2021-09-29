@@ -56,7 +56,7 @@ def test_collection_show_on_non_collection(
     data = load_api_fixtures("collection_operations.yaml")
     epid = data["metadata"][epid_key]
 
-    result = run_line(f"globus collection show {epid}", assert_exit_code=2)
+    result = run_line(f"globus collection show {epid}", assert_exit_code=3)
     assert (
         f"Expected {epid} to be a collection ID.\n"
         f"Instead, found it was of type '{ep_type}'."

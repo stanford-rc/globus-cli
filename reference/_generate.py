@@ -26,19 +26,31 @@ except Exception:
     REV_DATE_T = time.gmtime()
 REV_DATE = time.strftime("%B %d, %Y", REV_DATE_T)
 
-EXIT_STATUS_TEXT = """0 on success.
+_EXIT_STATUS_TEXT_COMMON = """
+2 if the command was used improperly.
+
+3 if the command was used on the wrong type of object, e.g. a collection command used
+on an endpoint.
+
+4 if the command has authentication or authorization requirements which were not met,
+as in ConsentRequired errors or missing logins.
+"""
+
+EXIT_STATUS_TEXT = (
+    """0 on success.
 
 1 if a network or server error occurred, unless --map-http-status has been
 used to change exit behavior on http error codes.
-
-2 if the command was used improperly.
 """
-EXIT_STATUS_NOHTTP_TEXT = """0 on success.
+    + _EXIT_STATUS_TEXT_COMMON
+)
+EXIT_STATUS_NOHTTP_TEXT = (
+    """0 on success.
 
 1 if an error occurred.
-
-2 if the command was used improperly.
 """
+    + _EXIT_STATUS_TEXT_COMMON
+)
 
 
 def walk_contexts(name="globus", cmd=CLI, parent_ctx=None):

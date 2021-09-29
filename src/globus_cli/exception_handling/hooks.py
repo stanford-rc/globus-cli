@@ -4,6 +4,7 @@ import click
 import globus_sdk
 
 from globus_cli.endpointish import WrongEndpointTypeError
+from globus_cli.login_manager import MissingLoginError
 from globus_cli.termio import PrintableErrorField, write_error_info
 
 from .registry import error_handler
@@ -12,6 +13,7 @@ from .registry import error_handler
 @error_handler(
     error_class=globus_sdk.GlobusAPIError,
     condition=lambda err: err.info.authorization_parameters,
+    exit_status=4,
 )
 def session_hook(exception: globus_sdk.GlobusAPIError) -> None:
     """
@@ -50,6 +52,7 @@ def session_hook(exception: globus_sdk.GlobusAPIError) -> None:
 @error_handler(
     error_class=globus_sdk.GlobusAPIError,
     condition=lambda err: err.info.consent_required,
+    exit_status=4,
 )
 def consent_required_hook(exception: globus_sdk.GlobusAPIError) -> None:
     """
@@ -178,10 +181,8 @@ def globus_error_hook(exception: globus_sdk.GlobusError) -> None:
     )
 
 
-@error_handler(error_class=WrongEndpointTypeError)
+@error_handler(error_class=WrongEndpointTypeError, exit_status=3)
 def wrong_endpoint_type_error_hook(exception: WrongEndpointTypeError) -> None:
-    ctx = click.get_current_context()
-
     click.echo(
         click.style(
             exception.expected_message + "\n" + exception.actual_message,
@@ -207,7 +208,14 @@ def wrong_endpoint_type_error_hook(exception: WrongEndpointTypeError) -> None:
             ),
             err=True,
         )
-    ctx.exit(2)
+
+
+@error_handler(error_class=MissingLoginError, exit_status=4)
+def missing_login_error_hook(exception: MissingLoginError) -> None:
+    click.echo(
+        click.style("MissingLoginError: ", fg="yellow") + exception.message,
+        err=True,
+    )
 
 
 def register_all_hooks() -> None:

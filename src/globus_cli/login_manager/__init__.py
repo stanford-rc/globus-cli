@@ -1,3 +1,4 @@
+from .errors import MissingLoginError
 from .local_server import is_remote_session
 from .manager import LoginManager
 from .tokenstore import (
@@ -8,6 +9,7 @@ from .tokenstore import (
 )
 
 __all__ = [
+    "MissingLoginError",
     "is_remote_session",
     "LoginManager",
     "delete_templated_client",

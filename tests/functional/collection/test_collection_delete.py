@@ -23,7 +23,7 @@ def test_collection_delete_missing_login(run_line, load_api_fixtures):
     epid = data["metadata"]["endpoint_id"]
     cid = data["metadata"]["guest_collection_id"]
 
-    result = run_line(f"globus collection delete {cid}", assert_exit_code=1)
+    result = run_line(f"globus collection delete {cid}", assert_exit_code=4)
     assert "success" not in result.output
     assert f"Missing login for {epid}" in result.stderr
     assert f"  globus login --gcs {epid}" in result.stderr
@@ -33,7 +33,7 @@ def test_collection_delete_on_gcsv5_host(run_line, load_api_fixtures):
     data = load_api_fixtures("collection_operations.yaml")
     epid = data["metadata"]["endpoint_id"]
 
-    result = run_line(f"globus collection delete {epid}", assert_exit_code=2)
+    result = run_line(f"globus collection delete {epid}", assert_exit_code=3)
     assert "success" not in result.output
     assert (
         f"Expected {epid} to be a collection ID.\n"
@@ -46,7 +46,7 @@ def test_collection_delete_on_gcp(run_line, load_api_fixtures):
     data = load_api_fixtures("collection_operations.yaml")
     epid = data["metadata"]["gcp_endpoint_id"]
 
-    result = run_line(f"globus collection delete {epid}", assert_exit_code=2)
+    result = run_line(f"globus collection delete {epid}", assert_exit_code=3)
     assert "success" not in result.output
     assert (
         f"Expected {epid} to be a collection ID.\n"
