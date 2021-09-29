@@ -62,9 +62,10 @@ def collection_show(login_manager, *, include_private_policies, collection_id):
     """
     Display a Mapped or Guest Collection
     """
-    endpoint_id = Endpointish(collection_id).get_collection_endpoint_id()
+    epish = Endpointish(collection_id)
+    endpoint_id = epish.get_collection_endpoint_id()
     login_manager.assert_logins(endpoint_id, assume_gcs=True)
-    client = get_gcs_client(endpoint_id)
+    client = get_gcs_client(endpoint_id, gcs_address=epish.get_gcs_address())
 
     query_params = {}
     fields = STANDARD_FIELDS

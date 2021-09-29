@@ -7,7 +7,12 @@ transfer:
   - path: /endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15
     json:
       {
-        "DATA": [],
+        "DATA": [
+          {
+            "DATA_TYPE": "server",
+            "hostname": "abc.xyz.data.globus.org"
+          }
+        ],
         "DATA_TYPE": "endpoint",
         "display_name": "Happy Fun Collection Name",
         "gcs_version": "5.4.10",

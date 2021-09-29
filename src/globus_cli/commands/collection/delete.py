@@ -13,9 +13,10 @@ def collection_delete(login_manager, *, collection_id):
     Delete an existing Collection. This requires the administrator role on the
     Endpoint.
     """
-    endpoint_id = Endpointish(collection_id).get_collection_endpoint_id()
+    epish = Endpointish(collection_id)
+    endpoint_id = epish.get_collection_endpoint_id()
     login_manager.assert_logins(endpoint_id, assume_gcs=True)
 
-    client = get_gcs_client(endpoint_id)
+    client = get_gcs_client(endpoint_id, gcs_address=epish.get_gcs_address())
     res = client.delete_collection(collection_id)
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="code")

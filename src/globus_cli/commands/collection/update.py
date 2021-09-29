@@ -213,6 +213,7 @@ def collection_update(
     epish = Endpointish(collection_id)
     endpoint_id = epish.get_collection_endpoint_id()
     login_manager.assert_logins(endpoint_id, assume_gcs=True)
+    client = get_gcs_client(endpoint_id, gcs_address=epish.get_gcs_address())
 
     if epish.ep_type == EndpointType.GUEST_COLLECTION:
         doc_class = GuestCollectionDocument
@@ -259,7 +260,6 @@ def collection_update(
         )
 
     doc = doc_class(**converted_kwargs)
-    client = get_gcs_client(endpoint_id)
     res = client.update_collection(collection_id, doc)
     formatted_print(
         res,

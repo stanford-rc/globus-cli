@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, cast
 
 from globus_sdk import GCSClient, RefreshTokenAuthorizer
 
@@ -8,7 +8,9 @@ from globus_cli.login_manager import internal_auth_client, token_storage_adapter
 from .transfer import get_client as get_transfer_client
 
 
-def get_gcs_client(gcs_id: str, *, require_auth=True) -> GCSClient:
+def get_gcs_client(
+    gcs_id: str, *, gcs_address: Optional[str] = None, require_auth: bool = True
+) -> GCSClient:
     adapter = token_storage_adapter()
     tokens = adapter.get_token_data(gcs_id)
     authorizer = None
@@ -28,8 +30,9 @@ def get_gcs_client(gcs_id: str, *, require_auth=True) -> GCSClient:
             f"Try login with '--gcs {gcs_id}' to fix."
         )
 
-    tc = get_transfer_client()
-    gcs_address = tc.get_endpoint(gcs_id)["DATA"][0]["hostname"]
+    if not gcs_address:
+        tc = get_transfer_client()
+        gcs_address = cast(str, tc.get_endpoint(gcs_id)["DATA"][0]["hostname"])
 
     return GCSClient(gcs_address, authorizer=authorizer, app_name=version.app_name)
 

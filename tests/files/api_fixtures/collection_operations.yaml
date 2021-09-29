@@ -9,7 +9,12 @@ transfer:
   - path: /endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15
     json:
       {
-        "DATA": [],
+        "DATA": [
+          {
+            "DATA_TYPE": "server",
+            "hostname": "abc.xyz.data.globus.org"
+          }
+        ],
         "DATA_TYPE": "endpoint",
         "activated": false,
         "canonical_name": "cf37806c-572c-47ff-88e2-511c646ef1a4#1405823f-0597-4a16-b296-46d4f0ae4b15",
@@ -38,7 +43,12 @@ transfer:
   - path: /endpoint/0e4a77f8-b778-4d5c-abaa-e1254e71427f
     json:
       {
-        "DATA": [],
+        "DATA": [
+          {
+            "DATA_TYPE": "server",
+            "hostname": "abc.xyz.data.globus.org"
+          }
+        ],
         "DATA_TYPE": "endpoint",
         "activated": false,
         "canonical_name": "cf37806c-572c-47ff-88e2-511c646ef1a4#0e4a77f8-b778-4d5c-abaa-e1254e71427f",
