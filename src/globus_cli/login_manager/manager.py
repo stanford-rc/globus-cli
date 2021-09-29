@@ -122,7 +122,7 @@ class LoginManager:
                 )
 
             raise click.ClickException(
-                message_prefix + f" for {server_string}, please run\n  {login_cmd}"
+                message_prefix + f" for {server_string}, please run\n\n  {login_cmd}\n"
             )
 
     @classmethod

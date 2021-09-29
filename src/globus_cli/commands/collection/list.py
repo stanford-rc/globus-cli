@@ -96,6 +96,7 @@ def collection_list(
     """
     List the Collections on a given Endpoint
     """
+    login_manager.assert_logins(endpoint_id, assume_gcs=True)
     client = get_gcs_client(endpoint_id)
     params = {}
     if include_private_policies:
