@@ -36,9 +36,11 @@ class Endpointish:
 
     def assert_ep_type(
         self,
-        expect_types: Tuple[EndpointType, ...],
+        expect_types: Union[Tuple[EndpointType, ...], EndpointType],
         error_class: Type[WrongEndpointTypeError] = WrongEndpointTypeError,
     ):
+        if isinstance(expect_types, EndpointType):
+            expect_types = (expect_types,)
         if self.ep_type not in expect_types:
             raise error_class(
                 click.get_current_context().command_path,

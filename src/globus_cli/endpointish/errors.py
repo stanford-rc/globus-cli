@@ -42,7 +42,11 @@ class WrongEndpointTypeError(ValueError):
 
     def _get_expected_message(self) -> str:
         expect_str = ", ".join(EndpointType.nice_name(x) for x in self.expected_types)
-        return f"Expected {self.endpoint_id} to be of type [{expect_str}]."
+        if len(self.expected_types) == 1:
+            expect_str = f"a {expect_str}"
+        else:
+            expect_str = f"one of [{expect_str}]"
+        return f"Expected {self.endpoint_id} to be {expect_str}."
 
     def _get_actual_message(self) -> str:
         actual_str = EndpointType.nice_name(self.actual_type)

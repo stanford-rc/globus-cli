@@ -23,6 +23,32 @@ def test_collection_list_opts(run_line, load_api_fixtures, add_gcs_login):
     assert responses.calls[-1].request.params["include"] == "private_policies"
 
 
+def test_collection_list_on_gcp(run_line, load_api_fixtures):
+    data = load_api_fixtures("collection_operations.yaml")
+    epid = data["metadata"]["gcp_endpoint_id"]
+
+    result = run_line(f"globus collection list {epid}", assert_exit_code=3)
+    assert "success" not in result.output
+    assert (
+        f"Expected {epid} to be a Globus Connect Server v5 Endpoint.\n"
+        "Instead, found it was of type 'Globus Connect Personal'."
+    ) in result.stderr
+    assert "This operation is not supported on objects of this type." in result.stderr
+
+
+def test_collection_list_on_mapped_collection(run_line, load_api_fixtures):
+    data = load_api_fixtures("collection_operations.yaml")
+    epid = data["metadata"]["mapped_collection_id"]
+
+    result = run_line(f"globus collection list {epid}", assert_exit_code=3)
+    assert "success" not in result.output
+    assert (
+        f"Expected {epid} to be a Globus Connect Server v5 Endpoint.\n"
+        "Instead, found it was of type 'Mapped Collection'."
+    ) in result.stderr
+    assert "This operation is not supported on objects of this type." in result.stderr
+
+
 @pytest.mark.parametrize(
     "filter_val",
     [

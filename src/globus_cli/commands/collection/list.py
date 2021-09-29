@@ -1,5 +1,6 @@
 import click
 
+from globus_cli.endpointish import Endpointish, EndpointType
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
 from globus_cli.principal_resolver import default_identity_id_resolver
@@ -94,10 +95,12 @@ def collection_list(
     mapped_collection_id,
 ):
     """
-    List the Collections on a given Endpoint
+    List the Collections on a given Globus Connect Server v5 Endpoint
     """
+    epish = Endpointish(endpoint_id)
+    epish.assert_ep_type(EndpointType.GCSV5_ENDPOINT)
     login_manager.assert_logins(endpoint_id, assume_gcs=True)
-    client = get_gcs_client(endpoint_id)
+    client = get_gcs_client(endpoint_id, gcs_address=epish.get_gcs_address())
     params = {}
     if include_private_policies:
         params["include"] = "private_policies"
