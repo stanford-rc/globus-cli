@@ -1,5 +1,12 @@
 = CLI Changelog
 
+== 3.0.1 (2021-09-29)
+
+Bugfixes:
+
+* Update dependency specification to avoid an issue in which old versions of
+  `cryptography` were not updated when an existing installation was updated
+
 == 3.0.0 (2021-09-29)
 
 This is a major release of the CLI and has several backwards incompatible
