@@ -1,4 +1,5 @@
 import json
+import uuid
 from io import TextIOWrapper
 from typing import Any, Dict, List, Optional
 
@@ -8,6 +9,8 @@ from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import CommaDelimitedList, command, mutex_option_group
 from globus_cli.services.search import get_search_client
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
+
+from ._common import index_id_arg
 
 
 @command("query", short_help="Perform a search")
@@ -37,11 +40,11 @@ from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
         "predefined sets of identities or groups. Supplied as a comma-delimited list."
     ),
 )
-@click.argument("INDEX_ID")
+@index_id_arg
 @mutex_option_group("-q", "--query-document")
 @LoginManager.requires_login(LoginManager.SEARCH_RS)
 def query_command(
-    index_id: str,
+    index_id: uuid.UUID,
     q: Optional[str],
     query_document: Optional[TextIOWrapper],
     limit: Optional[int],
