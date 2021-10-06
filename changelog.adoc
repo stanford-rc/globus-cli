@@ -1,5 +1,12 @@
 = CLI Changelog
 
+== Unreleased
+
+Bugfixes:
+
+* `globus task cancel --all` no longer throws a TypeError.
+
+
 == 3.0.1 (2021-09-29)
 
 Bugfixes:
