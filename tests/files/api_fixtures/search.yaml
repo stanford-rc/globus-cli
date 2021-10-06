@@ -1,6 +1,8 @@
 metadata:
   index_id: 6f831ac8-4c41-4812-b383-6fb04f8b9f9f
   error_index_id: 2ac1f660-298b-432f-89ae-c1299ad4233e
+  task_id: 49869cb5-4fca-4f19-bbb6-8b0a18bd1f95
+  pending_task_id: cfdedea7-9c52-42cb-84a6-6daa8217f772
 
 search:
   - path: /v1/index/6f831ac8-4c41-4812-b383-6fb04f8b9f9f/search
@@ -240,4 +242,53 @@ search:
         "message": "Request failed input validation.",
         "request_id": "2771688b76d38f89ba11fbb2d886f136",
         "status": 400
+      }
+  - path: /v1/task/49869cb5-4fca-4f19-bbb6-8b0a18bd1f95
+    json:
+      {
+        "additional_details": null,
+        "completion_date": "2021-10-05T18:42:49",
+        "creation_date": "2021-10-05T18:42:49",
+        "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+        "message": null,
+        "state": "SUCCESS",
+        "state_description": "Task succeeded",
+        "task_id": "49869cb5-4fca-4f19-bbb6-8b0a18bd1f95"
+      }
+  - path: /v1/task_list/6f831ac8-4c41-4812-b383-6fb04f8b9f9f
+    json:
+      {
+        "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+        "tasks": [
+          {
+            "additional_details": null,
+            "completion_date": "2021-10-05T18:42:49",
+            "creation_date": "2021-10-05T18:42:49",
+            "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+            "message": null,
+            "state": "SUCCESS",
+            "state_description": "Task succeeded",
+            "task_id": "49869cb5-4fca-4f19-bbb6-8b0a18bd1f95"
+          },
+          {
+            "additional_details": null,
+            "completion_date": "2021-10-05T18:31:40",
+            "creation_date": "2021-10-05T18:31:39",
+            "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+            "message": null,
+            "state": "SUCCESS",
+            "state_description": "Task succeeded",
+            "task_id": "fea08a77-5ad8-48e0-992e-f001755df897"
+          },
+          {
+            "additional_details": null,
+            "completion_date": null,
+            "creation_date": "2021-10-05T18:18:51",
+            "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+            "message": null,
+            "state": "PENDING",
+            "state_description": "Task is waiting to start",
+            "task_id": "cfdedea7-9c52-42cb-84a6-6daa8217f772"
+          }
+        ]
       }
