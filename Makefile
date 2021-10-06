@@ -18,9 +18,12 @@ reference:
 test:
 	tox
 
-.PHONY: showvars release
+.PHONY: showvars prepare-release release
 showvars:
 	@echo "CLI_VERSION=$(CLI_VERSION)"
+prepare-release:
+	tox -e prepare-release
+	$(EDITOR) changelog.adoc
 release:
 	git tag -s "$(CLI_VERSION)" -m "v$(CLI_VERSION)"
 	tox -e publish-release

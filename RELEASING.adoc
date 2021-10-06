@@ -1,0 +1,24 @@
+Releasing a Version
+-------------------
+
+To perform a release, the following steps should be followed:
+
+Setup:
+
+  - Make sure you have a pypi account
+  - Setup your credentials for twine (the pypi upload tool)
+      https://github.com/pypa/twine[twine docs for detail]
+  - Make sure you have a gpg key setup for use with git.
+      https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work[git-scm.com guide for detail]
+
+Do it:
+
+  - update the version in `src/globus_cli/version.py`
+  - `make prepare-release` to update version and changelog
+  - Add and commit the result with
+    `git commit -m 'Bump version and changelog for release'`
+  - `make release` to build dists, upload via twine, and tag the release
+  - push the newly created version tag to GitHub
+  - Create a GitHub release with a copy of the changelog
+  - Ensure that `docs.globus.org` gets updated with new docs/changelog
+      Procedure is set in that repo.
