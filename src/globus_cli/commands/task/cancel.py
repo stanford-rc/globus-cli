@@ -71,8 +71,10 @@ def cancel_task(all, task_id):
         task_ids = [
             task_row["task_id"]
             for task_row in client.paginated.task_list(
-                filter="type:TRANSFER,DELETE/status:ACTIVE,INACTIVE",
-                fields="task_id",
+                query_params={
+                    "filter": "type:TRANSFER,DELETE/status:ACTIVE,INACTIVE",
+                    "fields": "task_id",
+                }
             ).items()
         ]
 
