@@ -1,8 +1,8 @@
 import uuid
+from typing import Optional
 
 import click
 
-from globus_cli.constants import EXPLICIT_NULL
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
 from globus_cli.services.transfer import get_client
@@ -10,11 +10,13 @@ from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 
 class SubscriptionIdType(click.ParamType):
-    def convert(self, value, param, ctx):
+    def convert(
+        self, value: str, param: Optional[click.Parameter], ctx: Optional[click.Context]
+    ):
         if value is None or (ctx and ctx.resilient_parsing):
             return None
         if value.lower() == "null":
-            return EXPLICIT_NULL
+            return None
         try:
             uuid.UUID(value)
             return value
@@ -26,7 +28,9 @@ class SubscriptionIdType(click.ParamType):
 @endpoint_id_arg
 @click.argument("SUBSCRIPTION_ID", type=SubscriptionIdType())
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def set_endpoint_subscription_id(**kwargs):
+def set_endpoint_subscription_id(
+    endpoint_id: str, subscription_id: Optional[str]
+) -> None:
     """
     Set an endpoint's subscription ID.
 
@@ -38,10 +42,6 @@ def set_endpoint_subscription_id(**kwargs):
     """
     # validate params. Requires a get call to check the endpoint type
     client = get_client()
-    endpoint_id = kwargs.pop("endpoint_id")
-    subscription_id = kwargs.pop("subscription_id")
-    if subscription_id is EXPLICIT_NULL:
-        subscription_id = None
 
     # make the update
     res = client.put(

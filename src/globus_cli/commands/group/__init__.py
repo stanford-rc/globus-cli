@@ -3,7 +3,7 @@ from globus_cli.parsing import group
 
 
 @group("group")
-def group_command():
+def group_command() -> None:
     """Manage Globus Groups"""
 
 

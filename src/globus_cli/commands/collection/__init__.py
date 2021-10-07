@@ -7,7 +7,7 @@ from .update import collection_update
 
 
 @group("collection")
-def collection_command():
+def collection_command() -> None:
     """Manage your Collections"""
 
 

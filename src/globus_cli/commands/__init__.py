@@ -21,7 +21,7 @@ from globus_cli.parsing import main_group
 
 
 @main_group
-def main():
+def main() -> None:
     """
     Interact with Globus from the command line
 

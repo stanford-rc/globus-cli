@@ -1,3 +1,5 @@
+from typing import Any
+
 import click
 
 from globus_cli.login_manager import LoginManager
@@ -69,7 +71,7 @@ $ globus endpoint create --shared host_ep:~/ my_shared_endpoint
     ),
 )
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def endpoint_create(**kwargs):
+def endpoint_create(**kwargs: Any) -> None:
     """
     Create a new endpoint.
 

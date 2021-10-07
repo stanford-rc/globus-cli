@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import click
 
 from globus_cli.login_manager import LoginManager
@@ -34,7 +36,7 @@ $ globus bookmark create \
 @click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_REQPATH)
 @click.argument("bookmark_name")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def bookmark_create(endpoint_plus_path, bookmark_name):
+def bookmark_create(endpoint_plus_path: Tuple[str, str], bookmark_name: str) -> None:
     """
     Create a new bookmark. Given an endpoint plus a path, and a name for the bookmark,
     the service will generate the bookmark's ID.

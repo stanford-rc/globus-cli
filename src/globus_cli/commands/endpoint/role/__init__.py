@@ -6,7 +6,7 @@ from globus_cli.parsing import group
 
 
 @group("role")
-def role_command():
+def role_command() -> None:
     """Manage endpoint roles"""
 
 
