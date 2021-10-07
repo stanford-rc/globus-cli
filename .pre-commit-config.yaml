@@ -36,3 +36,10 @@ repos:
         - types-requests
         - click
         - 'globus-sdk==3.0.1'
+- repo: local
+  hooks:
+    - id: fix-changelog
+      name: "Fix changelog"
+      entry: ./changelog.d/post-fix-changelog.py
+      language: python
+      files: ^changelog\.adoc$
