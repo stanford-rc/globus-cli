@@ -15,7 +15,7 @@ def process_file(filename):
     with open(filename) as f:
         content = f.read()
 
-    content = MD_H1_PATTERN.sub(r"= \2", content)
+    content = MD_H1_PATTERN.sub(r"== \2", content)
     content = MD_H3_PATTERN.sub(r"\2:", content)
 
     with open(filename, "w") as f:
