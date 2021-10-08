@@ -28,12 +28,7 @@ def test_query_string(run_line, load_api_fixtures, addargs, expect_params):
         ["globus", "search", "query", index_id, "-q", "tomatillo"] + addargs
     )
 
-    assert "simmer 20 minutes" in result.output
-    data = json.loads(result.output)
-    assert data["count"] == 1
-    assert [x["subject"] for x in data["gmeta"]] == [
-        "https://en.wikipedia.org/wiki/Salsa_verde"
-    ]
+    assert result.output.strip() == "https://en.wikipedia.org/wiki/Salsa_verde"
 
     sent = responses.calls[-1].request
     assert sent.method == "GET"
@@ -69,12 +64,7 @@ def test_query_document(run_line, load_api_fixtures, tmp_path, addargs, expect_p
         ["globus", "search", "query", index_id, "--query-document", str(doc)] + addargs
     )
 
-    assert "simmer 20 minutes" in result.output
-    data = json.loads(result.output)
-    assert data["count"] == 1
-    assert [x["subject"] for x in data["gmeta"]] == [
-        "https://en.wikipedia.org/wiki/Salsa_verde"
-    ]
+    assert result.output.strip() == "https://en.wikipedia.org/wiki/Salsa_verde"
 
     sent = responses.calls[-1].request
     assert sent.method == "POST"

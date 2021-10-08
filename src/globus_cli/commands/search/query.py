@@ -8,9 +8,16 @@ import click
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import CommaDelimitedList, command, mutex_option_group
 from globus_cli.services.search import get_search_client
-from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
+from globus_cli.termio import formatted_print, outformat_is_text, print_command_hint
 
 from ._common import index_id_arg
+
+
+# a callback for output printing
+# used to get non-table formatted list output
+def _print_subjects(data):
+    for item in data["gmeta"]:
+        click.echo(item["subject"])
 
 
 @command("query", short_help="Perform a search")
@@ -59,6 +66,13 @@ def query_command(
     If a query document and command-line options are provided, the options used will
     override any options which were present on the query document.
     """
+    if outformat_is_text():
+        print_command_hint(
+            "Text output for queries only shows the 'subject' which identifies each "
+            "document.\n"
+            "For more complete output, use `--format JSON`"
+        )
+
     search_client = get_search_client()
 
     if q:
@@ -87,7 +101,4 @@ def query_command(
     else:
         raise click.UsageError("Either '-q' or '--query-document' must be provided")
 
-    # format such that TEXT mode is JSON output
-    # because Globus Search data is user-supplied JSON, there is no other sensible way
-    # to format the data
-    formatted_print(data, text_format=FORMAT_TEXT_RAW)
+    formatted_print(data, text_format=_print_subjects)
