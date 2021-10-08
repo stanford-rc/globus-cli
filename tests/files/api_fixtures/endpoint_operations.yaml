@@ -25,6 +25,16 @@ transfer:
         "request_id": "SlzMEdxjp",
         "resource": "/endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15"
       }
+  - path: /endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15/subscription
+    method: put
+    json:
+      {
+        "DATA_TYPE": "result",
+        "code": "Updated",
+        "message": "Endpoint updated successfully",
+        "request_id": "ABCdef789",
+        "resource": "/endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15"
+      }
   - path: /endpoint/1405823f-0597-4a16-b296-46d4f0ae4b15
     json:
       {
@@ -98,6 +108,16 @@ transfer:
         "request_id": "SlzMEdxjp",
         "resource": "/endpoint/b379e973-f5c5-4501-8377-5a0ecf37a99b"
       }
+  - path: /endpoint/b379e973-f5c5-4501-8377-5a0ecf37a99b/subscription
+    method: put
+    json:
+      {
+        "DATA_TYPE": "result",
+        "code": "Updated",
+        "message": "Endpoint updated successfully",
+        "request_id": "ABCdef789",
+        "resource": "/endpoint/b379e973-f5c5-4501-8377-5a0ecf37a99b"
+      }
   - path: /endpoint/b379e973-f5c5-4501-8377-5a0ecf37a99b
     json:
       {
@@ -150,6 +170,16 @@ transfer:
         "code": "Updated",
         "message": "Endpoint updated successfully",
         "request_id": "SlzMEdxjp",
+        "resource": "/endpoint/06e2c959-d311-4bab-b2ea-25ad77d9fc12"
+      }
+  - path: /endpoint/06e2c959-d311-4bab-b2ea-25ad77d9fc12/subscription
+    method: put
+    json:
+      {
+        "DATA_TYPE": "result",
+        "code": "Updated",
+        "message": "Endpoint updated successfully",
+        "request_id": "ABCdef789",
         "resource": "/endpoint/06e2c959-d311-4bab-b2ea-25ad77d9fc12"
       }
   - path: /endpoint/06e2c959-d311-4bab-b2ea-25ad77d9fc12
