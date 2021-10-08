@@ -1,0 +1,294 @@
+metadata:
+  index_id: 6f831ac8-4c41-4812-b383-6fb04f8b9f9f
+  error_index_id: 2ac1f660-298b-432f-89ae-c1299ad4233e
+  task_id: 49869cb5-4fca-4f19-bbb6-8b0a18bd1f95
+  pending_task_id: cfdedea7-9c52-42cb-84a6-6daa8217f772
+
+search:
+  - path: /v1/index/6f831ac8-4c41-4812-b383-6fb04f8b9f9f/search
+    method: get
+    json:
+      {
+        "@datatype": "GSearchResult",
+        "@version": "2017-09-01",
+        "count": 1,
+        "gmeta": [
+          {
+            "@datatype": "GMetaResult",
+            "@version": "2019-08-27",
+            "entries": [
+              {
+                "content": {
+                  "cuisine": [
+                    "mexican"
+                  ],
+                  "handle": "salsa-verde",
+                  "ingredients": [
+                    {
+                      "amount": {
+                        "number": 10
+                      },
+                      "default": "tomatillo",
+                      "preparation": "simmer 20 minutes",
+                      "type": "fruit"
+                    },
+                    {
+                      "amount": {
+                        "number": 2
+                      },
+                      "default": "serrano pepper",
+                      "preparation": "seeded",
+                      "substitutes": [
+                        "jalapeno",
+                        "thai bird chili"
+                      ],
+                      "type": "fruit"
+                    },
+                    {
+                      "amount": {
+                        "number": 2,
+                        "unit": "clove"
+                      },
+                      "default": "garlic",
+                      "type": "vegetable"
+                    },
+                    {
+                      "amount": {
+                        "number": 0.5
+                      },
+                      "default": "yellow onion",
+                      "type": "vegetable"
+                    },
+                    {
+                      "amount": {
+                        "number": 2,
+                        "unit": "tsp"
+                      },
+                      "default": "salt",
+                      "type": "spice"
+                    },
+                    {
+                      "amount": {
+                        "number": 2,
+                        "unit": "tbsp"
+                      },
+                      "default": "coriander",
+                      "preparation": "ground",
+                      "subsitutes": [
+                        "cumin"
+                      ],
+                      "type": "spice"
+                    }
+                  ],
+                  "keywords": [
+                    "salsa",
+                    "tomatillo",
+                    "coriander",
+                    "serrano pepper"
+                  ],
+                  "origin": {
+                    "author": "Diana Kennedy",
+                    "title": "Regional Mexican Cooking",
+                    "type": "book"
+                  }
+                },
+                "entry_id": null,
+                "matched_principal_sets": []
+              }
+            ],
+            "subject": "https://en.wikipedia.org/wiki/Salsa_verde"
+          }
+        ],
+        "has_next_page": false,
+        "offset": 0,
+        "total": 1
+      }
+  - path: /v1/index/6f831ac8-4c41-4812-b383-6fb04f8b9f9f/search
+    method: post
+    json:
+      {
+        "@datatype": "GSearchResult",
+        "@version": "2017-09-01",
+        "count": 1,
+        "gmeta": [
+          {
+            "@datatype": "GMetaResult",
+            "@version": "2019-08-27",
+            "entries": [
+              {
+                "content": {
+                  "cuisine": [
+                    "mexican"
+                  ],
+                  "handle": "salsa-verde",
+                  "ingredients": [
+                    {
+                      "amount": {
+                        "number": 10
+                      },
+                      "default": "tomatillo",
+                      "preparation": "simmer 20 minutes",
+                      "type": "fruit"
+                    },
+                    {
+                      "amount": {
+                        "number": 2
+                      },
+                      "default": "serrano pepper",
+                      "preparation": "seeded",
+                      "substitutes": [
+                        "jalapeno",
+                        "thai bird chili"
+                      ],
+                      "type": "fruit"
+                    },
+                    {
+                      "amount": {
+                        "number": 2,
+                        "unit": "clove"
+                      },
+                      "default": "garlic",
+                      "type": "vegetable"
+                    },
+                    {
+                      "amount": {
+                        "number": 0.5
+                      },
+                      "default": "yellow onion",
+                      "type": "vegetable"
+                    },
+                    {
+                      "amount": {
+                        "number": 2,
+                        "unit": "tsp"
+                      },
+                      "default": "salt",
+                      "type": "spice"
+                    },
+                    {
+                      "amount": {
+                        "number": 2,
+                        "unit": "tbsp"
+                      },
+                      "default": "coriander",
+                      "preparation": "ground",
+                      "subsitutes": [
+                        "cumin"
+                      ],
+                      "type": "spice"
+                    }
+                  ],
+                  "keywords": [
+                    "salsa",
+                    "tomatillo",
+                    "coriander",
+                    "serrano pepper"
+                  ],
+                  "origin": {
+                    "author": "Diana Kennedy",
+                    "title": "Regional Mexican Cooking",
+                    "type": "book"
+                  }
+                },
+                "entry_id": null,
+                "matched_principal_sets": []
+              }
+            ],
+            "subject": "https://en.wikipedia.org/wiki/Salsa_verde"
+          }
+        ],
+        "has_next_page": false,
+        "offset": 0,
+        "total": 1
+      }
+  - path: /v1/index/6f831ac8-4c41-4812-b383-6fb04f8b9f9f/ingest
+    method: post
+    json:
+      {
+        "acknowledged": true,
+        "task_id": "965865a7-f075-4407-84e7-0838279803a2"
+      }
+  - path: /v1/index/2ac1f660-298b-432f-89ae-c1299ad4233e/search
+    method: get
+    status: 404
+    json:
+      {
+        "@datatype": "GError",
+        "@version":"2017-09-01",
+        "code": "NotFound.NoSuchIndex",
+        "message": "There is no search index named \"2ac1f660-298b-432f-89ae-c1299ad4233e\"",
+        "request_id": "0cd6b6eee44d7b6863b0db2b07f01484",
+        "status": 404
+      }
+  - path: /v1/index/2ac1f660-298b-432f-89ae-c1299ad4233e/ingest
+    method: post
+    status: 400
+    json:
+      {
+        "@datatype": "GError",
+        "@version": "2017-09-01",
+        "code": "BadRequest.ValidationError",
+        "error_data": {
+          "messages": {
+            "json": {
+              "ingest_data": {
+                "visible_to": [
+                  "Missing data for required field."
+                ]
+              }
+            }
+          }
+        },
+        "message": "Request failed input validation.",
+        "request_id": "2771688b76d38f89ba11fbb2d886f136",
+        "status": 400
+      }
+  - path: /v1/task/49869cb5-4fca-4f19-bbb6-8b0a18bd1f95
+    json:
+      {
+        "additional_details": null,
+        "completion_date": "2021-10-05T18:42:49",
+        "creation_date": "2021-10-05T18:42:49",
+        "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+        "message": null,
+        "state": "SUCCESS",
+        "state_description": "Task succeeded",
+        "task_id": "49869cb5-4fca-4f19-bbb6-8b0a18bd1f95"
+      }
+  - path: /v1/task_list/6f831ac8-4c41-4812-b383-6fb04f8b9f9f
+    json:
+      {
+        "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+        "tasks": [
+          {
+            "additional_details": null,
+            "completion_date": "2021-10-05T18:42:49",
+            "creation_date": "2021-10-05T18:42:49",
+            "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+            "message": null,
+            "state": "SUCCESS",
+            "state_description": "Task succeeded",
+            "task_id": "49869cb5-4fca-4f19-bbb6-8b0a18bd1f95"
+          },
+          {
+            "additional_details": null,
+            "completion_date": "2021-10-05T18:31:40",
+            "creation_date": "2021-10-05T18:31:39",
+            "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+            "message": null,
+            "state": "SUCCESS",
+            "state_description": "Task succeeded",
+            "task_id": "fea08a77-5ad8-48e0-992e-f001755df897"
+          },
+          {
+            "additional_details": null,
+            "completion_date": null,
+            "creation_date": "2021-10-05T18:18:51",
+            "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+            "message": null,
+            "state": "PENDING",
+            "state_description": "Task is waiting to start",
+            "task_id": "cfdedea7-9c52-42cb-84a6-6daa8217f772"
+          }
+        ]
+      }
