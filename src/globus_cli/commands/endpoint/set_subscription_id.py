@@ -46,6 +46,6 @@ def set_endpoint_subscription_id(
     # make the update
     res = client.put(
         f"/endpoint/{endpoint_id}/subscription",
-        {"subscription_id": subscription_id},
+        data={"subscription_id": subscription_id},
     )
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")
