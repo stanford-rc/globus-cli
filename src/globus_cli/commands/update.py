@@ -1,4 +1,6 @@
 import atexit
+import os
+import pathlib
 import site
 import subprocess
 import sys
@@ -12,6 +14,14 @@ from globus_cli.version import get_versions
 # if so, a `pip install --user` was used
 # https://docs.python.org/3/library/site.html#site.getuserbase
 IS_USER_INSTALL = __file__.startswith(site.getuserbase())
+
+# check if the source is in the PIPX home, which would mean that this is a pipx install
+# (even if it is in the userbase dir)
+# pipx home discovery extracted from pipx itself. see:
+#   https://github.com/pypa/pipx/blob/878f03504417fa4cc9a6676b1bc24aef2ba3e491/src/pipx/constants.py#L8
+_DEFAULT_PIPX_HOME = pathlib.Path.home() / ".local/pipx"
+_PIPX_HOME = pathlib.Path(os.getenv("PIPX_HOME", _DEFAULT_PIPX_HOME)).resolve()
+IS_PIPX_INSTALL = __file__.startswith(str(_PIPX_HOME))
 
 
 def _call_pip(*args):
@@ -48,18 +58,10 @@ def _check_pip_installed():
     disable_options=["format", "map_http_status"],
     short_help="Update the Globus CLI to its  latest version",
 )
+@click.option("--force", is_flag=True, hidden=True)
 @click.option("--yes", is_flag=True, help='Automatically say "yes" to all prompts')
-# hidden options to fetch branches or tags from GitHub. One turns this mode
-# on or off, and the other is used to set a non-main target
-# --development-version implies --development
-@click.option("--development", is_flag=True, hidden=True)
-@click.option("--development-version", hidden=True, default=None)
-def update_command(yes, development, development_version):
+def update_command(yes, force, development, development_version):
     """Update the Globus CLI to its latest version.
-
-    NOTE: This command requires having pip. If you used an alternative method
-    of installing the Globus CLI you can install pip to run this command,
-    or manually update the Globus CLI using the method you used for install.
 
     The *globus update* command checks if a more recent version of the Globus CLI
     is available on PyPi, and if so asks for user consent to update to the most
@@ -91,38 +93,29 @@ def update_command(yes, development, development_version):
         click.echo("`globus update` requires pip. Please install pip and try again")
         click.get_current_context().exit(1)
 
-    # --development-version implies --development
-    development = development or (development_version is not None)
+    # lookup version from PyPi, abort if we can't get it
+    latest, current = get_versions()
+    if latest is None:
+        click.echo("Failed to lookup latest version. Aborting.")
+        click.get_current_context().exit(1)
 
-    # if we're running with `--development`, then the target version is a
-    # tarball from GitHub, and we can skip out on the safety checks
-    if development:
-        # default to main
-        development_version = development_version or "main"
-        target_version = (
-            "https://github.com/globus/globus-cli/archive/{}.tar.gz#egg=globus-cli"
-        ).format(development_version)
-    else:
-        # lookup version from PyPi, abort if we can't get it
-        latest, current = get_versions()
-        if latest is None:
-            click.echo("Failed to lookup latest version. Aborting.")
-            click.get_current_context().exit(1)
-
-        # in the case where we're already up to date, do nothing and exit
-        if current == latest:
-            click.echo(f"You are already running the latest version: {current}")
+    # in the case where we're already up to date, do nothing and exit
+    if current == latest:
+        click.echo(f"You are already running the latest version: {current}")
+        if not force:
             return
+        else:
+            click.echo("continuing with update (--force)")
 
-        # show the version(s) and prompt to continue
-        click.echo(f"You are running version {current}\nThe latest version is {latest}")
-        if not yes and (not click.confirm("Continue with the upgrade?", default=True)):
-            click.get_current_context().exit(1)
+    # show the version(s) and prompt to continue
+    click.echo(f"You are running version {current}\nThe latest version is {latest}")
+    if not (yes or force or click.confirm("Continue with the upgrade?", default=True)):
+        click.get_current_context().exit(1)
 
-        # if we make it through to here, it means we didn't hit any safe (or
-        # unsafe) abort conditions, so set the target version for upgrade to
-        # the latest
-        target_version = f"globus-cli=={latest}"
+    # if we make it through to here, it means we didn't hit any safe (or
+    # unsafe) abort conditions, so set the target version for upgrade to
+    # the latest
+    target_version = f"globus-cli=={latest}"
 
     # print verbose warning/help message, to guide less fortunate souls who hit
     # Ctrl+C at a foolish time, lose connectivity, or don't invoke with `sudo`
@@ -150,6 +143,6 @@ def update_command(yes, development, development_version):
     @atexit.register
     def do_upgrade():
         install_args = ["install", "--upgrade", target_version]
-        if IS_USER_INSTALL:
+        if IS_USER_INSTALL and not IS_PIPX_INSTALL:
             install_args.insert(1, "--user")
         _call_pip(*install_args)
