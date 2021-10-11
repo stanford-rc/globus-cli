@@ -1,9 +1,10 @@
 import logging
 import sys
 import textwrap
+from typing import Tuple, Union
 
 import click
-from globus_sdk import RefreshTokenAuthorizer, TransferClient
+from globus_sdk import GlobusHTTPResponse, RefreshTokenAuthorizer, TransferClient
 
 from globus_cli import login_manager, version
 from globus_cli.termio import FORMAT_SILENT, formatted_print
@@ -18,7 +19,7 @@ class CustomTransferClient(TransferClient):
     # TDOD: Remove this function when endpoints natively support recursive ls
     def recursive_operation_ls(
         self, endpoint_id, depth=3, filter_after_first=True, **params
-    ):
+    ) -> RecursiveLsResponse:
         """
         Makes recursive calls to ``GET /operation/endpoint/<endpoint_id>/ls``
         Does not preserve access to top level operation_ls fields, but
@@ -57,7 +58,9 @@ class CustomTransferClient(TransferClient):
         )
         return RecursiveLsResponse(self, endpoint_id, depth, filter_after_first, params)
 
-    def get_endpoint_w_server_list(self, endpoint_id):
+    def get_endpoint_w_server_list(
+        self, endpoint_id
+    ) -> Tuple[GlobusHTTPResponse, Union[str, GlobusHTTPResponse]]:
         """
         A helper for handling endpoint server list lookups correctly accounting
         for various endpoint types.
@@ -92,7 +95,7 @@ class CustomTransferClient(TransferClient):
 
     def task_wait_with_io(
         self, meow, heartbeat, polling_interval, timeout, task_id, timeout_exit_code
-    ):
+    ) -> None:
         """
         Options are the core "task wait" options, including the `--meow` easter
         egg.
@@ -176,7 +179,7 @@ class CustomTransferClient(TransferClient):
         click.get_current_context().exit(exit_code)
 
 
-def get_client():
+def get_client() -> CustomTransferClient:
     adapter = login_manager.token_storage_adapter()
     tokens = adapter.get_token_data("transfer.api.globus.org")
     authorizer = None

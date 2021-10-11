@@ -49,7 +49,7 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         # the SDK version bounds versions of `cryptography` and `requests`
-        "globus-sdk==3.0.2",
+        "globus-sdk==3.0.3",
         "click>=8.0.0,<9",
         "jmespath==0.10.0",
         # these are dependencies of the SDK, but they are used directly in the CLI
