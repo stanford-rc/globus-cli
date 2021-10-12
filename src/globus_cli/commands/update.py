@@ -60,7 +60,7 @@ def _check_pip_installed():
 )
 @click.option("--force", is_flag=True, hidden=True)
 @click.option("--yes", is_flag=True, help='Automatically say "yes" to all prompts')
-def update_command(yes, force, development, development_version):
+def update_command(yes: bool, force: bool) -> None:
     """Update the Globus CLI to its latest version.
 
     The *globus update* command checks if a more recent version of the Globus CLI
