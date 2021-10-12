@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import NoReturn, Optional
 
 import click
 
@@ -95,7 +95,7 @@ def endpoint_is_activated(
     client = get_client()
     res = client.endpoint_get_activation_requirements(endpoint_id)
 
-    def fail(deadline=None):
+    def fail(deadline=None) -> NoReturn:
         exp_string = ""
         if deadline is not None:
             exp_string = f" or will expire within {deadline} seconds"

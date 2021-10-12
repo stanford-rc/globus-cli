@@ -1,7 +1,8 @@
 import webbrowser
-from typing import Optional
+from typing import Dict, Optional, Union
 
 import click
+from globus_sdk import GlobusHTTPResponse
 
 from globus_cli.login_manager import LoginManager, is_remote_session
 from globus_cli.parsing import command, endpoint_id_arg, mutex_option_group
@@ -194,7 +195,9 @@ def endpoint_activate(
 
     # check if endpoint is already activated unless --force
     if not force:
-        res = client.endpoint_autoactivate(endpoint_id, if_expires_in=60)
+        res: Union[Dict[str, str], GlobusHTTPResponse] = client.endpoint_autoactivate(
+            endpoint_id, if_expires_in=60
+        )
 
         if "AlreadyActivated" == res["code"]:
             formatted_print(
@@ -266,7 +269,7 @@ def endpoint_activate(
             if data["name"] == "lifetime_in_hours" and myproxy_lifetime is not None:
                 data["value"] = str(myproxy_lifetime)
 
-        res = client.endpoint_activate(endpoint_id, requirements_data)
+        res = client.endpoint_activate(endpoint_id, requirements_data=requirements_data)
 
     # web activation
     elif web:
@@ -285,7 +288,9 @@ def endpoint_activate(
         filled_requirements_data = fill_delegate_proxy_activation_requirements(
             requirements_data, delegate_proxy, lifetime_hours=proxy_lifetime or 12
         )
-        res = client.endpoint_activate(endpoint_id, filled_requirements_data)
+        res = client.endpoint_activate(
+            endpoint_id, requirements_data=filled_requirements_data
+        )
 
     # output
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")
