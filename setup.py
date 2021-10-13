@@ -48,14 +48,13 @@ setup(
     package_dir={"": "src"},
     python_requires=">=3.6",
     install_requires=[
-        # the SDK version bounds versions of `cryptography` and `requests`
-        "globus-sdk==3.0.3",
+        "globus-sdk==3.1.0",
         "click>=8.0.0,<9",
         "jmespath==0.10.0",
         # these are dependencies of the SDK, but they are used directly in the CLI
         # declare them here in case the underlying lib ever changes
         "requests>=2.19.1,<3.0.0",
-        "cryptography>=2.0,<37",
+        "cryptography>=3.3.1,<37",
     ],
     extras_require={"development": DEV_REQUIREMENTS},
     entry_points={"console_scripts": ["globus = globus_cli:main"]},
