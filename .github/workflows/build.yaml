@@ -46,3 +46,19 @@ jobs:
         # mindeps runs on py36, as "the oldest everything"
         if: ${{ matrix.python-version == '3.6' && matrix.os == 'ubuntu-latest' }}
         run: python -m tox -e py-mindeps
+
+  # use the oldest python version we support for this build
+  test-ancient-virtualenv:
+    name: "Python 3.6, Using Old virtualenv"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Install Requirements
+        run: python -m pip install -U pip setuptools tox
+      - name: Downgrade Virtualenv
+        run: python -m pip install 'virtualenv==16.7.12'
+      - name: Run Tests
+        run: python -m tox -e py
