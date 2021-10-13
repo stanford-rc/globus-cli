@@ -10,18 +10,28 @@ import click
 from globus_cli.parsing import command
 from globus_cli.version import get_versions
 
+
 # check if the source for this is inside of the USER_BASE
 # if so, a `pip install --user` was used
 # https://docs.python.org/3/library/site.html#site.getuserbase
-IS_USER_INSTALL = __file__.startswith(site.getuserbase())
+def _is_user_install() -> bool:
+    # under old versions of virtualenv, `getuserbase` is not included in the generated
+    # `site.py` which gets injected into the virtualenv
+    # therefore, if the `site` module has no such method, immediately fail
+    # (virtualenv != "user install")
+    if not hasattr(site, "getuserbase"):
+        return False
+    return __file__.startswith(site.getuserbase())
+
 
 # check if the source is in the PIPX home, which would mean that this is a pipx install
 # (even if it is in the userbase dir)
 # pipx home discovery extracted from pipx itself. see:
 #   https://github.com/pypa/pipx/blob/878f03504417fa4cc9a6676b1bc24aef2ba3e491/src/pipx/constants.py#L8
-_DEFAULT_PIPX_HOME = pathlib.Path.home() / ".local/pipx"
-_PIPX_HOME = pathlib.Path(os.getenv("PIPX_HOME", _DEFAULT_PIPX_HOME)).resolve()
-IS_PIPX_INSTALL = __file__.startswith(str(_PIPX_HOME))
+def _is_pipx_install() -> bool:
+    _DEFAULT_PIPX_HOME = pathlib.Path.home() / ".local/pipx"
+    _PIPX_HOME = pathlib.Path(os.getenv("PIPX_HOME", _DEFAULT_PIPX_HOME)).resolve()
+    return __file__.startswith(str(_PIPX_HOME))
 
 
 def _call_pip(*args):
@@ -143,6 +153,6 @@ def update_command(yes: bool, force: bool) -> None:
     @atexit.register
     def do_upgrade():
         install_args = ["install", "--upgrade", target_version]
-        if IS_USER_INSTALL and not IS_PIPX_INSTALL:
+        if _is_user_install() and not _is_pipx_install():
             install_args.insert(1, "--user")
         _call_pip(*install_args)
