@@ -8,7 +8,7 @@ class LocationType(click.ParamType):
     Validates that given location string is two comma separated floats
     """
 
-    name = "LATTITUDE,LONGITUDE"
+    name = "LATITUDE,LONGITUDE"
 
     def convert(self, value, param, ctx):
         try:
@@ -19,5 +19,5 @@ class LocationType(click.ParamType):
         except (ValueError, AttributeError):
             self.fail(
                 f"location {value} is not two comma separated floats "
-                "for lattitude and longitude"
+                "for latitude and longitude"
             )
