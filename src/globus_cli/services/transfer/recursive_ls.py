@@ -3,12 +3,51 @@
 import logging
 import time
 from collections import deque
+from typing import Any, Deque, Dict, Iterator, List, Optional, Tuple, cast
 
-logger = logging.getLogger(__name__)
+from globus_sdk import GlobusHTTPResponse, TransferClient
 
-# constants for controlling rate limiting
+log = logging.getLogger(__name__)
+
+ITEM_T = Dict[str, Any]
+QUEUE_T = Deque[Tuple[Optional[str], str, int]]
+
+# constants for controlling client-side rate limiting
 SLEEP_FREQUENCY = 25
 SLEEP_LEN = 1
+
+
+def _client_side_limiter() -> Iterator[None]:
+    counter = 0
+    while True:
+        counter += 1
+        # rate limit based on number of ls calls we have made
+        if counter % SLEEP_FREQUENCY == 0:
+            log.debug(
+                "recursive_operation_ls sleeping %s seconds to rate limit itself.",
+                SLEEP_LEN,
+            )
+            time.sleep(SLEEP_LEN)
+
+        yield
+
+
+def _extend_q(q: QUEUE_T, res: GlobusHTTPResponse, relpath: str, depth: int) -> None:
+    # add data to queue, including the dir's name in the absolute and relative paths
+    # and increase the depth by one.
+    # data is reversed to maintain any "orderby" ordering
+    res_data = cast(List[Dict[str, Any]], res["DATA"])
+    q.extend(
+        [
+            (
+                res["path"] + item["name"],
+                (relpath + "/" if relpath else "") + item["name"],
+                depth + 1,
+            )
+            for item in reversed(res_data)
+            if item["type"] == "dir"
+        ]
+    )
 
 
 class RecursiveLsResponse:
@@ -21,63 +60,57 @@ class RecursiveLsResponse:
     Uses an internal queue for BFS of the filesystem.
 
     Rate limits calls to reduce the changes of connection errors.
+
+    :param client: `TransferClient`` used for making the operation_ls calls.
+    :param endpoint_id: The endpoint that will be recursively ls'ed.
+    :param ls_params: Query params sent to operation_ls
+    :param max_depth: The maximum depth the recursive ls will go into the filesys
+    :param filter_after_first: If True, any filter in ``ls_params`` will be applied
+        to all calls. If False, any filter will be removed after the first ls.
     """
 
-    def __init__(self, client, endpoint_id, max_depth, filter_after_first, ls_params):
-        """
-        **Parameters**
-          ``client``
-            A `TransferClient`` used for making the operation_ls calls.
-          ``endpoint_id``
-            The endpoint that will be recursively ls'ed.
-          ``max_depth``
-            The maximum depth the recursive ls will go into the file system.
-          ``filter_after_first``
-            If True, any filter in ``ls_params`` will be applied to all calls
-            If False, any filter in ``ls_params`` will only be applied to the
-            first ls.
-          ``ls_params``
-            Query params sent to operation_ls, see operation_ls for more
-            details.
-        """
-        logger.info(
-            "Creating RecursiveLsResponse on path {} of endpoint {}".format(
-                ls_params.get("path"), endpoint_id
-            )
+    def __init__(
+        self,
+        client: TransferClient,
+        endpoint_id: str,
+        ls_params: Dict[str, Any],
+        *,
+        max_depth: int = 3,
+        filter_after_first: bool = True,
+    ) -> None:
+        self._client = client
+        self._endpoint_id = endpoint_id
+        self._ls_params = ls_params
+        self._max_depth = max_depth
+        self._filter_after_first = filter_after_first
+
+        start_path = cast(Optional[str], ls_params.get("path"))
+        log.info(
+            "Creating RecursiveLsResponse on path '%s' of endpoint '%s'",
+            start_path,
+            endpoint_id,
         )
 
-        self.client = client
-        self.endpoint_id = endpoint_id
-        self.ls_params = ls_params
-        self.max_depth = max_depth
-        self.filter_after_first = filter_after_first
-        self.filtering = True
-        self.ls_count = 0
-
-        # queue of (absolute_path, relative_path, depth) tuples.
-        self.queue = deque()
-        # initialized with the start path (if any) and a depth of 0
-        self.queue.append((self.ls_params.get("path"), "", 0))
-
         # call the iterable_func method to convert it to a generator expression
-        self.generator = self.iterable_func()
+        self._generator = self._iterable_func(start_path)
 
         # grab the first element out of the internal iteration function
         # because this could raise a StopIteration exception, we need to be
         # careful and make sure that such a condition is respected (and
         # replicated as an iterable of length 0)
         try:
-            self.first_elem = next(self.generator)
+            self._first_elem: Optional[ITEM_T] = next(self._generator)
         except StopIteration:
-            # express this internally as "generator is null" -- just need some
+            # express this internally as "first_elem is null" -- just need some
             # way of making sure that it's clear
-            self.generator = None
+            self._first_elem = None
 
-    def __iter__(self):
-        yield self.first_elem
-        yield from self.generator
+    def __iter__(self) -> Iterator[ITEM_T]:
+        if self._first_elem is not None:
+            yield self._first_elem
+            yield from self._generator
 
-    def iterable_func(self):
+    def _iterable_func(self, start_path: Optional[str]) -> Iterator[ITEM_T]:
         """
         An internal function which has generator semantics. Defined using the
         `yield` syntax.
@@ -86,62 +119,44 @@ class RecursiveLsResponse:
         We rely on the implicit StopIteration built into this type of function
         to propagate through the final `next()` call.
         """
+        # iterator used for client-side limiting
+        limiter = _client_side_limiter()
+
+        # queue of (absolute_path, relative_path, depth) tuples.
+        dir_queue: QUEUE_T = deque()
+        # initialized with the start path (if any) and a depth of 0
+        dir_queue.append((start_path, "", 0))
+
         # BFS is not done until the queue is empty
-        while self.queue:
-            logger.debug(
+        while dir_queue:
+            next(limiter)
+            log.debug(
                 "recursive_operation_ls BFS queue not empty, getting next path now."
             )
 
-            # rate limit based on number of ls calls we have made
-            self.ls_count += 1
-            if self.ls_count % SLEEP_FREQUENCY == 0:
-                logger.debug(
-                    f"recursive_operation_ls sleeping {SLEEP_LEN} seconds to "
-                    "rate limit itself."
-                )
-                time.sleep(SLEEP_LEN)
-
             # get path and current depth from the queue
-            abs_path, rel_path, depth = self.queue.pop()
+            abs_path, rel_path, depth = dir_queue.pop()
 
             # set the target path to the popped absolute path if it exists
-            if abs_path:
-                self.ls_params["path"] = abs_path
+            if abs_path is not None:
+                self._ls_params["path"] = abs_path
+
+            # do the operation_ls with the updated params
+            res = self._client.operation_ls(self._endpoint_id, **self._ls_params)
+            res_data = res["DATA"]
+
+            # add to the queue if there are additional listings to do
+            # and we are not at the depth limit
+            if depth < self._max_depth:
+                _extend_q(dir_queue, res, rel_path, depth)
 
             # if filter_after_first is False, stop filtering after the first
             # ls call has been made
-            if not self.filter_after_first:
-                if self.filtering:
-                    self.filtering = False
-                else:
-                    try:
-                        self.ls_params.pop("filter")
-                    except KeyError:
-                        pass
-
-            # do the operation_ls with the updated params
-            res = self.client.operation_ls(self.endpoint_id, **self.ls_params)
-            res_data = res["DATA"]
-
-            # if we aren't at the depth limit, add dir entries to the queue.
-            # including the dir's name in the absolute and relative paths
-            # and increase the depth by one.
-            # data is reversed to maintain any "orderby" ordering
-            if depth < self.max_depth:
-                self.queue.extend(
-                    [
-                        (
-                            res["path"] + item["name"],
-                            (rel_path + "/" if rel_path else "") + item["name"],
-                            depth + 1,
-                        )
-                        for item in reversed(res_data)
-                        if item["type"] == "dir"
-                    ]
-                )
+            if not self._filter_after_first:
+                self._ls_params.pop("filter", None)
 
             # for each item in the response data update the item's name with
             # the relative path popped from the queue, and yield the item
             for item in res_data:
                 item["name"] = (rel_path + "/" if rel_path else "") + item["name"]
-                yield item
+                yield cast(ITEM_T, item)

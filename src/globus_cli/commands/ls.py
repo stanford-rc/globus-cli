@@ -182,7 +182,7 @@ def ls_command(
         # could do so with "type:dir" or "type:file" filters added in, and
         # potentially work out some viable behavior based on what people want
         res = client.recursive_operation_ls(
-            endpoint_id, depth=recursive_depth_limit, **ls_params
+            endpoint_id, ls_params, depth=recursive_depth_limit
         )
     else:
         res = client.operation_ls(endpoint_id, **ls_params)

@@ -1,7 +1,8 @@
 import logging
 import sys
 import textwrap
-from typing import Tuple, Union
+import uuid
+from typing import Any, Dict, Tuple, Union
 
 import click
 from globus_sdk import GlobusHTTPResponse, RefreshTokenAuthorizer, TransferClient
@@ -18,45 +19,32 @@ log = logging.getLogger(__name__)
 class CustomTransferClient(TransferClient):
     # TDOD: Remove this function when endpoints natively support recursive ls
     def recursive_operation_ls(
-        self, endpoint_id, depth=3, filter_after_first=True, **params
+        self,
+        endpoint_id: Union[str, uuid.UUID],
+        params: Dict[str, Any],
+        depth: int = 3,
     ) -> RecursiveLsResponse:
         """
         Makes recursive calls to ``GET /operation/endpoint/<endpoint_id>/ls``
         Does not preserve access to top level operation_ls fields, but
         adds a "path" field for every item that represents the full
         path to that item.
-        :rtype: iterable of :class:`GlobusResponse
-                <globus_sdk.response.GlobusResponse>`
-        **Parameters**
-            ``endpoint_id`` (*string*)
-              The endpoint being recursively ls'ed. If no "path" is given in
-              params, the start path is determined by this endpoint.
-            ``depth`` (*int*)
-              The maximum file depth the recursive ls will go to.
-            ``filter_after_first`` (*bool*)
-              If False, any "filter" in params will only be applied to the
-              first, top level ls, all results beyond that will be unfiltered.
-            ``params``
-              Parameters that will be passed through as query params.
-        **Examples**
-        >>> tc = globus_sdk.TransferClient(...)
-        >>> for entry in tc.recursive_operation_ls(ep_id, path="/~/project1/"):
-        >>>     print(entry["path"], entry["type"])
-        **External Documentation**
-        See
-        `List Directory Contents \
-        <https://docs.globus.org/api/transfer/file_operations/#list_directory_contents>`_
-        in the REST documentation for details, but note that top level data
-        fields are no longer available and an additional per item
-        "path" field is added.
+
+        :rtype: iterable of :class:`GlobusResponse <globus_sdk.response.GlobusResponse>`
+
+        :param endpoint_id: The endpoint being recursively ls'ed. If no "path" is given
+            in params, the start path is determined by this endpoint.
+        :param params: Parameters that will be passed through as query params.
+        :param depth: The maximum file depth the recursive ls will go to.
         """
         endpoint_id = str(endpoint_id)
         log.info(
-            "TransferClient.recursive_operation_ls({}, {}, {})".format(
-                endpoint_id, depth, params
-            )
+            "TransferClient.recursive_operation_ls(%s, %s, %s)",
+            endpoint_id,
+            depth,
+            params,
         )
-        return RecursiveLsResponse(self, endpoint_id, depth, filter_after_first, params)
+        return RecursiveLsResponse(self, endpoint_id, params, max_depth=depth)
 
     def get_endpoint_w_server_list(
         self, endpoint_id
