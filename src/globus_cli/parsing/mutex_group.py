@@ -1,11 +1,12 @@
 import functools
-from typing import Callable, List, TypeVar, Union
+from typing import Any, Callable, List, TypeVar, Union, cast
 
 import click
 
 from ..utils import format_list_of_words
 
-C = TypeVar("C", bound=Callable)
+RT = TypeVar("RT")
+C = TypeVar("C", bound=Callable[..., RT])
 
 
 class MutexInfo:
@@ -57,18 +58,18 @@ def mutex_option_group(*options: Union[str, MutexInfo]) -> Callable[[C], C]:
         else:
             opt_infos.append(opt)
 
-    def decorator(func):
+    def decorator(func: C) -> C:
         @functools.wraps(func)
-        def wrapped(*args, **kwargs):
+        def wrapped(*args: Any, **kwargs: Any) -> RT:
             found_opts = []
             for opt in opt_infos:
                 if opt.is_present(kwargs):
                     found_opts.append(opt)
             if len(found_opts) > 1:
-                option_str = format_list_of_words(*opt_infos)
+                option_str = format_list_of_words(*(str(o) for o in opt_infos))
                 raise click.UsageError(f"{option_str} are mutually exclusive")
             return func(*args, **kwargs)
 
-        return wrapped
+        return cast(C, wrapped)
 
     return decorator

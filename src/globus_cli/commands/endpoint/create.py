@@ -1,9 +1,12 @@
-from typing import Any
-
-import click
+from typing import Any, Optional, Tuple
 
 from globus_cli.login_manager import LoginManager
-from globus_cli.parsing import ENDPOINT_PLUS_REQPATH, command, one_use_option
+from globus_cli.parsing import (
+    ENDPOINT_PLUS_REQPATH,
+    command,
+    mutex_option_group,
+    one_use_option,
+)
 from globus_cli.services.transfer import assemble_generic_doc, autoactivate, get_client
 from globus_cli.termio import FORMAT_TEXT_RECORD, formatted_print
 
@@ -49,7 +52,7 @@ $ globus endpoint create --shared host_ep:~/ my_shared_endpoint
     is_flag=True,
     help=(
         "Create a Globus Connect Personal endpoint. "
-        "Mutually exclusive with --server and --shared. "
+        "Mutually exclusive with --server and --shared."
     ),
 )
 @one_use_option(
@@ -65,36 +68,28 @@ $ globus endpoint create --shared host_ep:~/ my_shared_endpoint
     default=None,
     type=ENDPOINT_PLUS_REQPATH,
     help=(
-        "Create a shared endpoint hosted on the given endpoint "
-        "and path. Mutually exclusive with --personal and "
-        "--server."
+        "Create a shared endpoint hosted on the given endpoint and path. "
+        "Mutually exclusive with --personal and --server."
     ),
 )
+@mutex_option_group("--shared", "--server", "--personal")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def endpoint_create(**kwargs: Any) -> None:
+def endpoint_create(
+    personal: bool, server: bool, shared: Optional[Tuple[str, str]], **kwargs: Any
+) -> None:
     """
     Create a new endpoint.
 
     Requires a display name and exactly one of --personal, --server, or --shared to make
     a Globus Connect Personal, Globus Connect Server, or Shared endpoint respectively.
+
+    Note that `--personal` does not perform local setup steps. When this command is run
+    with the `--personal` flag, it returns a setup key which can be passed to
+    Globus Connect Personal during setup.
     """
     client = get_client()
 
-    # get endpoint type, ensure unambiguous.
-    personal = kwargs.pop("personal")
-    server = kwargs.pop("server")
-    shared = kwargs.pop("shared")
-
-    if personal and (not server) and (not shared):
-        endpoint_type = "personal"
-    elif server and (not personal) and (not shared):
-        endpoint_type = "server"
-    elif shared and (not personal) and (not server):
-        endpoint_type = "shared"
-    else:
-        raise click.UsageError(
-            "Exactly one of --personal, --server, or --shared is required."
-        )
+    endpoint_type = "personal" if personal else "server" if server else "shared"
 
     # validate options
     kwargs["is_globus_connect"] = personal or None
