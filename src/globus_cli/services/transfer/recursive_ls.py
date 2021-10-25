@@ -3,9 +3,9 @@
 import logging
 import time
 from collections import deque
-from typing import Any, Deque, Dict, Iterator, List, Optional, Tuple, cast
+from typing import Any, Deque, Dict, Iterator, Optional, Tuple, cast
 
-from globus_sdk import GlobusHTTPResponse, TransferClient
+from globus_sdk import TransferClient
 
 log = logging.getLogger(__name__)
 
@@ -30,24 +30,6 @@ def _client_side_limiter() -> Iterator[None]:
             time.sleep(SLEEP_LEN)
 
         yield
-
-
-def _extend_q(q: QUEUE_T, res: GlobusHTTPResponse, relpath: str, depth: int) -> None:
-    # add data to queue, including the dir's name in the absolute and relative paths
-    # and increase the depth by one.
-    # data is reversed to maintain any "orderby" ordering
-    res_data = cast(List[Dict[str, Any]], res["DATA"])
-    q.extend(
-        [
-            (
-                res["path"] + item["name"],
-                (relpath + "/" if relpath else "") + item["name"],
-                depth + 1,
-            )
-            for item in reversed(res_data)
-            if item["type"] == "dir"
-        ]
-    )
 
 
 class RecursiveLsResponse:
@@ -148,7 +130,20 @@ class RecursiveLsResponse:
             # add to the queue if there are additional listings to do
             # and we are not at the depth limit
             if depth < self._max_depth:
-                _extend_q(dir_queue, res, rel_path, depth)
+                # queue data includes the dir's name in the absolute and relative paths
+                # and increases the depth by one.
+                dir_queue.extend(
+                    [
+                        (
+                            res["path"] + item["name"],
+                            (rel_path + "/" if rel_path else "") + item["name"],
+                            depth + 1,
+                        )
+                        # data is reversed to maintain any "orderby" ordering
+                        for item in reversed(res_data)
+                        if item["type"] == "dir"
+                    ]
+                )
 
             # if filter_after_first is False, stop filtering after the first
             # ls call has been made
