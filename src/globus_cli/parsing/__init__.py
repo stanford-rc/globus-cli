@@ -1,7 +1,6 @@
 from globus_cli.parsing.commands import command, group, main_group
 from globus_cli.parsing.mutex_group import MutexInfo, mutex_option_group
 from globus_cli.parsing.one_use_option import one_use_option
-from globus_cli.parsing.process_stdin import shlex_process_stream
 from globus_cli.parsing.shared_options import (
     collection_id_arg,
     delete_and_rm_options,
@@ -53,5 +52,4 @@ __all__ = [
     "synchronous_task_wait_options",
     "security_principal_opts",
     "no_local_server_option",
-    "shlex_process_stream",
 ]

@@ -1,13 +1,13 @@
 import click
 from globus_sdk import TransferData
 
+from globus_cli import utils
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import (
     ENDPOINT_PLUS_OPTPATH,
     TaskPath,
     command,
     mutex_option_group,
-    shlex_process_stream,
     task_submission_options,
 )
 from globus_cli.services.transfer import autoactivate, get_client
@@ -396,14 +396,7 @@ def transfer_command(
                 recursive=recursive,
             )
 
-        shlex_process_stream(
-            process_batch_line,
-            batch,
-            (
-                "Enter transfers, line by line, as\n\n"
-                "    [--recursive] [--external-checksum TEXT] SOURCE_PATH DEST_PATH\n"
-            ),
-        )
+        utils.shlex_process_stream(process_batch_line, batch)
 
     else:
         transfer_data.add_item(
