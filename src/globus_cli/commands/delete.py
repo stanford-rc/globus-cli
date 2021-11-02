@@ -155,9 +155,7 @@ def delete_command(
             """
             delete_data.add_item(str(path))
 
-        shlex_process_stream(
-            process_batch_line, batch, "Enter paths to delete, line by line."
-        )
+        shlex_process_stream(process_batch_line, batch)
     else:
         if not star_silent and enable_globs and path.endswith("*"):
             # not intuitive, but `click.confirm(abort=True)` prints to stdout

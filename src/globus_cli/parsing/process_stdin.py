@@ -1,10 +1,7 @@
 import shlex
-import sys
-
-import click
 
 
-def shlex_process_stream(process_command, stream, helptext):
+def shlex_process_stream(process_command, stream):
     """
     Use shlex to process stdin line-by-line.
     Also prints help text.
@@ -13,18 +10,6 @@ def shlex_process_stream(process_command, stream, helptext):
     processing single lines of input. helptext is prepended to the standard
     message printed to interactive sessions.
     """
-    # if input is interactive, print help to stderr
-    if sys.stdin.isatty():
-        click.echo(
-            f"""\
-{helptext}
-Lines are split with shlex in POSIX mode:
-  https://docs.python.org/library/shlex.html#parsing-rules
-Terminate input with Ctrl+D or <EOF>
-""",
-            err=True,
-        )
-
     # use readlines() rather than implicit file read line looping to force
     # python to properly capture EOF (otherwise, EOF acts as a flush and
     # things get weird)

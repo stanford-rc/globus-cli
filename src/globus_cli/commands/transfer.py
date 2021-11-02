@@ -396,14 +396,7 @@ def transfer_command(
                 recursive=recursive,
             )
 
-        shlex_process_stream(
-            process_batch_line,
-            batch,
-            (
-                "Enter transfers, line by line, as\n\n"
-                "    [--recursive] [--external-checksum TEXT] SOURCE_PATH DEST_PATH\n"
-            ),
-        )
+        shlex_process_stream(process_batch_line, batch)
 
     else:
         transfer_data.add_item(
