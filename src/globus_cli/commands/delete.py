@@ -1,13 +1,13 @@
 import click
 from globus_sdk import DeleteData
 
+from globus_cli import utils
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import (
     ENDPOINT_PLUS_OPTPATH,
     TaskPath,
     command,
     delete_and_rm_options,
-    shlex_process_stream,
     task_submission_options,
 )
 from globus_cli.services.transfer import autoactivate, get_client
@@ -155,7 +155,7 @@ def delete_command(
             """
             delete_data.add_item(str(path))
 
-        shlex_process_stream(process_batch_line, batch)
+        utils.shlex_process_stream(process_batch_line, batch)
     else:
         if not star_silent and enable_globs and path.endswith("*"):
             # not intuitive, but `click.confirm(abort=True)` prints to stdout
