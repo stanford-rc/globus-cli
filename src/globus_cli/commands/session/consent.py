@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import click
 
 from globus_cli.login_manager import LoginManager
@@ -11,7 +13,7 @@ from globus_cli.parsing import command, no_local_server_option
 )
 @no_local_server_option
 @click.argument("SCOPES", nargs=-1, required=True)
-def session_consent(scopes, no_local_server):
+def session_consent(scopes: Tuple[str], no_local_server: bool) -> None:
     """
     Update your current CLI auth session by authenticating with a specific scope or set
     of scopes.
@@ -19,8 +21,6 @@ def session_consent(scopes, no_local_server):
     This command is necessary when the CLI needs access to resources which require the
     user to explicitly consent to access.
     """
-    session_params = {"scope": " ".join(scopes)}
-
     manager = LoginManager()
     manager.run_login_flow(
         no_local_server=no_local_server,
@@ -33,5 +33,5 @@ def session_consent(scopes, no_local_server):
             "\n---"
         ),
         epilog="\nYou have successfully updated your CLI session.\n",
-        session_params=session_params,
+        scopes=list(scopes),
     )
