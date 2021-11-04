@@ -1,5 +1,5 @@
 import functools
-from typing import Dict, Generator, List, Optional, Tuple
+from typing import Dict, Iterator, List, Optional, Tuple
 
 import click
 import globus_sdk
@@ -46,9 +46,18 @@ class LoginManager:
         self._nonstatic_requirements[rs_name] = scopes
 
     @property
-    def login_requirements(self) -> Generator[Tuple[str, List[str]], None, None]:
+    def login_requirements(self) -> Iterator[Tuple[str, List[str]]]:
         yield from self.STATIC_SCOPES.items()
         yield from self._nonstatic_requirements.items()
+
+    @property
+    def always_required_scopes(self) -> Iterator[str]:
+        """
+        scopes which are required on all login flows, regardless of the specified
+        scopes for that flow
+        """
+        # openid -> required to ensure the presence of an id_token in the response data
+        yield AuthScopes.openid
 
     def is_logged_in(self) -> bool:
         res = []
@@ -92,6 +101,11 @@ class LoginManager:
             scopes = [
                 s for _rs_name, rs_scopes in self.login_requirements for s in rs_scopes
             ]
+        # ensure that the requested scope list contains the scopes which are listed as
+        # "always required"
+        for s in self.always_required_scopes:
+            if s not in scopes:
+                scopes.append(s)
         # use a link login if remote session or user requested
         if no_local_server or is_remote_session():
             do_link_auth_flow(scopes, session_params=session_params)
