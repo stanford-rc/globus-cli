@@ -1,0 +1,39 @@
+metadata:
+  task_id: 42277910-0c18-11ec-ba76-138ac5bdb19f
+
+transfer:
+  - path: /task/42277910-0c18-11ec-ba76-138ac5bdb19f/event_list
+    json:
+      {
+        "DATA_TYPE": "event_list",
+        "length": 3,
+        "limit": 10,
+        "offset": 0,
+        "total": 3,
+        "DATA": [
+          {
+            "DATA_TYPE": "event",
+            "code": "CANCELED",
+            "description": "canceled",
+            "details": "Canceled by the task owner",
+            "is_error": true,
+            "time": "2021-10-06T16:14:05+00:00"
+          },
+          {
+            "DATA_TYPE": "event",
+            "code": "PERMISSION_DENIED",
+            "description": "permission denied",
+            "details": "Error (make directories)\nEndpoint: Globus Tutorial Endpoint 1 (ddb59aef-6d04-11e5-ba46-22000b92c6ec)\nServer: ep1.transfer.globus.org:2811\nFile: /foo/\nCommand: MKD /foo\nMessage: Fatal FTP response\n---\nDetails: 550-GlobusError: v=1 c=PERMISSION_DENIED\\r\\n550-GridFTP-Error: Path not allowed.\\r\\n550 End.\\r\\n",
+            "is_error": true,
+            "time": "2021-10-06T16:13:57+00:00"
+          },
+          {
+            "DATA_TYPE": "event",
+            "code": "STARTED",
+            "description": "started",
+            "details": "{\n  \"type\": \"GridFTP Transfer\",\n  \"concurrency\": 2,\n  \"parallelism\": 4,\n  \"pipelining\": 20\n}",
+            "is_error": false,
+            "time": "2021-10-06T16:13:57+00:00"
+          }
+        ]
+      }
