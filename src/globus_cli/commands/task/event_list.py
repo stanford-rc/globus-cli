@@ -1,4 +1,5 @@
 import json
+import uuid
 
 import click
 
@@ -37,11 +38,15 @@ $ globus task pause-info TASK_ID --format JSON
 """,
 )
 @task_id_arg
-@click.option("--limit", default=10, show_default=True, help="Limit number of results.")
+@click.option(
+    "--limit", type=int, default=10, show_default=True, help="Limit number of results."
+)
 @click.option("--filter-errors", is_flag=True, help="Filter results to errors")
 @click.option("--filter-non-errors", is_flag=True, help="Filter results to non errors")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def task_event_list(task_id, limit, filter_errors, filter_non_errors):
+def task_event_list(
+    task_id: uuid.UUID, limit: int, filter_errors: bool, filter_non_errors: bool
+):
     """
     This command shows the recent events for a running task.
     Most events of interest are fault events, which are errors which occurred on an
@@ -73,6 +78,7 @@ def task_event_list(task_id, limit, filter_errors, filter_non_errors):
     event_iterator = PagingWrapper(
         client.paginated.task_event_list(
             task_id,
+            # TODO: convert to `filter=filter_string` when SDK support is added
             query_params={"filter": filter_string},
         ).items(),
         limit=limit,
