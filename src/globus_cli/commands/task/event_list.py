@@ -71,7 +71,10 @@ def task_event_list(task_id, limit, filter_errors, filter_non_errors):
         filter_string = ""
 
     event_iterator = PagingWrapper(
-        client.paginated.task_event_list(task_id, filter=filter_string).items(),
+        client.paginated.task_event_list(
+            task_id,
+            query_params={"filter": filter_string},
+        ).items(),
         limit=limit,
     )
 
