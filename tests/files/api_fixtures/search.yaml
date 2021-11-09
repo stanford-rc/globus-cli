@@ -3,6 +3,19 @@ metadata:
   error_index_id: 2ac1f660-298b-432f-89ae-c1299ad4233e
   task_id: 49869cb5-4fca-4f19-bbb6-8b0a18bd1f95
   pending_task_id: cfdedea7-9c52-42cb-84a6-6daa8217f772
+  index_list_data:
+    "6f831ac8-4c41-4812-b383-6fb04f8b9f9f":
+      display_name: "example_cookery"
+      status: "open"
+      permissions: owner
+    "c1b60556-b9d3-4c2a-a2e1-e297c079abbf":
+      display_name: "Globus Tutorials"
+      status: "open"
+      permissions: writer
+    "75df9506-4e85-4ce5-9f2c-8dcf25ae172e":
+      display_name: "Searchable Files Demo Index"
+      status: "open"
+      permissions: owner,writer
 
 search:
   - path: /v1/index/6f831ac8-4c41-4812-b383-6fb04f8b9f9f/search
@@ -289,6 +302,102 @@ search:
             "state": "PENDING",
             "state_description": "Task is waiting to start",
             "task_id": "cfdedea7-9c52-42cb-84a6-6daa8217f772"
+          }
+        ]
+      }
+  - path: /v1/index/6f831ac8-4c41-4812-b383-6fb04f8b9f9f
+    json:
+      {
+        "@datatype": "GSearchIndex",
+        "@version": "2017-09-01",
+        "creation_date": "2018-04-20 19:23:46",
+        "description": "Example index of Cookery",
+        "display_name": "example_cookery",
+        "id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+        "is_trial": false,
+        "max_size_in_mb": 5000,
+        "num_entries": 5,
+        "num_subjects": 3,
+        "size_in_mb": 0,
+        "status": "open",
+        "subscription_id": null
+      }
+  - path: /beta/index
+    method: POST
+    json:
+      {
+        "@datatype": "GSearchIndex",
+        "@version": "2017-09-01",
+        "creation_date": "2018-04-20 19:23:46",
+        "description": "Example index of Cookery",
+        "display_name": "example_cookery",
+        "id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+        "is_trial": false,
+        "max_size_in_mb": 1,
+        "num_entries": 0,
+        "num_subjects": 0,
+        "size_in_mb": 0,
+        "status": "open",
+        "subscription_id": null
+      }
+  - path: /v1/index_list
+    json:
+      {
+        "index_list": [
+          {
+            "@datatype": "GSearchIndex",
+            "@version": "2017-09-01",
+            "creation_date": "2018-04-20 19:23:46",
+            "description": "Example index of Cookery",
+            "display_name": "example_cookery",
+            "id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+            "is_trial": false,
+            "max_size_in_mb": 5000,
+            "num_entries": 5,
+            "num_subjects": 3,
+            "permissions": [
+              "owner"
+            ],
+            "size_in_mb": 0,
+            "status": "open",
+            "subscription_id": null
+          },
+          {
+            "@datatype": "GSearchIndex",
+            "@version": "2017-09-01",
+            "creation_date": "2021-01-26 15:23:25",
+            "description": "A place for new users to learn about Globus Search",
+            "display_name": "Globus Tutorials",
+            "id": "c1b60556-b9d3-4c2a-a2e1-e297c079abbf",
+            "is_trial": false,
+            "max_size_in_mb": 5000,
+            "num_entries": 0,
+            "num_subjects": 0,
+            "permissions": [
+              "writer"
+            ],
+            "size_in_mb": 0,
+            "status": "open",
+            "subscription_id": null
+          },
+          {
+            "@datatype": "GSearchIndex",
+            "@version": "2017-09-01",
+            "creation_date": "2021-05-04 21:53:04",
+            "description": "An index created for use with the Searchable Files Demo App",
+            "display_name": "Searchable Files Demo Index",
+            "id": "75df9506-4e85-4ce5-9f2c-8dcf25ae172e",
+            "is_trial": true,
+            "max_size_in_mb": 1,
+            "num_entries": 22,
+            "num_subjects": 11,
+            "permissions": [
+              "owner",
+              "writer"
+            ],
+            "size_in_mb": 0,
+            "status": "open",
+            "subscription_id": null
           }
         ]
       }
