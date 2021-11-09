@@ -57,7 +57,11 @@ class LoginManager:
         scopes for that flow
         """
         # openid -> required to ensure the presence of an id_token in the response data
-        yield AuthScopes.openid
+        # WARNING:
+        # all other Auth scopes are required the moment we add 'openid'
+        # adding 'openid' without other scopes gives us back an Auth token which is not
+        # valid for the other necessary scopes
+        yield from self.STATIC_SCOPES[self.AUTH_RS]
 
     def is_logged_in(self) -> bool:
         res = []
