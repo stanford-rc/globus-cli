@@ -53,6 +53,12 @@ def logout_command(ignore_errors):
     If an expected token cannot be found in local storage a warning will be raised
     as it is possible the token still exists and needs to be manually rescinded
     at https://auth.globus.org/consents for security.
+
+    If the GLOBUS_PROFILE environment variable is set, you will log out of the account
+    for the profile it's set to, and may still be logged in on other profiles,
+    including the default profile. See the docs for details:
+
+    https://docs.globus.org/cli/environment_variables/#profile_switching_with_globus_profile
     """
     # try to get the user's preferred username from userinfo
     # if an API error is raised, they probably are not logged in
