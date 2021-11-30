@@ -4,7 +4,6 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import ENDPOINT_PLUS_REQPATH, command
-from globus_cli.services.transfer import get_client
 from globus_cli.termio import formatted_print
 
 
@@ -36,7 +35,12 @@ $ globus bookmark create \
 @click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_REQPATH)
 @click.argument("bookmark_name")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def bookmark_create(endpoint_plus_path: Tuple[str, str], bookmark_name: str) -> None:
+def bookmark_create(
+    *,
+    login_manager: LoginManager,
+    endpoint_plus_path: Tuple[str, str],
+    bookmark_name: str
+) -> None:
     """
     Create a new bookmark. Given an endpoint plus a path, and a name for the bookmark,
     the service will generate the bookmark's ID.
@@ -52,9 +56,9 @@ def bookmark_create(endpoint_plus_path: Tuple[str, str], bookmark_name: str) -> 
     'PATH' is assumed to be URL-encoded.  'PATH' must be a directory and end with "/".
     """
     endpoint_id, path = endpoint_plus_path
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
     submit_data = {"endpoint_id": str(endpoint_id), "path": path, "name": bookmark_name}
 
-    res = client.create_bookmark(submit_data)
+    res = transfer_client.create_bookmark(submit_data)
     formatted_print(res, simple_text="Bookmark ID: {}".format(res["id"]))

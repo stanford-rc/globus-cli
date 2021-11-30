@@ -2,7 +2,6 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
-from globus_cli.services.transfer import get_client
 from globus_cli.termio import FORMAT_TEXT_RECORD, formatted_print, is_verbose
 
 from ._common import resolve_id_or_name
@@ -33,7 +32,7 @@ $ globus ls "$(globus bookmark show BOOKMARK_NAME)"
 )
 @click.argument("bookmark_id_or_name")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def bookmark_show(bookmark_id_or_name):
+def bookmark_show(*, login_manager: LoginManager, bookmark_id_or_name):
     """
     Given a single bookmark ID or bookmark name, show the bookmark details. By default,
     when the format is TEXT, this will display the endpoint ID and path in
@@ -43,8 +42,8 @@ def bookmark_show(bookmark_id_or_name):
 
     If *-v, --verbose* is given, several fields will be displayed.
     """
-    client = get_client()
-    res = resolve_id_or_name(client, bookmark_id_or_name)
+    transfer_client = login_manager.get_transfer_client()
+    res = resolve_id_or_name(transfer_client, bookmark_id_or_name)
     formatted_print(
         res,
         text_format=FORMAT_TEXT_RECORD,

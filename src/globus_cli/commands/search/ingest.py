@@ -6,7 +6,6 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
-from globus_cli.services.search import get_search_client
 from globus_cli.termio import FORMAT_TEXT_RECORD, formatted_print
 
 from ._common import index_id_arg
@@ -16,7 +15,9 @@ from ._common import index_id_arg
 @index_id_arg
 @click.argument("DOCUMENT", type=click.File("r"))
 @LoginManager.requires_login(LoginManager.SEARCH_RS)
-def ingest_command(index_id: uuid.UUID, document: TextIOWrapper):
+def ingest_command(
+    *, login_manager: LoginManager, index_id: uuid.UUID, document: TextIOWrapper
+):
     """
     Submit a Globus Search 'GIngest' document, to be indexed in a Globus Search Index.
     You must have 'owner', 'admin', or 'writer' permissions on that index.
@@ -33,7 +34,7 @@ def ingest_command(index_id: uuid.UUID, document: TextIOWrapper):
     On success, the response will contain a Task ID, which can be used to monitor the
     Ingest Task.
     """
-    search_client = get_search_client()
+    search_client = login_manager.get_search_client()
     doc = json.load(document)
 
     datatype = doc.get("@datatype", "GIngest")

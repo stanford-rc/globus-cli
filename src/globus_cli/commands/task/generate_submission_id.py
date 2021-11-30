@@ -1,6 +1,5 @@
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
-from globus_cli.services.transfer import get_client
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 
@@ -20,7 +19,7 @@ $ globus transfer --submission-id "$sub_id" ...
 """,
 )
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def generate_submission_id():
+def generate_submission_id(*, login_manager: LoginManager):
     """
     Generate a new task submission ID for use in  `globus transfer` and `globus delete`.
     Submission IDs allow you to safely retry submission of a task in the presence of
@@ -31,7 +30,7 @@ def generate_submission_id():
     \b
     Important Note: Submission IDs are not the same as Task IDs.
     """
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
-    res = client.get_submission_id()
+    res = transfer_client.get_submission_id()
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="value")

@@ -1,7 +1,7 @@
 from globus_cli.endpointish import Endpointish
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
-from globus_cli.services.transfer import assemble_generic_doc, get_client
+from globus_cli.services.transfer import assemble_generic_doc
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 from ._common import (
@@ -14,13 +14,12 @@ from ._common import (
 @endpoint_id_arg
 @endpoint_create_and_update_params(create=False)
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def endpoint_update(**kwargs):
+def endpoint_update(*, login_manager: LoginManager, **kwargs):
     """Update attributes of an endpoint"""
-    # validate params. Requires a get call to check the endpoint type
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
     endpoint_id = kwargs.pop("endpoint_id")
 
-    epish = Endpointish(endpoint_id, transfer_client=client)
+    epish = Endpointish(endpoint_id, transfer_client=transfer_client)
     epish.assert_is_traditional_endpoint()
 
     if epish.data["host_endpoint_id"]:
@@ -37,5 +36,5 @@ def endpoint_update(**kwargs):
 
     # make the update
     ep_doc = assemble_generic_doc("endpoint", **kwargs)
-    res = client.update_endpoint(endpoint_id, ep_doc)
+    res = transfer_client.update_endpoint(endpoint_id, ep_doc)
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")

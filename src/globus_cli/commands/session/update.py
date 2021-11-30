@@ -2,7 +2,6 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import IdentityType, command, no_local_server_option
-from globus_cli.services.auth import get_auth_client
 
 
 def _update_session_params_all_case(identity_set, session_params):
@@ -75,8 +74,8 @@ def _update_session_params_identities_case(identity_set, session_params, identit
     is_flag=True,
     help="Add every identity in your identity set to your session",
 )
-@LoginManager.requires_login(LoginManager.AUTH_RS, pass_manager=True)
-def session_update(login_manager, *, identities, no_local_server, all):
+@LoginManager.requires_login(LoginManager.AUTH_RS)
+def session_update(*, login_manager, identities, no_local_server, all):
     """
     Update your current CLI auth session by authenticating
     with specific identities.
@@ -95,7 +94,7 @@ def session_update(login_manager, *, identities, no_local_server, all):
     if (not (identities or all)) or (identities and all):
         raise click.UsageError("IDENTITY values and --all are mutually exclusive")
 
-    auth_client = get_auth_client()
+    auth_client = login_manager.get_auth_client()
     session_params = {"session_message": "Authenticate to update your CLI session."}
     identity_set = auth_client.oauth2_userinfo()["identity_set"]
 

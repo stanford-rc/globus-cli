@@ -2,7 +2,6 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
-from globus_cli.services.transfer import get_client
 from globus_cli.termio import FORMAT_TEXT_RECORD, formatted_print
 
 from ._common import task_id_arg
@@ -70,15 +69,15 @@ $ globus task pause-info TASK_ID --format JSON
 )
 @task_id_arg
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def task_pause_info(task_id):
+def task_pause_info(*, login_manager: LoginManager, task_id):
     """
     Show messages from activity managers who have explicitly paused the given
     in-progress task and list any active pause rules that apply to it.
 
     This command displays no information for tasks which are not paused.
     """
-    client = get_client()
-    res = client.task_pause_info(task_id)
+    transfer_client = login_manager.get_transfer_client()
+    res = transfer_client.task_pause_info(task_id)
 
     def _custom_text_format(res):
         explicit_pauses = [

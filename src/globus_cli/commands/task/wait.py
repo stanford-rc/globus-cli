@@ -1,7 +1,7 @@
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, synchronous_task_wait_options
-from globus_cli.services.transfer import get_client
 
+from .._common import transfer_task_wait_with_io
 from ._common import task_id_arg
 
 
@@ -35,7 +35,16 @@ $ globus task wait --polling-interval 300 TASK_ID
 @task_id_arg
 @synchronous_task_wait_options
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def task_wait(meow, heartbeat, polling_interval, timeout, task_id, timeout_exit_code):
+def task_wait(
+    *,
+    login_manager: LoginManager,
+    meow,
+    heartbeat,
+    polling_interval,
+    timeout,
+    task_id,
+    timeout_exit_code
+):
     """
     Wait for a task to complete.
 
@@ -45,7 +54,13 @@ def task_wait(meow, heartbeat, polling_interval, timeout, task_id, timeout_exit_
     If the task succeeds by then, it exits with status 0. Otherwise, it exits with
     status 1.
     """
-    client = get_client()
-    client.task_wait_with_io(
-        meow, heartbeat, polling_interval, timeout, task_id, timeout_exit_code
+    transfer_client = login_manager.get_transfer_client()
+    transfer_task_wait_with_io(
+        transfer_client,
+        meow,
+        heartbeat,
+        polling_interval,
+        timeout,
+        task_id,
+        timeout_exit_code,
     )

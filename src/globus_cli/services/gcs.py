@@ -1,41 +1,6 @@
-from typing import Dict, List, Optional, cast
+from typing import Dict, List, Optional
 
-from globus_sdk import GCSClient, RefreshTokenAuthorizer
-
-from globus_cli import version
-from globus_cli.login_manager import internal_auth_client, token_storage_adapter
-
-from .transfer import get_client as get_transfer_client
-
-
-def get_gcs_client(
-    gcs_id: str, *, gcs_address: Optional[str] = None, require_auth: bool = True
-) -> GCSClient:
-    adapter = token_storage_adapter()
-    tokens = adapter.get_token_data(gcs_id)
-    authorizer = None
-
-    # if there are tokens, build the authorizer
-    if tokens is not None:
-        authorizer = RefreshTokenAuthorizer(
-            tokens["refresh_token"],
-            internal_auth_client(),
-            access_token=tokens["access_token"],
-            expires_at=tokens["expires_at_seconds"],
-            on_refresh=adapter.on_refresh,
-        )
-    elif require_auth:
-        raise ValueError(
-            f"Could not get login data for GCS {gcs_id}. "
-            f"Try login with '--gcs {gcs_id}' to fix."
-        )
-
-    if not gcs_address:
-        tc = get_transfer_client()
-        gcs_address = cast(str, tc.get_endpoint(gcs_id)["DATA"][0]["hostname"])
-
-    return GCSClient(gcs_address, authorizer=authorizer, app_name=version.app_name)
-
+from globus_sdk import GCSClient
 
 CONNECTOR_INFO: List[Dict[str, str]] = [
     {
@@ -105,3 +70,9 @@ def connector_id_to_display_name(connector_id: str) -> str:
         display_name = f"UNKNOWN ({connector_id})"
 
     return display_name
+
+
+class CustomGCSClient(GCSClient):
+    def __init__(self, *args, source_epish=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.source_epish = source_epish

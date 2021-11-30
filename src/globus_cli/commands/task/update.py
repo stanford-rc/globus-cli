@@ -2,7 +2,7 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
-from globus_cli.services.transfer import assemble_generic_doc, get_client
+from globus_cli.services.transfer import assemble_generic_doc
 from globus_cli.termio import formatted_print
 
 from ._common import task_id_arg
@@ -28,15 +28,15 @@ $ globus task update TASK_ID --label 'my task updated by me' \
 @click.option("--label", help="New Label for the task")
 @click.option("--deadline", help="New Deadline for the task")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def update_task(deadline, label, task_id):
+def update_task(*, login_manager: LoginManager, deadline, label, task_id):
     """
     Update label and/or deadline on an active task.
 
     If a Task has completed, these attributes may no longer be updated.
     """
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
     task_doc = assemble_generic_doc("task", label=label, deadline=deadline)
 
-    res = client.update_task(task_id, task_doc)
+    res = transfer_client.update_task(task_id, task_doc)
     formatted_print(res, simple_text="Success")

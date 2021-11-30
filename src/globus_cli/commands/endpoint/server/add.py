@@ -1,6 +1,6 @@
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
-from globus_cli.services.transfer import assemble_generic_doc, get_client
+from globus_cli.services.transfer import assemble_generic_doc
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 from ._common import server_add_and_update_opts
@@ -22,6 +22,8 @@ $ globus endpoint server add $ep_id --hostname gridftp.example.org
 @server_add_and_update_opts(add=True)
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
 def server_add(
+    *,
+    login_manager: LoginManager,
     endpoint_id,
     subject,
     port,
@@ -35,7 +37,7 @@ def server_add(
 
     An endpoint must be a Globus Connect Server endpoint to have servers.
     """
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
     server_doc = assemble_generic_doc(
         "server", subject=subject, port=port, scheme=scheme, hostname=hostname
@@ -54,5 +56,5 @@ def server_add(
             outgoing_data_port_end=outgoing_data_ports[1],
         )
 
-    res = client.add_endpoint_server(endpoint_id, server_doc)
+    res = transfer_client.add_endpoint_server(endpoint_id, server_doc)
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")

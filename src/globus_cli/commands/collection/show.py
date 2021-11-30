@@ -1,10 +1,9 @@
 import click
 
-from globus_cli.endpointish import Endpointish
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import collection_id_arg, command
 from globus_cli.principal_resolver import default_identity_id_resolver
-from globus_cli.services.gcs import connector_id_to_display_name, get_gcs_client
+from globus_cli.services.gcs import connector_id_to_display_name
 from globus_cli.termio import FORMAT_TEXT_RECORD, formatted_print
 from globus_cli.utils import filter_fields, sorted_json_field
 
@@ -55,17 +54,14 @@ PRIVATE_FIELDS = [
         "Some policy data may only be visible in `--format JSON` output"
     ),
 )
-@LoginManager.requires_login(
-    LoginManager.TRANSFER_RS, LoginManager.AUTH_RS, pass_manager=True
-)
-def collection_show(login_manager, *, include_private_policies, collection_id):
+@LoginManager.requires_login(LoginManager.TRANSFER_RS, LoginManager.AUTH_RS)
+def collection_show(
+    *, login_manager: LoginManager, include_private_policies, collection_id
+):
     """
     Display a Mapped or Guest Collection
     """
-    epish = Endpointish(collection_id)
-    endpoint_id = epish.get_collection_endpoint_id()
-    login_manager.assert_logins(endpoint_id, assume_gcs=True)
-    client = get_gcs_client(endpoint_id, gcs_address=epish.get_gcs_address())
+    gcs_client = login_manager.get_gcs_client(collection_id=collection_id)
 
     query_params = {}
     fields = STANDARD_FIELDS
@@ -74,7 +70,7 @@ def collection_show(login_manager, *, include_private_policies, collection_id):
         query_params["include"] = "private_policies"
         fields += PRIVATE_FIELDS
 
-    res = client.get_collection(collection_id, query_params=query_params)
+    res = gcs_client.get_collection(collection_id, query_params=query_params)
 
     # walk the list of all known fields and reduce the rendering to only look
     # for fields which are actually present

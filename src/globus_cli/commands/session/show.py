@@ -8,7 +8,6 @@ from globus_cli.login_manager import (
     token_storage_adapter,
 )
 from globus_cli.parsing import command
-from globus_cli.services.auth import get_auth_client
 from globus_cli.termio import formatted_print, print_command_hint
 
 
@@ -37,13 +36,13 @@ $ globus session show --format json
 """,
 )
 @LoginManager.requires_login(LoginManager.AUTH_RS)
-def session_show():
+def session_show(*, login_manager):
     """List all identities in your current CLI auth session.
 
     Lists identities that are in the session tied to the CLI's access tokens along with
     the time the user authenticated with that identity.
     """
-    auth_client = get_auth_client()
+    auth_client = login_manager.get_auth_client()
     adapter = token_storage_adapter()
 
     # get a token to introspect, refreshing if neccecary

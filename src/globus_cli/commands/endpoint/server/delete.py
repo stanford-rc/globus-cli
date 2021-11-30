@@ -4,7 +4,6 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
-from globus_cli.services.transfer import get_client
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 
@@ -64,7 +63,7 @@ $ globus endpoint server delete $ep_id $server_id
 @endpoint_id_arg
 @click.argument("server")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def server_delete(endpoint_id, server):
+def server_delete(*, login_manager: LoginManager, endpoint_id, server):
     """
     Delete a server belonging to an endpoint.
 
@@ -73,13 +72,13 @@ def server_delete(endpoint_id, server):
 
     To get the IDs of servers to remove use 'globus endpoint server list'.
     """
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
     mode = _detect_mode(server)
 
     # list (even if not necessary) in order to make errors more consistent when
     # mode='id'
-    endpoint, server_list = client.get_endpoint_w_server_list(endpoint_id)
+    endpoint, server_list = transfer_client.get_endpoint_w_server_list(endpoint_id)
 
     if server_list == "S3":
         raise click.UsageError("You cannot delete servers from S3 endpoints.")
@@ -108,6 +107,6 @@ def server_delete(endpoint_id, server):
         else:
             server = matches[0]["id"]
 
-    response = client.delete_endpoint_server(endpoint_id, server)
+    response = transfer_client.delete_endpoint_server(endpoint_id, server)
 
     formatted_print(response, text_format=FORMAT_TEXT_RAW, response_key="message")

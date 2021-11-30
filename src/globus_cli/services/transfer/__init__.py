@@ -3,9 +3,10 @@ from .activation import (
     autoactivate,
     supported_activation_methods,
 )
-from .client import CustomTransferClient, get_client
+from .client import CustomTransferClient
 from .data import assemble_generic_doc, display_name_or_cname, iterable_response_to_dict
 from .delegate_proxy import fill_delegate_proxy_activation_requirements
+from .recursive_ls import RecursiveLsResponse
 
 ENDPOINT_LIST_FIELDS = (
     ("ID", "id"),
@@ -17,7 +18,7 @@ ENDPOINT_LIST_FIELDS = (
 __all__ = (
     "ENDPOINT_LIST_FIELDS",
     "CustomTransferClient",
-    "get_client",
+    "RecursiveLsResponse",
     "supported_activation_methods",
     "activation_requirements_help_text",
     "autoactivate",

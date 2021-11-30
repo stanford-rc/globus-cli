@@ -3,13 +3,13 @@ import globus_sdk
 from globus_sdk import AuthAPIError
 
 from globus_cli.login_manager import (
+    LoginManager,
     delete_templated_client,
     internal_native_client,
     token_storage_adapter,
 )
 from globus_cli.login_manager.auth_flows import _STORE_CONFIG_USERINFO
 from globus_cli.parsing import command
-from globus_cli.services.auth import get_auth_client
 
 
 def warnecho(msg):
@@ -43,7 +43,8 @@ Before attempting any further CLI commands, you will have to login again using
     is_flag=True,
     default=False,
 )
-def logout_command(ignore_errors):
+@LoginManager.requires_login()
+def logout_command(*, login_manager: LoginManager, ignore_errors):
     """
     Logout of the Globus CLI
 
@@ -57,7 +58,9 @@ def logout_command(ignore_errors):
     # try to get the user's preferred username from userinfo
     # if an API error is raised, they probably are not logged in
     try:
-        username = get_auth_client().oauth2_userinfo()["preferred_username"]
+        username = login_manager.get_auth_client().oauth2_userinfo()[
+            "preferred_username"
+        ]
     except AuthAPIError:
         warnecho(
             "Unable to lookup username. You may not be logged in. "

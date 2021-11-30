@@ -4,7 +4,6 @@ from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
 from globus_cli.services.transfer import (
     display_name_or_cname,
-    get_client,
     iterable_response_to_dict,
 )
 from globus_cli.termio import formatted_print
@@ -36,16 +35,16 @@ $ globus bookmark list --jmespath='DATA[*].[name, endpoint_id]' --format=unix
     short_help="List your bookmarks",
 )
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def bookmark_list():
+def bookmark_list(*, login_manager: LoginManager):
     """List all bookmarks for the current user"""
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
-    bookmark_iterator = client.bookmark_list()
+    bookmark_iterator = transfer_client.bookmark_list()
 
     def get_ep_name(item):
         ep_id = item["endpoint_id"]
         try:
-            ep_doc = client.get_endpoint(ep_id)
+            ep_doc = transfer_client.get_endpoint(ep_id)
             return display_name_or_cname(ep_doc)
         except TransferAPIError as err:
             if err.code == "EndpointDeleted":

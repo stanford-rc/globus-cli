@@ -3,8 +3,7 @@ import uuid
 from typing import Tuple, Type, Union, cast
 
 import click
-
-from globus_cli.services.transfer import get_client
+import globus_sdk
 
 from .endpoint_type import EndpointType
 from .errors import (
@@ -17,8 +16,13 @@ log = logging.getLogger(__name__)
 
 
 class Endpointish:
-    def __init__(self, endpoint_id: Union[str, uuid.UUID], *, transfer_client=None):
-        self._client = transfer_client if transfer_client is not None else get_client()
+    def __init__(
+        self,
+        endpoint_id: Union[str, uuid.UUID],
+        *,
+        transfer_client: globus_sdk.TransferClient
+    ):
+        self._client = transfer_client
         self.endpoint_id = endpoint_id
 
         log.debug("Endpointish getting ep data")

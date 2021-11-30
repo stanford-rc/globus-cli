@@ -1,10 +1,17 @@
 import functools
+import uuid
 from typing import Dict, Iterator, List, Optional, Tuple
 
 import click
 import globus_sdk
 from globus_sdk.scopes import AuthScopes, GroupsScopes, SearchScopes, TransferScopes
 
+from globus_cli.endpointish import Endpointish, EndpointType
+
+from .. import version
+from ..services.auth import CustomAuthClient
+from ..services.gcs import CustomGCSClient
+from ..services.transfer import CustomTransferClient
 from .auth_flows import do_link_auth_flow, do_local_server_auth_flow
 from .errors import MissingLoginError
 from .local_server import is_remote_session
@@ -132,7 +139,7 @@ class LoginManager:
             raise MissingLoginError(missing_servers, assume_gcs=assume_gcs)
 
     @classmethod
-    def requires_login(cls, *resource_servers: str, pass_manager: bool = False):
+    def requires_login(cls, *resource_servers: str):
         """
         Command decorator for specifying a resource server that the user must have
         tokens for in order to run the command.
@@ -151,7 +158,7 @@ class LoginManager:
         Usage for commands which have dynamic resource servers depending
         on the arguments passed to the command (e.g. commands for the GCS API)
 
-        @LoginManager.requies_login(pass_manager=True)
+        @LoginManager.requies_login()
         def command(login_manager, endpoint_id)
 
             login_manager.<do the thing>(endpoint_id)
@@ -163,12 +170,94 @@ class LoginManager:
             def wrapper(*args, **kwargs):
                 manager = cls()
                 manager.assert_logins(*resource_servers)
-                # if pass_manager is True, pass it as an additional positional arg
-                if pass_manager:
-                    return func(*args, manager, **kwargs)
-                else:
-                    return func(*args, **kwargs)
+                return func(*args, login_manager=manager, **kwargs)
 
             return wrapper
 
         return inner
+
+    def _get_client_authorizer(
+        self, resource_server: str, *, no_tokens_msg: Optional[str] = None
+    ) -> globus_sdk.RefreshTokenAuthorizer:
+        tokens = self._token_storage.get_token_data(resource_server)
+
+        # if there are no tokens, raise an error
+        # this *should* never be reached, but it's a safety check to ensure we never go
+        # into a bad state
+        if tokens is None:
+            raise ValueError(
+                no_tokens_msg
+                or f"Could not get login data for {resource_server}. Try login to fix."
+            )
+
+        return globus_sdk.RefreshTokenAuthorizer(
+            tokens["refresh_token"],
+            internal_auth_client(),
+            access_token=tokens["access_token"],
+            expires_at=tokens["expires_at_seconds"],
+            on_refresh=self._token_storage.on_refresh,
+        )
+
+    def get_transfer_client(self) -> CustomTransferClient:
+        authorizer = self._get_client_authorizer(TransferScopes.resource_server)
+        return CustomTransferClient(authorizer=authorizer, app_name=version.app_name)
+
+    def get_auth_client(self) -> CustomAuthClient:
+        authorizer = self._get_client_authorizer(AuthScopes.resource_server)
+        return CustomAuthClient(authorizer=authorizer, app_name=version.app_name)
+
+    def get_groups_client(self) -> globus_sdk.GroupsClient:
+        authorizer = self._get_client_authorizer(GroupsScopes.resource_server)
+        return globus_sdk.GroupsClient(authorizer=authorizer, app_name=version.app_name)
+
+    def get_search_client(self) -> globus_sdk.SearchClient:
+        authorizer = self._get_client_authorizer(SearchScopes.resource_server)
+        return globus_sdk.SearchClient(authorizer=authorizer, app_name=version.app_name)
+
+    def _get_gcs_info(
+        self,
+        *,
+        collection_id: Optional[uuid.UUID] = None,
+        endpoint_id: Optional[uuid.UUID] = None,
+    ) -> Tuple[str, Endpointish]:
+        if collection_id is not None and endpoint_id is not None:  # pragma: no cover
+            raise ValueError("Internal Error! collection_id and endpoint_id are mutex")
+
+        transfer_client = self.get_transfer_client()
+
+        if collection_id is not None:
+            epish = Endpointish(collection_id, transfer_client=transfer_client)
+            resolved_ep_id = epish.get_collection_endpoint_id()
+        elif endpoint_id is not None:
+            epish = Endpointish(endpoint_id, transfer_client=transfer_client)
+            epish.assert_ep_type(EndpointType.GCSV5_ENDPOINT)
+            resolved_ep_id = str(endpoint_id)
+        else:  # pragma: no cover
+            raise ValueError("Internal Error! collection_id or endpoint_id is required")
+        return (resolved_ep_id, epish)
+
+    def get_gcs_client(
+        self,
+        *,
+        collection_id: Optional[uuid.UUID] = None,
+        endpoint_id: Optional[uuid.UUID] = None,
+    ) -> CustomGCSClient:
+        gcs_id, epish = self._get_gcs_info(
+            collection_id=collection_id, endpoint_id=endpoint_id
+        )
+
+        self.assert_logins(gcs_id, assume_gcs=True)
+
+        authorizer = self._get_client_authorizer(
+            gcs_id,
+            no_tokens_msg=(
+                f"Could not get login data for GCS {gcs_id}. "
+                f"Try login with '--gcs {gcs_id}' to fix."
+            ),
+        )
+        return CustomGCSClient(
+            epish.get_gcs_address(),
+            source_epish=epish,
+            authorizer=authorizer,
+            app_name=version.app_name,
+        )

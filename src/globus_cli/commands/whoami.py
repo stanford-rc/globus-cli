@@ -3,7 +3,6 @@ from globus_sdk import AuthAPIError
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
-from globus_cli.services.auth import get_auth_client
 from globus_cli.termio import (
     FORMAT_TEXT_RECORD,
     formatted_print,
@@ -54,16 +53,16 @@ $ globus whoami --linked-identities
     help="Also show identities linked to the currently logged-in primary identity.",
 )
 @LoginManager.requires_login(LoginManager.AUTH_RS)
-def whoami_command(linked_identities):
+def whoami_command(*, login_manager, linked_identities):
     """
     Display information for the currently logged-in user.
     """
-    client = get_auth_client()
+    auth_client = login_manager.get_auth_client()
 
     # get userinfo from auth.
     # if we get back an error the user likely needs to log in again
     try:
-        res = client.oauth2_userinfo()
+        res = auth_client.oauth2_userinfo()
     except AuthAPIError:
         click.echo(
             "Unable to get user information. Please try logging in again.", err=True

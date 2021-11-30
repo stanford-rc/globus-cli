@@ -2,7 +2,7 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, mutex_option_group
-from globus_cli.services.transfer import get_client, iterable_response_to_dict
+from globus_cli.services.transfer import iterable_response_to_dict
 from globus_cli.termio import FORMAT_TEXT_RECORD, formatted_print
 
 from ._common import task_id_arg
@@ -160,17 +160,19 @@ $ globus task show TASK_ID
 )
 @mutex_option_group("--successful-transfers", "--skipped-errors")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def show_task(successful_transfers, skipped_errors, task_id):
+def show_task(
+    *, login_manager: LoginManager, successful_transfers, skipped_errors, task_id
+):
     """
     Print information detailing the status and other info about a task.
 
     The task may be pending, completed, or in progress.
     """
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
     if successful_transfers:
-        print_successful_transfers(client, task_id)
+        print_successful_transfers(transfer_client, task_id)
     elif skipped_errors:
-        print_skipped_errors(client, task_id)
+        print_skipped_errors(transfer_client, task_id)
     else:
-        print_task_detail(client, task_id)
+        print_task_detail(transfer_client, task_id)

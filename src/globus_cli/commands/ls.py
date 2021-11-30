@@ -1,10 +1,13 @@
+from typing import Any, Dict, Union
+
 import click
+from globus_sdk.services.transfer.response import IterableTransferResponse
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import ENDPOINT_PLUS_OPTPATH, command
 from globus_cli.services.transfer import (
+    RecursiveLsResponse,
     autoactivate,
-    get_client,
     iterable_response_to_dict,
 )
 from globus_cli.termio import formatted_print, is_verbose, outformat_is_text
@@ -118,6 +121,8 @@ $ globus ls $ep_id:/share/godata/ --filter '~*.txt'  # done with --filter, bette
 )
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
 def ls_command(
+    *,
+    login_manager: LoginManager,
     endpoint_plus_path,
     recursive_depth_limit,
     recursive,
@@ -157,11 +162,11 @@ def ls_command(
 
     # do autoactivation before the `ls` call so that recursive invocations
     # won't do this repeatedly, and won't have to instantiate new clients
-    client = get_client()
-    autoactivate(client, endpoint_id, if_expires_in=60)
+    transfer_client = login_manager.get_transfer_client()
+    autoactivate(transfer_client, endpoint_id, if_expires_in=60)
 
     # create the query paramaters to send to operation_ls
-    ls_params = {"show_hidden": int(show_hidden)}
+    ls_params: Dict[str, Any] = {"show_hidden": int(show_hidden)}
     if path:
         ls_params["path"] = path
     if filter_val:
@@ -181,11 +186,13 @@ def ls_command(
         # if we're asked to change or "improve" the behavior in the future, we
         # could do so with "type:dir" or "type:file" filters added in, and
         # potentially work out some viable behavior based on what people want
-        res = client.recursive_operation_ls(
+        res: Union[
+            IterableTransferResponse, RecursiveLsResponse
+        ] = transfer_client.recursive_operation_ls(
             endpoint_id, ls_params, depth=recursive_depth_limit
         )
     else:
-        res = client.operation_ls(endpoint_id, **ls_params)
+        res = transfer_client.operation_ls(endpoint_id, **ls_params)
 
     def cleaned_item_name(item):
         return item["name"] + ("/" if item["type"] == "dir" else "")
