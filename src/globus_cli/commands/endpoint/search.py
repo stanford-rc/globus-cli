@@ -4,12 +4,7 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
-from globus_cli.services.auth import maybe_lookup_identity_id
-from globus_cli.services.transfer import (
-    ENDPOINT_LIST_FIELDS,
-    get_client,
-    iterable_response_to_dict,
-)
+from globus_cli.services.transfer import ENDPOINT_LIST_FIELDS, iterable_response_to_dict
 from globus_cli.termio import formatted_print
 from globus_cli.utils import PagingWrapper
 
@@ -74,6 +69,8 @@ $ globus endpoint search --filter-scope my-endpoints
 @click.argument("filter_fulltext", required=False)
 @LoginManager.requires_login(LoginManager.AUTH_RS, LoginManager.TRANSFER_RS)
 def endpoint_search(
+    *,
+    login_manager: LoginManager,
     filter_fulltext: Optional[str],
     limit: int,
     filter_owner_id: Optional[str],
@@ -95,14 +92,15 @@ def endpoint_search(
             "an additional filter."
         )
 
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
+    auth_client = login_manager.get_auth_client()
 
     owner_id = filter_owner_id
     if owner_id:
-        owner_id = maybe_lookup_identity_id(owner_id)
+        owner_id = auth_client.maybe_lookup_identity_id(owner_id)
 
     search_iterator = PagingWrapper(
-        client.paginated.endpoint_search(
+        transfer_client.paginated.endpoint_search(
             filter_fulltext=filter_fulltext,
             filter_scope=filter_scope,
             filter_owner_id=owner_id,

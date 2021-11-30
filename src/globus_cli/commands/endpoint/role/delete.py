@@ -1,6 +1,5 @@
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
-from globus_cli.services.transfer import get_client
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 from ._common import role_id_arg
@@ -23,12 +22,12 @@ $ globus endpoint role delete 'ddb59aef-6d04-11e5-ba46-22000b92c6ec' \
 @endpoint_id_arg
 @role_id_arg
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def role_delete(role_id, endpoint_id):
+def role_delete(*, login_manager: LoginManager, role_id, endpoint_id):
     """
     Remove a role from an endpoint.
 
     You must have sufficient privileges to modify the roles on the endpoint.
     """
-    client = get_client()
-    res = client.delete_endpoint_role(endpoint_id, role_id)
+    transfer_client = login_manager.get_transfer_client()
+    res = transfer_client.delete_endpoint_role(endpoint_id, role_id)
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")

@@ -9,8 +9,10 @@ from globus_cli.parsing import (
     synchronous_task_wait_options,
     task_submission_options,
 )
-from globus_cli.services.transfer import autoactivate, get_client
+from globus_cli.services.transfer import autoactivate
 from globus_cli.termio import err_is_terminal, formatted_print, term_is_interactive
+
+from ._common import transfer_task_wait_with_io
 
 
 @command(
@@ -39,6 +41,8 @@ $ globus rm $ep_id:~/mydir --recursive
 @click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_REQPATH)
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
 def rm_command(
+    *,
+    login_manager: LoginManager,
     ignore_missing,
     star_silent,
     recursive,
@@ -69,14 +73,14 @@ def rm_command(
     """
     endpoint_id, path = endpoint_plus_path
 
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
     # attempt to activate unless --skip-activation-check is given
     if not skip_activation_check:
-        autoactivate(client, endpoint_id, if_expires_in=60)
+        autoactivate(transfer_client, endpoint_id, if_expires_in=60)
 
     delete_data = DeleteData(
-        client,
+        transfer_client,
         endpoint_id,
         label=label,
         recursive=recursive,
@@ -113,12 +117,13 @@ def rm_command(
 
     # Print task submission to stderr so that `-Fjson` is still correctly
     # respected, as it will be by `task wait`
-    res = client.submit_delete(delete_data)
+    res = transfer_client.submit_delete(delete_data)
     task_id = res["task_id"]
     click.echo(f'Delete task submitted under ID "{task_id}"', err=True)
 
     # do a `task wait` equivalent, including printing and correct exit status
-    client.task_wait_with_io(
+    transfer_task_wait_with_io(
+        transfer_client,
         meow,
         heartbeat,
         polling_interval,

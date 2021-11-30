@@ -5,7 +5,6 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
-from globus_cli.services.transfer import get_client
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 
@@ -29,7 +28,7 @@ class SubscriptionIdType(click.ParamType):
 @click.argument("SUBSCRIPTION_ID", type=SubscriptionIdType())
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
 def set_endpoint_subscription_id(
-    endpoint_id: str, subscription_id: Optional[str]
+    *, login_manager: LoginManager, endpoint_id: str, subscription_id: Optional[str]
 ) -> None:
     """
     Set an endpoint's subscription ID.
@@ -40,11 +39,9 @@ def set_endpoint_subscription_id(
 
     SUBSCRIPTION_ID should either be a valid subscription ID or 'null'.
     """
-    # validate params. Requires a get call to check the endpoint type
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
-    # make the update
-    res = client.put(
+    res = transfer_client.put(
         f"/endpoint/{endpoint_id}/subscription",
         data={"subscription_id": subscription_id},
     )

@@ -1,10 +1,8 @@
 import click
 
-from globus_cli.endpointish import Endpointish, EndpointType
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
 from globus_cli.principal_resolver import default_identity_id_resolver
-from globus_cli.services.gcs import get_gcs_client
 from globus_cli.termio import FORMAT_TEXT_TABLE, formatted_print
 
 STANDARD_FIELDS = [
@@ -83,12 +81,10 @@ created-by-me:
         "the ID of the Mapped Collection"
     ),
 )
-@LoginManager.requires_login(
-    LoginManager.TRANSFER_RS, LoginManager.AUTH_RS, pass_manager=True
-)
+@LoginManager.requires_login(LoginManager.TRANSFER_RS, LoginManager.AUTH_RS)
 def collection_list(
-    login_manager,
     *,
+    login_manager: LoginManager,
     endpoint_id,
     include_private_policies,
     filters,
@@ -97,10 +93,8 @@ def collection_list(
     """
     List the Collections on a given Globus Connect Server v5 Endpoint
     """
-    epish = Endpointish(endpoint_id)
-    epish.assert_ep_type(EndpointType.GCSV5_ENDPOINT)
-    login_manager.assert_logins(endpoint_id, assume_gcs=True)
-    client = get_gcs_client(endpoint_id, gcs_address=epish.get_gcs_address())
+    gcs_client = login_manager.get_gcs_client(endpoint_id=endpoint_id)
+
     params = {}
     if include_private_policies:
         params["include"] = "private_policies"
@@ -109,5 +103,5 @@ def collection_list(
         query_params["mapped_collection_id"] = mapped_collection_id
     if filters:
         query_params["filter"] = ",".join(filters)
-    res = client.get_collection_list(**params, query_params=query_params)
+    res = gcs_client.get_collection_list(**params, query_params=query_params)
     formatted_print(res, text_format=FORMAT_TEXT_TABLE, fields=STANDARD_FIELDS)

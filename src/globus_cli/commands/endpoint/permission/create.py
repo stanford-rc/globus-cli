@@ -2,8 +2,7 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import ENDPOINT_PLUS_REQPATH, command, security_principal_opts
-from globus_cli.services.auth import maybe_lookup_identity_id
-from globus_cli.services.transfer import assemble_generic_doc, get_client
+from globus_cli.services.transfer import assemble_generic_doc
 from globus_cli.termio import FORMAT_TEXT_RECORD, formatted_print
 
 
@@ -49,7 +48,13 @@ $ globus endpoint permission create $ep_id:/ --permissions rw --identity go@glob
 @click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_REQPATH)
 @LoginManager.requires_login(LoginManager.AUTH_RS, LoginManager.TRANSFER_RS)
 def create_command(
-    principal, permissions, endpoint_plus_path, notify_email, notify_message
+    *,
+    login_manager: LoginManager,
+    principal,
+    permissions,
+    endpoint_plus_path,
+    notify_email,
+    notify_message
 ):
     """
     Create a new access control rule on the target endpoint, granting users new
@@ -65,17 +70,20 @@ def create_command(
     endpoint_id, path = endpoint_plus_path
     principal_type, principal_val = principal
 
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
+    auth_client = login_manager.get_auth_client()
 
     if principal_type == "identity":
-        principal_val = maybe_lookup_identity_id(principal_val)
+        principal_val = auth_client.maybe_lookup_identity_id(principal_val)
         if not principal_val:
             raise click.UsageError(
                 "Identity does not exist. "
                 "Use --provision-identity to auto-provision an identity."
             )
     elif principal_type == "provision-identity":
-        principal_val = maybe_lookup_identity_id(principal_val, provision=True)
+        principal_val = auth_client.maybe_lookup_identity_id(
+            principal_val, provision=True
+        )
         principal_type = "identity"
 
     if not notify_email:
@@ -91,7 +99,7 @@ def create_command(
         notify_message=notify_message,
     )
 
-    res = client.add_endpoint_acl_rule(endpoint_id, rule_data)
+    res = transfer_client.add_endpoint_acl_rule(endpoint_id, rule_data)
     formatted_print(
         res,
         text_format=FORMAT_TEXT_RECORD,

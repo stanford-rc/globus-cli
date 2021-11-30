@@ -5,7 +5,7 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
-from globus_cli.services.transfer import get_client, iterable_response_to_dict
+from globus_cli.services.transfer import iterable_response_to_dict
 from globus_cli.termio import formatted_print
 from globus_cli.utils import PagingWrapper
 
@@ -45,7 +45,12 @@ $ globus task pause-info TASK_ID --format JSON
 @click.option("--filter-non-errors", is_flag=True, help="Filter results to non errors")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
 def task_event_list(
-    task_id: uuid.UUID, limit: int, filter_errors: bool, filter_non_errors: bool
+    *,
+    login_manager: LoginManager,
+    task_id: uuid.UUID,
+    limit: int,
+    filter_errors: bool,
+    filter_non_errors: bool
 ):
     """
     This command shows the recent events for a running task.
@@ -60,7 +65,7 @@ def task_event_list(
     NOTE: Tasks older than one month may no longer have event log history. In this
     case, no events will be shown.
     """
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
     # cannot filter by both errors and non errors
     if filter_errors and filter_non_errors:
@@ -76,7 +81,7 @@ def task_event_list(
         filter_string = ""
 
     event_iterator = PagingWrapper(
-        client.paginated.task_event_list(
+        transfer_client.paginated.task_event_list(
             task_id,
             # TODO: convert to `filter=filter_string` when SDK support is added
             query_params={"filter": filter_string},

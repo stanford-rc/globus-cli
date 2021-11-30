@@ -1,6 +1,6 @@
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
-from globus_cli.services.transfer import assemble_generic_doc, get_client
+from globus_cli.services.transfer import assemble_generic_doc
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 from ._common import server_add_and_update_opts, server_id_arg
@@ -24,6 +24,8 @@ $ globus endpoint server update $ep_id $server_id --scheme ftp
 @server_id_arg
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
 def server_update(
+    *,
+    login_manager: LoginManager,
     endpoint_id,
     server_id,
     subject,
@@ -38,7 +40,7 @@ def server_update(
 
     At least one field must be updated.
     """
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
     server_doc = assemble_generic_doc(
         "server", subject=subject, port=port, scheme=scheme, hostname=hostname
@@ -57,5 +59,5 @@ def server_update(
             outgoing_data_port_end=outgoing_data_ports[1],
         )
 
-    res = client.update_endpoint_server(endpoint_id, server_id, server_doc)
+    res = transfer_client.update_endpoint_server(endpoint_id, server_id, server_doc)
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")

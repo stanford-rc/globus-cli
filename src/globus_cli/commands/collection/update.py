@@ -1,9 +1,11 @@
+from typing import Type, Union
+
 import click
 from globus_sdk import GuestCollectionDocument, MappedCollectionDocument
 
 from globus_cli import utils
 from globus_cli.constants import EXPLICIT_NULL
-from globus_cli.endpointish import Endpointish, EndpointType
+from globus_cli.endpointish import EndpointType
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import (
     CommaDelimitedList,
@@ -15,7 +17,6 @@ from globus_cli.parsing import (
     mutex_option_group,
     nullable_multi_callback,
 )
-from globus_cli.services.gcs import get_gcs_client
 from globus_cli.termio import FORMAT_TEXT_RECORD, formatted_print
 
 
@@ -197,12 +198,10 @@ def collection_update_params(f):
 @collection_id_arg
 @collection_update_params
 @mutex_option_group("--enable-https", "--disable-https")
-@LoginManager.requires_login(
-    LoginManager.TRANSFER_RS, LoginManager.AUTH_RS, pass_manager=True
-)
+@LoginManager.requires_login(LoginManager.TRANSFER_RS, LoginManager.AUTH_RS)
 def collection_update(
-    login_manager,
     *,
+    login_manager: LoginManager,
     collection_id,
     verify,
     **kwargs,
@@ -210,13 +209,12 @@ def collection_update(
     """
     Update a Mapped or Guest Collection
     """
-    epish = Endpointish(collection_id)
-    endpoint_id = epish.get_collection_endpoint_id()
-    login_manager.assert_logins(endpoint_id, assume_gcs=True)
-    client = get_gcs_client(endpoint_id, gcs_address=epish.get_gcs_address())
+    gcs_client = login_manager.get_gcs_client(collection_id=collection_id)
 
-    if epish.ep_type == EndpointType.GUEST_COLLECTION:
-        doc_class = GuestCollectionDocument
+    if gcs_client.source_epish.ep_type == EndpointType.GUEST_COLLECTION:
+        doc_class: Union[
+            Type[GuestCollectionDocument], Type[MappedCollectionDocument]
+        ] = GuestCollectionDocument
     else:
         doc_class = MappedCollectionDocument
 
@@ -254,13 +252,14 @@ def collection_update(
     if unsupported_params:
         opt_strs = utils.get_current_option_help(filter_names=unsupported_params)
         raise click.UsageError(
-            f"Use of incompatible options with {epish.nice_type_name}.\n"
+            "Use of incompatible options with "
+            f"{gcs_client.source_epish.nice_type_name}.\n"
             "The following options are not supported on this collection type:\n  "
             + "\n  ".join(opt_strs)
         )
 
     doc = doc_class(**converted_kwargs)
-    res = client.update_collection(collection_id, doc)
+    res = gcs_client.update_collection(collection_id, doc)
     formatted_print(
         res,
         fields=[("code", lambda x: x.full_data["code"])],

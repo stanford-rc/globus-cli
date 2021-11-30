@@ -28,7 +28,7 @@ def test_requires_login_success(mock_get_adapter):
 
     # single server
     @LoginManager.requires_login("a.globus.org")
-    def dummy_command():
+    def dummy_command(login_manager):
         return True
 
     assert dummy_command()
@@ -39,7 +39,7 @@ def test_requires_login_multi_server_success(mock_get_adapter):
     mock_get_adapter._instance.get_token_data = mock_get_tokens
 
     @LoginManager.requires_login("a.globus.org", "b.globus.org")
-    def dummy_command():
+    def dummy_command(login_manager):
         return True
 
     assert dummy_command()
@@ -50,7 +50,7 @@ def test_requires_login_single_server_fail(mock_get_adapter):
     mock_get_adapter._instance.get_token_data = mock_get_tokens
 
     @LoginManager.requires_login("c.globus.org")
-    def dummy_command():
+    def dummy_command(login_manager):
         return True
 
     with pytest.raises(MissingLoginError) as ex:
@@ -66,7 +66,7 @@ def test_requires_login_fail_two_servers(mock_get_adapter):
     mock_get_adapter._instance.get_token_data = mock_get_tokens
 
     @LoginManager.requires_login("c.globus.org", "d.globus.org")
-    def dummy_command():
+    def dummy_command(login_manager):
         return True
 
     with pytest.raises(MissingLoginError) as ex:
@@ -86,7 +86,7 @@ def test_requires_login_fail_multi_server(mock_get_adapter):
     mock_get_adapter._instance.get_token_data = mock_get_tokens
 
     @LoginManager.requires_login("c.globus.org", "d.globus.org", "e.globus.org")
-    def dummy_command():
+    def dummy_command(login_manager):
         return True
 
     with pytest.raises(MissingLoginError) as ex:
@@ -104,11 +104,10 @@ def test_requires_login_fail_multi_server(mock_get_adapter):
 def test_requires_login_pass_manager(mock_get_adapter):
     mock_get_adapter._instance.get_token_data = mock_get_tokens
 
-    @LoginManager.requires_login(pass_manager=True)
-    def dummy_command(manager):
-
-        assert manager.has_login("a.globus.org")
-        assert not manager.has_login("c.globus.org")
+    @LoginManager.requires_login()
+    def dummy_command(login_manager):
+        assert login_manager.has_login("a.globus.org")
+        assert not login_manager.has_login("c.globus.org")
 
         return True
 
@@ -120,9 +119,9 @@ def test_gcs_error_message(mock_get_adapter):
     mock_get_adapter._instance.get_token_data = mock_get_tokens
     dummy_id = str(uuid.uuid1())
 
-    @LoginManager.requires_login(pass_manager=True)
-    def dummy_command(manager):
-        manager.assert_logins(dummy_id, assume_gcs=True)
+    @LoginManager.requires_login()
+    def dummy_command(login_manager):
+        login_manager.assert_logins(dummy_id, assume_gcs=True)
 
     with pytest.raises(MissingLoginError) as excinfo:
         dummy_command()

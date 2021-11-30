@@ -1,29 +1,30 @@
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
-from globus_cli.services.groups import get_groups_client
 from globus_cli.termio import formatted_print
+
+
+def _format_session_enforcement(res):
+    if res.get("enforce_session"):
+        return "strict"
+    else:
+        return "not strict"
+
+
+def _parse_roles(res):
+    roles = set()
+    for membership in res["my_memberships"]:
+        roles.add(membership["role"])
+
+    return ",".join(sorted(roles))
 
 
 @command("list", short_help="List groups you belong to")
 @LoginManager.requires_login(LoginManager.GROUPS_RS)
-def group_list():
+def group_list(*, login_manager: LoginManager):
     """List all groups for the current user"""
-    client = get_groups_client()
+    groups_client = login_manager.get_groups_client()
 
-    groups = client.get_my_groups()
-
-    def _format_session_enforcement(res):
-        if res.get("enforce_session"):
-            return "strict"
-        else:
-            return "not strict"
-
-    def _parse_roles(res):
-        roles = set()
-        for membership in res["my_memberships"]:
-            roles.add(membership["role"])
-
-        return ",".join(sorted(roles))
+    groups = groups_client.get_my_groups()
 
     formatted_print(
         groups,

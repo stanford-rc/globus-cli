@@ -1,9 +1,10 @@
 from textwrap import dedent
+from typing import Optional
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
-from globus_cli.services.transfer import get_client
 from globus_cli.termio import FORMAT_TEXT_RECORD, formatted_print
+from globus_cli.types import FIELD_LIST_T
 
 from ._common import server_id_arg
 
@@ -22,16 +23,16 @@ $ globus endpoint server show $ep_id $server_id
 @endpoint_id_arg
 @server_id_arg
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def server_show(endpoint_id, server_id):
+def server_show(*, login_manager: LoginManager, endpoint_id, server_id):
     """
     Display inofrmation about a server belonging to an endpoint.
     """
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
-    server_doc = client.get_endpoint_server(endpoint_id, server_id)
+    server_doc = transfer_client.get_endpoint_server(endpoint_id, server_id)
+    fields: FIELD_LIST_T = [("ID", "id")]
     if not server_doc["uri"]:  # GCP endpoint server
-        fields = (("ID", "id"),)
-        text_epilog = dedent(
+        text_epilog: Optional[str] = dedent(
             """
             This server is for a Globus Connect Personal installation.
 
@@ -62,11 +63,12 @@ def server_show(endpoint_id, server_id):
                 ),
             )
 
-        fields = (
-            ("ID", "id"),
-            ("URI", "uri"),
-            ("Subject", "subject"),
-            ("Data Ports", advertised_port_summary),
+        fields.extend(
+            [
+                ("URI", "uri"),
+                ("Subject", "subject"),
+                ("Data Ports", advertised_port_summary),
+            ]
         )
         text_epilog = None
 

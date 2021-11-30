@@ -2,7 +2,6 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
-from globus_cli.services.transfer import get_client
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 
@@ -20,7 +19,7 @@ $ globus endpoint permission delete $ep_id $rule_id
 @endpoint_id_arg
 @click.argument("rule_id")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def delete_command(endpoint_id, rule_id):
+def delete_command(*, login_manager: LoginManager, endpoint_id, rule_id):
     """
     Delete an existing access control rule, removing whatever permissions it previously
     granted users on the endpoint.
@@ -28,7 +27,7 @@ def delete_command(endpoint_id, rule_id):
     Note you cannot remove the built in rule that gives the endpoint owner full
     read and write access to the endpoint.
     """
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
-    res = client.delete_endpoint_acl_rule(endpoint_id, rule_id)
+    res = transfer_client.delete_endpoint_acl_rule(endpoint_id, rule_id)
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")

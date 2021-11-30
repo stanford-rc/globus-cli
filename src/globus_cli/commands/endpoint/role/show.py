@@ -1,14 +1,8 @@
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
-from globus_cli.services.auth import lookup_identity_name
-from globus_cli.services.transfer import get_client
 from globus_cli.termio import FORMAT_TEXT_RECORD, formatted_print
 
 from ._common import role_id_arg
-
-
-def lookup_principal(role):
-    return lookup_identity_name(role["principal"])
 
 
 @command(
@@ -35,7 +29,7 @@ $ globus endpoint role show EP_ID ROLE_ID
 @endpoint_id_arg
 @role_id_arg
 @LoginManager.requires_login(LoginManager.AUTH_RS, LoginManager.TRANSFER_RS)
-def role_show(endpoint_id, role_id):
+def role_show(*, login_manager: LoginManager, endpoint_id, role_id):
     """
     Show full info for a role on an endpoint.
 
@@ -44,9 +38,13 @@ def role_show(endpoint_id, role_id):
 
     You must have sufficient privileges to see the roles on the endpoint.
     """
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
+    auth_client = login_manager.get_auth_client()
 
-    role = client.get_endpoint_role(endpoint_id, role_id)
+    def lookup_principal(role):
+        return auth_client.lookup_identity_name(role["principal"])
+
+    role = transfer_client.get_endpoint_role(endpoint_id, role_id)
     formatted_print(
         role,
         text_format=FORMAT_TEXT_RECORD,

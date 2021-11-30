@@ -9,7 +9,6 @@ from globus_cli.parsing import command, endpoint_id_arg, mutex_option_group
 from globus_cli.services.transfer import (
     activation_requirements_help_text,
     fill_delegate_proxy_activation_requirements,
-    get_client,
 )
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
@@ -117,6 +116,8 @@ $ globus endpoint activate $ep_id --myproxy -U username
 @mutex_option_group("--web", "--myproxy", "--delegate-proxy")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
 def endpoint_activate(
+    *,
+    login_manager: LoginManager,
     endpoint_id: str,
     myproxy: bool,
     myproxy_username: Optional[str],
@@ -172,7 +173,7 @@ def endpoint_activate(
     user the error will not be detected until the user attempts to perform an
     operation on the endpoint.
     """
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
     # validate options
     if no_autoactivate and not (myproxy or web or delegate_proxy):
@@ -195,9 +196,9 @@ def endpoint_activate(
 
     # check if endpoint is already activated unless --force
     if not force:
-        res: Union[Dict[str, str], GlobusHTTPResponse] = client.endpoint_autoactivate(
-            endpoint_id, if_expires_in=60
-        )
+        res: Union[
+            Dict[str, str], GlobusHTTPResponse
+        ] = transfer_client.endpoint_autoactivate(endpoint_id, if_expires_in=60)
 
         if "AlreadyActivated" == res["code"]:
             formatted_print(
@@ -212,7 +213,7 @@ def endpoint_activate(
     # attempt autoactivation unless --no-autoactivate
     if not no_autoactivate:
 
-        res = client.endpoint_autoactivate(endpoint_id)
+        res = transfer_client.endpoint_autoactivate(endpoint_id)
 
         if "AutoActivated" in res["code"]:
             formatted_print(
@@ -234,7 +235,7 @@ def endpoint_activate(
     # myproxy activation
     if myproxy:
         # fetch activation requirements
-        requirements_data = client.endpoint_get_activation_requirements(
+        requirements_data = transfer_client.endpoint_get_activation_requirements(
             endpoint_id
         ).data
         # filter to the myproxy requirements; ensure that there are values
@@ -269,7 +270,9 @@ def endpoint_activate(
             if data["name"] == "lifetime_in_hours" and myproxy_lifetime is not None:
                 data["value"] = str(myproxy_lifetime)
 
-        res = client.endpoint_activate(endpoint_id, requirements_data=requirements_data)
+        res = transfer_client.endpoint_activate(
+            endpoint_id, requirements_data=requirements_data
+        )
 
     # web activation
     elif web:
@@ -282,13 +285,13 @@ def endpoint_activate(
 
     # delegate proxy activation
     elif delegate_proxy:
-        requirements_data = client.endpoint_get_activation_requirements(
+        requirements_data = transfer_client.endpoint_get_activation_requirements(
             endpoint_id
         ).data
         filled_requirements_data = fill_delegate_proxy_activation_requirements(
             requirements_data, delegate_proxy, lifetime_hours=proxy_lifetime or 12
         )
-        res = client.endpoint_activate(
+        res = transfer_client.endpoint_activate(
             endpoint_id, requirements_data=filled_requirements_data
         )
 

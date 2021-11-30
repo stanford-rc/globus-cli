@@ -10,7 +10,7 @@ from globus_cli.parsing import (
     delete_and_rm_options,
     task_submission_options,
 )
-from globus_cli.services.transfer import autoactivate, get_client
+from globus_cli.services.transfer import autoactivate
 from globus_cli.termio import (
     FORMAT_TEXT_RECORD,
     err_is_terminal,
@@ -68,6 +68,8 @@ $ globus task wait "$task_id"
 @click.argument("endpoint_plus_path", type=ENDPOINT_PLUS_OPTPATH)
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
 def delete_command(
+    *,
+    login_manager: LoginManager,
     batch,
     ignore_missing,
     star_silent,
@@ -121,14 +123,14 @@ def delete_command(
     if path is None and (not batch):
         raise click.UsageError("delete requires either a PATH OR --batch")
 
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
     # attempt to activate unless --skip-activation-check is given
     if not skip_activation_check:
-        autoactivate(client, endpoint_id, if_expires_in=60)
+        autoactivate(transfer_client, endpoint_id, if_expires_in=60)
 
     delete_data = DeleteData(
-        client,
+        transfer_client,
         endpoint_id,
         label=label,
         recursive=recursive,
@@ -182,7 +184,7 @@ def delete_command(
         # exit safely
         return
 
-    res = client.submit_delete(delete_data)
+    res = transfer_client.submit_delete(delete_data)
     formatted_print(
         res,
         text_format=FORMAT_TEXT_RECORD,

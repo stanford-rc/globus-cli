@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 import click
 from globus_sdk import TransferData
 
@@ -10,7 +12,7 @@ from globus_cli.parsing import (
     mutex_option_group,
     task_submission_options,
 )
-from globus_cli.services.transfer import autoactivate, get_client
+from globus_cli.services.transfer import autoactivate
 from globus_cli.termio import FORMAT_TEXT_RECORD, formatted_print
 
 
@@ -220,6 +222,8 @@ fi
 @mutex_option_group("--recursive", "--external-checksum")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
 def transfer_command(
+    *,
+    login_manager: LoginManager,
     batch,
     sync_level,
     recursive,
@@ -348,13 +352,13 @@ def transfer_command(
         return {"DATA_TYPE": "filter_rule", "method": "exclude", "name": name_pattern}
 
     if exclude:
-        filter_rules = [_make_exclude_rule(s) for s in exclude]
+        filter_rules: Optional[List[str]] = [_make_exclude_rule(s) for s in exclude]
     else:
         filter_rules = None
 
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
     transfer_data = TransferData(
-        client,
+        transfer_client,
         source_endpoint,
         dest_endpoint,
         label=label,
@@ -434,10 +438,10 @@ def transfer_command(
     # autoactivate after parsing all args and putting things together
     # skip this if skip-activation-check is given
     if not skip_activation_check:
-        autoactivate(client, source_endpoint, if_expires_in=60)
-        autoactivate(client, dest_endpoint, if_expires_in=60)
+        autoactivate(transfer_client, source_endpoint, if_expires_in=60)
+        autoactivate(transfer_client, dest_endpoint, if_expires_in=60)
 
-    res = client.submit_transfer(transfer_data)
+    res = transfer_client.submit_transfer(transfer_data)
     formatted_print(
         res,
         text_format=FORMAT_TEXT_RECORD,

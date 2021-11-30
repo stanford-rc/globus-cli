@@ -2,7 +2,6 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
-from globus_cli.services.transfer import get_client
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 from ._common import task_id_arg
@@ -48,7 +47,7 @@ $ globus task cancel --all
     "--all", "-a", is_flag=True, help="Cancel all in-progress tasks that you own"
 )
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def cancel_task(all, task_id):
+def cancel_task(*, login_manager: LoginManager, all, task_id):
     """
     Cancel a task you own or all tasks which you own.
 
@@ -65,12 +64,12 @@ def cancel_task(all, task_id):
             "task ID to cancel."
         )
 
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
     if all:
         task_ids = [
             task_row["task_id"]
-            for task_row in client.paginated.task_list(
+            for task_row in transfer_client.paginated.task_list(
                 query_params={
                     "filter": "type:TRANSFER,DELETE/status:ACTIVE,INACTIVE",
                     "fields": "task_id",
@@ -85,7 +84,7 @@ def cancel_task(all, task_id):
 
         def cancellation_iterator():
             for i in task_ids:
-                yield (i, client.cancel_task(i).data)
+                yield (i, transfer_client.cancel_task(i).data)
 
         def json_converter(res):
             return {
@@ -104,5 +103,5 @@ def cancel_task(all, task_id):
         formatted_print(None, text_format=_custom_text, json_converter=json_converter)
 
     else:
-        res = client.cancel_task(task_id)
+        res = transfer_client.cancel_task(task_id)
         formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")

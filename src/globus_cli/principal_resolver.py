@@ -21,7 +21,7 @@ applied on JSON output).
 """
 from globus_sdk import IdentityMap
 
-from globus_cli.services.auth import get_auth_client
+from globus_cli.login_manager import LoginManager
 
 IDENTITY_URN_PREFIX = "urn:globus:auth:identity:"
 
@@ -59,7 +59,7 @@ class PrincipalResolver:
     @property
     def idmap(self):
         if not self._idmap:
-            self._idmap = IdentityMap(get_auth_client())
+            self._idmap = IdentityMap(LoginManager().get_auth_client())
         return self._idmap
 
     def _raw_id_from_object(self, obj):

@@ -7,7 +7,7 @@ from globus_cli.parsing import (
     mutex_option_group,
     one_use_option,
 )
-from globus_cli.services.transfer import assemble_generic_doc, autoactivate, get_client
+from globus_cli.services.transfer import assemble_generic_doc, autoactivate
 from globus_cli.termio import FORMAT_TEXT_RECORD, formatted_print
 
 from ._common import (
@@ -75,7 +75,12 @@ $ globus endpoint create --shared host_ep:~/ my_shared_endpoint
 @mutex_option_group("--shared", "--server", "--personal")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
 def endpoint_create(
-    personal: bool, server: bool, shared: Optional[Tuple[str, str]], **kwargs: Any
+    *,
+    login_manager: LoginManager,
+    personal: bool,
+    server: bool,
+    shared: Optional[Tuple[str, str]],
+    **kwargs: Any
 ) -> None:
     """
     Create a new endpoint.
@@ -87,7 +92,7 @@ def endpoint_create(
     with the `--personal` flag, it returns a setup key which can be passed to
     Globus Connect Personal during setup.
     """
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
 
     endpoint_type = "personal" if personal else "server" if server else "shared"
 
@@ -102,14 +107,14 @@ def endpoint_create(
         kwargs["host_path"] = host_path
 
         ep_doc = assemble_generic_doc("shared_endpoint", **kwargs)
-        autoactivate(client, endpoint_id, if_expires_in=60)
-        res = client.create_shared_endpoint(ep_doc)
+        autoactivate(transfer_client, endpoint_id, if_expires_in=60)
+        res = transfer_client.create_shared_endpoint(ep_doc)
 
     # non shared endpoint creation
     else:
         # omit `is_globus_connect` key if not GCP, otherwise include as `True`
         ep_doc = assemble_generic_doc("endpoint", **kwargs)
-        res = client.create_endpoint(ep_doc)
+        res = transfer_client.create_endpoint(ep_doc)
 
     # output
     formatted_print(

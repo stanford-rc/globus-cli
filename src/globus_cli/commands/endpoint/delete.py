@@ -1,7 +1,6 @@
 from globus_cli.endpointish import Endpointish
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
-from globus_cli.services.transfer import get_client
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 
@@ -17,14 +16,16 @@ $ globus endpoint delete $ep_id
 )
 @endpoint_id_arg
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def endpoint_delete(endpoint_id: str) -> None:
+def endpoint_delete(*, login_manager: LoginManager, endpoint_id: str) -> None:
     """Delete a given endpoint.
 
     WARNING: Deleting an endpoint will permanently disable any existing shared
     endpoints that are hosted on it.
     """
-    client = get_client()
-    Endpointish(endpoint_id, transfer_client=client).assert_is_traditional_endpoint()
+    transfer_client = login_manager.get_transfer_client()
+    Endpointish(
+        endpoint_id, transfer_client=transfer_client
+    ).assert_is_traditional_endpoint()
 
-    res = client.delete_endpoint(endpoint_id)
+    res = transfer_client.delete_endpoint(endpoint_id)
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")

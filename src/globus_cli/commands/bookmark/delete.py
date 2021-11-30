@@ -2,7 +2,6 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
-from globus_cli.services.transfer import get_client
 from globus_cli.termio import FORMAT_TEXT_RAW, formatted_print
 
 from ._common import resolve_id_or_name
@@ -25,12 +24,12 @@ $ globus bookmark delete "Bookmark Name"
 )
 @click.argument("bookmark_id_or_name")
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
-def bookmark_delete(bookmark_id_or_name):
+def bookmark_delete(*, login_manager: LoginManager, bookmark_id_or_name):
     """
     Delete one bookmark, given its ID or name.
     """
-    client = get_client()
-    bookmark_id = resolve_id_or_name(client, bookmark_id_or_name)["id"]
+    transfer_client = login_manager.get_transfer_client()
+    bookmark_id = resolve_id_or_name(transfer_client, bookmark_id_or_name)["id"]
 
-    res = client.delete_bookmark(bookmark_id)
+    res = transfer_client.delete_bookmark(bookmark_id)
     formatted_print(res, text_format=FORMAT_TEXT_RAW, response_key="message")

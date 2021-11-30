@@ -7,7 +7,6 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import CommaDelimitedList, command, mutex_option_group
-from globus_cli.services.search import get_search_client
 from globus_cli.termio import formatted_print, outformat_is_text, print_command_hint
 
 from ._common import index_id_arg
@@ -51,6 +50,8 @@ def _print_subjects(data):
 @mutex_option_group("-q", "--query-document")
 @LoginManager.requires_login(LoginManager.SEARCH_RS)
 def query_command(
+    *,
+    login_manager: LoginManager,
     index_id: uuid.UUID,
     q: Optional[str],
     query_document: Optional[TextIOWrapper],
@@ -73,7 +74,7 @@ def query_command(
             "For more complete output, use `--format JSON`"
         )
 
-    search_client = get_search_client()
+    search_client = login_manager.get_search_client()
 
     if q:
         query_params: Dict[str, Any] = {}

@@ -2,7 +2,7 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
-from globus_cli.services.transfer import get_client, iterable_response_to_dict
+from globus_cli.services.transfer import iterable_response_to_dict
 from globus_cli.termio import formatted_print
 from globus_cli.utils import PagingWrapper
 
@@ -145,6 +145,8 @@ globus task list --format=unix --jmespath='DATA[*].[task_id, status]' | \
 )
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
 def task_list(
+    *,
+    login_manager: LoginManager,
     limit,
     filter_task_id,
     filter_status,
@@ -200,9 +202,9 @@ def task_list(
         "completion_time", [filter_completed_after, filter_completed_before]
     )
 
-    client = get_client()
+    transfer_client = login_manager.get_transfer_client()
     task_iterator = PagingWrapper(
-        client.paginated.task_list(
+        transfer_client.paginated.task_list(
             query_params={"filter": filter_string[:-1]},  # remove trailing /
         ).items(),
         limit=limit,

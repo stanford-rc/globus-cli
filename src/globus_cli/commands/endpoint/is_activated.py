@@ -4,7 +4,7 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command, endpoint_id_arg
-from globus_cli.services.transfer import activation_requirements_help_text, get_client
+from globus_cli.services.transfer import activation_requirements_help_text
 from globus_cli.termio import formatted_print
 
 
@@ -82,7 +82,11 @@ fi
 )
 @LoginManager.requires_login(LoginManager.TRANSFER_RS)
 def endpoint_is_activated(
-    endpoint_id: str, until: Optional[int], absolute_time: bool
+    *,
+    login_manager: LoginManager,
+    endpoint_id: str,
+    until: Optional[int],
+    absolute_time: bool,
 ) -> None:
     """
     Check if an endpoint is activated or requires activation.
@@ -92,8 +96,8 @@ def endpoint_is_activated(
     If the endpoint is not activated, this command will output a link for web
     activation, or you can use 'globus endpoint activate' to activate the endpoint.
     """
-    client = get_client()
-    res = client.endpoint_get_activation_requirements(endpoint_id)
+    transfer_client = login_manager.get_transfer_client()
+    res = transfer_client.endpoint_get_activation_requirements(endpoint_id)
 
     def fail(deadline=None) -> NoReturn:
         exp_string = ""

@@ -2,7 +2,6 @@ import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import IdentityType, command
-from globus_cli.services.auth import get_auth_client
 from globus_cli.termio import FORMAT_TEXT_TABLE, formatted_print, is_verbose
 from globus_cli.utils import CLIStubResponse
 
@@ -37,10 +36,8 @@ $ globus get-identities --verbose go@globusid.org clitester1a@globusid.org \
     "values", type=IdentityType(allow_b32_usernames=True), required=True, nargs=-1
 )
 @click.option("--provision", hidden=True, is_flag=True)
-@LoginManager.requires_login(
-    LoginManager.AUTH_RS,
-)
-def get_identities_command(values, provision):
+@LoginManager.requires_login(LoginManager.AUTH_RS)
+def get_identities_command(*, login_manager: LoginManager, values, provision):
     """
     Lookup Globus Auth Identities given one or more uuids
     and/or usernames.
@@ -53,7 +50,7 @@ def get_identities_command(values, provision):
     If more fields are desired, --verbose will give tabular output, but does not
     guarantee order and ignores inputs with no corresponding Globus Auth identity.
     """
-    client = get_auth_client()
+    auth_client = login_manager.get_auth_client()
 
     # since API doesn't accept mixed ids and usernames,
     # split input values into separate lists
@@ -64,9 +61,11 @@ def get_identities_command(values, provision):
     # then combine the calls into one response
     results = []
     if len(ids):
-        results += client.get_identities(ids=ids, provision=provision)["identities"]
+        results += auth_client.get_identities(ids=ids, provision=provision)[
+            "identities"
+        ]
     if len(usernames):
-        results += client.get_identities(usernames=usernames, provision=provision)[
+        results += auth_client.get_identities(usernames=usernames, provision=provision)[
             "identities"
         ]
     res = CLIStubResponse({"identities": results})
