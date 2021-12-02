@@ -2,7 +2,7 @@ from typing import Tuple
 
 import click
 
-from globus_cli.login_manager import LoginManager
+from globus_cli.login_manager import LoginManager, get_client_login, is_client_login
 from globus_cli.parsing import command, no_local_server_option
 
 
@@ -21,17 +21,22 @@ def session_consent(scopes: Tuple[str], no_local_server: bool) -> None:
     This command is necessary when the CLI needs access to resources which require the
     user to explicitly consent to access.
     """
-    manager = LoginManager()
-    manager.run_login_flow(
-        no_local_server=no_local_server,
-        local_server_message=(
-            "You are running 'globus session consent', "
-            "which should automatically open a browser window for you to "
-            "authenticate with specific identities.\n"
-            "If this fails or you experience difficulty, try "
-            "'globus session consent --no-local-server'"
-            "\n---"
-        ),
-        epilog="\nYou have successfully updated your CLI session.\n",
-        scopes=list(scopes),
-    )
+    if is_client_login():
+        client = get_client_login()
+        client.oauth2_client_credentials_tokens(requested_scopes=scopes)
+
+    else:
+        manager = LoginManager()
+        manager.run_login_flow(
+            no_local_server=no_local_server,
+            local_server_message=(
+                "You are running 'globus session consent', "
+                "which should automatically open a browser window for you to "
+                "authenticate with specific identities.\n"
+                "If this fails or you experience difficulty, try "
+                "'globus session consent --no-local-server'"
+                "\n---"
+            ),
+            epilog="\nYou have successfully updated your CLI session.\n",
+            scopes=list(scopes),
+        )
