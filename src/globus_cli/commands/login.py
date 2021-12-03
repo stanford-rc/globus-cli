@@ -62,9 +62,9 @@ You may force a new login with
 )
 def login_command(no_local_server, force, gcs_servers):
     """
-    Get credentials for the Globus CLI
+    Get credentials for the Globus CLI.
 
-    Necessary before any Globus CLI commands which require authentication will work
+    Necessary before any Globus CLI commands which require authentication will work.
 
     This command directs you to the page necessary to permit the Globus CLI to make API
     calls for you, and gets the OAuth2 tokens needed to use those permissions.
@@ -73,6 +73,12 @@ def login_command(no_local_server, force, gcs_servers):
     page, where you can read and consent to the permissions required to use the
     Globus CLI. The CLI then takes care of getting the credentials through a
     local server.
+
+    You can use the GLOBUS_PROFILE environment variable to switch between separate
+    accounts without having to log out. If this variable is not set, logging in uses a
+    default profile. See the docs for details:
+
+    https://docs.globus.org/cli/environment_variables/#profile_switching_with_globus_profile
 
     If the CLI detects you are on a remote session, or the --no-local-server option is
     used, the CLI will instead print a link for you to manually follow to the Globus
