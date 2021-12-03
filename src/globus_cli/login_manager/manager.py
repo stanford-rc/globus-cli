@@ -4,7 +4,13 @@ from typing import Dict, Iterator, List, Optional, Tuple
 
 import click
 import globus_sdk
-from globus_sdk.scopes import AuthScopes, GroupsScopes, SearchScopes, TransferScopes
+from globus_sdk.scopes import (
+    AuthScopes,
+    GCSEndpointScopeBuilder,
+    GroupsScopes,
+    SearchScopes,
+    TransferScopes,
+)
 
 from globus_cli.endpointish import Endpointish, EndpointType
 
@@ -286,6 +292,9 @@ class LoginManager:
             collection_id=collection_id, endpoint_id=endpoint_id
         )
 
+        self.add_requirement(
+            gcs_id, scopes=[GCSEndpointScopeBuilder(gcs_id).manage_collections]
+        )
         self.assert_logins(gcs_id, assume_gcs=True)
 
         authorizer = self._get_client_authorizer(
