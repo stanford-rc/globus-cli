@@ -3,6 +3,9 @@ metadata:
   group1_name: "Group 1"
   group2_id: "93fca046-1666-11ec-88b2-f50515619d57"
   group2_name: "Group 2"
+  user1_id: "00000000-0000-0000-0000-000000000001"
+  user1_username: "test_user1"
+  group_already_added_user_id: "00000000-0000-0000-0000-000000000002"
 
 groups:
   - path: /groups/my_groups
@@ -43,3 +46,32 @@ groups:
           ]
         }
     ]
+  - path: /groups/8b7d57bc-1666-11ec-88b2-f50515619d57
+    method: post
+    json:
+      {
+        "add": [
+          {
+            "group_id": "8b7d57bc-1666-11ec-88b2-f50515619d57",
+            "identity_id": "00000000-0000-0000-0000-000000000001",
+            "username": "test_user1",
+            "role": "member",
+            "status": "active"
+          }
+        ]
+      }
+  - path: /groups/00000000-0000-0000-0000-000000000002
+    method: post
+    json:
+      {
+        "add": [],
+        "errors": {
+          "add": [
+            {
+              "code": "ALREADY_ACTIVE",
+              "detail": "The identity is already an active member of the group.",
+              "identity_id": "00000000-0000-0000-0000-000000000001"
+            }
+          ]
+        }
+      }

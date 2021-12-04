@@ -4,7 +4,7 @@ from .endpoint_plus_path import (
     ENDPOINT_PLUS_REQPATH,
     EndpointPlusPath,
 )
-from .identity_type import IdentityType
+from .identity_type import IdentityType, ParsedIdentity
 from .location import LocationType
 from .nullable import StringOrNull, UrlOrNull, nullable_multi_callback
 from .prefix_mapper import JSONStringOrFile
@@ -17,6 +17,7 @@ __all__ = (
     "EndpointPlusPath",
     "IdentityType",
     "LocationType",
+    "ParsedIdentity",
     "StringOrNull",
     "UrlOrNull",
     "nullable_multi_callback",
