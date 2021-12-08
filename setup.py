@@ -5,10 +5,10 @@ from setuptools import find_packages, setup
 
 DEV_REQUIREMENTS = [
     # lint
-    "flake8<4",
+    "flake8<5",
     "isort<6",
-    "black==21.9b0",
-    "flake8-bugbear==21.9.1",
+    "black==21.11b1",
+    "flake8-bugbear==21.11.29",
     "mypy==0.910",
     # tests
     "pytest<7",
@@ -48,7 +48,7 @@ setup(
     package_dir={"": "src"},
     python_requires=">=3.6",
     install_requires=[
-        "globus-sdk==3.1.0",
+        "globus-sdk==3.2.0",
         "click>=8.0.0,<9",
         "jmespath==0.10.0",
         # these are dependencies of the SDK, but they are used directly in the CLI
@@ -75,5 +75,6 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
 )

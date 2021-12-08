@@ -84,18 +84,22 @@ def query_command(
             query_params["bypass_visible_to"] = bypass_visible_to
 
         data = search_client.search(
-            index_id, q, advanced=advanced, limit=limit, query_params=query_params
+            index_id,
+            q,
+            advanced=advanced,
+            limit=limit if limit is not None else 10,
+            query_params=query_params,
         )
     elif query_document:
         doc = json.load(query_document)
 
-        if limit:
+        if limit is not None:
             doc["limit"] = limit
         if advanced:
             doc["advanced"] = advanced
         if bypass_visible_to:
             doc["bypass_visible_to"] = bypass_visible_to
-        if filter_principal_sets:
+        if filter_principal_sets is not None:
             doc["filter_principal_sets"] = filter_principal_sets
 
         data = search_client.post_search(index_id, doc)
