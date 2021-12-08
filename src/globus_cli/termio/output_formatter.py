@@ -254,8 +254,14 @@ def formatted_print(
         if text_preamble is not None:
             click.echo(text_preamble)
 
-        # if there's a response key, key into it
-        data = response_data if response_key is None else response_data[response_key]
+        # If there's a response key, either key into the response data or apply it as a
+        # callable to extract from the response data
+        if response_key is None:
+            data = response_data
+        elif callable(response_key):
+            data = response_key(response_data)
+        else:
+            data = response_data[response_key]
 
         #  do the various kinds of printing
         if text_format == FORMAT_TEXT_TABLE:
