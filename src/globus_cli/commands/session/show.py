@@ -4,7 +4,9 @@ import globus_sdk
 
 from globus_cli.login_manager import (
     LoginManager,
+    get_client_login,
     internal_auth_client,
+    is_client_login,
     token_storage_adapter,
 )
 from globus_cli.parsing import command
@@ -58,10 +60,13 @@ def session_show(*, login_manager):
         session_info = {}
         authentications = {}
     else:
-        internal_client = internal_auth_client()
+        if is_client_login():
+            introspect_client = get_client_login()
+        else:
+            introspect_client = internal_auth_client()
 
         access_token = tokendata["access_token"]
-        res = internal_client.oauth2_token_introspect(
+        res = introspect_client.oauth2_token_introspect(
             access_token, include="session_info"
         )
 

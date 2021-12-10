@@ -122,6 +122,9 @@ def internal_auth_client():
         client_secret = client_data["client_secret"]
     else:
         # register a new instance client with auth
+        if is_client_login():
+            raise ValueError("client logins shouldn't create internal auth clients")
+
         nc = internal_native_client()
         res = nc.post(
             "/v2/api/clients",
@@ -146,7 +149,15 @@ def delete_templated_client():
     adapter = token_storage_adapter()
 
     # first, get the templated credentialed client
-    ac = internal_auth_client()
+    try:
+        ac = internal_auth_client()
+
+    # client logins shouldn't have templated clients to delete,
+    # but just in-case there was one catch errors here and return
+    # rather than skip cleanup entirely
+    except ValueError:
+        if is_client_login():
+            return
 
     # now, remove its relevant data from storage
     adapter.remove_config(_CLIENT_DATA_CONFIG_KEY)

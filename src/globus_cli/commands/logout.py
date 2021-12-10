@@ -6,6 +6,7 @@ from globus_cli.login_manager import (
     LoginManager,
     delete_templated_client,
     internal_native_client,
+    is_client_login,
     token_storage_adapter,
 )
 from globus_cli.login_manager.auth_flows import _STORE_CONFIG_USERINFO
@@ -25,6 +26,17 @@ You may also want to logout of any browser session you have with Globus:
 Before attempting any further CLI commands, you will have to login again using
 
   globus login
+"""
+
+_CLIENT_LOGOUT_EPILOG = """
+You have successfully revoked all CLI tokens for this client identity,
+however client identities are always considered logged in as they can request
+new tokens at will.
+
+You will need to unset the GLOBUS_CLI_CLIENT_ID and GLOBUS_CLI_CLIENT_SECRET
+environment variables if you wish to prevent further use of the Globus CLI
+with this client identity, or be able to run globus login for a normal login
+flow.
 """
 
 
@@ -73,9 +85,12 @@ def logout_command(*, login_manager: LoginManager, ignore_errors):
             "Attempting logout anyway...\n"
         )
         username = None
-    click.echo(
-        "Logging out of Globus{}\n".format(" as " + username if username else "")
-    )
+    if is_client_login():
+        click.echo(f"Revoking all CLI tokens for {username}")
+    else:
+        click.echo(
+            "Logging out of Globus{}\n".format(" as " + username if username else "")
+        )
 
     # first, try to delete the templated credentialed client
     # ignore failure (maybe creds are already invalidated or the client was deleted)
@@ -128,4 +143,7 @@ def logout_command(*, login_manager: LoginManager, ignore_errors):
 
     adapter.remove_config(_STORE_CONFIG_USERINFO)
 
-    click.echo(_LOGOUT_EPILOG)
+    if is_client_login():
+        click.echo(_CLIENT_LOGOUT_EPILOG)
+    else:
+        click.echo(_LOGOUT_EPILOG)

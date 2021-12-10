@@ -120,11 +120,12 @@ class LoginManager:
         scopes: Optional[List[str]] = None,
     ):
         if is_client_login():
-            raise ValueError(
+            click.echo(
                 "Client identities do not need to log in. If you are trying "
                 "to do a user log in, please unset the GLOBUS_CLI_CLIENT_ID "
                 "and GLOBUS_CLI_CLIENT_SECRET environment variables."
             )
+            click.get_current_context().exit(1)
 
         if scopes is None:  # flatten scopes to list of strings if none provided
             scopes = [
