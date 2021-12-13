@@ -78,6 +78,17 @@ def mock_login_token_response():
 
 
 @pytest.fixture
+def client_login(monkeypatch):
+    monkeypatch.setenv("GLOBUS_CLI_CLIENT_ID", "fake_client_id")
+    monkeypatch.setenv("GLOBUS_CLI_CLIENT_SECRET", "fake_client_secret")
+
+
+@pytest.fixture()
+def client_login_no_secret(monkeypatch):
+    monkeypatch.setenv("GLOBUS_CLI_CLIENT_ID", "fake_client_id")
+
+
+@pytest.fixture
 def test_token_storage(mock_login_token_response):
     """Put memory-backed sqlite token storage in place for the testsuite to use."""
     mockstore = SQLiteAdapter(":memory:")
