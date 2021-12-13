@@ -293,6 +293,8 @@ class LoginManager:
             collection_id=collection_id, endpoint_id=endpoint_id
         )
 
+        # client identities need to have this scope added as a requirement
+        # so that they correctly request it when building authorizers
         self.add_requirement(
             gcs_id, scopes=[GCSEndpointScopeBuilder(gcs_id).manage_collections]
         )
