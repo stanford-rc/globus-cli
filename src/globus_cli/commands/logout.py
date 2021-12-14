@@ -94,20 +94,22 @@ def logout_command(*, login_manager: LoginManager, ignore_errors):
 
     # first, try to delete the templated credentialed client
     # ignore failure (maybe creds are already invalidated or the client was deleted)
-    try:
-        delete_templated_client()
-    except AuthAPIError:
-        if not ignore_errors:
-            warnecho(
-                "Failure while deleting internal client. "
-                "Please try logging out again",
-            )
-            click.get_current_context().exit(1)
-        else:
-            warnecho(
-                "Warning: Failed to delete internal client. "
-                "Continuing... (--ignore-errors)",
-            )
+    # client logins don't do this as they don't use a templated client
+    if not is_client_login():
+        try:
+            delete_templated_client()
+        except AuthAPIError:
+            if not ignore_errors:
+                warnecho(
+                    "Failure while deleting internal client. "
+                    "Please try logging out again",
+                )
+                click.get_current_context().exit(1)
+            else:
+                warnecho(
+                    "Warning: Failed to delete internal client. "
+                    "Continuing... (--ignore-errors)",
+                )
 
     # because the client was deleted above, the tokens should all be revoked
     # but it could have been the `--ignore-errors` case, so take a shot at revoking
