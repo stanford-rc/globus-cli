@@ -5,14 +5,13 @@ import globus_sdk
 from globus_sdk.tokenstorage import SQLiteAdapter
 
 from ._old_config import invalidate_old_config
-from .client_login import is_client_login
+from .client_login import get_client_login, is_client_login
 
 # internal constants
 _CLIENT_DATA_CONFIG_KEY = "auth_client_data"
 
 # env vars used throughout this module
 GLOBUS_ENV = os.environ.get("GLOBUS_SDK_ENVIRONMENT")
-GLOBUS_PROFILE = os.environ.get("GLOBUS_PROFILE")
 
 
 def _template_client_id():
@@ -77,20 +76,26 @@ def _get_storage_filename():
 
 def _resolve_namespace():
     """
-    expected namespaces are:
+    expected user namespaces are:
 
     userprofile/production        (default)
     userprofile/sandbox           (env is set to sandbox)
     userprofile/test/myprofile    (env is set to test, profile is set to myprofile)
-    clientprofile/production      (client login)
-    clientprofile/sandbox         (client login, env is set to sandbox)
-    clientprofile/test/myprofile  (client login, env is set to test,
-                                   profile is set to myprofile)
-    """
-    prefix = "clientprofile/" if is_client_login() else "userprofile/"
-    env = GLOBUS_ENV if GLOBUS_ENV else "production"
 
-    return prefix + (f"{env}/{GLOBUS_PROFILE}" if GLOBUS_PROFILE else env)
+    client namespaces ignore profile, and include client_id in the namespace:
+
+    clientprofile/production/926cc9c6-b481-4a5e-9ccd-b497f04c643b (default)
+    clientprofile/sandbox/926cc9c6-b481-4a5e-9ccd-b497f04c643b    (sandbox env)
+    """
+    env = GLOBUS_ENV if GLOBUS_ENV else "production"
+    profile = os.environ.get("GLOBUS_PROFILE")
+
+    if is_client_login():
+        client_id = get_client_login().client_id
+        return f"clientprofile/{env}/{client_id}"
+
+    else:
+        return "userprofile/" + env + (f"/{profile}" if profile else "")
 
 
 def token_storage_adapter():

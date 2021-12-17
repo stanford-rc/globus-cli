@@ -88,6 +88,11 @@ def client_login_no_secret(monkeypatch):
     monkeypatch.setenv("GLOBUS_CLI_CLIENT_ID", "fake_client_id")
 
 
+@pytest.fixture()
+def user_profile(monkeypatch):
+    monkeypatch.setenv("GLOBUS_PROFILE", "test_user_profile")
+
+
 @pytest.fixture
 def test_token_storage(mock_login_token_response):
     """Put memory-backed sqlite token storage in place for the testsuite to use."""

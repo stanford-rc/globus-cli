@@ -2,7 +2,6 @@ import globus_sdk
 import pytest
 
 from globus_cli.login_manager import get_client_login, is_client_login
-from globus_cli.login_manager.tokenstore import _resolve_namespace
 
 
 def test_is_client_login_success(client_login):
@@ -33,7 +32,3 @@ def test_get_client_login_no_login():
 def test_get_client_login_no_secret(client_login_no_secret):
     with pytest.raises(ValueError):
         get_client_login()
-
-
-def test_client_namespace(client_login):
-    assert _resolve_namespace() == "clientprofile/production"
