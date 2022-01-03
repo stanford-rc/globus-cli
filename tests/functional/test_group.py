@@ -69,3 +69,13 @@ def test_group_member_remove(run_line, load_api_fixtures):
     assert "remove" in sent_data
     assert len(sent_data["remove"]) == 1
     assert sent_data["remove"][0]["identity_id"] == member
+
+
+def test_group_member_already_removed(run_line, load_api_fixtures):
+    data = load_api_fixtures("groups.yaml")
+    group = data["metadata"]["group_user_remove_error"]
+    member = data["metadata"]["user1_id"]
+    result = run_line(
+        f"globus group member remove {group} {member}", assert_exit_code=1
+    )
+    assert "Identity has no membership in group" in result.stderr

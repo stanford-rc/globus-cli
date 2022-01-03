@@ -7,6 +7,7 @@ metadata:
   user1_id: "00000000-0000-0000-0000-000000000001"
   user1_username: "test_user1"
   group_already_added_user_id: "00000000-0000-0000-0000-000000000002"
+  group_user_remove_error: "bcb0b12e-fdde-4283-8d77-e484716ce310"
 
 groups:
   - path: /groups/my_groups
@@ -90,4 +91,19 @@ groups:
             "status": "removed"
           }
         ]
+      }
+  - path: /groups/bcb0b12e-fdde-4283-8d77-e484716ce310
+    method: post
+    json:
+      {
+        "remove": [],
+        "errors": {
+          "remove": [
+            {
+              "code": "NO_MEMBERSHIP",
+              "detail": "Identity has no membership in group.",
+              "identity_id": "00000000-0000-0000-0000-000000000001"
+            }
+          ]
+        }
       }
