@@ -3,9 +3,11 @@ metadata:
   group1_name: "Group 1"
   group2_id: "93fca046-1666-11ec-88b2-f50515619d57"
   group2_name: "Group 2"
+  group_remove_id: "7fa8b8c1-aad3-47cf-a844-4b1cdbf7c124"
   user1_id: "00000000-0000-0000-0000-000000000001"
   user1_username: "test_user1"
   group_already_added_user_id: "00000000-0000-0000-0000-000000000002"
+  group_user_remove_error: "bcb0b12e-fdde-4283-8d77-e484716ce310"
 
 groups:
   - path: /groups/my_groups
@@ -70,6 +72,36 @@ groups:
             {
               "code": "ALREADY_ACTIVE",
               "detail": "The identity is already an active member of the group.",
+              "identity_id": "00000000-0000-0000-0000-000000000001"
+            }
+          ]
+        }
+      }
+  # edit members request to test removal:
+  - path: /groups/7fa8b8c1-aad3-47cf-a844-4b1cdbf7c124
+    method: post
+    json:
+      {
+        "remove": [
+          {
+            "group_id": "7fa8b8c1-aad3-47cf-a844-4b1cdbf7c124",
+            "identity_id": "00000000-0000-0000-0000-000000000001",
+            "username": "test_user1",
+            "role": "member",
+            "status": "removed"
+          }
+        ]
+      }
+  - path: /groups/bcb0b12e-fdde-4283-8d77-e484716ce310
+    method: post
+    json:
+      {
+        "remove": [],
+        "errors": {
+          "remove": [
+            {
+              "code": "NO_MEMBERSHIP",
+              "detail": "Identity has no membership in group.",
               "identity_id": "00000000-0000-0000-0000-000000000001"
             }
           ]
