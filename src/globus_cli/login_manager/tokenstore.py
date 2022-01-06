@@ -5,13 +5,13 @@ import globus_sdk
 from globus_sdk.tokenstorage import SQLiteAdapter
 
 from ._old_config import invalidate_old_config
+from .client_login import get_client_login, is_client_login
 
 # internal constants
 _CLIENT_DATA_CONFIG_KEY = "auth_client_data"
 
 # env vars used throughout this module
 GLOBUS_ENV = os.environ.get("GLOBUS_SDK_ENVIRONMENT")
-GLOBUS_PROFILE = os.environ.get("GLOBUS_PROFILE")
 
 
 def _template_client_id():
@@ -75,16 +75,27 @@ def _get_storage_filename():
 
 
 def _resolve_namespace():
+    """
+    expected user namespaces are:
+
+    userprofile/production        (default)
+    userprofile/sandbox           (env is set to sandbox)
+    userprofile/test/myprofile    (env is set to test, profile is set to myprofile)
+
+    client namespaces ignore profile, and include client_id in the namespace:
+
+    clientprofile/production/926cc9c6-b481-4a5e-9ccd-b497f04c643b (default)
+    clientprofile/sandbox/926cc9c6-b481-4a5e-9ccd-b497f04c643b    (sandbox env)
+    """
     env = GLOBUS_ENV if GLOBUS_ENV else "production"
-    # namespace any user profile so that non-user namespaces may be used in the future
-    # e.g. for client-credentials authenticated use of the CLI
-    #
-    # expected namespaces are
-    #
-    #     userprofile/production     (default)
-    #     userprofile/sandbox        (env is set to sandbox, profile is unset)
-    #     userprofile/test/myprofile (env is set to test, profile is set to myprofile)
-    return "userprofile/" + (f"{env}/{GLOBUS_PROFILE}" if GLOBUS_PROFILE else env)
+    profile = os.environ.get("GLOBUS_PROFILE")
+
+    if is_client_login():
+        client_id = get_client_login().client_id
+        return f"clientprofile/{env}/{client_id}"
+
+    else:
+        return "userprofile/" + env + (f"/{profile}" if profile else "")
 
 
 def token_storage_adapter():
@@ -109,6 +120,9 @@ def internal_auth_client():
     save the credentials for that client, and then build and return the
     ConfidentialAppAuthClient.
     """
+    if is_client_login():
+        raise ValueError("client logins shouldn't create internal auth clients")
+
     adapter = token_storage_adapter()
     client_data = adapter.read_config(_CLIENT_DATA_CONFIG_KEY)
     if client_data is not None:

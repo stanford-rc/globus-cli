@@ -4,7 +4,13 @@ from typing import Dict, Iterator, List, Optional, Tuple
 
 import click
 import globus_sdk
-from globus_sdk.scopes import AuthScopes, GroupsScopes, SearchScopes, TransferScopes
+from globus_sdk.scopes import (
+    AuthScopes,
+    GCSEndpointScopeBuilder,
+    GroupsScopes,
+    SearchScopes,
+    TransferScopes,
+)
 
 from globus_cli.endpointish import Endpointish, EndpointType
 
@@ -13,6 +19,7 @@ from ..services.auth import CustomAuthClient
 from ..services.gcs import CustomGCSClient
 from ..services.transfer import CustomTransferClient
 from .auth_flows import do_link_auth_flow, do_local_server_auth_flow
+from .client_login import get_client_login, is_client_login
 from .errors import MissingLoginError
 from .local_server import is_remote_session
 from .tokenstore import internal_auth_client, token_storage_adapter
@@ -93,6 +100,10 @@ class LoginManager:
         Determines if the user has a valid refresh token for the given
         resource server
         """
+        # client identities are always logged in
+        if is_client_login():
+            return True
+
         tokens = self._token_storage.get_token_data(resource_server)
         if tokens is None or "refresh_token" not in tokens:
             return False
@@ -108,6 +119,14 @@ class LoginManager:
         session_params: Optional[dict] = None,
         scopes: Optional[List[str]] = None,
     ):
+        if is_client_login():
+            click.echo(
+                "Client identities do not need to log in. If you are trying "
+                "to do a user log in, please unset the GLOBUS_CLI_CLIENT_ID "
+                "and GLOBUS_CLI_CLIENT_SECRET environment variables."
+            )
+            click.get_current_context().exit(1)
+
         if scopes is None:  # flatten scopes to list of strings if none provided
             scopes = [
                 s for _rs_name, rs_scopes in self.login_requirements for s in rs_scopes
@@ -178,25 +197,53 @@ class LoginManager:
 
     def _get_client_authorizer(
         self, resource_server: str, *, no_tokens_msg: Optional[str] = None
-    ) -> globus_sdk.RefreshTokenAuthorizer:
+    ) -> globus_sdk.authorizers.RenewingAuthorizer:
         tokens = self._token_storage.get_token_data(resource_server)
 
-        # if there are no tokens, raise an error
-        # this *should* never be reached, but it's a safety check to ensure we never go
-        # into a bad state
-        if tokens is None:
-            raise ValueError(
-                no_tokens_msg
-                or f"Could not get login data for {resource_server}. Try login to fix."
+        if is_client_login():
+            # construct scopes for the specified resource server.
+            # this is not guaranteed to contain always required scopes,
+            # additional logic may be needed to handle client identities that
+            # may be missing those.
+            scopes = []
+            for rs_name, rs_scopes in self.login_requirements:
+                if rs_name == resource_server:
+                    scopes.extend(rs_scopes)
+
+            # if we already have a token use it. This token could be invalid
+            # or for another client, but automatic retries will handle that
+            access_token = None
+            expires_at = None
+            if tokens:
+                access_token = tokens["access_token"]
+                expires_at = tokens["expires_at_seconds"]
+
+            return globus_sdk.ClientCredentialsAuthorizer(
+                confidential_client=get_client_login(),
+                scopes=scopes,
+                access_token=access_token,
+                expires_at=expires_at,
+                on_refresh=self._token_storage.on_refresh,
             )
 
-        return globus_sdk.RefreshTokenAuthorizer(
-            tokens["refresh_token"],
-            internal_auth_client(),
-            access_token=tokens["access_token"],
-            expires_at=tokens["expires_at_seconds"],
-            on_refresh=self._token_storage.on_refresh,
-        )
+        else:
+            # tokens are required for user logins
+            if tokens is None:
+                raise ValueError(
+                    no_tokens_msg
+                    or (
+                        f"Could not get login data for {resource_server}."
+                        " Try login to fix."
+                    )
+                )
+
+            return globus_sdk.RefreshTokenAuthorizer(
+                tokens["refresh_token"],
+                internal_auth_client(),
+                access_token=tokens["access_token"],
+                expires_at=tokens["expires_at_seconds"],
+                on_refresh=self._token_storage.on_refresh,
+            )
 
     def get_transfer_client(self) -> CustomTransferClient:
         authorizer = self._get_client_authorizer(TransferScopes.resource_server)
@@ -246,6 +293,11 @@ class LoginManager:
             collection_id=collection_id, endpoint_id=endpoint_id
         )
 
+        # client identities need to have this scope added as a requirement
+        # so that they correctly request it when building authorizers
+        self.add_requirement(
+            gcs_id, scopes=[GCSEndpointScopeBuilder(gcs_id).manage_collections]
+        )
         self.assert_logins(gcs_id, assume_gcs=True)
 
         authorizer = self._get_client_authorizer(

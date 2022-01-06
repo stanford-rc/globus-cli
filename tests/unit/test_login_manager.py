@@ -2,6 +2,7 @@ import re
 import uuid
 from unittest.mock import patch
 
+import globus_sdk
 import pytest
 
 from globus_cli.login_manager import LoginManager, MissingLoginError
@@ -127,3 +128,42 @@ def test_gcs_error_message(mock_get_adapter):
         dummy_command()
 
     assert f"globus login --gcs {dummy_id}" in str(excinfo.value)
+
+
+def test_client_login_two_requirements(client_login):
+    @LoginManager.requires_login(LoginManager.TRANSFER_RS, LoginManager.AUTH_RS)
+    def dummy_command(*, login_manager):
+        transfer_client = login_manager.get_transfer_client()
+        auth_client = login_manager.get_auth_client()
+
+        assert isinstance(
+            transfer_client.authorizer, globus_sdk.ClientCredentialsAuthorizer
+        )
+        assert isinstance(
+            auth_client.authorizer, globus_sdk.ClientCredentialsAuthorizer
+        )
+
+        return True
+
+    assert dummy_command()
+
+
+@patch.object(LoginManager, "_get_gcs_info")
+def test_client_login_gcs(mock_get_gcs_info, client_login, add_gcs_login):
+    class fake_endpointish:
+        def get_gcs_address(self):
+            return "fake_adress"
+
+    gcs_id = "fake_gcs_id"
+    mock_get_gcs_info.return_value = gcs_id, fake_endpointish()
+    add_gcs_login(gcs_id)
+
+    @LoginManager.requires_login(LoginManager.TRANSFER_RS)
+    def dummy_command(*, login_manager, collection_id):
+        gcs_client = login_manager.get_gcs_client(collection_id=collection_id)
+
+        assert isinstance(gcs_client.authorizer, globus_sdk.ClientCredentialsAuthorizer)
+
+        return True
+
+    assert dummy_command(collection_id=gcs_id)

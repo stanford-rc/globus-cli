@@ -5,6 +5,14 @@ from typing import Any, Dict, Tuple, Union
 
 import click
 from globus_sdk import GlobusHTTPResponse, TransferClient
+from globus_sdk.transport import (
+    RetryCheckFlags,
+    RetryCheckResult,
+    RetryContext,
+    set_retry_check_flags,
+)
+
+from globus_cli.login_manager import get_client_login, is_client_login
 
 from .data import display_name_or_cname
 from .recursive_ls import RecursiveLsResponse
@@ -12,7 +20,32 @@ from .recursive_ls import RecursiveLsResponse
 log = logging.getLogger(__name__)
 
 
+@set_retry_check_flags(RetryCheckFlags.RUN_ONCE)
+def _retry_client_consent(ctx: RetryContext) -> RetryCheckResult:
+    """
+    if using a client login automatically get needed consents by requesting
+    the needed scopes
+    """
+    if (not is_client_login()) or (ctx.response is None):
+        return RetryCheckResult.no_decision
+
+    if ctx.response.status_code == 403:
+        error_code = ctx.response.json().get("code")
+        required_scopes = ctx.response.json().get("required_scopes")
+
+        if error_code == "ConsentRequired" and required_scopes:
+            client = get_client_login()
+            client.oauth2_client_credentials_tokens(requested_scopes=required_scopes)
+            return RetryCheckResult.do_retry
+
+    return RetryCheckResult.no_decision
+
+
 class CustomTransferClient(TransferClient):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.transport.register_retry_check(_retry_client_consent)
+
     # TODO: Remove this function when endpoints natively support recursive ls
     def recursive_operation_ls(
         self,
