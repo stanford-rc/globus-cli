@@ -1,7 +1,7 @@
 import click
 from globus_sdk.scopes import GCSEndpointScopeBuilder
 
-from globus_cli.login_manager import LoginManager
+from globus_cli.login_manager import LoginManager, is_client_login
 from globus_cli.parsing import command, no_local_server_option
 
 _SHARED_EPILOG = """\
@@ -37,6 +37,13 @@ You may force a new login with
     )
     + _SHARED_EPILOG
 )
+
+_IS_CLIENT_ID_RESPONSE = """\
+GLOBUS_CLI_CLIENT_ID and GLOBUS_CLI_CLIENT_SECRET are both set.
+
+When using client credentials, do not run 'globus login'
+Clients are always "logged in"
+"""
 
 
 @command(
@@ -86,6 +93,9 @@ def login_command(no_local_server, force, gcs_servers):
     given access code from the web to the CLI.
     """
     manager = LoginManager()
+
+    if is_client_login():
+        raise click.UsageError(_IS_CLIENT_ID_RESPONSE)
 
     # add GCS servers to LoginManager requirements so that the login check and login
     # flow will make use of the requested GCS servers
