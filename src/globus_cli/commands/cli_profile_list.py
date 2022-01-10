@@ -1,10 +1,10 @@
 import os
-from typing import Any, Dict, Iterator, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, cast
 
 import click
 import globus_sdk.tokenstorage
 
-from globus_cli.login_manager import token_storage_adapter
+from globus_cli.login_manager import is_client_login, token_storage_adapter
 from globus_cli.parsing import command
 from globus_cli.termio import FORMAT_TEXT_TABLE, formatted_print
 from globus_cli.types import FIELD_LIST_T
@@ -56,10 +56,31 @@ def _parse_and_filter_profiles(
         if data["client"]:
             client_profiles.append(data)
         else:
-            if all or data["profile"] is not None:
-                user_profiles.append(data)
+            user_profiles.append(data)
 
     return (client_profiles, user_profiles)
+
+
+def _get_current_checker() -> Callable[[Dict[str, Any]], str]:
+    is_client = is_client_login()
+
+    def is_current(data: Dict[str, Any]) -> bool:
+        globus_env = os.getenv("GLOBUS_SDK_ENVIRONMENT", "production")
+        if data["env"] != globus_env:
+            return False
+        if is_client != data["client"]:
+            return False
+        if data["client"]:
+            return cast(str, data["profile"]) == os.getenv("GLOBUS_CLI_CLIENT_ID")
+        else:
+            return cast(str, data["profile"]) == os.getenv("GLOBUS_PROFILE")
+
+    def field_callback(data: Dict[str, Any]) -> str:
+        if is_current(data):
+            return "-> "
+        return ""
+
+    return field_callback
 
 
 @command(
@@ -76,22 +97,25 @@ def cli_profile_list(*, all: bool) -> None:
     """
 
     client_profiles, user_profiles = _parse_and_filter_profiles(all)
+    current_profile_field = _get_current_checker()
 
     if user_profiles:
-        fields: FIELD_LIST_T = [("GLOBUS_PROFILE", "profile")]
+        fields: FIELD_LIST_T = [
+            ("", current_profile_field),
+            ("GLOBUS_PROFILE", "profile"),
+            ("is_default", lambda x: "True" if x["default"] else "False"),
+        ]
         if all:
             fields += [
                 ("GLOBUS_SDK_ENVIRONMENT", "env"),
-                ("is_default", lambda x: "True" if x["default"] else "False"),
             ]
         formatted_print(user_profiles, text_format=FORMAT_TEXT_TABLE, fields=fields)
     if client_profiles:
-        click.echo(
-            """
-==========
-"""
-        )
-        fields = [("GLOBUS_CLI_CLIENT_ID", "profile")]
+        click.echo("")
+        fields = [
+            ("", current_profile_field),
+            ("GLOBUS_CLI_CLIENT_ID", "profile"),
+        ]
         if all:
             fields.append(("GLOBUS_SDK_ENVIRONMENT", "env"))
         formatted_print(client_profiles, text_format=FORMAT_TEXT_TABLE, fields=fields)

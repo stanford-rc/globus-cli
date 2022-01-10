@@ -171,21 +171,33 @@ def print_table(iterable, fields, print_headers=True):
     # handle the case in which the column header is the widest thing
     widths = [max(w, len(h)) for w, h in zip(widths, headers)]
 
-    # create a format string based on column widths
-    format_str = " | ".join("{:" + str(w) + "}" for w in widths)
-
     def none_to_null(val):
         if val is None:
             return "NULL"
         return val
 
+    def format_line(inputs):
+        out = ""
+        last_offset = 3
+        for w, h, x in zip(widths, headers, inputs):
+            out += str(x).ljust(w)
+            if h:
+                out += " | "
+                last_offset = 3
+            else:
+                last_offset = 0
+        return out[:-last_offset]
+
     # print headers
     if print_headers:
-        click.echo(format_str.format(*(h for h in headers)))
-        click.echo(format_str.format(*("-" * w for w in widths)))
+        click.echo(format_line(headers))
+        click.echo(
+            format_line(["-" * w if h else " " * w for w, h in zip(widths, headers)])
+        )
+
     # print the rows of data
     for i in iterable:
-        click.echo(format_str.format(*(none_to_null(f(i)) for f in fields)))
+        click.echo(format_line([none_to_null(f(i)) for f in fields]))
 
 
 def formatted_print(
