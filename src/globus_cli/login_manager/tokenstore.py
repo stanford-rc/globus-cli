@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import cast
 
 import globus_sdk
 from globus_sdk.tokenstorage import SQLiteAdapter
@@ -12,6 +13,11 @@ _CLIENT_DATA_CONFIG_KEY = "auth_client_data"
 
 # env vars used throughout this module
 GLOBUS_ENV = os.environ.get("GLOBUS_SDK_ENVIRONMENT")
+
+
+# stub to allow type casting of a function to an object with an attribute
+class _TokenStoreFuncProto:
+    _instance: SQLiteAdapter
 
 
 def _template_client_id():
@@ -98,18 +104,17 @@ def _resolve_namespace():
         return "userprofile/" + env + (f"/{profile}" if profile else "")
 
 
-def token_storage_adapter():
-    if not hasattr(token_storage_adapter, "_instance"):
+def token_storage_adapter() -> SQLiteAdapter:
+    as_proto = cast(_TokenStoreFuncProto, token_storage_adapter)
+    if not hasattr(as_proto, "_instance"):
         # when initializing the token storage adapter, check if the storage file exists
         # if it does not, then use this as a flag to clean the old config
         fname = _get_storage_filename()
         if not os.path.exists(fname):
             invalidate_old_config(internal_native_client())
         # namespace is equal to the current environment
-        token_storage_adapter._instance = SQLiteAdapter(
-            fname, namespace=_resolve_namespace()
-        )
-    return token_storage_adapter._instance
+        as_proto._instance = SQLiteAdapter(fname, namespace=_resolve_namespace())
+    return as_proto._instance
 
 
 def internal_auth_client():
