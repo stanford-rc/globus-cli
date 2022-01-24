@@ -1,6 +1,7 @@
 metadata:
   group1_id: "8b7d57bc-1666-11ec-88b2-f50515619d57"
   group1_name: "Group 1"
+  group1_description: "The first group."
   group2_id: "93fca046-1666-11ec-88b2-f50515619d57"
   group2_name: "Group 2"
   group_remove_id: "7fa8b8c1-aad3-47cf-a844-4b1cdbf7c124"
@@ -48,6 +49,86 @@ groups:
           ]
         }
     ]
+  - path: /groups
+    method: post
+    json:
+      {
+        "id": "8b7d57bc-1666-11ec-88b2-f50515619d57",
+        "name": "Group 1",
+        "description": "The first group.",
+        "group_type": "regular",
+        "enforce_session": false,
+        "policies": {
+          "authentication_assurance_timeout": 28800,
+          "group_members_visibility": "managers",
+          "group_visibility": "private",
+          "is_high_assurance": false,
+          "join_requests": false,
+          "signup_fields": []
+        }
+      }
+  - path: /groups/8b7d57bc-1666-11ec-88b2-f50515619d57
+    method: get
+    json:
+      {
+        "id": "8b7d57bc-1666-11ec-88b2-f50515619d57",
+        "name": "Group 1",
+        "description": "The first group.",
+        "group_type": "regular",
+        "enforce_session": false,
+        "my_memberships": [
+            {
+                "group_id": "8b7d57bc-1666-11ec-88b2-f50515619d57",
+                "identity_id": "a24d6e82-1666-11ec-88b2-f50515619d57",
+                "username": "alice@example.com",
+                "role": "admin"
+            }
+        ],
+        "policies": {
+          "authentication_assurance_timeout": 28800,
+          "group_members_visibility": "managers",
+          "group_visibility": "private",
+          "is_high_assurance": false,
+          "join_requests": false,
+          "signup_fields": []
+        }
+      }
+  - path: /groups/8b7d57bc-1666-11ec-88b2-f50515619d57
+    method: put
+    json:
+      {
+        "id": "8b7d57bc-1666-11ec-88b2-f50515619d57",
+        "name": "New Name",
+        "description": "New Description",
+        "group_type": "regular",
+        "enforce_session": false,
+        "policies": {
+          "authentication_assurance_timeout": 28800,
+          "group_members_visibility": "managers",
+          "group_visibility": "private",
+          "is_high_assurance": false,
+          "join_requests": false,
+          "signup_fields": []
+        }
+      }
+  - path: /groups/8b7d57bc-1666-11ec-88b2-f50515619d57
+    method: delete
+    json:
+      {
+        "id": "8b7d57bc-1666-11ec-88b2-f50515619d57",
+        "name": "Group 1",
+        "description": "The first group.",
+        "group_type": "regular",
+        "enforce_session": false,
+        "policies": {
+          "authentication_assurance_timeout": 28800,
+          "group_members_visibility": "managers",
+          "group_visibility": "private",
+          "is_high_assurance": false,
+          "join_requests": false,
+          "signup_fields": []
+        }
+      }
   - path: /groups/8b7d57bc-1666-11ec-88b2-f50515619d57
     method: post
     json:
