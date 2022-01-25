@@ -7,7 +7,7 @@ from globus_cli.termio import formatted_print
 from ._common import group_create_and_update_params
 
 
-@group_create_and_update_params()
+@group_create_and_update_params(create=True)
 @command("create", short_help="Create a new group")
 @LoginManager.requires_login(LoginManager.GROUPS_RS)
 def group_create(*, login_manager: LoginManager, **kwargs: Any):

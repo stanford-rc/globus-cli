@@ -64,7 +64,8 @@ def test_group_update(run_line, load_api_fixtures):
     group1_id = data["metadata"]["group1_id"]
 
     result = run_line(
-        f"globus group update {group1_id} 'New Name' --description 'New Description'"
+        f"globus group update {group1_id} "
+        "--name 'New Name' --description 'New Description'"
     )
 
     assert "Group updated successfully" in result.output
