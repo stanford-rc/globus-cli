@@ -15,11 +15,7 @@ def group_id_arg(f: Optional[Callable] = None, *, required=True):
 
 
 def parse_roles(res):
-    roles = set()
-    for membership in res["my_memberships"]:
-        roles.add(membership["role"])
-
-    return ",".join(sorted(roles))
+    return ",".join(sorted(set(m["role"] for m in res["my_memberships"])))
 
 
 def format_session_enforcement(res):
