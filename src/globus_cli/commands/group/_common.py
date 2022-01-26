@@ -4,14 +4,10 @@ from typing import Callable, Optional
 import click
 
 
-def group_id_arg(f: Optional[Callable] = None, *, required=True):
-    """
-    By default, the group ID is made required; pass `required=False` to the
-    decorator arguments to make it optional.
-    """
+def group_id_arg(f: Optional[Callable] = None):
     if f is None:
-        return functools.partial(group_id_arg, required=required)
-    return click.argument("GROUP_ID", required=required)(f)
+        return functools.partial(group_id_arg)
+    return click.argument("GROUP_ID")(f)
 
 
 def parse_roles(res):

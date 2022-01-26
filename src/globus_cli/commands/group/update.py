@@ -9,9 +9,9 @@ from ._common import group_create_and_update_params, group_id_arg
 
 @group_create_and_update_params()
 @group_id_arg
-@command("update", short_help="Update an existing group")
+@command("update")
 @LoginManager.requires_login(LoginManager.GROUPS_RS)
-def group_update(group_id, *, login_manager: LoginManager, **kwargs: Any):
+def group_update(*, login_manager: LoginManager, group_id: str, **kwargs: Any):
     """Update an existing group."""
     groups_client = login_manager.get_groups_client()
 
@@ -19,13 +19,15 @@ def group_update(group_id, *, login_manager: LoginManager, **kwargs: Any):
     group = groups_client.get_group(group_id)
 
     # assemble put data using existing values for any field not given
+    # note that the API does not accept the full group document, so we must
+    # specify name and description instead of just iterating kwargs
     data = {}
     for field in ["name", "description"]:
         if kwargs.get(field) is not None:
-            data[field] = kwargs.get(field)
+            data[field] = kwargs[field]
         else:
             data[field] = group[field]
 
-    response = groups_client.update_group(group_id, kwargs)
+    response = groups_client.update_group(group_id, data)
 
     formatted_print(response, simple_text="Group updated successfully")

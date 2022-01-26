@@ -6,9 +6,13 @@ from ._common import group_id_arg
 
 
 @group_id_arg
-@command("delete", short_help="Delete a group")
+@command("delete")
 @LoginManager.requires_login(LoginManager.GROUPS_RS)
-def group_delete(group_id, *, login_manager: LoginManager):
+def group_delete(
+    *,
+    login_manager: LoginManager,
+    group_id: str,
+):
     """Delete a group"""
     groups_client = login_manager.get_groups_client()
 

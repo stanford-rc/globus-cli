@@ -11,9 +11,13 @@ from ._common import (
 
 
 @group_id_arg
-@command("show", short_help="Show a group definition")
+@command("show")
 @LoginManager.requires_login(LoginManager.GROUPS_RS)
-def group_show(*, login_manager: LoginManager, group_id):
+def group_show(
+    *,
+    login_manager: LoginManager,
+    group_id: str,
+):
     """Show a group definition"""
     groups_client = login_manager.get_groups_client()
 

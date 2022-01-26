@@ -8,7 +8,7 @@ from ._common import group_create_and_update_params
 
 
 @group_create_and_update_params(create=True)
-@command("create", short_help="Create a new group")
+@command("create")
 @LoginManager.requires_login(LoginManager.GROUPS_RS)
 def group_create(*, login_manager: LoginManager, **kwargs: Any):
     """Create a new group"""
