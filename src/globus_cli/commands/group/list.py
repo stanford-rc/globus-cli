@@ -2,6 +2,8 @@ from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
 from globus_cli.termio import formatted_print
 
+from ._common import format_session_enforcement, parse_roles
+
 
 def _format_session_enforcement(res):
     if res.get("enforce_session"):
@@ -32,7 +34,7 @@ def group_list(*, login_manager: LoginManager):
             ("Group ID", "id"),
             ("Name", "name"),
             ("Type", "group_type"),
-            ("Session Enforcement", _format_session_enforcement),
-            ("Roles", _parse_roles),
+            ("Session Enforcement", format_session_enforcement),
+            ("Roles", parse_roles),
         ],
     )

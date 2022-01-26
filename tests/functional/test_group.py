@@ -22,6 +22,102 @@ def test_group_list(run_line, load_api_fixtures):
     assert group2_name in result.output
 
 
+def test_group_show(run_line, load_api_fixtures):
+    """
+    Basic success test for globus group show
+    """
+    data = load_api_fixtures("groups.yaml")
+
+    group1_id = data["metadata"]["group1_id"]
+    group1_name = data["metadata"]["group1_name"]
+    group1_description = data["metadata"]["group1_description"]
+
+    result = run_line(f"globus group show {group1_id}")
+
+    assert group1_name in result.output
+    assert group1_description in result.output
+
+
+def test_group_create(run_line, load_api_fixtures):
+    """
+    Basic success test for globus group create
+    """
+    data = load_api_fixtures("groups.yaml")
+
+    group1_id = data["metadata"]["group1_id"]
+    group1_name = data["metadata"]["group1_name"]
+    group1_description = data["metadata"]["group1_description"]
+
+    result = run_line(
+        f"globus group create '{group1_name}' --description '{group1_description}'"
+    )
+
+    assert f"Group {group1_id} created successfully" in result.output
+
+
+def test_group_update(run_line, load_api_fixtures):
+    """
+    Basic success test for globus group update
+    Confirms existing values are included in the put document when
+    not specified by options
+    """
+    data = load_api_fixtures("groups.yaml")
+
+    group1_id = data["metadata"]["group1_id"]
+    group1_name = data["metadata"]["group1_name"]
+    group1_description = data["metadata"]["group1_description"]
+    new_name = "New Name"
+    new_description = "New Description"
+
+    # update name
+    result = run_line(f"globus group update {group1_id} --name '{new_name}'")
+    assert "Group updated successfully" in result.output
+
+    # confirm description is in the put document with the pre-existing value
+    last_req = responses.calls[-1].request
+    sent = json.loads(last_req.body)
+    assert sent["name"] == new_name
+    assert sent["description"] == group1_description
+
+    # update description
+    result = run_line(
+        f"globus group update {group1_id} --description '{new_description}'"
+    )
+    assert "Group updated successfully" in result.output
+
+    # confirm name is in the put document with the pre-existing value
+    last_req = responses.calls[-1].request
+    sent = json.loads(last_req.body)
+    assert sent["name"] == group1_name
+    assert sent["description"] == new_description
+
+    # update both name and description
+    result = run_line(
+        f"globus group update {group1_id} "
+        f"--name '{new_name}' --description '{new_description}'"
+    )
+    assert "Group updated successfully" in result.output
+
+    # confirm both fields use new value
+    last_req = responses.calls[-1].request
+    sent = json.loads(last_req.body)
+    assert sent["name"] == new_name
+    assert sent["description"] == new_description
+
+
+def test_group_delete(run_line, load_api_fixtures):
+    """
+    Basic success test for globus group delete
+    """
+    data = load_api_fixtures("groups.yaml")
+
+    group1_id = data["metadata"]["group1_id"]
+
+    result = run_line(f"globus group delete {group1_id}")
+
+    assert "Group deleted successfully" in result.output
+
+
 def test_group_member_add(run_line, load_api_fixtures):
     data = load_api_fixtures("groups.yaml")
     group = data["metadata"]["group1_id"]
