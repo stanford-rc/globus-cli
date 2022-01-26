@@ -26,7 +26,6 @@ def group_update(group_id, *, login_manager: LoginManager, **kwargs: Any):
         else:
             data[field] = group[field]
 
-    # response = groups_client.update_group(group_id, kwargs)
-    response = groups_client.put(f"/groups/{group_id}", data=data)
+    response = groups_client.update_group(group_id, kwargs)
 
     formatted_print(response, simple_text="Group updated successfully")
