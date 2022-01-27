@@ -5,7 +5,24 @@ on:
   # build weekly at 4:00 AM UTC
   schedule:
     - cron: '0 4 * * 1'
+
 jobs:
+  lint:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    name: "lint on ${{ matrix.os }} "
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - name: install tox
+        run: python -m pip install -U tox
+      - name: run linting
+        run: make lint
+
   test:
     strategy:
       matrix:
@@ -18,38 +35,58 @@ jobs:
             python-version: "3.10"
           - os: macos-latest
             python-version: "3.10"
-    name: "Python ${{ matrix.python-version }} on ${{ matrix.os }}"
+    name: "test py${{ matrix.python-version }} on ${{ matrix.os }}"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Requirements
-        run: python -m pip install -U pip setuptools tox
-      - name: Run Linting
-        # only lint on 3.10 for faster overall runs
-        if: ${{ matrix.python-version == '3.10' }}
-        run: python -m tox -e lint
-      - name: Test reference docs generation
-        # make sure this does not fail, only on linux 3.9+
-        # because that's the build environment used (i.e. the one which really matters)
-        if: ${{ (matrix.python-version == '3.9' || matrix.python-version == '3.10') && matrix.os == 'ubuntu-latest' }}
-        run: python -m tox -e reference
-      - name: Test package build
-        # only on linux 3.10 for faster runs
-        if: ${{ matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest' }}
-        run: python -m tox -e twine-check
-      - name: Run Tests
+      - name: install tox
+        run: python -m pip install -U tox
+      - name: run tests
         run: python -m tox -e py
-      - name: Mindeps Test
-        # mindeps runs on py36, as "the oldest everything"
-        if: ${{ matrix.python-version == '3.6' && matrix.os == 'ubuntu-latest' }}
-        run: python -m tox -e py-mindeps
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - name: install tox
+        run: python -m pip install -U tox
+      - name: test reference docs generation
+        run: python -m tox -e reference
+
+  test-package-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - name: install tox
+        run: python -m pip install -U tox
+      - name: check package metadata
+        run: python -m tox -e twine-check
+
+  test-mindeps:
+    runs-on: ubuntu-latest
+    name: "mindeps"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+      - name: install tox
+        run: python -m pip install -U tox
+      - name: test
+        run: tox -e py-mindeps
 
   # use the oldest python version we support for this build
   test-ancient-virtualenv:
-    name: "Python 3.6, Using Old virtualenv"
+    name: "test on py3.6, using old virtualenv"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
