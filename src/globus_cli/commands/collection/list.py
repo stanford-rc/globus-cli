@@ -94,14 +94,13 @@ def collection_list(
     List the Collections on a given Globus Connect Server v5 Endpoint
     """
     gcs_client = login_manager.get_gcs_client(endpoint_id=endpoint_id)
-
     params = {}
+    if mapped_collection_id:
+        params["mapped_collection_id"] = mapped_collection_id
+    # note `filter` (no s) is the argument to `get_collection_list`
+    if filters:
+        params["filter"] = ",".join(filters)
     if include_private_policies:
         params["include"] = "private_policies"
-    query_params = {}
-    if mapped_collection_id:
-        query_params["mapped_collection_id"] = mapped_collection_id
-    if filters:
-        query_params["filter"] = ",".join(filters)
-    res = gcs_client.get_collection_list(**params, query_params=query_params)
+    res = gcs_client.get_collection_list(**params)
     formatted_print(res, text_format=FORMAT_TEXT_TABLE, fields=STANDARD_FIELDS)
