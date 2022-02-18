@@ -1,5 +1,6 @@
 metadata:
   index_id: 6f831ac8-4c41-4812-b383-6fb04f8b9f9f
+  role_id: MDQ0ODgy
   error_index_id: 2ac1f660-298b-432f-89ae-c1299ad4233e
   task_id: 49869cb5-4fca-4f19-bbb6-8b0a18bd1f95
   pending_task_id: cfdedea7-9c52-42cb-84a6-6daa8217f772
@@ -16,6 +17,16 @@ metadata:
       display_name: "Searchable Files Demo Index"
       status: "open"
       permissions: owner,writer
+  index_role_list_data:
+    "MDAwMjQx":
+      role: owner
+      value: "foo@globusid.org"
+    "MDQ0ODYz":
+      role: writer
+      value: "bar@globusid.org"
+    "MDQ0ODkz":
+      role: writer
+      value: "Globus Group (9da26beb-33f5-4e1a-b9f6-a44a624c4ddd)"
 
 search:
   - path: /v1/index/6f831ac8-4c41-4812-b383-6fb04f8b9f9f/search
@@ -400,4 +411,60 @@ search:
             "subscription_id": null
           }
         ]
+      }
+  - path: /v1/index/6f831ac8-4c41-4812-b383-6fb04f8b9f9f/role_list
+    method: get
+    json:
+      {
+        "role_list": [
+          {
+            "creation_date": "2021-03-18 19:51:16",
+            "id": "MDAwMjQx",
+            "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+            "principal": "urn:globus:auth:identity:25de0aed-aa83-4600-a1be-a62a910af116",
+            "principal_type": "identity",
+            "role_name": "owner"
+          },
+          {
+            "creation_date": "2022-01-24 19:06:14",
+            "id": "MDQ0ODkz",
+            "index_id": "60d1160b-f016-40b0-8545-99619865873d",
+            "principal": "urn:globus:groups:id:9da26beb-33f5-4e1a-b9f6-a44a624c4ddd",
+            "principal_type": "group",
+            "role_name": "writer"
+          },
+          {
+            "creation_date": "2022-01-24 15:33:41",
+            "id": "MDQ0ODYz",
+            "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+            "principal": "urn:globus:auth:identity:a5cd4055-ca33-43c0-923f-810fca2ebd68",
+            "principal_type": "identity",
+            "role_name": "writer"
+          }
+        ]
+      }
+  - path: /v1/index/6f831ac8-4c41-4812-b383-6fb04f8b9f9f/role
+    method: post
+    json:
+      {
+        "creation_date": "2022-01-24 17:44:27",
+        "id": "MDQ0ODgy",
+        "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+        "principal": "urn:globus:auth:identity:25de0aed-aa83-4600-a1be-a62a910af116",
+        "principal_type": "identity",
+        "role_name": "writer"
+      }
+  - path: /v1/index/6f831ac8-4c41-4812-b383-6fb04f8b9f9f/role/MDQ0ODgy
+    method: delete
+    json:
+      {
+        "deleted": {
+          "creation_date": "2022-01-24 17:44:27",
+          "id": "MDQ0ODgy",
+          "index_id": "6f831ac8-4c41-4812-b383-6fb04f8b9f9f",
+          "principal": "urn:globus:auth:identity:25de0aed-aa83-4600-a1be-a62a910af116",
+          "principal_type": "identity",
+          "role_name": "writer"
+        },
+        "success": true
       }
