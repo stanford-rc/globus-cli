@@ -28,6 +28,18 @@ def parse_visibility(res):
     return res["policies"]["group_visibility"]
 
 
+def parse_members_visibility(res):
+    return res["policies"]["group_members_visibility"]
+
+
+def parse_join_requests(res):
+    return res["policies"]["join_requests"]
+
+
+def parse_signup_fields(res):
+    return ",".join(sorted({f for f in res["policies"]["signup_fields"]}))
+
+
 def group_create_and_update_params(
     f: Optional[Callable] = None, *, create: bool = False
 ) -> Callable:
