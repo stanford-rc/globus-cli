@@ -35,7 +35,7 @@ repos:
         - types-setuptools
         - types-requests
         - click
-        - 'globus-sdk==3.4.2'
+        - 'globus-sdk==3.5.0'
 - repo: local
   hooks:
     - id: fix-changelog
