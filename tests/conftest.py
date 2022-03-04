@@ -12,7 +12,6 @@ from click.testing import CliRunner
 from globus_sdk._testing import register_response_set
 from globus_sdk.tokenstorage import SQLiteAdapter
 from globus_sdk.transport import RequestsTransport
-from globus_sdk.utils import slash_join
 from ruamel.yaml import YAML
 
 import globus_cli
@@ -233,53 +232,6 @@ def mocked_responses(monkeypatch):
 
     responses.stop()
     responses.reset()
-
-
-@pytest.fixture
-def register_api_route(mocked_responses):
-    # copied almost verbatim from the SDK testsuite
-    def func(
-        service,
-        path,
-        method=responses.GET,
-        adding_headers=None,
-        replace=False,
-        **kwargs,
-    ):
-        base_url_map = {
-            "auth": "https://auth.globus.org/",
-            "nexus": "https://nexus.api.globusonline.org/",
-            "transfer": "https://transfer.api.globus.org/v0.10",
-            "search": "https://search.api.globus.org/",
-            "gcs": "https://abc.xyz.data.globus.org/api",
-            "groups": "https://groups.api.globus.org/v2/",
-        }
-        assert service in base_url_map
-        base_url = base_url_map.get(service)
-        full_url = slash_join(base_url, path)
-
-        # can set it to `{}` explicitly to clear the default
-        if adding_headers is None:
-            adding_headers = {"Content-Type": "application/json"}
-
-        if replace:
-            responses.replace(
-                method,
-                full_url,
-                headers=adding_headers,
-                match_querystring=None,
-                **kwargs,
-            )
-        else:
-            responses.add(
-                method,
-                full_url,
-                headers=adding_headers,
-                match_querystring=None,
-                **kwargs,
-            )
-
-    return func
 
 
 def _iter_fixture_routes(routes):

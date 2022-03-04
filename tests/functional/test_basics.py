@@ -1,7 +1,7 @@
 import os
 
 import pytest
-from globus_sdk._testing import load_response_set
+from globus_sdk._testing import RegisteredResponse, load_response, load_response_set
 
 
 def test_parsing(run_line):
@@ -108,39 +108,42 @@ def test_transfer_call_no_auth(run_line):
     assert "No Authentication provided." in result.stderr
 
 
-def test_transfer_call(run_line, register_api_route, go_ep1_id):
+def test_transfer_call(run_line):
     """
     Runs ls using test transfer refresh token to confirm
     test transfer refresh token is live and configured correctly
     """
-    load_response_set("cli.transfer_activate_success")
-    register_api_route(
-        "transfer",
-        f"/operation/endpoint/{go_ep1_id}/ls",
-        json={
-            # not *quite* verbatim data from the API, but very similar and in the right
-            # format with all fields populated
-            "DATA": [
-                {
-                    "DATA_TYPE": "file",
-                    "group": "root",
-                    "last_modified": "2021-01-14 00:33:38+00:00",
-                    "link_group": None,
-                    "link_last_modified": None,
-                    "link_size": None,
-                    "link_target": None,
-                    "link_user": None,
-                    "name": name,
-                    "permissions": "0755",
-                    "size": 4096,
-                    "type": "dir",
-                    "user": "root",
-                }
-                for name in ["home", "mnt", "not shareable", "share"]
-            ]
-        },
+    meta = load_response_set("cli.transfer_activate_success").metadata
+    epid = meta["endpoint_id"]
+    load_response(
+        RegisteredResponse(
+            service="transfer",
+            path=f"/operation/endpoint/{epid}/ls",
+            json={
+                # not *quite* verbatim data from the API, but very similar and in the
+                # right format with all fields populated
+                "DATA": [
+                    {
+                        "DATA_TYPE": "file",
+                        "group": "root",
+                        "last_modified": "2021-01-14 00:33:38+00:00",
+                        "link_group": None,
+                        "link_last_modified": None,
+                        "link_size": None,
+                        "link_target": None,
+                        "link_user": None,
+                        "name": name,
+                        "permissions": "0755",
+                        "size": 4096,
+                        "type": "dir",
+                        "user": "root",
+                    }
+                    for name in ["home", "mnt", "not shareable", "share"]
+                ]
+            },
+        )
     )
-    result = run_line("globus ls " + go_ep1_id + ":/")
+    result = run_line("globus ls " + epid + ":/")
     assert "home/" in result.output
 
 
