@@ -2,6 +2,7 @@ import json
 
 import pytest
 import responses
+from globus_sdk._testing import load_response_set
 
 
 @pytest.mark.parametrize(
@@ -17,12 +18,12 @@ import responses
         ),
     ],
 )
-def test_query_string(run_line, load_api_fixtures, addargs, expect_params):
+def test_query_string(run_line, addargs, expect_params):
     """
     Runs 'globus search query -q ...' and validates results
     """
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["index_id"]
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["index_id"]
 
     result = run_line(
         ["globus", "search", "query", index_id, "-q", "tomatillo"] + addargs
@@ -51,12 +52,12 @@ def test_query_string(run_line, load_api_fixtures, addargs, expect_params):
         ),
     ],
 )
-def test_query_document(run_line, load_api_fixtures, tmp_path, addargs, expect_params):
+def test_query_document(run_line, tmp_path, addargs, expect_params):
     """
     Runs 'globus search query --query-document ...' and validates results
     """
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["index_id"]
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["index_id"]
     doc = tmp_path / "doc.json"
     doc.write_text(json.dumps({"q": "tomatillo"}))
 
@@ -77,12 +78,12 @@ def test_query_document(run_line, load_api_fixtures, tmp_path, addargs, expect_p
         assert sent_body[k] == v
 
 
-def test_query_string_and_document_mutex(run_line, load_api_fixtures, tmp_path):
+def test_query_string_and_document_mutex(run_line, tmp_path):
     """
     Check that `-q` and `--query-document` cannot be used together
     """
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["index_id"]
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["index_id"]
     doc = tmp_path / "doc.json"
     doc.write_text(json.dumps({"q": "tomatillo"}))
 
@@ -102,12 +103,12 @@ def test_query_string_and_document_mutex(run_line, load_api_fixtures, tmp_path):
     assert "mutually exclusive" in result.stderr
 
 
-def test_query_required(run_line, load_api_fixtures):
+def test_query_required(run_line):
     """
     Check that at least one of `-q` or `--query-document` must be provided
     """
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["index_id"]
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["index_id"]
 
     result = run_line(
         [

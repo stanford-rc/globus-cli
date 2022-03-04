@@ -306,13 +306,12 @@ def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id):
 
             for path, method, params in _iter_fixture_routes(routes):
                 if "query_params" in params:
-                    query_params = params.pop("query_params")
                     # TODO: remove this int/float conversion after we upgrade to
                     # `responses>=0.19.0` when this issue is expected to be fixed
                     #   https://github.com/getsentry/responses/pull/485
                     query_params = {
                         k: str(v) if isinstance(v, (int, float)) else v
-                        for k, v in query_params.items()
+                        for k, v in params.pop("query_params").items()
                     }
                     params["match"] = [
                         responses.matchers.query_param_matcher(query_params)
@@ -343,12 +342,16 @@ def _register_all_response_sets(test_file_dir):
 
             for idx, (path, method, params) in enumerate(_iter_fixture_routes(routes)):
                 if "query_params" in params:
-                    match = [
-                        responses.matchers.query_param_matcher(
-                            params.pop("query_params")
-                        )
+                    # TODO: remove this int/float conversion after we upgrade to
+                    # `responses>=0.19.0` when this issue is expected to be fixed
+                    #   https://github.com/getsentry/responses/pull/485
+                    query_params = {
+                        k: str(v) if isinstance(v, (int, float)) else v
+                        for k, v in params.pop("query_params").items()
+                    }
+                    params["match"] = [
+                        responses.matchers.query_param_matcher(query_params)
                     ]
-                    params["match"] = match
                 response_set[f"{method}_{service}_{path}_{idx}"] = {
                     "service": service,
                     "path": path,

@@ -1,6 +1,9 @@
-def test_index_list(run_line, load_api_fixtures):
-    data = load_api_fixtures("search.yaml")
-    list_data = data["metadata"]["index_list_data"]
+from globus_sdk._testing import load_response_set
+
+
+def test_index_list(run_line):
+    meta = load_response_set("cli.search").metadata
+    list_data = meta["index_list_data"]
 
     result = run_line(["globus", "search", "index", "list"])
 
@@ -14,9 +17,9 @@ def test_index_list(run_line, load_api_fixtures):
     assert len(found) == len(list_data)
 
 
-def test_index_show(run_line, load_api_fixtures):
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["index_id"]
+def test_index_show(run_line):
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["index_id"]
 
     result, matcher = run_line(
         ["globus", "search", "index", "show", index_id], matcher=True
@@ -24,9 +27,9 @@ def test_index_show(run_line, load_api_fixtures):
     matcher.check(r"^Index ID:\s+([\w-]+)$", groups=[index_id])
 
 
-def test_index_create(run_line, load_api_fixtures):
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["index_id"]
+def test_index_create(run_line):
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["index_id"]
 
     result, matcher = run_line(
         [

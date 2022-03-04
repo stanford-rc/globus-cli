@@ -2,12 +2,13 @@ import json
 
 import pytest
 import responses
+from globus_sdk._testing import load_response_set
 
 
 @pytest.mark.parametrize("datatype_field", [None, "GIngest"])
-def test_gingest_document(run_line, load_api_fixtures, tmp_path, datatype_field):
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["index_id"]
+def test_gingest_document(run_line, tmp_path, datatype_field):
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["index_id"]
 
     data = {
         "ingest_type": "GMetaEntry",
@@ -38,9 +39,9 @@ def test_gingest_document(run_line, load_api_fixtures, tmp_path, datatype_field)
 
 
 @pytest.mark.parametrize("datatype", ["GMetaEntry", "GMetaList"])
-def test_auto_wrap_document(run_line, load_api_fixtures, tmp_path, datatype):
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["index_id"]
+def test_auto_wrap_document(run_line, tmp_path, datatype):
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["index_id"]
 
     entry_data = {
         "@datatype": "GMetaEntry",
@@ -73,13 +74,11 @@ def test_auto_wrap_document(run_line, load_api_fixtures, tmp_path, datatype):
     assert sent_body["ingest_data"] == data
 
 
-def test_auto_wrap_document_rejects_bad_doctype(run_line, load_api_fixtures, tmp_path):
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["index_id"]
+def test_auto_wrap_document_rejects_bad_doctype(run_line, tmp_path):
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["index_id"]
 
-    data = {
-        "@datatype": "NoSuchDocumentType",
-    }
+    data = {"@datatype": "NoSuchDocumentType"}
 
     doc = tmp_path / "doc.json"
     doc.write_text(json.dumps(data))
