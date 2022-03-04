@@ -1,6 +1,7 @@
 import os
 
 import pytest
+from globus_sdk._testing import load_response_set
 
 
 def test_parsing(run_line):
@@ -55,11 +56,11 @@ def test_whoami(run_line, load_api_fixtures):
     assert result.output == "foo@globusid.org\n"
 
 
-def test_whoami_no_auth(run_line, load_api_fixtures):
+def test_whoami_no_auth(run_line):
     """
     Runs whoami with config set to be empty, confirms no login seen.
     """
-    load_api_fixtures("all_authentication_failed.yaml")
+    load_response_set("cli.all_authentication_failed")
     result = run_line("globus whoami", assert_exit_code=1)
     assert "Unable to get user information" in result.stderr
 
@@ -73,12 +74,12 @@ def test_json_raw_string_output(run_line, load_api_fixtures):
     assert '"Foo McUser"\n' == result.output
 
 
-def test_auth_call_no_auth(run_line, load_api_fixtures):
+def test_auth_call_no_auth(run_line):
     """
     Runs get-identities with config set to be empty,
     confirms No Authentication CLI error.
     """
-    load_api_fixtures("all_authentication_failed.yaml")
+    load_response_set("cli.all_authentication_failed")
     result = run_line(
         "globus get-identities foo@globusid.org",
         assert_exit_code=1,
@@ -97,13 +98,13 @@ def test_auth_call(run_line, load_api_fixtures):
     assert user_id in result.output
 
 
-def test_transfer_call_no_auth(run_line, load_api_fixtures, go_ep1_id):
+def test_transfer_call_no_auth(run_line):
     """
     Runs ls with config set to be empty,
     confirms No Authentication CLI error.
     """
-    load_api_fixtures("all_authentication_failed.yaml")
-    result = run_line("globus ls " + go_ep1_id, assert_exit_code=1)
+    meta = load_response_set("cli.all_authentication_failed").metadata
+    result = run_line(["globus", "ls", meta["endpoint_id"]], assert_exit_code=1)
     assert "No Authentication provided." in result.stderr
 
 

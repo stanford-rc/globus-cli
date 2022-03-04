@@ -10,6 +10,7 @@ import globus_sdk
 import pytest
 import responses
 from click.testing import CliRunner
+from globus_sdk._testing import register_response_set
 from globus_sdk.tokenstorage import SQLiteAdapter
 from globus_sdk.transport import RequestsTransport
 from globus_sdk.utils import slash_join
@@ -331,6 +332,47 @@ def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id, t
         return data
 
     return func
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _register_all_response_sets():
+    fixture_dir = os.path.join(os.path.dirname(__file__), "files", "api_fixtures")
+
+    def do_register(filename):
+        with open(os.path.join(fixture_dir, filename)) as fp:
+            data = yaml.load(fp.read())
+
+        response_set = {}
+        response_set_metadata = {}
+        for service, routes in data.items():
+            if service == "metadata":
+                response_set_metadata = routes
+                continue
+
+            for idx, (path, method, params) in enumerate(_iter_fixture_routes(routes)):
+                if "query_params" in params:
+                    match = [
+                        responses.matchers.query_param_matcher(
+                            params.pop("query_params")
+                        )
+                    ]
+                    params["match"] = match
+                response_set[f"{method}_{service}_{path}_{idx}"] = {
+                    "service": service,
+                    "path": path,
+                    "method": method.upper(),
+                    **params,
+                }
+
+        scenario_name = filename.rsplit(".", 1)[0]
+        register_response_set(
+            f"cli.{scenario_name}", response_set, metadata=response_set_metadata
+        )
+
+    for filename in os.listdir(fixture_dir):
+        if not filename.endswith(".yaml"):
+            continue
+        do_register(filename)
 
 
 @pytest.fixture(autouse=True)
