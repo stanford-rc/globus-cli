@@ -2,6 +2,7 @@ metadata:
   endpoint_id: "1405823f-0597-4a16-b296-46d4f0ae4b15"
   gcp_endpoint_id: "06e2c959-d311-4bab-b2ea-25ad77d9fc12"
   share_id: "b379e973-f5c5-4501-8377-5a0ecf37a99b"
+  go_ep2_id: "ddb59af0-6d04-11e5-ba46-22000b92c6ec"
 
 transfer:
   - path: /endpoint
@@ -240,7 +241,7 @@ transfer:
           }
         ]
       }
-  - path: /endpoint/{GO_EP2_ID}
+  - path: /endpoint/ddb59af0-6d04-11e5-ba46-22000b92c6ec
     json:
       {
         "DATA": [

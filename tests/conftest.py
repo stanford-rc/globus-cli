@@ -3,7 +3,6 @@ import os
 import re
 import shlex
 import time
-import urllib.parse
 from unittest import mock
 
 import globus_sdk
@@ -35,11 +34,6 @@ def go_ep1_id():
 @pytest.fixture(scope="session")
 def go_ep2_id():
     return "ddb59af0-6d04-11e5-ba46-22000b92c6ec"
-
-
-@pytest.fixture(scope="session")
-def task_id():
-    return "549ef13c-600f-11eb-9608-0afa7b051b85"
 
 
 def _mock_token_response_data(rs_name, scope, token_blob=None):
@@ -250,7 +244,6 @@ def register_api_route(mocked_responses):
         method=responses.GET,
         adding_headers=None,
         replace=False,
-        match_querystring=False,
         **kwargs,
     ):
         base_url_map = {
@@ -274,7 +267,7 @@ def register_api_route(mocked_responses):
                 method,
                 full_url,
                 headers=adding_headers,
-                match_querystring=match_querystring,
+                match_querystring=None,
                 **kwargs,
             )
         else:
@@ -282,7 +275,7 @@ def register_api_route(mocked_responses):
                 method,
                 full_url,
                 headers=adding_headers,
-                match_querystring=match_querystring,
+                match_querystring=None,
                 **kwargs,
             )
 
@@ -300,7 +293,7 @@ def _iter_fixture_routes(routes):
 
 
 @pytest.fixture
-def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id, task_id):
+def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id):
     def func(filename):
         filename = os.path.join(test_file_dir, "api_fixtures", filename)
         with open(filename) as fp:
@@ -312,21 +305,20 @@ def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id, t
                 continue
 
             for path, method, params in _iter_fixture_routes(routes):
-                # allow /endpoint/{GO_EP1_ID} as a path
-                use_path = path.format(
-                    GO_EP1_ID=go_ep1_id, GO_EP2_ID=go_ep2_id, TASK_ID=task_id
-                )
                 if "query_params" in params:
-                    # copy and set match_querystring=True
-                    params = dict(match_querystring=True, **params)
-                    # remove and encode query params
-                    query_params = urllib.parse.urlencode(params.pop("query_params"))
-                    # modify path (assume no prior params)
-                    use_path = use_path + "?" + query_params
-                print(
-                    f"debug: register_api_route({service}, {use_path}, {method}, ...)"
-                )
-                register_api_route(service, use_path, method=method.upper(), **params)
+                    query_params = params.pop("query_params")
+                    # TODO: remove this int/float conversion after we upgrade to
+                    # `responses>=0.19.0` when this issue is expected to be fixed
+                    #   https://github.com/getsentry/responses/pull/485
+                    query_params = {
+                        k: str(v) if isinstance(v, (int, float)) else v
+                        for k, v in query_params.items()
+                    }
+                    params["match"] = [
+                        responses.matchers.query_param_matcher(query_params)
+                    ]
+                print(f"debug: register_api_route({service}, {path}, {method}, ...)")
+                register_api_route(service, path, method=method.upper(), **params)
 
         # after registration, return the raw fixture data
         return data
@@ -335,8 +327,8 @@ def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id, t
 
 
 @pytest.fixture(autouse=True, scope="session")
-def _register_all_response_sets():
-    fixture_dir = os.path.join(os.path.dirname(__file__), "files", "api_fixtures")
+def _register_all_response_sets(test_file_dir):
+    fixture_dir = os.path.join(test_file_dir, "api_fixtures")
 
     def do_register(filename):
         with open(os.path.join(fixture_dir, filename)) as fp:
