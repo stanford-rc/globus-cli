@@ -47,11 +47,11 @@ def test_invalid_command(run_line):
     assert "Error: No such command" in result.stderr
 
 
-def test_whoami(run_line, load_api_fixtures):
+def test_whoami(run_line):
     """
     Runs whoami to confirm test config successfully setup
     """
-    load_api_fixtures("foo_user_info.yaml")
+    load_response_set("cli.foo_user_info")
     result = run_line("globus whoami")
     assert result.output == "foo@globusid.org\n"
 
@@ -65,11 +65,11 @@ def test_whoami_no_auth(run_line):
     assert "Unable to get user information" in result.stderr
 
 
-def test_json_raw_string_output(run_line, load_api_fixtures):
+def test_json_raw_string_output(run_line):
     """
     Get single-field jmespath output and make sure it's quoted
     """
-    load_api_fixtures("foo_user_info.yaml")
+    load_response_set("cli.foo_user_info")
     result = run_line("globus whoami --jmespath name")
     assert '"Foo McUser"\n' == result.output
 
@@ -87,13 +87,13 @@ def test_auth_call_no_auth(run_line):
     assert "No Authentication provided." in result.stderr
 
 
-def test_auth_call(run_line, load_api_fixtures):
+def test_auth_call(run_line):
     """
     Runs get-identities using test auth refresh token to confirm
     test auth refresh token is live and configured correctly
     """
-    data = load_api_fixtures("foo_user_info.yaml")
-    user_id = data["metadata"]["user_id"]
+    meta = load_response_set("cli.foo_user_info").metadata
+    user_id = meta["user_id"]
     result = run_line("globus get-identities foo@globusid.org")
     assert user_id in result.output
 
@@ -108,12 +108,12 @@ def test_transfer_call_no_auth(run_line):
     assert "No Authentication provided." in result.stderr
 
 
-def test_transfer_call(run_line, load_api_fixtures, register_api_route, go_ep1_id):
+def test_transfer_call(run_line, register_api_route, go_ep1_id):
     """
     Runs ls using test transfer refresh token to confirm
     test transfer refresh token is live and configured correctly
     """
-    load_api_fixtures("transfer_activate_success.yaml")
+    load_response_set("cli.transfer_activate_success")
     register_api_route(
         "transfer",
         f"/operation/endpoint/{go_ep1_id}/ls",
@@ -144,13 +144,13 @@ def test_transfer_call(run_line, load_api_fixtures, register_api_route, go_ep1_i
     assert "home/" in result.output
 
 
-def test_transfer_batch_stdin_dryrun(run_line, load_api_fixtures, go_ep1_id, go_ep2_id):
+def test_transfer_batch_stdin_dryrun(run_line, go_ep1_id, go_ep2_id):
     """
     Dry-runs a transfer in batchmode, confirms batchmode inputs received
     """
     # put a submission ID and autoactivate response in place
-    load_api_fixtures("get_submission_id.yaml")
-    load_api_fixtures("transfer_activate_success.yaml")
+    load_response_set("cli.get_submission_id")
+    load_response_set("cli.transfer_activate_success")
 
     batch_input = "abc /def\n/xyz p/q/r\n"
     result = run_line(
@@ -162,12 +162,10 @@ def test_transfer_batch_stdin_dryrun(run_line, load_api_fixtures, go_ep1_id, go_
         assert f'"destination_path": "{dst}"' in result.output
 
 
-def test_transfer_batch_file_dryrun(
-    run_line, load_api_fixtures, go_ep1_id, go_ep2_id, tmp_path
-):
+def test_transfer_batch_file_dryrun(run_line, go_ep1_id, go_ep2_id, tmp_path):
     # put a submission ID and autoactivate response in place
-    load_api_fixtures("get_submission_id.yaml")
-    load_api_fixtures("transfer_activate_success.yaml")
+    load_response_set("cli.get_submission_id")
+    load_response_set("cli.transfer_activate_success")
     temp = tmp_path / "batch"
     temp.write_text("abc /def\n/xyz p/q/r\n")
     result = run_line(
@@ -188,13 +186,13 @@ def test_transfer_batch_file_dryrun(
         assert f'"destination_path": "{dst}"' in result.output
 
 
-def test_delete_batchmode_dryrun(run_line, load_api_fixtures, go_ep1_id):
+def test_delete_batchmode_dryrun(run_line, go_ep1_id):
     """
     Dry-runs a delete in batchmode
     """
     # put a submission ID and autoactivate response in place
-    load_api_fixtures("get_submission_id.yaml")
-    load_api_fixtures("transfer_activate_success.yaml")
+    load_response_set("cli.get_submission_id")
+    load_response_set("cli.transfer_activate_success")
 
     batch_input = "abc/def\n/xyz\nabcdef\nabc/def/../xyz\n"
     result = run_line(

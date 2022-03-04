@@ -3,6 +3,7 @@ from unittest import mock
 
 import globus_sdk
 from globus_sdk import NativeAppAuthClient
+from globus_sdk._testing import load_response_set
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.login_manager.auth_flows import (
@@ -49,7 +50,6 @@ class MockToken:
 def test_login_gcs_different_identity(
     monkeypatch,
     run_line,
-    load_api_fixtures,
     mock_remote_session,
     mock_local_server_flow,
     mock_login_token_response,
@@ -60,7 +60,7 @@ def test_login_gcs_different_identity(
     identity is prevented. The user is instructed to logout, which should correctly
     remove the `sub` in config storage (which is what originally raises that error).
     """
-    load_api_fixtures("user_info_logout.yaml")
+    load_response_set("cli.user_info_logout")
     test_token_storage.store_config(
         _STORE_CONFIG_USERINFO, {"sub": str(uuid.UUID(int=0))}
     )

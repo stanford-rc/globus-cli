@@ -1,24 +1,26 @@
 import json
 
+from globus_sdk._testing import load_response_set
 
-def test_default_one_id(run_line, load_api_fixtures):
+
+def test_default_one_id(run_line):
     """
     Runs get-identities with one id, confirms correct username returned
     """
-    data = load_api_fixtures("foo_user_info.yaml")
-    user_id = data["metadata"]["user_id"]
-    username = data["metadata"]["username"]
+    meta = load_response_set("cli.foo_user_info").metadata
+    user_id = meta["user_id"]
+    username = meta["username"]
     result = run_line(f"globus get-identities {user_id}")
     assert username + "\n" == result.output
 
 
-def test_defualt_one_username(run_line, load_api_fixtures):
+def test_default_one_username(run_line):
     """
     Runs get-identities with one username, confirms correct id returned
     """
-    data = load_api_fixtures("foo_user_info.yaml")
-    user_id = data["metadata"]["user_id"]
-    username = data["metadata"]["username"]
+    meta = load_response_set("cli.foo_user_info").metadata
+    user_id = meta["user_id"]
+    username = meta["username"]
     result = run_line("globus get-identities " + username)
     assert user_id + "\n" == result.output
 
@@ -38,13 +40,13 @@ def test_invalid_username(run_line, register_api_route):
     assert "'invalid' does not appear to be a valid identity" in result.stderr
 
 
-def test_default_multiple_inputs(run_line, load_api_fixtures):
+def test_default_multiple_inputs(run_line):
     """
     Runs get-identities with id username, duplicate and invalid inputs
     Confirms order is preserved and all values are as expected
     """
-    data = load_api_fixtures("multiuser_get_identities.yaml")
-    users = data["metadata"]["users"]
+    meta = load_response_set("cli.multiuser_get_identities").metadata
+    users = meta["users"]
     in_vals = [
         users[0]["username"],
         users[0]["user_id"],
@@ -65,24 +67,24 @@ def test_default_multiple_inputs(run_line, load_api_fixtures):
     assert "\n".join(expected) + "\n" == result.output
 
 
-def test_verbose(run_line, load_api_fixtures):
+def test_verbose(run_line):
     """
     Runs get-identities with --verbose, confirms expected fields found
     """
-    data = load_api_fixtures("foo_user_info.yaml")
-    user_id = data["metadata"]["user_id"]
+    meta = load_response_set("cli.foo_user_info").metadata
+    user_id = meta["user_id"]
     result = run_line("globus get-identities --verbose " + user_id)
     for key in ["username", "user_id", "name", "organization", "email"]:
-        assert data["metadata"][key] in result.output
+        assert meta[key] in result.output
 
 
-def test_json(run_line, load_api_fixtures):
+def test_json(run_line):
     """
     Runs get-identities with -F json confirms expected values
     """
-    data = load_api_fixtures("foo_user_info.yaml")
-    user_id = data["metadata"]["user_id"]
+    meta = load_response_set("cli.foo_user_info").metadata
+    user_id = meta["user_id"]
     output = json.loads(run_line("globus get-identities -F json " + user_id).output)
-    assert data["metadata"]["user_id"] == output["identities"][0]["id"]
+    assert meta["user_id"] == output["identities"][0]["id"]
     for key in ["username", "name", "organization", "email"]:
-        assert data["metadata"][key] == output["identities"][0][key]
+        assert meta[key] == output["identities"][0][key]

@@ -3,17 +3,18 @@ import uuid
 
 import pytest
 import responses
+from globus_sdk._testing import load_response_set
 
 DUMMY_ID1 = str(uuid.UUID(int=1))
 DUMMY_ID2 = str(uuid.UUID(int=2))
 
 
 @pytest.mark.parametrize("provision", [True, False])
-def test_permission_create_identity_name(run_line, load_api_fixtures, provision):
-    data = load_api_fixtures("endpoint_acl_operations.yaml")
-    user_id = data["metadata"]["user_id"]
-    username = data["metadata"]["username"]
-    ep = data["metadata"]["endpoint_id"]
+def test_permission_create_identity_name(run_line, provision):
+    meta = load_response_set("cli.endpoint_acl_operations").metadata
+    user_id = meta["user_id"]
+    username = meta["username"]
+    ep = meta["endpoint_id"]
 
     result = run_line(
         [
@@ -35,10 +36,10 @@ def test_permission_create_identity_name(run_line, load_api_fixtures, provision)
     assert "Access rule created successfully." in result.stdout
 
 
-def test_permission_create_identity_id(run_line, load_api_fixtures):
-    data = load_api_fixtures("endpoint_acl_operations.yaml")
-    user_id = data["metadata"]["user_id"]
-    ep = data["metadata"]["endpoint_id"]
+def test_permission_create_identity_id(run_line):
+    meta = load_response_set("cli.endpoint_acl_operations").metadata
+    user_id = meta["user_id"]
+    ep = meta["endpoint_id"]
 
     result = run_line(
         [

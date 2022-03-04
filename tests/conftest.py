@@ -292,39 +292,6 @@ def _iter_fixture_routes(routes):
         yield path, method, params
 
 
-@pytest.fixture
-def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id):
-    def func(filename):
-        filename = os.path.join(test_file_dir, "api_fixtures", filename)
-        with open(filename) as fp:
-            data = yaml.load(fp.read())
-        for service, routes in data.items():
-            # allow use of the key "metadata" to expose extra data from a fixture file
-            # to the user of it
-            if service == "metadata":
-                continue
-
-            for path, method, params in _iter_fixture_routes(routes):
-                if "query_params" in params:
-                    # TODO: remove this int/float conversion after we upgrade to
-                    # `responses>=0.19.0` when this issue is expected to be fixed
-                    #   https://github.com/getsentry/responses/pull/485
-                    query_params = {
-                        k: str(v) if isinstance(v, (int, float)) else v
-                        for k, v in params.pop("query_params").items()
-                    }
-                    params["match"] = [
-                        responses.matchers.query_param_matcher(query_params)
-                    ]
-                print(f"debug: register_api_route({service}, {path}, {method}, ...)")
-                register_api_route(service, path, method=method.upper(), **params)
-
-        # after registration, return the raw fixture data
-        return data
-
-    return func
-
-
 @pytest.fixture(autouse=True, scope="session")
 def _register_all_response_sets(test_file_dir):
     fixture_dir = os.path.join(test_file_dir, "api_fixtures")

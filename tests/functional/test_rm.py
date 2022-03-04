@@ -2,6 +2,7 @@ import json
 
 import pytest
 import responses
+from globus_sdk._testing import load_response_set
 
 
 @pytest.fixture
@@ -38,27 +39,27 @@ def _load_probably_json_substring(x):
     return json.loads(x[x.index("{") : x.rindex("}") + 1])
 
 
-def test_recursive(run_line, load_api_fixtures, go_ep1_id):
+def test_recursive(run_line, go_ep1_id):
     """
     Makes a dir on ep1, then --recursive rm's it.
     Confirms delete task was successful.
     """
-    load_api_fixtures("transfer_activate_success.yaml")
-    load_api_fixtures("get_submission_id.yaml")
-    load_api_fixtures("submit_delete_success.yaml")
+    load_response_set("cli.transfer_activate_success")
+    load_response_set("cli.get_submission_id")
+    load_response_set("cli.submit_delete_success")
 
     result = run_line(f"globus rm -r -F json {go_ep1_id}:/foo")
     res = _load_probably_json_substring(result.output)
     assert res["status"] == "SUCCEEDED"
 
 
-def test_no_file(run_line, load_api_fixtures, go_ep1_id):
+def test_no_file(run_line, go_ep1_id):
     """
     Attempts to remove a non-existent file. Confirms exit code 1
     """
-    load_api_fixtures("transfer_activate_success.yaml")
-    load_api_fixtures("get_submission_id.yaml")
-    load_api_fixtures("submit_delete_failed.yaml")
+    load_response_set("cli.transfer_activate_success")
+    load_response_set("cli.get_submission_id")
+    load_response_set("cli.submit_delete_failed")
 
     run_line(f"globus rm {go_ep1_id}:/nosuchfile.txt", assert_exit_code=1)
 
@@ -68,14 +69,14 @@ def test_no_file(run_line, load_api_fixtures, go_ep1_id):
     assert sent_data["ignore_missing"] is False
 
 
-def test_ignore_missing(run_line, load_api_fixtures, go_ep1_id):
+def test_ignore_missing(run_line, go_ep1_id):
     """
     Attempts to remove a non-existant file path, with --ignore-missing.
     Confirms exit code 0 and silent output.
     """
-    load_api_fixtures("transfer_activate_success.yaml")
-    load_api_fixtures("get_submission_id.yaml")
-    load_api_fixtures("submit_delete_success.yaml")
+    load_response_set("cli.transfer_activate_success")
+    load_response_set("cli.get_submission_id")
+    load_response_set("cli.submit_delete_success")
 
     path = "/~/nofilehere.txt"
     result = run_line(f"globus rm -f {go_ep1_id}:{path}")
@@ -86,13 +87,13 @@ def test_ignore_missing(run_line, load_api_fixtures, go_ep1_id):
     assert sent_data["ignore_missing"] is True
 
 
-def test_timeout(run_line, load_api_fixtures, patch_sleep, go_ep1_id):
+def test_timeout(run_line, patch_sleep, go_ep1_id):
     """
     If a task is retrying without success, `rm` should wait and eventually time out.
     """
-    load_api_fixtures("transfer_activate_success.yaml")
-    load_api_fixtures("get_submission_id.yaml")
-    load_api_fixtures("submit_delete_queued.yaml")
+    load_response_set("cli.transfer_activate_success")
+    load_response_set("cli.get_submission_id")
+    load_response_set("cli.submit_delete_queued")
 
     result = run_line(
         f"globus rm -r --timeout 2 {go_ep1_id}:/foo/bar.txt",
@@ -101,15 +102,15 @@ def test_timeout(run_line, load_api_fixtures, patch_sleep, go_ep1_id):
     assert "Task has yet to complete after 2 seconds" in result.stderr
 
 
-def test_timeout_explicit_status(run_line, load_api_fixtures, patch_sleep, go_ep1_id):
+def test_timeout_explicit_status(run_line, patch_sleep, go_ep1_id):
     """
     As above, submit a task which sits queued and times out.
     Confirms rm exits STATUS after given timeout, where
     STATUS is set via the --timeout-exit-code opt
     """
-    load_api_fixtures("transfer_activate_success.yaml")
-    load_api_fixtures("get_submission_id.yaml")
-    load_api_fixtures("submit_delete_queued.yaml")
+    load_response_set("cli.transfer_activate_success")
+    load_response_set("cli.get_submission_id")
+    load_response_set("cli.submit_delete_queued")
 
     status = 50
     result = run_line(

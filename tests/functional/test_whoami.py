@@ -14,7 +14,7 @@ def test_verbose(run_line):
         assert meta[field] in result.output
 
 
-def test_linked_identities(run_line, load_api_fixtures):
+def test_linked_identities(run_line):
     """
     Confirms --linked-identities sees foo2
     """
@@ -28,7 +28,7 @@ def test_linked_identities(run_line, load_api_fixtures):
         assert n in result.output
 
 
-def test_verbose_linked_identities(run_line, load_api_fixtures):
+def test_verbose_linked_identities(run_line):
     """
     Confirms combining --verbose and --linked-identities has expected
     values present for the whole identity set.
