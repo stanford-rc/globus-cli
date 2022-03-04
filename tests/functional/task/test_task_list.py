@@ -1,8 +1,9 @@
 import responses
+from globus_sdk._testing import load_response_set
 
 
-def test_task_list_success(run_line, load_api_fixtures):
-    load_api_fixtures("task_list.yaml")
+def test_task_list_success(run_line):
+    load_response_set("cli.task_list")
     result = run_line("globus task list")
     assert "SUCCEEDED" in result.output
     assert "TRANSFER" in result.output

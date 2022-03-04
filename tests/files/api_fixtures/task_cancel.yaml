@@ -1,3 +1,6 @@
+metadata:
+  task_id: 42277910-0c18-11ec-ba76-138ac5bdb19f
+
 transfer:
   - path: /task_list
     json:

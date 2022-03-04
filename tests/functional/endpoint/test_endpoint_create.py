@@ -3,14 +3,15 @@ import re
 
 import pytest
 import responses
+from globus_sdk._testing import load_response_set
 
 
-def test_gcp_creation(run_line, load_api_fixtures):
+def test_gcp_creation(run_line):
     """
     Runs endpoint create with --personal
     Confirms personal endpoint is created successfully
     """
-    load_api_fixtures("gcp_create.yaml")
+    load_response_set("cli.gcp_create")
     result = run_line("globus endpoint create --personal personal_create -F json")
     res = json.loads(result.output)
     assert res["DATA_TYPE"] == "endpoint_create_result"
@@ -18,13 +19,13 @@ def test_gcp_creation(run_line, load_api_fixtures):
     assert "id" in res
 
 
-def test_shared_creation(run_line, load_api_fixtures, go_ep1_id):
+def test_shared_creation(run_line, go_ep1_id):
     """
     Runs endpoint create with --shared and a host path
     Confirms shared endpoint is created successfully
     """
-    load_api_fixtures("transfer_activate_success.yaml")
-    load_api_fixtures("endpoint_operations.yaml")
+    load_response_set("cli.transfer_activate_success")
+    load_response_set("cli.endpoint_operations")
     result = run_line(
         "globus endpoint create share_create "
         "-F json --shared {}:/~/".format(go_ep1_id)
@@ -36,12 +37,12 @@ def test_shared_creation(run_line, load_api_fixtures, go_ep1_id):
     assert "id" in res
 
 
-def test_gcs_creation(run_line, load_api_fixtures):
+def test_gcs_creation(run_line):
     """
     Runs endpoint create with --server
     Confirms endpoint is created successfully
     """
-    load_api_fixtures("endpoint_operations.yaml")
+    load_response_set("cli.endpoint_operations")
     result = run_line("globus endpoint create gcs_create --server -F json")
     res = json.loads(result.output)
     assert res["DATA_TYPE"] == "endpoint_create_result"
@@ -51,20 +52,20 @@ def test_gcs_creation(run_line, load_api_fixtures):
 
 
 @pytest.mark.parametrize("ep_type", ["personal", "server"])
-def test_text_ouptut(run_line, load_api_fixtures, ep_type):
+def test_text_ouptut(run_line, ep_type):
     """
     Creates GCP and GCS endpoint
     Confirms (non)presence of setup key in text output
     """
     if ep_type == "personal":
         opt = "--personal"
-        data = load_api_fixtures("gcp_create.yaml")
-        ep_id = data["metadata"]["endpoint_id"]
-        setup_key = data["metadata"]["setup_key"]
+        meta = load_response_set("cli.gcp_create").metadata
+        ep_id = meta["endpoint_id"]
+        setup_key = meta["setup_key"]
     else:
         opt = "--server"
-        data = load_api_fixtures("endpoint_operations.yaml")
-        ep_id = data["metadata"]["endpoint_id"]
+        meta = load_response_set("cli.endpoint_operations").metadata
+        ep_id = meta["endpoint_id"]
         setup_key = None
 
     result = run_line(f"globus endpoint create gcp_text {opt}")
@@ -86,17 +87,17 @@ def test_text_ouptut(run_line, load_api_fixtures, ep_type):
         ("server", ("--server",)),
     ],
 )
-def test_general_options(run_line, load_api_fixtures, ep_type, type_opts, go_ep1_id):
+def test_general_options(run_line, ep_type, type_opts, go_ep1_id):
     """
     Creates a shared, personal, and server endpoints using options
     available for all endpoint types. Confirms expected values through SDK
     """
     if ep_type == "personal":
-        load_api_fixtures("gcp_create.yaml")
+        load_response_set("cli.gcp_create")
     else:
-        load_api_fixtures("endpoint_operations.yaml")
+        load_response_set("cli.endpoint_operations")
     if ep_type == "share":
-        load_api_fixtures("transfer_activate_success.yaml")
+        load_response_set("cli.transfer_activate_success")
 
     # options with option value and expected value
     # if expected value is not set, it will be copied from the option value

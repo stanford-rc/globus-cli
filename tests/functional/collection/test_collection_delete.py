@@ -1,27 +1,30 @@
-def test_guest_collection_delete(run_line, load_api_fixtures, add_gcs_login):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["endpoint_id"]
-    cid = data["metadata"]["guest_collection_id"]
+from globus_sdk._testing import load_response_set
+
+
+def test_guest_collection_delete(run_line, add_gcs_login):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["endpoint_id"]
+    cid = meta["guest_collection_id"]
     add_gcs_login(epid)
 
     result = run_line(f"globus collection delete {cid}")
     assert "success" in result.output
 
 
-def test_mapped_collection_delete(run_line, load_api_fixtures, add_gcs_login):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["endpoint_id"]
-    cid = data["metadata"]["mapped_collection_id"]
+def test_mapped_collection_delete(run_line, add_gcs_login):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["endpoint_id"]
+    cid = meta["mapped_collection_id"]
     add_gcs_login(epid)
 
     result = run_line(f"globus collection delete {cid}")
     assert "success" in result.output
 
 
-def test_collection_delete_missing_login(run_line, load_api_fixtures):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["endpoint_id"]
-    cid = data["metadata"]["guest_collection_id"]
+def test_collection_delete_missing_login(run_line):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["endpoint_id"]
+    cid = meta["guest_collection_id"]
 
     result = run_line(f"globus collection delete {cid}", assert_exit_code=4)
     assert "success" not in result.output
@@ -29,9 +32,9 @@ def test_collection_delete_missing_login(run_line, load_api_fixtures):
     assert f"  globus login --gcs {epid}" in result.stderr
 
 
-def test_collection_delete_on_gcsv5_host(run_line, load_api_fixtures):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["endpoint_id"]
+def test_collection_delete_on_gcsv5_host(run_line):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["endpoint_id"]
 
     result = run_line(f"globus collection delete {epid}", assert_exit_code=3)
     assert "success" not in result.output
@@ -42,9 +45,9 @@ def test_collection_delete_on_gcsv5_host(run_line, load_api_fixtures):
     assert "This operation is not supported on objects of this type." in result.stderr
 
 
-def test_collection_delete_on_gcp(run_line, load_api_fixtures):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["gcp_endpoint_id"]
+def test_collection_delete_on_gcp(run_line):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["gcp_endpoint_id"]
 
     result = run_line(f"globus collection delete {epid}", assert_exit_code=3)
     assert "success" not in result.output
