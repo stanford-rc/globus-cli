@@ -1,12 +1,14 @@
 import json
 
+from globus_sdk._testing import load_response_set
 
-def test_bookmark_create(run_line, load_api_fixtures, go_ep1_id):
+
+def test_bookmark_create(run_line, go_ep1_id):
     """
     Runs bookmark create, confirms simple things about text and json output
     """
-    data = load_api_fixtures("bookmark_operations.yaml")
-    bookmark_id = data["metadata"]["bookmark_id"]
+    meta = load_response_set("cli.bookmark_operations").metadata
+    bookmark_id = meta["bookmark_id"]
     result = run_line(f"globus bookmark create {go_ep1_id}:/share/ sharebm")
     assert f"Bookmark ID: {bookmark_id}" in result.output
 
@@ -20,14 +22,14 @@ def test_bookmark_create(run_line, load_api_fixtures, go_ep1_id):
     assert json_output["endpoint_id"] == go_ep1_id
 
 
-def test_bookmark_show(run_line, load_api_fixtures, go_ep1_id):
+def test_bookmark_show(run_line, go_ep1_id):
     """
     Runs bookmark show on bm1's name and id.
     Confirms both inputs work, and verbose output is as expected.
     """
-    data = load_api_fixtures("bookmark_operations.yaml")
-    bookmark_id = data["metadata"]["bookmark_id"]
-    bookmark_name = data["metadata"]["bookmark_name"]
+    meta = load_response_set("cli.bookmark_operations").metadata
+    bookmark_id = meta["bookmark_id"]
+    bookmark_name = meta["bookmark_name"]
 
     # id
     result = run_line(f'globus bookmark show "{bookmark_id}"')
@@ -42,13 +44,13 @@ def test_bookmark_show(run_line, load_api_fixtures, go_ep1_id):
     assert f"Endpoint ID: {go_ep1_id}" in result.output
 
 
-def test_bookmark_rename_by_id(run_line, load_api_fixtures):
+def test_bookmark_rename_by_id(run_line):
     """
     Runs bookmark rename on bm1's id.
     """
-    data = load_api_fixtures("bookmark_operations.yaml")
-    bookmark_id = data["metadata"]["bookmark_id"]
-    updated_bookmark_name = data["metadata"]["bookmark_name_after_update"]
+    meta = load_response_set("cli.bookmark_operations").metadata
+    bookmark_id = meta["bookmark_id"]
+    updated_bookmark_name = meta["bookmark_name_after_update"]
 
     result = run_line(
         f'globus bookmark rename "{bookmark_id}" "{updated_bookmark_name}"'
@@ -56,13 +58,13 @@ def test_bookmark_rename_by_id(run_line, load_api_fixtures):
     assert "Success" in result.output
 
 
-def test_bookmark_rename_by_name(run_line, load_api_fixtures):
+def test_bookmark_rename_by_name(run_line):
     """
     Runs bookmark rename on bm1's name. Confirms can be shown by new name.
     """
-    data = load_api_fixtures("bookmark_operations.yaml")
-    bookmark_name = data["metadata"]["bookmark_name"]
-    updated_bookmark_name = data["metadata"]["bookmark_name_after_update"]
+    meta = load_response_set("cli.bookmark_operations").metadata
+    bookmark_name = meta["bookmark_name"]
+    updated_bookmark_name = meta["bookmark_name_after_update"]
 
     result = run_line(
         f'globus bookmark rename "{bookmark_name}" "{updated_bookmark_name}"'
@@ -70,29 +72,29 @@ def test_bookmark_rename_by_name(run_line, load_api_fixtures):
     assert "Success" in result.output
 
 
-def test_bookmark_delete_by_id(run_line, load_api_fixtures):
+def test_bookmark_delete_by_id(run_line):
     """
     Runs bookmark delete on bm1's id. Confirms success message.
     """
-    data = load_api_fixtures("bookmark_operations.yaml")
-    bookmark_id = data["metadata"]["bookmark_id"]
+    meta = load_response_set("cli.bookmark_operations").metadata
+    bookmark_id = meta["bookmark_id"]
     result = run_line(f'globus bookmark delete "{bookmark_id}"')
     assert "deleted successfully" in result.output
 
 
-def test_bookmark_delete_by_name(run_line, load_api_fixtures):
+def test_bookmark_delete_by_name(run_line):
     """
     Runs bookmark delete on bm1's name. Confirms success message.
     """
-    data = load_api_fixtures("bookmark_operations.yaml")
-    bookmark_name = data["metadata"]["bookmark_name"]
+    meta = load_response_set("cli.bookmark_operations").metadata
+    bookmark_name = meta["bookmark_name"]
     result = run_line(f'globus bookmark delete "{bookmark_name}"')
     assert "deleted successfully" in result.output
 
 
-def test_bookmark_list(run_line, load_api_fixtures):
-    data = load_api_fixtures("bookmark_list.yaml")
-    bookmarks = data["metadata"]["bookmarks"]
+def test_bookmark_list(run_line):
+    meta = load_response_set("cli.bookmark_list").metadata
+    bookmarks = meta["bookmarks"]
 
     result = run_line("globus bookmark list")
     for bm_id in bookmarks.keys():
@@ -112,7 +114,7 @@ def test_bookmark_list(run_line, load_api_fixtures):
             break
 
 
-def test_bookmark_list_failure(run_line, load_api_fixtures):
-    load_api_fixtures("bookmark_list_failure.yaml")
+def test_bookmark_list_failure(run_line):
+    load_response_set("cli.bookmark_list_failure")
     result = run_line("globus bookmark list", assert_exit_code=1)
     assert "InternalError" in result.stderr

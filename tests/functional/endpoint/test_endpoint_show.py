@@ -1,16 +1,17 @@
 import pytest
+from globus_sdk._testing import load_response_set
 
 
 @pytest.mark.parametrize("ep_type", ["personal", "share", "server"])
-def test_show_works(run_line, load_api_fixtures, ep_type):
+def test_show_works(run_line, ep_type):
     """make sure it doesn't blow up"""
-    data = load_api_fixtures("endpoint_operations.yaml")
+    meta = load_response_set("cli.endpoint_operations").metadata
     if ep_type == "personal":
-        epid = data["metadata"]["gcp_endpoint_id"]
+        epid = meta["gcp_endpoint_id"]
     elif ep_type == "share":
-        epid = data["metadata"]["share_id"]
+        epid = meta["share_id"]
     else:
-        epid = data["metadata"]["endpoint_id"]
+        epid = meta["endpoint_id"]
 
     result = run_line(f"globus endpoint show {epid}")
 
@@ -18,9 +19,9 @@ def test_show_works(run_line, load_api_fixtures, ep_type):
     assert epid in result.output
 
 
-def test_show_long_description(run_line, load_api_fixtures):
-    data = load_api_fixtures("endpoint_with_long_description.yaml")
-    epid = data["metadata"]["endpoint_id"]
+def test_show_long_description(run_line):
+    meta = load_response_set("cli.endpoint_with_long_description").metadata
+    epid = meta["endpoint_id"]
 
     result = run_line(f"globus endpoint show {epid}")
 
@@ -34,18 +35,18 @@ def test_show_long_description(run_line, load_api_fixtures):
 
 # confirm that this *does not* error:
 # showing a GCSv5 host needs to be supported for show (unlike update, delete, etc)
-def test_show_on_gcsv5_endpoint(run_line, load_api_fixtures):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["endpoint_id"]
+def test_show_on_gcsv5_endpoint(run_line):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["endpoint_id"]
 
     result = run_line(f"globus endpoint show {epid}")
     assert "Display Name:" in result.output
     assert epid in result.output
 
 
-def test_show_on_gcsv5_collection(run_line, load_api_fixtures):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["mapped_collection_id"]
+def test_show_on_gcsv5_collection(run_line):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["mapped_collection_id"]
 
     result = run_line(f"globus endpoint show {epid}", assert_exit_code=3)
     assert (
@@ -58,9 +59,9 @@ def test_show_on_gcsv5_collection(run_line, load_api_fixtures):
     ) in result.stderr
 
 
-def test_show_on_gcsv5_collection_skip_check(run_line, load_api_fixtures):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["mapped_collection_id"]
+def test_show_on_gcsv5_collection_skip_check(run_line):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["mapped_collection_id"]
 
     result = run_line(f"globus endpoint show --skip-endpoint-type-check {epid}")
     assert "Display Name:" in result.output

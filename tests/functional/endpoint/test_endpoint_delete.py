@@ -1,9 +1,11 @@
 import json
 
+from globus_sdk._testing import load_response_set
 
-def test_simple_deletion(run_line, load_api_fixtures):
-    data = load_api_fixtures("endpoint_operations.yaml")
-    epid = data["metadata"]["endpoint_id"]
+
+def test_simple_deletion(run_line):
+    meta = load_response_set("cli.endpoint_operations").metadata
+    epid = meta["endpoint_id"]
     result = run_line(f"globus endpoint delete {epid} -F json")
 
     res = json.loads(result.output)
@@ -12,9 +14,9 @@ def test_simple_deletion(run_line, load_api_fixtures):
     assert res["message"] == "Endpoint deleted successfully"
 
 
-def test_delete_gcs_guest_collection(run_line, load_api_fixtures):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["guest_collection_id"]
+def test_delete_gcs_guest_collection(run_line):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["guest_collection_id"]
     result = run_line(f"globus endpoint delete {epid}", assert_exit_code=3)
 
     assert "success" not in result.output
@@ -28,9 +30,9 @@ def test_delete_gcs_guest_collection(run_line, load_api_fixtures):
     ) in result.stderr
 
 
-def test_delete_gcs_mapped_collection(run_line, load_api_fixtures):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["mapped_collection_id"]
+def test_delete_gcs_mapped_collection(run_line):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["mapped_collection_id"]
     result = run_line(f"globus endpoint delete {epid}", assert_exit_code=3)
 
     assert "success" not in result.output
@@ -44,9 +46,9 @@ def test_delete_gcs_mapped_collection(run_line, load_api_fixtures):
     ) in result.stderr
 
 
-def test_delete_gcsv5_endpoint(run_line, load_api_fixtures):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["endpoint_id"]
+def test_delete_gcsv5_endpoint(run_line):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["endpoint_id"]
     result = run_line(f"globus endpoint delete {epid}", assert_exit_code=3)
 
     assert "success" not in result.output

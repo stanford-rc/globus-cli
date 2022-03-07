@@ -1,10 +1,11 @@
 import pytest
 import responses
+from globus_sdk._testing import load_response_set
 
 
-def test_collection_list(run_line, load_api_fixtures, add_gcs_login):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["endpoint_id"]
+def test_collection_list(run_line, add_gcs_login):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["endpoint_id"]
     add_gcs_login(epid)
     result = run_line(f"globus collection list {epid}")
     collection_names = ["Happy Fun Collection Name 1", "Happy Fun Collection Name 2"]
@@ -12,20 +13,20 @@ def test_collection_list(run_line, load_api_fixtures, add_gcs_login):
         assert name in result.stdout
 
 
-def test_collection_list_opts(run_line, load_api_fixtures, add_gcs_login):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["endpoint_id"]
+def test_collection_list_opts(run_line, add_gcs_login):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["endpoint_id"]
     add_gcs_login(epid)
-    cid = data["metadata"]["mapped_collection_id"]
+    cid = meta["mapped_collection_id"]
     run_line(f"globus collection list --mapped-collection-id {cid} {epid}")
     assert responses.calls[-1].request.params["mapped_collection_id"] == cid
     run_line(f"globus collection list --include-private-policies {epid}")
     assert responses.calls[-1].request.params["include"] == "private_policies"
 
 
-def test_collection_list_on_gcp(run_line, load_api_fixtures):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["gcp_endpoint_id"]
+def test_collection_list_on_gcp(run_line):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["gcp_endpoint_id"]
 
     result = run_line(f"globus collection list {epid}", assert_exit_code=3)
     assert "success" not in result.output
@@ -36,9 +37,9 @@ def test_collection_list_on_gcp(run_line, load_api_fixtures):
     assert "This operation is not supported on objects of this type." in result.stderr
 
 
-def test_collection_list_on_mapped_collection(run_line, load_api_fixtures):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["mapped_collection_id"]
+def test_collection_list_on_mapped_collection(run_line):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["mapped_collection_id"]
 
     result = run_line(f"globus collection list {epid}", assert_exit_code=3)
     assert "success" not in result.output
@@ -61,11 +62,9 @@ def test_collection_list_on_mapped_collection(run_line, load_api_fixtures):
         ["mapped-collections", "managed-by_me", "created-by-me"],
     ],
 )
-def test_collection_list_filters(
-    run_line, load_api_fixtures, add_gcs_login, filter_val
-):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["endpoint_id"]
+def test_collection_list_filters(run_line, add_gcs_login, filter_val):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["endpoint_id"]
     add_gcs_login(epid)
     if not isinstance(filter_val, list):
         filter_val = [filter_val]

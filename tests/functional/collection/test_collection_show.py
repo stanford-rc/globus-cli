@@ -1,11 +1,12 @@
 import pytest
+from globus_sdk._testing import load_response_set
 
 
-def test_collection_show(run_line, load_api_fixtures, add_gcs_login):
-    data = load_api_fixtures("collection_operations.yaml")
-    cid = data["metadata"]["mapped_collection_id"]
-    username = data["metadata"]["username"]
-    epid = data["metadata"]["endpoint_id"]
+def test_collection_show(run_line, add_gcs_login):
+    meta = load_response_set("cli.collection_operations").metadata
+    cid = meta["mapped_collection_id"]
+    username = meta["username"]
+    epid = meta["endpoint_id"]
     add_gcs_login(epid)
 
     _result, matcher = run_line(f"globus collection show {cid}", matcher=True)
@@ -17,11 +18,11 @@ def test_collection_show(run_line, load_api_fixtures, add_gcs_login):
     matcher.check(r"^Connector:\s+(.*)$", groups=["POSIX"])
 
 
-def test_collection_show_private_policies(run_line, load_api_fixtures, add_gcs_login):
-    data = load_api_fixtures("collection_show_private_policies.yaml")
-    cid = data["metadata"]["collection_id"]
-    username = data["metadata"]["username"]
-    epid = data["metadata"]["endpoint_id"]
+def test_collection_show_private_policies(run_line, add_gcs_login):
+    meta = load_response_set("cli.collection_show_private_policies").metadata
+    cid = meta["collection_id"]
+    username = meta["username"]
+    epid = meta["endpoint_id"]
     add_gcs_login(epid)
 
     _result, matcher = run_line(
@@ -50,11 +51,9 @@ def test_collection_show_private_policies(run_line, load_api_fixtures, add_gcs_l
         ("endpoint_id", "Globus Connect Server v5 Endpoint"),
     ],
 )
-def test_collection_show_on_non_collection(
-    run_line, load_api_fixtures, epid_key, ep_type
-):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"][epid_key]
+def test_collection_show_on_non_collection(run_line, epid_key, ep_type):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta[epid_key]
 
     result = run_line(f"globus collection show {epid}", assert_exit_code=3)
     assert (

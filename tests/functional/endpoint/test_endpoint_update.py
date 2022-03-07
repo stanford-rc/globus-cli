@@ -2,24 +2,22 @@ import json
 
 import pytest
 import responses
+from globus_sdk._testing import load_response_set
 
 
-@pytest.mark.parametrize(
-    "ep_type",
-    ["personal", "share", "server"],
-)
-def test_general_options(run_line, load_api_fixtures, ep_type):
+@pytest.mark.parametrize("ep_type", ["personal", "share", "server"])
+def test_general_options(run_line, ep_type):
     """
     Runs endpoint update with parameters allowed for all endpoint types
     Confirms all endpoint types are successfully updated
     """
-    data = load_api_fixtures("endpoint_operations.yaml")
+    meta = load_response_set("cli.endpoint_operations").metadata
     if ep_type == "personal":
-        epid = data["metadata"]["gcp_endpoint_id"]
+        epid = meta["gcp_endpoint_id"]
     elif ep_type == "share":
-        epid = data["metadata"]["share_id"]
+        epid = meta["share_id"]
     else:
-        epid = data["metadata"]["endpoint_id"]
+        epid = meta["endpoint_id"]
 
     # options with option value and expected value
     # if expected value is not set, it will be copied from the option value
@@ -83,20 +81,17 @@ def test_general_options(run_line, load_api_fixtures, ep_type):
         assert item["expected"] == sent_data[item["key"]]
 
 
-@pytest.mark.parametrize(
-    "ep_type",
-    ["personal", "share"],
-)
-def test_invalid_gcs_only_options(run_line, load_api_fixtures, ep_type):
+@pytest.mark.parametrize("ep_type", ["personal", "share"])
+def test_invalid_gcs_only_options(run_line, ep_type):
     """
     For all GCS only options, tries to update a GCP and shared endpoint
     Confirms invalid options are caught at the CLI level rather than API
     """
-    data = load_api_fixtures("endpoint_operations.yaml")
+    meta = load_response_set("cli.endpoint_operations").metadata
     if ep_type == "personal":
-        epid = data["metadata"]["gcp_endpoint_id"]
+        epid = meta["gcp_endpoint_id"]
     elif ep_type == "share":
-        epid = data["metadata"]["share_id"]
+        epid = meta["share_id"]
     else:
         raise NotImplementedError
     options = [
@@ -115,13 +110,13 @@ def test_invalid_gcs_only_options(run_line, load_api_fixtures, ep_type):
         assert "Globus Connect Server" in result.stderr
 
 
-def test_invalid_managed_only_options(run_line, load_api_fixtures):
+def test_invalid_managed_only_options(run_line):
     """
     For all managed only options, tries to update a GCS endpoint
     Confirms invalid options are caught at the CLI level rather than AP
     """
-    data = load_api_fixtures("endpoint_operations.yaml")
-    epid = data["metadata"]["endpoint_id"]
+    meta = load_response_set("cli.endpoint_operations").metadata
+    epid = meta["endpoint_id"]
 
     options = [
         "--network-use custom",

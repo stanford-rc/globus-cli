@@ -2,15 +2,16 @@ import json
 
 import pytest
 import responses
+from globus_sdk._testing import load_response_set
 
 
 @pytest.mark.parametrize("cid_key", ["mapped_collection_id", "guest_collection_id"])
-def test_collection_update(run_line, load_api_fixtures, add_gcs_login, cid_key):
+def test_collection_update(run_line, add_gcs_login, cid_key):
     is_mapped = cid_key.startswith("mapped")
 
-    data = load_api_fixtures("collection_operations.yaml")
-    cid = data["metadata"][cid_key]
-    epid = data["metadata"]["endpoint_id"]
+    meta = load_response_set("cli.collection_operations").metadata
+    cid = meta[cid_key]
+    epid = meta["endpoint_id"]
     add_gcs_login(epid)
 
     ep_type_specific_opts = []
@@ -52,11 +53,11 @@ def test_collection_update(run_line, load_api_fixtures, add_gcs_login, cid_key):
 )
 @pytest.mark.parametrize("cid_key", ["mapped_collection_id", "guest_collection_id"])
 def test_collection_update_verify_opts(
-    run_line, load_api_fixtures, add_gcs_login, verify_str, verify_settings, cid_key
+    run_line, add_gcs_login, verify_str, verify_settings, cid_key
 ):
-    data = load_api_fixtures("collection_operations.yaml")
-    cid = data["metadata"][cid_key]
-    epid = data["metadata"]["endpoint_id"]
+    meta = load_response_set("cli.collection_operations").metadata
+    cid = meta[cid_key]
+    epid = meta["endpoint_id"]
     add_gcs_login(epid)
 
     result = run_line(["globus", "collection", "update", cid, "--verify", verify_str])
@@ -68,9 +69,9 @@ def test_collection_update_verify_opts(
         assert sent[k] == v
 
 
-def test_collection_update_on_gcp(run_line, load_api_fixtures):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["gcp_endpoint_id"]
+def test_collection_update_on_gcp(run_line):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["gcp_endpoint_id"]
 
     result = run_line(
         f"globus collection update {epid} --description foo", assert_exit_code=3
@@ -85,9 +86,9 @@ def test_collection_update_on_gcp(run_line, load_api_fixtures):
     ) in result.stderr
 
 
-def test_collection_update_on_gcsv5_host(run_line, load_api_fixtures):
-    data = load_api_fixtures("collection_operations.yaml")
-    epid = data["metadata"]["endpoint_id"]
+def test_collection_update_on_gcsv5_host(run_line):
+    meta = load_response_set("cli.collection_operations").metadata
+    epid = meta["endpoint_id"]
 
     result = run_line(
         f"globus collection update {epid} --description foo", assert_exit_code=3
@@ -100,12 +101,10 @@ def test_collection_update_on_gcsv5_host(run_line, load_api_fixtures):
     assert "This operation is not supported on objects of this type." in result.stderr
 
 
-def test_gust_collection_update_rejects_invalid_opts(
-    run_line, load_api_fixtures, add_gcs_login
-):
-    data = load_api_fixtures("collection_operations.yaml")
-    cid = data["metadata"]["guest_collection_id"]
-    epid = data["metadata"]["endpoint_id"]
+def test_gust_collection_update_rejects_invalid_opts(run_line, add_gcs_login):
+    meta = load_response_set("cli.collection_operations").metadata
+    cid = meta["guest_collection_id"]
+    epid = meta["endpoint_id"]
     add_gcs_login(epid)
 
     result = run_line(

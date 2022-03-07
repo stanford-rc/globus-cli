@@ -1,10 +1,11 @@
 import pytest
+from globus_sdk._testing import load_response_set
 
 
-def test_username_not_in_idset(run_line, load_api_fixtures):
+def test_username_not_in_idset(run_line):
     """trying to 'session update' with an identity not in your identity set results in
     an error"""
-    load_api_fixtures("foo_user_info.yaml")
+    load_response_set("cli.foo_user_info")
     result = run_line("globus session update sirosen@globusid.org", assert_exit_code=1)
     assert "'sirosen@globusid.org' is not in your identity set" in result.stderr
 
@@ -12,8 +13,8 @@ def test_username_not_in_idset(run_line, load_api_fixtures):
 @pytest.mark.parametrize(
     "userparam", ["sirosen@globusid.org", "f4ee724c-b27c-4ccc-8237-989aa4085af4"]
 )
-def test_mix_user_and_domains(run_line, load_api_fixtures, userparam):
-    load_api_fixtures("foo_user_info.yaml")
+def test_mix_user_and_domains(run_line, userparam):
+    load_response_set("cli.foo_user_info")
     result = run_line(
         f"globus session update uchicago.edu {userparam}", assert_exit_code=2
     )
@@ -27,20 +28,18 @@ def test_mix_user_and_domains(run_line, load_api_fixtures, userparam):
     "idparam",
     ["sirosen@globusid.org", "f4ee724c-b27c-4ccc-8237-989aa4085af4", "uchicago.edu"],
 )
-def test_all_mutex(run_line, load_api_fixtures, idparam):
-    load_api_fixtures("foo_user_info.yaml")
+def test_all_mutex(run_line, idparam):
+    load_response_set("cli.foo_user_info")
     result = run_line(f"globus session update --all {idparam}", assert_exit_code=2)
     assert "IDENTITY values and --all are mutually exclusive" in result.stderr
 
 
-def test_username_flow(
-    run_line, load_api_fixtures, mock_remote_session, mock_link_flow
-):
+def test_username_flow(run_line, mock_remote_session, mock_link_flow):
     mock_remote_session.return_value = True
 
-    data = load_api_fixtures("foo_user_info.yaml")
-    username = data["metadata"]["username"]
-    user_id = data["metadata"]["user_id"]
+    meta = load_response_set("cli.foo_user_info").metadata
+    username = meta["username"]
+    user_id = meta["user_id"]
 
     result = run_line(f"globus session update {username}")
 
@@ -53,10 +52,10 @@ def test_username_flow(
     assert call_kwargs["session_params"]["session_required_identities"] == user_id
 
 
-def test_domain_flow(run_line, load_api_fixtures, mock_remote_session, mock_link_flow):
+def test_domain_flow(run_line, mock_remote_session, mock_link_flow):
     mock_remote_session.return_value = True
 
-    load_api_fixtures("foo_user_info.yaml")
+    load_response_set("cli.foo_user_info")
 
     result = run_line("globus session update uchicago.edu")
 
@@ -72,14 +71,12 @@ def test_domain_flow(run_line, load_api_fixtures, mock_remote_session, mock_link
     )
 
 
-def test_all_flow(
-    run_line, load_api_fixtures, mock_remote_session, mock_local_server_flow
-):
+def test_all_flow(run_line, mock_remote_session, mock_local_server_flow):
     mock_remote_session.return_value = False
 
-    data = load_api_fixtures("foo_user_info.yaml")
-    ids = [x["user_id"] for x in data["metadata"]["linked_ids"]]
-    ids.append(data["metadata"]["user_id"])
+    meta = load_response_set("cli.foo_user_info").metadata
+    ids = [x["user_id"] for x in meta["linked_ids"]]
+    ids.append(meta["user_id"])
 
     result = run_line("globus session update --all")
 

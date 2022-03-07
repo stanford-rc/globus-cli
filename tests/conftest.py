@@ -3,16 +3,15 @@ import os
 import re
 import shlex
 import time
-import urllib.parse
 from unittest import mock
 
 import globus_sdk
 import pytest
 import responses
 from click.testing import CliRunner
+from globus_sdk._testing import register_response_set
 from globus_sdk.tokenstorage import SQLiteAdapter
 from globus_sdk.transport import RequestsTransport
-from globus_sdk.utils import slash_join
 from ruamel.yaml import YAML
 
 import globus_cli
@@ -34,11 +33,6 @@ def go_ep1_id():
 @pytest.fixture(scope="session")
 def go_ep2_id():
     return "ddb59af0-6d04-11e5-ba46-22000b92c6ec"
-
-
-@pytest.fixture(scope="session")
-def task_id():
-    return "549ef13c-600f-11eb-9608-0afa7b051b85"
 
 
 def _mock_token_response_data(rs_name, scope, token_blob=None):
@@ -240,54 +234,6 @@ def mocked_responses(monkeypatch):
     responses.reset()
 
 
-@pytest.fixture
-def register_api_route(mocked_responses):
-    # copied almost verbatim from the SDK testsuite
-    def func(
-        service,
-        path,
-        method=responses.GET,
-        adding_headers=None,
-        replace=False,
-        match_querystring=False,
-        **kwargs,
-    ):
-        base_url_map = {
-            "auth": "https://auth.globus.org/",
-            "nexus": "https://nexus.api.globusonline.org/",
-            "transfer": "https://transfer.api.globus.org/v0.10",
-            "search": "https://search.api.globus.org/",
-            "gcs": "https://abc.xyz.data.globus.org/api",
-            "groups": "https://groups.api.globus.org/v2/",
-        }
-        assert service in base_url_map
-        base_url = base_url_map.get(service)
-        full_url = slash_join(base_url, path)
-
-        # can set it to `{}` explicitly to clear the default
-        if adding_headers is None:
-            adding_headers = {"Content-Type": "application/json"}
-
-        if replace:
-            responses.replace(
-                method,
-                full_url,
-                headers=adding_headers,
-                match_querystring=match_querystring,
-                **kwargs,
-            )
-        else:
-            responses.add(
-                method,
-                full_url,
-                headers=adding_headers,
-                match_querystring=match_querystring,
-                **kwargs,
-            )
-
-    return func
-
-
 def _iter_fixture_routes(routes):
     # walk a fixture file either as a list of routes
     for x in routes:
@@ -298,39 +244,49 @@ def _iter_fixture_routes(routes):
         yield path, method, params
 
 
-@pytest.fixture
-def load_api_fixtures(register_api_route, test_file_dir, go_ep1_id, go_ep2_id, task_id):
-    def func(filename):
-        filename = os.path.join(test_file_dir, "api_fixtures", filename)
-        with open(filename) as fp:
+@pytest.fixture(autouse=True, scope="session")
+def _register_all_response_sets(test_file_dir):
+    fixture_dir = os.path.join(test_file_dir, "api_fixtures")
+
+    def do_register(filename):
+        with open(os.path.join(fixture_dir, filename)) as fp:
             data = yaml.load(fp.read())
+
+        response_set = {}
+        response_set_metadata = {}
         for service, routes in data.items():
-            # allow use of the key "metadata" to expose extra data from a fixture file
-            # to the user of it
             if service == "metadata":
+                response_set_metadata = routes
                 continue
 
-            for path, method, params in _iter_fixture_routes(routes):
-                # allow /endpoint/{GO_EP1_ID} as a path
-                use_path = path.format(
-                    GO_EP1_ID=go_ep1_id, GO_EP2_ID=go_ep2_id, TASK_ID=task_id
-                )
+            for idx, (path, method, params) in enumerate(_iter_fixture_routes(routes)):
                 if "query_params" in params:
-                    # copy and set match_querystring=True
-                    params = dict(match_querystring=True, **params)
-                    # remove and encode query params
-                    query_params = urllib.parse.urlencode(params.pop("query_params"))
-                    # modify path (assume no prior params)
-                    use_path = use_path + "?" + query_params
-                print(
-                    f"debug: register_api_route({service}, {use_path}, {method}, ...)"
-                )
-                register_api_route(service, use_path, method=method.upper(), **params)
+                    # TODO: remove this int/float conversion after we upgrade to
+                    # `responses>=0.19.0` when this issue is expected to be fixed
+                    #   https://github.com/getsentry/responses/pull/485
+                    query_params = {
+                        k: str(v) if isinstance(v, (int, float)) else v
+                        for k, v in params.pop("query_params").items()
+                    }
+                    params["match"] = [
+                        responses.matchers.query_param_matcher(query_params)
+                    ]
+                response_set[f"{method}_{service}_{path}_{idx}"] = {
+                    "service": service,
+                    "path": path,
+                    "method": method.upper(),
+                    **params,
+                }
 
-        # after registration, return the raw fixture data
-        return data
+        scenario_name = filename.rsplit(".", 1)[0]
+        register_response_set(
+            f"cli.{scenario_name}", response_set, metadata=response_set_metadata
+        )
 
-    return func
+    for filename in os.listdir(fixture_dir):
+        if not filename.endswith(".yaml"):
+            continue
+        do_register(filename)
 
 
 @pytest.fixture(autouse=True)

@@ -3,6 +3,7 @@ import uuid
 
 import pytest
 import responses
+from globus_sdk._testing import load_response_set
 
 
 def _last_search_call():
@@ -14,11 +15,11 @@ def _last_search_call():
     return sent
 
 
-def test_index_role_list(run_line, load_api_fixtures):
-    load_api_fixtures("multiuser_get_identities.yaml")
-    data = load_api_fixtures("search.yaml")
-    list_data = data["metadata"]["index_role_list_data"]
-    index_id = data["metadata"]["index_id"]
+def test_index_role_list(run_line):
+    load_response_set("cli.multiuser_get_identities")
+    meta = load_response_set("cli.search").metadata
+    list_data = meta["index_role_list_data"]
+    index_id = meta["index_id"]
 
     result = run_line(["globus", "search", "index", "role", "list", index_id])
     output_lines = result.output.splitlines()
@@ -50,10 +51,10 @@ def test_index_role_list(run_line, load_api_fixtures):
         ],
     ],
 )
-def test_index_role_create_identity(run_line, load_api_fixtures, cli_args):
-    load_api_fixtures("multiuser_get_identities.yaml")
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["index_id"]
+def test_index_role_create_identity(run_line, cli_args):
+    load_response_set("cli.multiuser_get_identities")
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["index_id"]
 
     run_line(
         ["globus", "search", "index", "role", "create", index_id, "writer"] + cli_args
@@ -85,15 +86,15 @@ def test_index_role_create_identity(run_line, load_api_fixtures, cli_args):
         ],
     ],
 )
-def test_index_role_create_group(run_line, load_api_fixtures, cli_args):
+def test_index_role_create_group(run_line, cli_args):
     # NOTE: this test uses the same fixture data, but the fixtures are populated with
     # role information for an identity-related role
     # as a result, the response and output will not match, but the command should still
     # succeed and we can inspect the request sent
     # however, we need to include the get-identities data for the username lookup step
-    load_api_fixtures("multiuser_get_identities.yaml")
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["index_id"]
+    load_response_set("cli.multiuser_get_identities")
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["index_id"]
 
     run_line(
         ["globus", "search", "index", "role", "create", index_id, "admin"] + cli_args
@@ -147,10 +148,10 @@ def test_index_role_create_invalid_args(run_line, cli_args, expect_message):
     assert expect_message in result.stderr
 
 
-def test_index_role_delete(run_line, load_api_fixtures):
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["index_id"]
-    role_id = data["metadata"]["role_id"]
+def test_index_role_delete(run_line):
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["index_id"]
+    role_id = meta["role_id"]
 
     result = run_line(
         ["globus", "search", "index", "role", "delete", index_id, role_id]

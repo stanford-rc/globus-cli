@@ -1,27 +1,29 @@
 import json
 
+from globus_sdk._testing import load_response_set
 
-def test_jmespath_noop(run_line, load_api_fixtures):
+
+def test_jmespath_noop(run_line):
     """
     Runs some simple fetch operations and confirms that `--jmespath '@'`
     doesn't change the output (but also that it overrides --format TEXT)
     """
-    data = load_api_fixtures("endpoint_operations.yaml")
-    epid = data["metadata"]["endpoint_id"]
+    meta = load_response_set("cli.endpoint_operations").metadata
+    epid = meta["endpoint_id"]
     result = run_line(f"globus endpoint show {epid} -Fjson")
     jmespathresult = run_line(f"globus endpoint show {epid} -Ftext --jmespath '@'")
 
     assert result.output == jmespathresult.output
 
 
-def test_jmespath_extract_from_list(run_line, load_api_fixtures, go_ep2_id):
+def test_jmespath_extract_from_list(run_line, go_ep2_id):
     """
     Uses jmespath to extract a value from a list result using a filter.
     Confirms that the result is identical to a direct fetch of that
     resource.
     """
-    load_api_fixtures("endpoint_operations.yaml")
-    load_api_fixtures("go_user_info.yaml")
+    load_response_set("cli.endpoint_operations")
+    load_response_set("cli.go_user_info")
     # list tutorial endpoints with a search, but extract go#ep2
     result = run_line(
         (

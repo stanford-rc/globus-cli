@@ -3,20 +3,18 @@ import uuid
 
 import pytest
 import responses
+from globus_sdk._testing import load_response_set
 
 
-@pytest.mark.parametrize(
-    "ep_type",
-    ["personal", "share", "server"],
-)
-def test_endpoint_set_subscription_id(run_line, load_api_fixtures, ep_type):
-    data = load_api_fixtures("endpoint_operations.yaml")
+@pytest.mark.parametrize("ep_type", ["personal", "share", "server"])
+def test_endpoint_set_subscription_id(run_line, ep_type):
+    meta = load_response_set("cli.endpoint_operations").metadata
     if ep_type == "personal":
-        epid = data["metadata"]["gcp_endpoint_id"]
+        epid = meta["gcp_endpoint_id"]
     elif ep_type == "share":
-        epid = data["metadata"]["share_id"]
+        epid = meta["share_id"]
     else:
-        epid = data["metadata"]["endpoint_id"]
+        epid = meta["endpoint_id"]
     subscription_id = str(uuid.UUID(int=0))
     run_line(f"globus endpoint set-subscription-id {epid} {subscription_id}")
     assert (

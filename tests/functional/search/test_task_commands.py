@@ -1,16 +1,19 @@
-def test_task_show(run_line, load_api_fixtures):
-    data = load_api_fixtures("search.yaml")
-    task_id = data["metadata"]["task_id"]
+from globus_sdk._testing import load_response_set
+
+
+def test_task_show(run_line):
+    meta = load_response_set("cli.search").metadata
+    task_id = meta["task_id"]
 
     result = run_line(["globus", "search", "task", "show", task_id])
     assert "SUCCESS (Task succeeded)" in result.output
 
 
-def test_task_list(run_line, load_api_fixtures):
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["index_id"]
-    success_task_id = data["metadata"]["task_id"]
-    pending_task_id = data["metadata"]["pending_task_id"]
+def test_task_list(run_line):
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["index_id"]
+    success_task_id = meta["task_id"]
+    pending_task_id = meta["pending_task_id"]
 
     result = run_line(["globus", "search", "task", "list", index_id])
 

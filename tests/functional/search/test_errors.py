@@ -1,9 +1,11 @@
 import json
 
+from globus_sdk._testing import load_response_set
 
-def test_notfound_error(run_line, load_api_fixtures):
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["error_index_id"]
+
+def test_notfound_error(run_line):
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["error_index_id"]
 
     result, matcher = run_line(
         ["globus", "search", "query", index_id, "-q", "*"],
@@ -14,9 +16,9 @@ def test_notfound_error(run_line, load_api_fixtures):
     assert f'There is no search index named "{index_id}"' in result.stderr
 
 
-def test_validation_error(run_line, load_api_fixtures, tmp_path):
-    data = load_api_fixtures("search.yaml")
-    index_id = data["metadata"]["error_index_id"]
+def test_validation_error(run_line, tmp_path):
+    meta = load_response_set("cli.search").metadata
+    index_id = meta["error_index_id"]
 
     # although not strictly necessary for the test (since we mock the response data),
     # this is an example of the malformed data on submit: missing 'visible_to', which
