@@ -1,7 +1,8 @@
 import json
 
+import pytest
 import responses
-from globus_sdk._testing import load_response_set
+from globus_sdk._testing import RegisteredResponse, load_response, load_response_set
 
 
 def test_group_list(run_line):
@@ -176,3 +177,152 @@ def test_group_member_already_removed(run_line):
         f"globus group member remove {group} {member}", assert_exit_code=1
     )
     assert "Identity has no membership in group" in result.stderr
+
+
+@pytest.mark.parametrize("action", ("accept", "decline"))
+@pytest.mark.parametrize("with_id_arg", (True, False))
+def test_group_invite_basic(run_line, action, with_id_arg):
+    group_id = "ee49e222-d007-11e4-8b51-22000aa51e6e"
+    identity_id = "00000000-0000-0000-0000-000000000001"
+    load_response(
+        RegisteredResponse(
+            service="groups",
+            path=f"/groups/{group_id}",
+            json={
+                "description": "Un film Italiano muy bien conocido",
+                "enforce_session": False,
+                "group_type": "regular",
+                "id": group_id,
+                "my_memberships": [
+                    {
+                        "group_id": group_id,
+                        "identity_id": identity_id,
+                        "membership_fields": {},
+                        "role": "member",
+                        "status": "invited",
+                        "username": "test_user1",
+                    },
+                ],
+                "name": "La Dolce Vita",
+                "parent_id": None,
+                "policies": {
+                    "authentication_assurance_timeout": 28800,
+                    "group_members_visibility": "managers",
+                    "group_visibility": "authenticated",
+                    "is_high_assurance": False,
+                    "join_requests": False,
+                    "signup_fields": [],
+                },
+                "session_limit": 28800,
+                "session_timeouts": {},
+            },
+        )
+    )
+    load_response(
+        RegisteredResponse(
+            service="groups",
+            path=f"/groups/{group_id}",
+            method="POST",
+            json={
+                action: [
+                    {
+                        "group_id": group_id,
+                        "identity_id": identity_id,
+                        "username": "test_user1",
+                        "role": "member",
+                        "status": "active",
+                    }
+                ]
+            },
+        )
+    )
+
+    add_args = []
+    if with_id_arg:
+        add_args = ["--identity", identity_id]
+    result = run_line(["globus", "group", "invite", action, group_id] + add_args)
+    assert identity_id in result.output
+
+    sent_data = json.loads(responses.calls[-1].request.body)
+    assert action in sent_data
+    assert len(sent_data[action]) == 1
+    assert sent_data[action][0]["identity_id"] == identity_id
+
+
+@pytest.mark.parametrize("action", ("accept", "decline"))
+@pytest.mark.parametrize("error_detail_present", (True, False))
+def test_group_invite_failure(run_line, action, error_detail_present):
+    group_id = "ee49e222-d007-11e4-8b51-22000aa51e6e"
+    identity_id = "00000000-0000-0000-0000-000000000001"
+    load_response(
+        RegisteredResponse(
+            service="groups",
+            path=f"/groups/{group_id}",
+            json={
+                "description": "Un film Italiano muy bien conocido",
+                "enforce_session": False,
+                "group_type": "regular",
+                "id": group_id,
+                "my_memberships": [
+                    {
+                        "group_id": group_id,
+                        "identity_id": identity_id,
+                        "membership_fields": {},
+                        "role": "member",
+                        "status": "invited",
+                        "username": "test_user1",
+                    },
+                ],
+                "name": "La Dolce Vita",
+                "parent_id": None,
+                "policies": {
+                    "authentication_assurance_timeout": 28800,
+                    "group_members_visibility": "managers",
+                    "group_visibility": "authenticated",
+                    "is_high_assurance": False,
+                    "join_requests": False,
+                    "signup_fields": [],
+                },
+                "session_limit": 28800,
+                "session_timeouts": {},
+            },
+        )
+    )
+
+    error_detail = (
+        {"detail": "Domo arigato, Mr. Roboto"} if error_detail_present else {}
+    )
+    load_response(
+        RegisteredResponse(
+            service="groups",
+            path=f"/groups/{group_id}",
+            method="POST",
+            json={
+                action: [],
+                "errors": {
+                    action: [
+                        {
+                            "code": "ERROR_ERROR_IT_IS_AN_ERROR",
+                            "identity_id": identity_id,
+                            **error_detail,
+                        }
+                    ]
+                },
+            },
+        )
+    )
+
+    result = run_line(
+        ["globus", "group", "invite", action, group_id], assert_exit_code=1
+    )
+    assert "Error" in result.stderr
+    if error_detail_present:
+        assert "Domo arigato" in result.stderr
+    else:
+        assert f"Could not {action} invite" in result.stderr
+
+    # the request sent was as expected
+    sent_data = json.loads(responses.calls[-1].request.body)
+    assert action in sent_data
+    assert len(sent_data[action]) == 1
+    assert sent_data[action][0]["identity_id"] == identity_id

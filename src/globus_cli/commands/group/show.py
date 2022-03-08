@@ -21,8 +21,7 @@ def group_show(
     """Show a group definition"""
     groups_client = login_manager.get_groups_client()
 
-    query_params = {"include": "my_memberships"}
-    group = groups_client.get_group(group_id, query_params=query_params)
+    group = groups_client.get_group(group_id, include="my_memberships")
 
     formatted_print(
         group,
