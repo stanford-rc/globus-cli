@@ -1,6 +1,6 @@
-import click
+from typing import Optional
 
-from typing import Any
+import click
 
 from globus_cli.login_manager import LoginManager
 from globus_cli.parsing import command
@@ -8,16 +8,34 @@ from globus_cli.termio import formatted_print
 
 from ._common import group_id_arg
 
+SIGNUP_FIELDS = [
+    "address",
+    "address1",
+    "address2",
+    "city",
+    "country",
+    "current_project_name",
+    "department",
+    "field_of_science",
+    "institution",
+    "phone",
+    "state",
+    "zip",
+]
+
 
 @click.option(
     "--high-assurance/--not-high-assurance",
-    help="Flag if the group will enforce high assurance access policies or not."
+    default=None,
+    help="Flag if the group will enforce high assurance access policies or not.",
 )
 @click.option(
     "--authentication-timeout",
     type=int,
-    help=("Time in seconds before a user must reauthenticate to access a "
-          "high assurance group")
+    help=(
+        "Time in seconds before a user must re-authenticate to access a "
+        "high assurance group"
+    ),
 )
 @click.option(
     "--visibility",
@@ -29,7 +47,7 @@ from ._common import group_id_arg
     ),
 )
 @click.option(
-    "--member-visibility",
+    "--members-visibility",
     type=click.Choice(("members", "managers"), case_sensitive=False),
     help=(
         "Determine who can see members of the group. "
@@ -39,50 +57,70 @@ from ._common import group_id_arg
 )
 @click.option(
     "--join-requests/--no-join-requests",
-    help="Flag if request to join the group are allowed or not."
+    default=None,
+    help="Flag if request to join the group are allowed or not.",
 )
 @click.option(
-    "--signup-field",
-    type=click.Choice(
-        ("institution", "current_project_name", "address", "city", "state",
-         "country", "address1", "address2", "zip", "phone", "department",
-         "field_of_science"), case_sensitive=False),
-    multiple=True,
+    "--signup-fields",
+    metavar=("{" + ",".join(SIGNUP_FIELDS) + "}"),
     help=(
-        "Field required from users to apply for group membership. "
-        "Pass this option multiple times to require multiple fields. "
-        "Any existing required fields will be overwritten if given."
-    )
+        "Comma separated list of fields to be required from users applying "
+        "for group membership. Pass an empty string to require no fields."
+    ),
 )
 @group_id_arg
 @command("set-policies")
 @LoginManager.requires_login(LoginManager.GROUPS_RS)
-def group_set_policies(*, login_manager: LoginManager, group_id: str, **kwargs: Any):
+def group_set_policies(
+    *,
+    login_manager: LoginManager,
+    group_id: str,
+    high_assurance: Optional[bool],
+    authentication_timeout: Optional[int],
+    visibility: Optional[str],
+    members_visibility: Optional[str],
+    join_requests: Optional[bool],
+    signup_fields: Optional[str],
+):
     """Update an existing group's policies"""
     groups_client = login_manager.get_groups_client()
 
     # get the current state of the group's policies
     existing_policies = groups_client.get_group_policies(group_id)
 
-    # map of groups API field names to CLI option names
-    field_option_map = {
-        "is_high_assurance": "high_assurance",
-        "authentication_assurance_timeout": "authentication_timeout",
-        "group_visibility": "visibility",
-        "group_members_visibility": "member_visibility",
-        "join_requests": "join_requests",
-        "signup_fields": "signup_field",
-    }
+    def _parse_signup_fields(fields):
+        ret = []
+        for field in fields.split(","):
+            if field == "":
+                continue
 
-    # assemble data using existing values for any field not given
-    print(kwargs)
-    data = {}
-    for field, existing_value in existing_policies.data.items():
-        option_name = field_option_map.get(field)
-        if option_name and kwargs.get(option_name) not in (None, ()):
-            data[field] = kwargs[option_name]
-        else:
-            data[field] = existing_value
+            if field.lower() in SIGNUP_FIELDS:
+                ret.append(field.lower())
+            else:
+                raise click.UsageError(
+                    f"{field} is not a valid signup field. "
+                    "Must be one of " + ", ".join(SIGNUP_FIELDS)
+                )
+        return ret
+
+    data = {
+        "is_high_assurance": high_assurance,
+        "authentication_assurance_timeout": authentication_timeout,
+        "group_visibility": visibility,
+        "group_members_visibility": members_visibility,
+        "join_requests": join_requests,
+        "signup_fields": (
+            _parse_signup_fields(signup_fields) if signup_fields is not None else None
+        ),
+    }
+    # remove any null values to prevent nulling out unspecified fields
+    data = {k: v for k, v in data.items() if v is not None}
+
+    # merge with existing data to include any required unspecified fields
+    data = {
+        k: (data[k] if k in data else existing_policies[k])
+        for k, v in existing_policies.data.items()
+    }
 
     response = groups_client.set_group_policies(group_id, data)
     formatted_print(response, simple_text="Group policies updated successfully")
