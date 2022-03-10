@@ -1,6 +1,8 @@
 from globus_cli.commands.group.create import group_create
 from globus_cli.commands.group.delete import group_delete
 from globus_cli.commands.group.invite import group_invite
+from globus_cli.commands.group.join import group_join
+from globus_cli.commands.group.leave import group_leave
 from globus_cli.commands.group.list import group_list
 from globus_cli.commands.group.member import group_member
 from globus_cli.commands.group.show import group_show
@@ -20,3 +22,5 @@ group_command.add_command(group_update)
 group_command.add_command(group_delete)
 group_command.add_command(group_member)
 group_command.add_command(group_invite)
+group_command.add_command(group_join)
+group_command.add_command(group_leave)

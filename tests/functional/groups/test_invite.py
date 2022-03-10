@@ -36,7 +36,7 @@ def _register_invitation_responses():
         "identity_id": identity_id,
         "username": username,
         "identity_id2": identity_id2,
-        "username2": username,
+        "username2": username2,
     }
 
     def action_response(
@@ -54,7 +54,11 @@ def _register_invitation_responses():
                     {
                         "group_id": group_id,
                         "identity_id": iid,
-                        "username": username,
+                        "username": username
+                        if iid == identity_id
+                        else username2
+                        if iid == identity_id2
+                        else "foo-user",
                         "role": "member",
                         "status": "active" if action == "accept" else "declined",
                     }
@@ -144,28 +148,28 @@ def _register_invitation_responses():
         metadata=_common_metadata,
     )
     register_response_set(
-        "action_response",
+        "group_accept_response",
         {
-            "accept_success": action_response("accept", True),
-            "decline_success": action_response("decline", True),
-            "accept_success_multiple": action_response(
-                "accept", True, add_ids=[identity_id2]
-            ),
-            "decline_success_multiple": action_response(
-                "decline", True, add_ids=[identity_id2]
-            ),
-            "accept_error": action_response("accept", False),
-            "decline_error": action_response("decline", False),
-            "accept_error_multiple": action_response(
-                "accept", False, add_ids=[identity_id2]
-            ),
-            "decline_error_multiple": action_response(
-                "decline", False, add_ids=[identity_id2]
-            ),
-            "accept_error_nodetail": action_response(
+            "default": action_response("accept", True),
+            "success_multiple": action_response("accept", True, add_ids=[identity_id2]),
+            "error": action_response("accept", False),
+            "error_multiple": action_response("accept", False, add_ids=[identity_id2]),
+            "error_nodetail": action_response(
                 "accept", False, error_detail_present=False
             ),
-            "decline_error_nodetail": action_response(
+        },
+        metadata=_common_metadata,
+    )
+    register_response_set(
+        "group_decline_response",
+        {
+            "default": action_response("decline", True),
+            "success_multiple": action_response(
+                "decline", True, add_ids=[identity_id2]
+            ),
+            "error": action_response("decline", False),
+            "error_multiple": action_response("decline", False, add_ids=[identity_id2]),
+            "error_nodetail": action_response(
                 "decline", False, error_detail_present=False
             ),
         },
@@ -177,7 +181,7 @@ def _register_invitation_responses():
 @pytest.mark.parametrize("with_id_arg", (True, False))
 def test_group_invite(run_line, action, with_id_arg):
     meta = load_response("group_w_invitation").metadata
-    load_response("action_response", case=f"{action}_success")
+    load_response(f"group_{action}_response")
 
     add_args = []
     if with_id_arg:
@@ -198,8 +202,8 @@ def test_group_invite(run_line, action, with_id_arg):
 def test_group_invite_failure(run_line, action, error_detail_present):
     meta = load_response("group_w_invitation").metadata
     load_response(
-        "action_response",
-        case=f"{action}_error" if error_detail_present else f"{action}_error_nodetail",
+        f"group_{action}_response",
+        case="error" if error_detail_present else "error_nodetail",
     )
 
     result = run_line(
@@ -234,7 +238,7 @@ def test_group_invite_failure_no_invitation(run_line, action):
 def test_group_invite_multiple(run_line, action, success):
     meta = load_response("group_w_invitation", case="multiple").metadata
     load_response(
-        "action_response", case=f"{action}_{'success' if success else 'error'}_multiple"
+        f"group_{action}_response", case=f"{'success' if success else 'error'}_multiple"
     )
 
     result = run_line(
