@@ -14,6 +14,9 @@ from globus_sdk._testing import (
 @pytest.fixture(autouse=True, scope="session")
 def _register_group_responses():
     group_id = "efdab3ca-cff1-11e4-9b86-123139260d4e"
+    identity_id = "00000000-0000-0000-0000-000000000001"
+    username = "test_user1"
+
     register_response_set(
         "get_group?include=memberships",
         dict(
@@ -134,6 +137,74 @@ def _register_group_responses():
             )
         ),
     )
+
+    common_action_metadata = {
+        "group_id": group_id,
+        "identity_id": identity_id,
+        "username": username,
+    }
+
+    # seed with relatively uniform data
+    response_sets = {}
+    for action in ["approve", "reject", "invite"]:
+        status = "active"
+        if action == "reject":
+            status = "rejected"
+        elif action == "invite":
+            status = "invited"
+        response_sets[action] = {
+            "default": {
+                "service": "groups",
+                "path": f"/groups/{group_id}",
+                "method": "POST",
+                "json": {
+                    action: [
+                        {
+                            "group_id": group_id,
+                            "identity_id": identity_id,
+                            "username": username,
+                            "role": "member",
+                            "status": status,
+                        }
+                    ]
+                },
+                "metadata": common_action_metadata,
+            },
+            "error": {
+                "service": "groups",
+                "path": f"/groups/{group_id}",
+                "method": "POST",
+                "json": {
+                    "errors": {
+                        action: [
+                            {
+                                "code": "ERROR_ERROR_IT_IS_AN_ERROR",
+                                "identity_id": identity_id,
+                                "detail": "Domo arigato, Mr. Roboto",
+                            }
+                        ]
+                    },
+                },
+                "metadata": common_action_metadata,
+            },
+            "error_nodetail": {
+                "service": "groups",
+                "path": f"/groups/{group_id}",
+                "method": "POST",
+                "json": {
+                    "errors": {"foo": "bar"},
+                },
+                "metadata": common_action_metadata,
+            },
+        }
+    # the response sets could be customized further here, prior to...
+    # ...registration of response sets
+    for action in ["approve", "reject", "invite"]:
+        register_response_set(
+            f"group_member_{action}",
+            response_sets[action],
+            metadata=common_action_metadata,
+        )
 
 
 def test_group_list(run_line):
@@ -501,3 +572,42 @@ def test_group_member_list_rejects_unknown_field(run_line):
         assert_exit_code=2,
     )
     assert "the values ['foo'] were not valid choices" in result.stderr
+
+
+@pytest.mark.parametrize("action", ["approve", "reject", "invite"])
+def test_group_member_simple_action_success(run_line, action):
+    meta = load_response(f"group_member_{action}").metadata
+    group = meta["group_id"]
+    member = meta["identity_id"]
+    username = meta["username"]
+    result = run_line(f"globus group member {action} {group} {member}")
+    assert member in result.output
+    assert username in result.output
+    assert group in result.output
+    sent_data = json.loads(responses.calls[-1].request.body)
+    assert action in sent_data
+    assert len(sent_data[action]) == 1
+    assert sent_data[action][0]["identity_id"] == member
+
+
+@pytest.mark.parametrize("action", ["approve", "reject", "invite"])
+@pytest.mark.parametrize("error_detail", [True, False])
+def test_group_member_simple_action_error(run_line, action, error_detail):
+    meta = load_response(
+        f"group_member_{action}", case="error" if error_detail else "error_nodetail"
+    ).metadata
+    group = meta["group_id"]
+    member = meta["identity_id"]
+    result = run_line(
+        f"globus group member {action} {group} {member}", assert_exit_code=1
+    )
+    assert "Error" in result.stderr
+    if error_detail:
+        assert "Domo arigato" in result.stderr
+    else:
+        if action == "approve":
+            assert "Could not approve the user" in result.stderr
+        elif action == "reject":
+            assert "Could not reject the user" in result.stderr
+        elif action == "invite":
+            assert "Could not invite the user" in result.stderr
