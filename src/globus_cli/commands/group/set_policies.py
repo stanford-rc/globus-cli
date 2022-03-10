@@ -27,7 +27,7 @@ SIGNUP_FIELDS = [
 @click.option(
     "--high-assurance/--no-high-assurance",
     default=None,
-    help="Flag if the group will enforce high assurance access policies or not.",
+    help="Whether the group should enforce high assurance access policies or not.",
 )
 @click.option(
     "--authentication-timeout",

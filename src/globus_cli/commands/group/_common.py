@@ -37,7 +37,7 @@ def parse_join_requests(res):
 
 
 def parse_signup_fields(res):
-    return ",".join(sorted({f for f in res["policies"]["signup_fields"]}))
+    return ",".join(sorted(f for f in res["policies"]["signup_fields"]))
 
 
 def group_create_and_update_params(
