@@ -25,7 +25,7 @@ SIGNUP_FIELDS = [
 
 
 @click.option(
-    "--high-assurance/--not-high-assurance",
+    "--high-assurance/--no-high-assurance",
     default=None,
     help="Flag if the group will enforce high assurance access policies or not.",
 )
