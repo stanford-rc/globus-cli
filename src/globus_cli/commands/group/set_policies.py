@@ -3,10 +3,10 @@ from typing import Optional
 import click
 
 from globus_cli.login_manager import LoginManager
-from globus_cli.parsing import command
+from globus_cli.parsing import CommaDelimitedList, command
 from globus_cli.termio import formatted_print
 
-from ._common import group_id_arg
+from ._common import MEMBERSHIP_FIELDS, group_id_arg
 
 SIGNUP_FIELDS = [
     "address",
@@ -62,7 +62,7 @@ SIGNUP_FIELDS = [
 )
 @click.option(
     "--signup-fields",
-    metavar=("{" + ",".join(SIGNUP_FIELDS) + "}"),
+    type=CommaDelimitedList(choices=MEMBERSHIP_FIELDS, convert_values=str.lower),
     help=(
         "Comma separated list of fields to be required from users applying "
         "for group membership. Pass an empty string to require no fields."
@@ -88,30 +88,13 @@ def group_set_policies(
     # get the current state of the group's policies
     existing_policies = groups_client.get_group_policies(group_id)
 
-    def _parse_signup_fields(fields):
-        ret = []
-        for field in fields.split(","):
-            if field == "":
-                continue
-
-            if field.lower() in SIGNUP_FIELDS:
-                ret.append(field.lower())
-            else:
-                raise click.UsageError(
-                    f"{field} is not a valid signup field. "
-                    "Must be one of " + ", ".join(SIGNUP_FIELDS)
-                )
-        return ret
-
     data = {
         "is_high_assurance": high_assurance,
         "authentication_assurance_timeout": authentication_timeout,
         "group_visibility": visibility,
         "group_members_visibility": members_visibility,
         "join_requests": join_requests,
-        "signup_fields": (
-            _parse_signup_fields(signup_fields) if signup_fields is not None else None
-        ),
+        "signup_fields": (signup_fields if signup_fields is not None else None),
     }
     # remove any null values to prevent nulling out unspecified fields
     data = {k: v for k, v in data.items() if v is not None}
