@@ -2,6 +2,9 @@ import functools
 from typing import Callable, Optional
 
 import click
+import globus_sdk
+
+MEMBERSHIP_FIELDS = {x.value for x in globus_sdk.GroupRequiredSignupFields}
 
 
 def group_id_arg(f: Optional[Callable] = None):
