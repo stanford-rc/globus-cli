@@ -8,20 +8,6 @@ from globus_cli.termio import formatted_print
 
 from ._common import MEMBERSHIP_FIELDS, group_id_arg
 
-SIGNUP_FIELDS = [
-    "address",
-    "address1",
-    "address2",
-    "city",
-    "country",
-    "current_project_name",
-    "department",
-    "field_of_science",
-    "institution",
-    "phone",
-    "state",
-    "zip",
-]
 
 
 @click.option(

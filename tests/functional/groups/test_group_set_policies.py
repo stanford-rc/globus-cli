@@ -38,31 +38,28 @@ def _register_group_responses():
 
 
 @pytest.mark.parametrize(
-    "option_data",
+    "add_args, field_name, expected_value",
     [
-        ("--high-assurance", None, "is_high_assurance", True),
-        ("--no-high-assurance", None, "is_high_assurance", False),
-        ("--authentication-timeout", 100, "authentication_assurance_timeout", 100),
-        ("--visibility", "authenticated", "group_visibility", "authenticated"),
-        ("--members-visibility", "members", "group_members_visibility", "members"),
-        ("--join-requests", None, "join_requests", True),
-        ("--no-join-requests", None, "join_requests", False),
-        ("--signup-fields", "address", "signup_fields", ["address"]),
+        (["--high-assurance"], "is_high_assurance", True),
+        (["--no-high-assurance"], "is_high_assurance", False),
+        (["--authentication-timeout", "100"], "authentication_assurance_timeout", 100),
+        (["--visibility", "authenticated"], "group_visibility", "authenticated"),
+        (["--members-visibility", "members"], "group_members_visibility", "members"),
+        (["--join-requests"], "join_requests", True),
+        (["--no-join-requests"], "join_requests", False),
+        (["--signup-fields", "address"], "signup_fields", ["address"]),
         (
-            "--signup-fields",
-            "address1,address2",
+            ["--signup-fields", "address1,address2"],
             "signup_fields",
             ["address1", "address2"],
         ),
     ],
 )
-def test_group_set_policies(run_line, option_data):
+def test_group_set_policies(run_line, add_args, field_name, expected_value):
     fixtures = load_response_set("get_and_set_group_policies")
     group_id = fixtures.metadata["group_id"]
 
-    option, arg, field_name, expected_value = option_data
-    arg_str = f" {arg}" if arg else ""
-    result = run_line(f"globus group set-policies {option}{arg_str} {group_id}")
+    result = run_line(["globus", "group", "set-policies", group_id] + add_args)
     assert "Group policies updated successfully" in result.output
 
     # TODO: expose get_last_request in globus_sdk._testing ?
