@@ -9,7 +9,6 @@ from globus_cli.termio import formatted_print
 from ._common import MEMBERSHIP_FIELDS, group_id_arg
 
 
-
 @click.option(
     "--high-assurance/--no-high-assurance",
     default=None,
