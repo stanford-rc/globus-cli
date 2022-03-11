@@ -5,7 +5,10 @@ from globus_cli.termio import FORMAT_TEXT_RECORD, formatted_print
 from ._common import (
     format_session_enforcement,
     group_id_arg,
+    parse_join_requests,
+    parse_members_visibility,
     parse_roles,
+    parse_signup_fields,
     parse_visibility,
 )
 
@@ -31,7 +34,10 @@ def group_show(
             ("Description", "description"),
             ("Type", "group_type"),
             ("Visibility", parse_visibility),
+            ("Membership Visibility", parse_members_visibility),
             ("Session Enforcement", format_session_enforcement),
+            ("Join Requests Allowed", parse_join_requests),
+            ("Signup Fields", parse_signup_fields),
             ("Roles", parse_roles),
         ],
     )

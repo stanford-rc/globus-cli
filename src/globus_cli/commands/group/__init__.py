@@ -5,6 +5,7 @@ from globus_cli.commands.group.join import group_join
 from globus_cli.commands.group.leave import group_leave
 from globus_cli.commands.group.list import group_list
 from globus_cli.commands.group.member import group_member
+from globus_cli.commands.group.set_policies import group_set_policies
 from globus_cli.commands.group.show import group_show
 from globus_cli.commands.group.update import group_update
 from globus_cli.parsing import group
@@ -24,3 +25,4 @@ group_command.add_command(group_member)
 group_command.add_command(group_invite)
 group_command.add_command(group_join)
 group_command.add_command(group_leave)
+group_command.add_command(group_set_policies)
