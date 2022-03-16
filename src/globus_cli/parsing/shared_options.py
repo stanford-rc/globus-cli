@@ -243,7 +243,7 @@ def delete_and_rm_options(
             type=click.File("r"),
             help=(
                 "Accept a batch of source/dest path pairs from a file. Use the "
-                " special `-` value to read from stdin; otherwise opens the file from "
+                "special `-` value to read from stdin; otherwise opens the file from "
                 "the argument and passes through lines from that file. Uses "
                 "SOURCE_ENDPOINT_ID and DEST_ENDPOINT_ID as passed on the commandline. "
                 "Commandline paths are still allowed and are used as prefixes to the "

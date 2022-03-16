@@ -24,7 +24,10 @@ def _print_subjects(data):
 @click.option(
     "--query-document",
     type=click.File("r"),
-    help="A complete query document to use to search the index.",
+    help=(
+        "A complete query document to use to search the index. Use the special `-` "
+        "value to read from stdin instead of a file."
+    ),
 )
 @click.option("--limit", type=int, help="Limit the number of results to return")
 @click.option(
