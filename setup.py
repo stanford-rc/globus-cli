@@ -4,12 +4,6 @@ import re
 from setuptools import find_packages, setup
 
 DEV_REQUIREMENTS = [
-    # lint
-    "flake8<5",
-    "isort<6",
-    "black==21.12b0",
-    "flake8-bugbear==22.1.11",
-    "mypy==0.931",
     # tests
     "pytest<7",
     "pytest-cov<3",
