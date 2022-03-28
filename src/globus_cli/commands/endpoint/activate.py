@@ -3,6 +3,7 @@ from typing import Dict, Optional, Union
 
 import click
 from globus_sdk import GlobusHTTPResponse
+from globus_sdk.config import get_webapp_url
 
 from globus_cli.login_manager import LoginManager, is_remote_session
 from globus_cli.parsing import command, endpoint_id_arg, mutex_option_group
@@ -276,7 +277,7 @@ def endpoint_activate(
 
     # web activation
     elif web:
-        url = f"https://app.globus.org/file-manager?origin_id={endpoint_id}"
+        url = f"{get_webapp_url()}file-manager?origin_id={endpoint_id}"
         if no_browser or is_remote_session():
             res = {"message": f"Web activation url: {url}", "url": url}
         else:
