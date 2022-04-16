@@ -209,6 +209,16 @@ fi
         "multiple patterns."
     ),
 )
+@click.option(
+    "--recursive-symlinks",
+    default="ignore",
+    show_default=True,
+    type=click.Choice(("ignore", "keep", "copy"), case_sensitive=False),
+    help=(
+        "For recursive transfers from POSIX gateways, how will symbolic links "
+        "be treated?"
+    ),
+)
 @click.argument(
     "source", metavar="SOURCE_ENDPOINT_ID[:SOURCE_PATH]", type=ENDPOINT_PLUS_OPTPATH
 )
@@ -227,6 +237,7 @@ def transfer_command(
     batch,
     sync_level,
     recursive,
+    recursive_symlinks,
     destination,
     source,
     checksum_algorithm,
@@ -370,6 +381,7 @@ def transfer_command(
         deadline=deadline,
         skip_source_errors=skip_source_errors,
         fail_on_quota_errors=fail_on_quota_errors,
+        recursive_symlinks=recursive_symlinks,
         additional_fields={
             "delete_destination_extra": delete,
             "skip_activation_check": skip_activation_check,
